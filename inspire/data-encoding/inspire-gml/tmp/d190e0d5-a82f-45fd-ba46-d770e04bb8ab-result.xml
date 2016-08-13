@@ -1,0 +1,232 @@
+<DsResultSet xmlns="http://www.interactive-instruments.de/etf/1.0">
+  <executableTestSuites>
+    <ExecutableTestSuite id="EID545f9e49-009b-4114-9333-7ca26413b5d4">
+      <label>INSPIRE GML encoding</label>
+      <description>This test suite examines GML documents against basic requirements for the GML encoding for spatial data sets in INSPIRE. This only covers application-schema-independent, generic requirements. Requirements related to specific application schemas are part of conformance classes with a dependency on this conformance class.</description>
+      <version>0.1.0</version>
+      <author>interactive instruments GmbH</author>
+      <creationDate>2016-08-09</creationDate>
+      <lastEditor>interactive instruments GmbH</lastEditor>
+      <lastUpdateDate>2016-08-09</lastUpdateDate>
+      <remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-encoding/inspire-gml</remoteResource>
+      <translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+      <StatisticalReportTableType id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
+        <label>Feature Type Statistics</label>
+        <description>The number of features per feature type and file in the dataset.</description>
+        <columnHeaderLabels>
+          <label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="file"/>
+          <label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureType"/>
+          <label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureCount"/>
+        </columnHeaderLabels>
+        <expression>('all all ' || count($features),
+for $feature in $features
+	let $ft := $feature/local-name()
+	group by $ft 
+	order by $ft
+	return 'all ' || $ft || ' ' || count($feature),
+if (count($db)&lt;=1) then () else
+for $file in $db
+	let $filename := local:filename($file)
+	order by $filename
+	return
+		for $feature in $features[local:filename(.)=$filename]
+			let $ft := $feature/local-name()
+			group by $ft 
+			order by $ft
+			return $filename || ' ' || $ft || ' ' || count($feature))</expression>
+      </StatisticalReportTableType>
+      <ParameterList>
+        <parameter name="files_to_test" required="true">
+          <defaultValue>.*</defaultValue>
+          <description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="filesToTest"/>
+          <allowedValues>.*</allowedValues>
+          <type>string</type>
+        </parameter>
+        <parameter name="tests_to_execute" required="false">
+          <defaultValue>.*</defaultValue>
+          <description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="testsToExecute"/>
+          <allowedValues>.*</allowedValues>
+          <type>string</type>
+        </parameter>
+        <parameter name="maximum_number_of_error_messages_per_test" required="false">
+          <defaultValue>100</defaultValue>
+          <description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="limitMessages"/>
+          <allowedValues>[1-9]+[0-9]*</allowedValues>
+          <type>integer</type>
+        </parameter>
+      </ParameterList>
+      <supportedTestObjectTypes>
+        <testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+      </supportedTestObjectTypes>
+      <Dependencies>
+        <dependency>
+          <reason bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="TODO"/>
+          <dependsOn ref="TODO UUID of GML 3.2 ETS"/>
+        </dependency>
+      </Dependencies>
+      <testModules>
+        <TestModule id="EID8e96257c-ae42-4123-b298-b8c5eda3a027">
+          <parent ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
+          <label>IGNORE</label>
+          <description>IGNORE</description>
+          <testCases>
+            <TestCase id="EIDf66872d4-3a1f-4581-a501-94200219bf13">
+              <parent ref="EID8e96257c-ae42-4123-b298-b8c5eda3a027"/>
+              <label>Basic tests</label>
+              <description>Verify that all documents contain GML features and use the expected character encoding.</description>
+              <dependency>
+                <!-- only for testing, this test case does not have a dependency -->
+                <reason bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="preCondition"/>
+                <dependsOn ref="TODO UUID of other Test Case"/>
+              </dependency>
+              <testSteps>
+                <TestStep id="EIDc177cf64-3a66-4ac4-92b9-61207aab8007">
+                  <parent ref="EIDf66872d4-3a1f-4581-a501-94200219bf13"/>
+                  <label>IGNORE</label>
+                  <description>IGNORE</description>
+                  <statementForExecution>not applicable</statementForExecution>
+                  <type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+                  <testAssertions>
+                    <TestAssertion id="EID928d8204-3015-4811-82fd-f4779b35385b">
+                      <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+                      <label>b.1: Document root element</label>
+                      <description>Check for each XML document that the root element is a GML feature or a GML feature collection.
+						 
+For feature collections the following root elements are recognised: 
+
+* wfs:FeatureCollection (WFS 2.0),
+* gml:FeatureCollection (GML 3.2),
+* base:SpatialDataSet (INSPIRE Base 3.2 or 3.3).
+
+This test is a pre-condition to identify the INSPIRE features in the test object.
+
+Limitations: Currently only feature collections are recognized as the test engine BaseX is not schema-aware. A new extension function is required to identify all feature elements.
+
+Relevant requirements and recommendations:
+
+* Recommendation 11 - For the exchange of spatial objects in GML, an XML document with a FeatureCollection root element from ISO 19142:2010 (WFS 2.0) should be used.
+
+Source: [Abstract Test Case 'Basic test'](http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml/basic)</description>
+                      <expectedResult/>
+                      <expression>(: TODO extension to identify all feature elements :)
+let $filesWithErrors := $db[not(wfs:FeatureCollection or gml:FeatureCollection or base32:SpatialDataSet or base:SpatialDataSet or gml:AbstractFeature)][position() le $limitErrors]
+return 
+(if ($filesWithErrors) then 'FAILED' else 'PASSED',
+ for $file in $filesWithErrors
+    order by local:filename($file)
+    let $root := $file/element()
+    return
+     (local:addMessage('errorInFile', map { 'filename': local:filename($root), 'count': '1' }),
+      local:addMessage('incorrectRoot', map { 'filename': local:filename($root), 'elementName': local-name($root), 'namespace': namespace-uri($root) })))</expression>
+                      <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+                      <translationTemplates>
+                        <translationTemplate ref="incorrectRoot"/>
+                        <translationTemplate ref="errorInFile"/>
+                      </translationTemplates>
+                    </TestAssertion>
+                    <TestAssertion id="EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009">
+                      <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+                      <label>b.2: Character encoding</label>
+                      <description>This test ensures that all linguistic texts can be encoded consistently and in any language – which in turn simplifies the processing of data. The use of UTF-8 also aligns with common practice and is the default character encoding for XML documents. 
+						 
+Inspect each XML document. If an XML declaration exists, verify that the encoding attribute has the value "UTF-8" or that the attribute is missing.
+
+Limitations: Currently the test is disabled as the test needs an BaseX extension - the XML declaration is NOT part of the node set in XML databases.
+
+Relevant requirements: 
+
+* Requirement 12 - XML documents shall be required to be encoded using UTF-8 as character encoding.
+
+Source: [Abstract Test Case 'Character encoding'](http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml/char-encoding)</description>
+                      <expectedResult/>
+                      <expression>() (: TODO :)</expression>
+                      <type ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
+                      <translationTemplates>
+                        <translationTemplate ref="notUTF8"/>
+                        <translationTemplate ref="errorInFile"/>
+                      </translationTemplates>
+                    </TestAssertion>
+                  </testAssertions>
+                </TestStep>
+              </testSteps>
+            </TestCase>
+          </testCases>
+        </TestModule>
+      </testModules>
+    </ExecutableTestSuite>
+  </executableTestSuites>
+  <testTaskResults>
+    <TestTaskResult id="d190e0d5-a82f-45fd-ba46-d770e04bb8ab">
+      <resultStatus>PASSED</resultStatus>
+      <startTimestamp>2016-08-13T16:25:01.119+02:00</startTimestamp>
+      <duration>0</duration>
+      <resultedFrom ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
+      <testObject ref="d93df45e-e287-433f-a0b9-42ed51e4b8b3"/>
+      <attachements>
+        <Attachment>
+          <label>Log file</label>
+          <encoding>UTF-8</encoding>
+          <mimeType>text/plain</mimeType>
+          <referencedData href="file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-log.txt"/>
+        </Attachment>
+        <Attachment>
+          <label>Feature statistics</label>
+          <encoding>UTF-8</encoding>
+          <mimeType>application/xml</mimeType>
+          <referencedData href="file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-stat.xml"/>
+        </Attachment>
+        <Attachment>
+          <label>XQuery executed against the dataset</label>
+          <encoding>UTF-8</encoding>
+          <mimeType>text/plain</mimeType>
+          <referencedData href="file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-query.xq"/>
+        </Attachment>
+      </attachements>
+      <testModuleResults>
+        <TestModuleResult id="93beb5ac-91d1-4730-ac8c-105e3fd72792">
+          <parent ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
+          <resultStatus>PASSED</resultStatus>
+          <startTimestamp>2016-08-13T16:25:01.119+02:00</startTimestamp>
+          <duration>0</duration>
+          <resultedFrom ref="EID8e96257c-ae42-4123-b298-b8c5eda3a027"/>
+          <testCaseResults>
+            <TestCaseResult id="85da74e6-f839-4a6f-b610-a3d6d9844e08">
+              <parent ref="EID8e96257c-ae42-4123-b298-b8c5eda3a027"/>
+              <resultStatus>PASSED</resultStatus>
+              <startTimestamp>2016-08-13T16:25:01.119+02:00</startTimestamp>
+              <duration>0</duration>
+              <resultedFrom ref="EIDf66872d4-3a1f-4581-a501-94200219bf13"/>
+              <testStepResults>
+                <TestStepResult id="6048519c-7f80-4ca5-8f70-92d92c174df5">
+                  <parent ref="EIDf66872d4-3a1f-4581-a501-94200219bf13"/>
+                  <resultStatus>PASSED</resultStatus>
+                  <startTimestamp>2016-08-13T16:25:01.119+02:00</startTimestamp>
+                  <duration>0</duration>
+                  <resultedFrom ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+                  <testAssertionResults>
+                    <TestAssertionResult id="c5b99a16-4eb9-4ce3-8eb4-360c2c5e3a45">
+                      <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+                      <resultStatus>PASSED</resultStatus>
+                      <startTimestamp>2016-08-13T16:25:01.119+02:00</startTimestamp>
+                      <duration>0</duration>
+                      <resultedFrom ref="EID928d8204-3015-4811-82fd-f4779b35385b"/>
+                      <messages/>
+                    </TestAssertionResult>
+                    <TestAssertionResult id="d6e9e0da-cbf0-457f-8d0a-77cdda33a96b">
+                      <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+                      <resultStatus>NOT_APPLICABLE</resultStatus>
+                      <startTimestamp>2016-08-13T16:25:00.995+02:00</startTimestamp>
+                      <duration>0</duration>
+                      <resultedFrom ref="EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009"/>
+                      <messages/>
+                    </TestAssertionResult>
+                  </testAssertionResults>
+                </TestStepResult>
+              </testStepResults>
+            </TestCaseResult>
+          </testCaseResults>
+        </TestModuleResult>
+      </testModuleResults>
+    </TestTaskResult>
+  </testTaskResults>
+</DsResultSet>
