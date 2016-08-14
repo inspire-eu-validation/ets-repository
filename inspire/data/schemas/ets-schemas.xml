@@ -1,0 +1,589 @@
+<ExecutableTestSuite id="EID09820daf-62b2-4fa3-a95f-56a0d2b7c4d8" xmlns="http://www.interactive-instruments.de/etf/1.0">
+	<label>INSPIRE GML application schemas </label>
+	<description><![CDATA[This test suite examines GML documents against basic requirements for the GML encoding for spatial data sets in INSPIRE. This only covers application-schema-independent, generic requirements. Requirements related to specific application schemas are part of conformance classes with a dependency on this conformance class.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml">Conformance Class 'INSPIRE GML encoding'</a>]]></description>
+	<version>0.1.0</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-14</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-14</lastUpdateDate>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/schemas</remoteResource>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
+		<label>Feature Type Statistics</label>
+		<description>The number of features per feature type and file in the dataset.</description>
+		<columnHeaderLabels>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="file"/>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureType"/>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureCount"/>
+		</columnHeaderLabels>
+		<expression>
+('all all ' || count($features),
+for $feature in $features
+	let $ft := $feature/local-name()
+	group by $ft 
+	order by $ft
+	return 'all ' || $ft || ' ' || count($feature),
+if (count($db)&lt;=1) then () else
+for $file in $db
+	let $filename := local:filename($file)
+	order by $filename
+	return
+		for $feature in $features[local:filename(.)=$filename]
+			let $ft := $feature/local-name()
+			group by $ft 
+			order by $ft
+			return $filename || ' ' || $ft || ' ' || count($feature))
+		</expression>
+	</StatisticalReportTableType>
+	<ParameterList>
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="maximum_number_of_error_messages_per_test" required="false">
+			<defaultValue>100</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="limitMessages"/>
+			<allowedValues>[1-9]+[0-9]*</allowedValues>
+			<type>integer</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+	  <testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<Dependencies>
+		<dependency>
+			<reason bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="directDependency"/>
+			<dependsOn ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
+		</dependency>
+	</Dependencies>
+	<testModules>
+	  <TestModule id="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b">
+		 <parent ref="EID09820daf-62b2-4fa3-a95f-56a0d2b7c4d8"/>
+		 <label>IGNORE</label>
+		 <description>IGNORE</description>
+		 <testCases>
+			<TestCase id="EID071a80e9-332e-4219-b600-329f47b98ef1">
+			  <parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+			  <label>Schema</label>
+			  <description>Verify whether each relevant element of the dataset under inspection carries a name specified in the target application schema.</description>
+			  <testSteps>
+				<TestStep id="EID871889b6-5664-4498-8762-849fb77a084f">
+					<parent ref="EID071a80e9-332e-4219-b600-329f47b98ef1"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EID09ad14e3-d46f-42fc-9b01-64cb6ed2134c">
+						 <parent ref="EID871889b6-5664-4498-8762-849fb77a084f"/>
+						 <label>a.1: Mapping of source data to INSPIRE</label>
+						 <description><![CDATA[Verify whether each relevant element of the source data set under inspection has been properly mapped to the INSPIRE application schemas. Inspect the documentation of the source data set and determine, if all relevant information has been mapped correctly to the INSPIRE application schema, i.e. that spatial object types, data types, attributes, association roles, code lists, and enumerations are mapped to the INSPIRE application schemas with the correct designation of mnemonic names.<br/><br/>
+Relevant requirements:<br/>
+<li>Article 4(1) - For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/schema">Abstract Test Case 'Schema'</a>]]></description>
+						 <expectedResult/>
+						 <expression/>
+						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+						 <translationTemplates/>
+					  </TestAssertion>
+					  <TestAssertion id="EID77f090cf-48ef-46f3-901b-6ef2db4a1599">
+						 <parent ref="EID871889b6-5664-4498-8762-849fb77a084f"/>
+						 <label>a.2: Modelling of additional spatial object types</label>
+						 <description><![CDATA[Inspect the XML Schema namespace of each feature element. If a namespace URI does not start with "http://inspire.ec.europa.eu/schemas/" or "urn:x-inspire:specification:gmlas:" it is not one of the approved INSPIRE application schema namespaces. Review the extension documentation for the identified namespaces to check that any extensions do not overlap with the spatial object types and associated data types and enumerations that are defined in Annexes II, III and IV of the Implementing Rule.<br/><br/>
+Relevant requirements:<br/>
+<li>Article 4(1) - For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/schema">Abstract Test Case 'Schema'</a>]]></description>
+						 <expectedResult/>
+						 <expression/>
+						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+						 <translationTemplates/>
+					  </TestAssertion>
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+			<TestCase id="EID2c6fe882-7c53-47f2-b4c4-66b15c248be4">
+			  <parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+			  <label>Schema validation</label>
+			  <description>Verify that all XML documents validate against their XML schema(s).</description>
+			  <testSteps>
+				<TestStep id="EID77f090cf-48ef-46f3-901b-6ef2db4a1599">
+					<parent ref="EID2c6fe882-7c53-47f2-b4c4-66b15c248be4"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EID40646a32-7b85-411f-abc7-1eba528d7d95">
+						 <parent ref="EID77f090cf-48ef-46f3-901b-6ef2db4a1599"/>
+						 <label>b.1: xsi:schemaLocation attribute</label>
+						 <description><![CDATA[Verify for each XML document that the xsi:schemaLocation attribute is provided in the root element.<br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 3: Common Types. Types that are common to several of the themes listed in Annexes I, II and III to Directive 2007/2/EC shall conform to the definitions and constraints and include the attributes and association roles set out in Annex I.</li>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 5 (2): Types. Types that are a sub-type of another type shall also include all this type‘s attributes and association roles.</li>
+<li>IR Requirement Article 5 (3): Types. Abstract types shall not be instantiated.</li>
+<li>IR Requirement Article 6 (5): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types that have an enumeration type may only take values from the lists specified for the enumeration type.</li>
+<li>IR Requirement Article 9 (1): Identifier Management. The data type Identifier defined in Section 2.1 of Annex I shall be used as a type for the external object identifier of a spatial object.</li>
+<li>TG Requirement 1: Spatial object types and data types shall comply with the multiplicities defined for the attributes and association roles in this section.</li>
+<li>TG Requirement 6: Data instance (XML) documents shall validate without error against the provided XML schema.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/schema-validation">Abstract Test Case 'Schema validation'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+let $filesWithErrors := $db[not(/*/@xsi:schemaLocation)][position() le $limitErrors]
+return
+(if ($filesWithErrors) then 'FAILED' else 'PASSED',
+ for $file in $filesWithErrors
+    order by local:filename($file)
+    let $root := $file/element()
+    return
+     (local:addMessage('errorInFile', map { 'filename': local:filename($root), 'count': '1' }),
+      local:addMessage('noSchemaLocation', map { 'filename': local:filename($root) })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="noSchemaLocation"/>
+							<translationTemplate ref="errorInFile"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EID0eaac0f2-9ab3-44ab-9f02-4ee0a1587d14">
+						 <parent ref="EID77f090cf-48ef-46f3-901b-6ef2db4a1599"/>
+						 <label>b.2: validate XML documents</label>
+						 <description><![CDATA[Validate each document against the schema(s) specified in the xsi:schemaLocation attribute using strict XML schema validation.<br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 3: Common Types. Types that are common to several of the themes listed in Annexes I, II and III to Directive 2007/2/EC shall conform to the definitions and constraints and include the attributes and association roles set out in Annex I.</li>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 5 (2): Types. Types that are a sub-type of another type shall also include all this type‘s attributes and association roles.</li>
+<li>IR Requirement Article 5 (3): Types. Abstract types shall not be instantiated.</li>
+<li>IR Requirement Article 6 (5): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types that have an enumeration type may only take values from the lists specified for the enumeration type.</li>
+<li>IR Requirement Article 9 (1): Identifier Management. The data type Identifier defined in Section 2.1 of Annex I shall be used as a type for the external object identifier of a spatial object.</li>
+<li>TG Requirement 1: Spatial object types and data types shall comply with the multiplicities defined for the attributes and association roles in this section.</li>
+<li>TG Requirement 6: Data instance (XML) documents shall validate without error against the provided XML schema.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/schema-validation">Abstract Test Case 'Schema validation'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+let $errors := for $file in $db
+  let $messages := validate:xsd-info($file)
+  let $errors := count($messages)
+  let $root := $file/element()
+  return
+   if ($errors>0) then
+    (local:addMessage('errorInFile', map { 'filename': local:filename($root), 'count': string($errors) }),
+     local:addMessage('invalidSchema', map { 'filename': local:filename($root), 'issues': fn:string-join($messages,file:line-separator()) }))
+   else ()						 
+return
+(if ($errors) then 'FAILED' else 'PASSED',
+ $errors)
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="invalidSchema"/>
+							<translationTemplate ref="errorInFile"/>
+						 </translationTemplates>
+					  </TestAssertion>					  
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+			<TestCase id="EID18099150-f7ac-4174-a7b6-45121383a5d3">
+			  <parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+			  <label>GML model</label>
+			  <description>Verify that the XML documents meet the requirements of the GML model that are not tested by XML schema validation alone.</description>
+			  <testSteps>
+				<TestStep id="EIDc04ade3c-0ad2-4fa5-9977-d83022855e3b">
+					<parent ref="EID18099150-f7ac-4174-a7b6-45121383a5d3"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EIDb33aaf9a-898f-4625-b87f-81c07ac09adf">
+						 <parent ref="EIDc04ade3c-0ad2-4fa5-9977-d83022855e3b"/>
+						 <label>c.1: Consistency with the GML model</label>
+						 <description><![CDATA[Inspect each property element and verify that it either carries a URI reference to an object (@xlink:href) that can be retrieved using HTTP GET, contains one or more object elements as child elements or contains a non-empty text node (whitespace is trimmed before checking for empty text).<br/><br/>
+Strictly, empty string values are valid according to the GML model, but they are not an appropriate value for any of the string-valued attributes in INSPIRE.<br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/gml-model">Abstract Test Case 'GML model'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+let $propertiesWithErrors := $features/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))>0) or @xsi:nil eq 'true')][position() le $limitErrors]
+let $featureIdsWithErrors := fn:distinct-values($propertiesWithErrors/../@gml:id)
+return
+(if ($propertiesWithErrors) then 'FAILED' else 'PASSED',
+ for $gmlid in $featureIdsWithErrors
+   order by $gmlid
+   let $feature := $features[@gml:id=$gmlid]
+   let $properties := $feature/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))>0) or @xsi:nil eq 'true')]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $gmlid, 'count': string(count($properties)) }),
+      local:addMessage('emptyValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $gmlid, 'propertyNames': fn:string-join($properties/local-name(),', ') })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="emptyValue"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>			
+					  <TestAssertion id="EIDb62f96a5-349f-40dd-b777-1e52ea09b686">
+						 <parent ref="EIDc04ade3c-0ad2-4fa5-9977-d83022855e3b"/>
+						 <label>c.2: nilReason attributes require xsi:nil=true</label>
+						 <description><![CDATA[Inspect each XML element that represents a feature property and that has a nilReason XML attribute. Verify that xsi:nil='true' is present in the property element, i.e. a reason is only provided in properties that are void / nil.<br/><br/>
+Limitation: This test currently does not analyse properties of data types or objects embedded in a feature.<br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/gml-model">Abstract Test Case 'GML model'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+let $propertiesWithErrors := $features/*[@nilReason and not(@xsi:nil eq 'true')][position() le $limitErrors]
+let $featureIdsWithErrors := fn:distinct-values($propertiesWithErrors/../@gml:id)
+return
+(if ($propertiesWithErrors) then 'FAILED' else 'PASSED',
+ for $gmlid in $featureIdsWithErrors
+   order by $gmlid
+   let $feature := $features[@gmlid=$gmlid]
+   let $properties := $feature/*[@nilReason and not(@xsi:nil eq 'true')]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $gmlid, 'count': string(count($properties)) }),
+      local:addMessage('nilMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $gmlid, 'propertyNames': fn:string-join($properties/local-name(),', ') })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="nilMissing"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EIDabc9199e-d5a8-4829-80bd-09b7e49e2a76">
+						 <parent ref="EIDc04ade3c-0ad2-4fa5-9977-d83022855e3b"/>
+						 <label>c.3: nilReason values</label>
+						 <description><![CDATA[Inspect all nilReason values and verify that either the values from the INSPIRE registry or the pre-defined values from the GML standard are used. Otherwise report incorrectReason. Valid values are:<br/>
+<li>'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Unknown'</li>
+<li>'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Unpopulated'</li>
+<li>'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Withheld'</li>
+<li>'unknown'</li>
+<li>'other:unpopulated'</li>
+<li>'withheld'</li><br/><br/>
+Limitation: This test currently does not analyse properties of data types or objects embedded in a feature.<br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/gml-model">Abstract Test Case 'GML model'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+let $values := ( 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Unknown', 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Unpopulated', 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Withheld', 'unknown', 'other:unpopulated', 'withheld' )
+let $propertiesWithErrors := $features/*[@xsi:nil eq 'true' and not(@nilReason =  $values)][position() le $limitErrors]
+let $featureIdsWithErrors := fn:distinct-values($propertiesWithErrors/../@gml:id)
+return
+(if ($propertiesWithErrors) then 'FAILED' else 'PASSED',
+ for $gmlid in $featureIdsWithErrors
+   order by $gmlid
+   let $feature := $features[@gmlid=$gmlid]
+   let $properties := $feature/*[@xsi:nil eq 'true' and not(@nilReason =  $values)]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $gmlid, 'count': string(count($properties)) }),
+      local:addMessage('incorrectReason', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $gmlid, 'propertyNames': fn:string-join($properties/local-name(),', ') })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="incorrectReason"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>					  			
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+			<TestCase id="EID7e0765c8-c149-4cf2-956f-ca4db0e0ed94">
+			  <parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+			  <label>Simple features</label>
+			  <description>Verify that all features that are not excluded from the default requirement that geometries meet the requirements of the Simple Features standard fulfill the requirements.</description>
+			  <testSteps>
+				<TestStep id="EID73531400-70ac-4374-83fd-5df504d5cfba">
+					<parent ref="EID7e0765c8-c149-4cf2-956f-ca4db0e0ed94"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EIDf625c820-71a1-41e2-afb2-11cdc7d5a01b">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.1: No spatial topology objects</label>
+						 <description><![CDATA[Verify that no spatial topology types are used, i.e. check that none of the GML object elements for spatial topology are used as child elements of a feature from the application schema.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//*[self::gml:Node|self::gml:Edge|self::gml:Face|self::gml:TopoSolid|self::gml:TopoPoint|self::gml:TopoCurve|self::gml:TopoSurface|self::gml:TopoVolume|self::gml:TopoComplex]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $element := $feature//*[self::gml:Node|self::gml:Edge|self::gml:Face|self::gml:TopoSolid|self::gml:TopoPoint|self::gml:TopoCurve|self::gml:TopoSurface|self::gml:TopoVolume|self::gml:TopoComplex][1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('spatialTopologyTypeFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'elementName': name($element) })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="spatialTopologyTypeFound"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>			
+					  <TestAssertion id="EID44cf3e26-809e-49a9-8ec0-750a373e9ff1">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.2: No non-linear interpolation</label>
+						 <description><![CDATA[Verify that only linear interpolation is used, i.e. check that none of the nonlinear GML curve segment object elements are used as child elements of a feature from the application schema.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//gml:Curve/gml:segments/*[not(self::gml:LineStringSegment)]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $element := $feature//gml:Curve/gml:segments/*[not(self::gml:LineStringSegment)][1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('invalidInterpolationFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'elementName': name($element) })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="invalidInterpolationFound"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EID3d7ad0b2-c9f5-4910-aa09-b3226b720f7d">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.3: Surface geometry elements</label>
+						 <description><![CDATA[Verify that only gml:Polygon or gml:Surface are used, i.e. check that none of the disallowed GML surface object elements are used as child elements of a feature from the application schema.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//*[self::gml:OrientableSurface|self::gml:CompositeSurface|self::gml:PolyhedralSurface|self::gml:Tin|self::gml:TriangulatedSurface]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $element := $feature//*[self::gml:OrientableSurface|self::gml:CompositeSurface|self::gml:PolyhedralSurface|self::gml:Tin|self::gml:TriangulatedSurface][1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('invalidSurfaceElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'elementName': name($element) })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="invalidSurfaceElementFound"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>			
+					  <TestAssertion id="EID008b7c4f-b315-4596-b5e9-4a29910eb43f">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.4: No non-planar interpolation</label>
+						 <description><![CDATA[Verify that only planar interpolation is used, i.e. check that only PolygonPatch is used as a GML surface patch object elements in features from the application schema.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//gml:Surface/gml:patches/*[not(self::gml:PolygonPatch)]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $element := $feature//gml:Surface/gml:patches/*[not(self::gml:PolygonPatch)][1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('invalidSurfacePatchElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'elementName': name($element) })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="invalidSurfacePatchElementFound"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>			
+					  <TestAssertion id="EID4f2f9722-897a-4bad-b11e-d4e119b6690d">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.5: Geometry elements</label>
+						 <description><![CDATA[Verify that only valid GML geometry elements are used, i.e. check that none of the disallowed GML geometry object elements are used as child elements of a feature from the application schema.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//*[self::gml:Solid|self::gml:MultiSolid|self::gml:CompositeSolid|self::gml:CompositeCurve|self::gml:Grid]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $element := $feature//*[self::gml:Solid|self::gml:MultiSolid|self::gml:CompositeSolid|self::gml:CompositeCurve|self::gml:Grid][1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('invalidGeometryElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'elementName': name($element) })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="invalidGeometryElementFound"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EIDbc49770c-4eab-4330-8462-af0664ae0b80">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.6: Point coordinates in gml:pos</label>
+						 <description><![CDATA[Verify that in points only gml:pos is used for coordinates.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//gml:Point/*[not(self::gml:pos)]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $element := $feature//gml:Point/*[not(self::gml:pos)][1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('invalidPositionElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'elementName': name($element), 'geometryType': 'point', 'posElementName': 'gml:pos' })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="invalidPositionElementFound"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EID894c6a96-4fb2-4921-ad98-1d2a52985887">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.7: Curve/Surface coordinates in gml:posList</label>
+						 <description><![CDATA[Verify that in curves and surfaces only gml:posList is used for coordinates.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//*[self::gml:LineString|self::gml:LineStringSegment|self::gml:LinearRing]/*[not(self::gml:posList)]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $element := ($feature//*[self::gml:LineString|self::gml:LineStringSegment|self::gml:LinearRing|self::gml:Arc|self::gml:Circle]/*[not(self::gml:posList)])[1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('invalidPositionElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'elementName': name($element), 'geometryType': 'curve/surface', 'posElementName': 'gml:posList' })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="invalidPositionElementFound"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EID160e4f83-e9c3-45c5-b684-20027f8f191a">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.8: No array property elements</label>
+						 <description><![CDATA[Verify that geometry aggregates do not use the GML array property elements, i.e. check that the only the regular property elements are used, but not the array property elements. For example, for a gml:MultiPoint, only gml:pointMember may be used, not gml:pointMembers.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//*[self::gml:MultiPoint/gml:pointMembers|self::gml:MultiCurve/gml:curveMembers|self::gml:MultiSurface/gml:surfaceMembers|self::gml:MultiGeometry/gml:geometryMembers]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $element := ($feature//*[self::gml:MultiPoint|self::gml:MultiCurve|self::gml:MultiSurface|self::gml:MultiGeometry]/*[self::gml:pointMembers|self::gml:curveMembers|self::gml:surfaceMembers|self::gml:geometryMembers])[1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('arrayElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'elementName': name($element) })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="arrayElementFound"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EIDf9e92525-152a-41fa-9990-42691f39b1ce">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.9: 1, 2 or 3 coordinate dimensions</label>
+						 <description><![CDATA[Coordinate reference systems may have 1, 2 or 3 dimensions, i.e. check all occurances of srsDimension and for values greater than '3'.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := $featuresToInspect[.//*[@srsDimension > 3]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $dimension := $feature//@srsDimension[. > 3][1]
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('tooManyDimensions', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'dimension': string($dimension) })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="tooManyDimensions"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>					  
+					  <TestAssertion id="EID79aec969-3ca0-4190-a6e9-8b49682f414a">
+						 <parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+						 <label>d.10: Validate geometries</label>
+						 <description><![CDATA[Verify that in curves and surfaces only gml:posList is used for coordinates, i.e. validate all geometry elements of a feature from the application schema using a geometry library.<br/><br/>
+<li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/simple-features">Abstract Test Case 'Simple features'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO: add other feature types to exclude; extend with subtypes :)
+let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresWithErrors := for $feature in $featuresToInspect
+  return
+   if (contains(ggeo:validate($feature,'110'),'F')) then $feature else ()
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('invalidGeometry', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="invalidGeometry"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>					  
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+		 </testCases>
+	  </TestModule>
+	</testModules>
+</ExecutableTestSuite>

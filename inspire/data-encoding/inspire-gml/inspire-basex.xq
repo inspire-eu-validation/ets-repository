@@ -28,7 +28,7 @@ for $case in $module//*[local-name()='TestCase']
 if ($disabled) then "
   let $startmessage := prof:void(local:start('" || $assertion/@id || "')) 
   let $endmessage := prof:void(local:end('" || $assertion/@id || "','" || $disabled || "'))
-  let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': disabled')
+  let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': " || $disabled || "')
   return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
     <parent ref='" || $step/@id || "'/>
@@ -82,11 +82,9 @@ return
       return "
 let $timestampStep := fn:current-dateTime()
 let $startmessage := prof:void(local:start('" || $step/@id || "')) 
-let $logentry := local:log('Test Step ''" || $step/etf:label || "'' started')
 let $assertionresults := (" || string-join( $assertion-results, ',' ) || ")
 let $status := if ($dependencyResult) then local:status($assertionresults/etf:resultStatus) else 'SKIPPED'
 let $endmessage := prof:void(local:end('" || $step/@id || "',$status))
-let $logentry := local:log('Test Step ''" || $step/etf:label || "'' finished: ' || $status)
 return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
 <parent ref='" || $case/@id || "'/>
@@ -119,11 +117,9 @@ return
 return "
 let $timestampModule := fn:current-dateTime()
 let $startmessage := prof:void(local:start('" || $module/@id || "'))
-let $logentry := local:log('Test Module ''" || $module/etf:label || "'' started')
 let $testcaseresults := (" || string-join( $test-case-results, ',' ) || ")
 let $status := local:status($testcaseresults/etf:resultStatus)
 let $endmessage := prof:void(local:end('" || $module/@id || "',$status))
-let $logentry := local:log('Test Module ''" || $module/etf:label || "'' finished: ' || $status)
 return
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
 <parent ref='" || $ets/@id || "'/>
@@ -251,7 +247,7 @@ declare variable $dbCount external := 1;
 declare variable $dbDir external;
 
 (: Project internals :)
-declare variable $assertionsFile := "ets-inspire-gml.xml";
+declare variable $assertionsFile := "ets-schemas.xml";
 declare variable $testQueryFile := "testquery.xq";
 
 declare variable $limitMessages := xs:int( $maximum_number_of_error_messages_per_test );
