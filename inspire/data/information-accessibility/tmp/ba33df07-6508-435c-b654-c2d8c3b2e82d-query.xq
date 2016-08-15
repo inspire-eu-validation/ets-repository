@@ -3,12 +3,14 @@ declare namespace hy-n3='urn:x-inspire:specification:gmlas:HydroNetwork:3.0';
 declare namespace hy-p3='urn:x-inspire:specification:gmlas:HydroPhysicalWaters:3.0'; 
 declare namespace net3='urn:x-inspire:specification:gmlas:Network:3.2'; 
 declare namespace gn3='urn:x-inspire:specification:gmlas:GeographicalNames:3.0'; 
+declare namespace cp3='urn:x-inspire:specification:gmlas:CadastralParcels:3.0'; 
 declare namespace base32='urn:x-inspire:specification:gmlas:BaseTypes:3.2'; 
 declare namespace hy='http://inspire.ec.europa.eu/schemas/hy/4.0'; 
 declare namespace hy-n='http://inspire.ec.europa.eu/schemas/hy-n/4.0'; 
 declare namespace hy-p='http://inspire.ec.europa.eu/schemas/hy-p/4.0'; 
 declare namespace net='http://inspire.ec.europa.eu/schemas/net/4.0'; 
 declare namespace gn='http://inspire.ec.europa.eu/schemas/gn/4.0'; 
+declare namespace cp='http://inspire.ec.europa.eu/schemas/cp/4.0'; 
 declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3'; 
 declare namespace gml='http://www.opengis.net/gml/3.2'; 
 declare namespace wfs='http://www.opengis.net/wfs/2.0'; 
@@ -132,37 +134,36 @@ let $logentry := local:log('Statistics table: ' || $duration || ' ms')
 
 
 let $timestampSuite := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EID545f9e49-009b-4114-9333-7ca26413b5d4'))
-let $logentry := local:log('Test Suite ''INSPIRE GML encoding'' started')
+let $startmessage := prof:void(local:start('EID499937ea-0590-42d2-bd7a-1cafff35ecdb'))
+let $logentry := local:log('Test Suite ''Information accessibility'' started')
 let $testmoduleresults := (
 let $timestampModule := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EID8e96257c-ae42-4123-b298-b8c5eda3a027'))
-let $logentry := local:log('Test Module ''IGNORE'' started')
+let $startmessage := prof:void(local:start('EIDa2530875-5e30-4538-9ca6-3c5876c39515'))
 let $testcaseresults := (
 let $timestampCase := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EIDf66872d4-3a1f-4581-a501-94200219bf13'))
-let $logentry := local:log('Test Case ''Basic tests'' started')
-let $dependencyResult := local:passed('TODO UUID of other Test Case')
+let $startmessage := prof:void(local:start('EIDf27df7ae-e6de-4d30-b189-230850ec78a2'))
+let $logentry := local:log('Test Case ''Coordinate reference systems'' started')
+let $dependencyResult := true()
 let $teststepresults := (
 let $timestampStep := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EIDc177cf64-3a66-4ac4-92b9-61207aab8007')) 
-let $logentry := local:log('Test Step ''IGNORE'' started')
+let $startmessage := prof:void(local:start('EID1e8dd827-c0f4-4004-aa0d-475155895ca4')) 
 let $assertionresults := (
 if ($dependencyResult) then
-let $startmessage := prof:void(local:start('EID928d8204-3015-4811-82fd-f4779b35385b')) 
+let $startmessage := prof:void(local:start('EID0bb601c0-8bde-4cbf-972a-aa4425669649')) 
 let $start := prof:current-ms()
 let $timestampAssertion := fn:current-dateTime()
 let $result :=
-try { (: TODO extension to identify all feature elements :)
-let $filesWithErrors := $db[not(wfs:FeatureCollection or gml:FeatureCollection or base32:SpatialDataSet or base:SpatialDataSet or gml:AbstractFeature)][position() le $limitErrors]
-return 
-(if ($filesWithErrors) then 'FAILED' else 'PASSED',
- for $file in $filesWithErrors
-    order by local:filename($file)
-    let $root := $file/element()
-    return
-     (local:addMessage('errorInFile', map { 'filename': local:filename($root), 'count': '1' }),
-      local:addMessage('incorrectRoot', map { 'filename': local:filename($root), 'elementName': local-name($root), 'namespace': namespace-uri($root) }))) } catch * {
+try { let $uris := distinct-values(($features//@srsName,$features//@frame))
+let $baduris := for $uri in $uris return if (doc-available($uri)) then () else $uri
+let $featuresWithErrors := $features[.//@srsName[. = $baduris] or .//@frame[. = $baduris]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $featureuris := ($feature//@srsName[. = $baduris]|$feature//@frame[. = $baduris])
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': string(count($featureuris)) }),
+      for $uri in $featureuris return local:addMessage('brokenLinkCRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'rsid': $uri }))) } catch * {
   let $text := '[' || $err:code || '] ' || $err:description || ' 
 ' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
   return ('FAILED', local:addMessage('systemError', map { '$text': $text }))
@@ -171,113 +172,99 @@ let $status_returned := $result[1]
 let $messages := $result[position()>1]
 let $status := if ($status_returned = ('PASSED','FAILED','WARNING','PASSED_MANUAL','INFO','SKIPPED')) then $status_returned else 'UNDEFINED'
 let $duration := prof:current-ms()-$start
-let $endmessage := prof:void(local:end('EID928d8204-3015-4811-82fd-f4779b35385b',$status))
-let $logentry := local:log('Test Assertion ''b.1: Document root element'': ' || $status || ' - ' ||$duration || ' ms')
+let $endmessage := prof:void(local:end('EID0bb601c0-8bde-4cbf-972a-aa4425669649',$status))
+let $logentry := local:log('Test Assertion ''a.1:'': ' || $status || ' - ' ||$duration || ' ms')
 return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EIDc177cf64-3a66-4ac4-92b9-61207aab8007'/>
+    <parent ref='EID1e8dd827-c0f4-4004-aa0d-475155895ca4'/>
     <resultStatus>{$status}</resultStatus>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>{$duration}</duration>
-    <resultedFrom ref='EID928d8204-3015-4811-82fd-f4779b35385b'/>
+    <resultedFrom ref='EID0bb601c0-8bde-4cbf-972a-aa4425669649'/>
     <messages>{$messages}</messages>
   </TestAssertionResult>
 else
-let $startmessage := prof:void(local:start('EID928d8204-3015-4811-82fd-f4779b35385b')) 
+let $startmessage := prof:void(local:start('EID0bb601c0-8bde-4cbf-972a-aa4425669649')) 
 let $timestampAssertion := fn:current-dateTime()
 let $status := 'SKIPPED'
-let $endmessage := prof:void(local:end('EID928d8204-3015-4811-82fd-f4779b35385b',$status))
-let $logentry := local:log('Test Assertion ''b.1: Document root element'': ' || $status)
+let $endmessage := prof:void(local:end('EID0bb601c0-8bde-4cbf-972a-aa4425669649',$status))
+let $logentry := local:log('Test Assertion ''a.1:'': ' || $status)
 return
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EIDc177cf64-3a66-4ac4-92b9-61207aab8007'/>
+    <parent ref='EID1e8dd827-c0f4-4004-aa0d-475155895ca4'/>
     <resultStatus>{$status}</resultStatus>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>0</duration>
-    <resultedFrom ref='EID928d8204-3015-4811-82fd-f4779b35385b'/>
-    <messages/>
-  </TestAssertionResult>,
-  let $startmessage := prof:void(local:start('EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009')) 
-  let $endmessage := prof:void(local:end('EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009','NOT_APPLICABLE'))
-  let $logentry := local:log('Test Assertion ''b.2: Character encoding'': disabled')
-  return 
-  <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EIDc177cf64-3a66-4ac4-92b9-61207aab8007'/>
-    <resultStatus>NOT_APPLICABLE</resultStatus>
-    <startTimestamp>2016-08-13T16:25:00.995+02:00</startTimestamp>
-    <duration>0</duration>
-    <resultedFrom ref='EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009'/>
+    <resultedFrom ref='EID0bb601c0-8bde-4cbf-972a-aa4425669649'/>
     <messages/>
   </TestAssertionResult>)
 let $status := if ($dependencyResult) then local:status($assertionresults/etf:resultStatus) else 'SKIPPED'
-let $endmessage := prof:void(local:end('EIDc177cf64-3a66-4ac4-92b9-61207aab8007',$status))
-let $logentry := local:log('Test Step ''IGNORE'' finished: ' || $status)
+let $endmessage := prof:void(local:end('EID1e8dd827-c0f4-4004-aa0d-475155895ca4',$status))
 return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-<parent ref='EIDf66872d4-3a1f-4581-a501-94200219bf13'/>
+<parent ref='EIDf27df7ae-e6de-4d30-b189-230850ec78a2'/>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampStep}</startTimestamp>
 <duration>{sum($assertionresults/duration)}</duration>
-<resultedFrom ref='EIDc177cf64-3a66-4ac4-92b9-61207aab8007'/>
+<resultedFrom ref='EID1e8dd827-c0f4-4004-aa0d-475155895ca4'/>
 <testAssertionResults>{$assertionresults}</testAssertionResults>
 </TestStepResult>)
 let $status := if ($dependencyResult) then local:status($teststepresults/etf:resultStatus) else 'SKIPPED'
-let $endmessage := prof:void(local:end('EIDf66872d4-3a1f-4581-a501-94200219bf13',$status))
-let $logentry := local:log('Test Case ''Basic tests'' finished: ' || $status)
+let $endmessage := prof:void(local:end('EIDf27df7ae-e6de-4d30-b189-230850ec78a2',$status))
+let $logentry := local:log('Test Case ''Coordinate reference systems'' finished: ' || $status)
 return 
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-<parent ref='EID8e96257c-ae42-4123-b298-b8c5eda3a027'/>
+<parent ref='EIDa2530875-5e30-4538-9ca6-3c5876c39515'/>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampCase}</startTimestamp>
 <duration>{sum($teststepresults/duration)}</duration>
-<resultedFrom ref='EIDf66872d4-3a1f-4581-a501-94200219bf13'/>
+<resultedFrom ref='EIDf27df7ae-e6de-4d30-b189-230850ec78a2'/>
 <testStepResults>{$teststepresults}</testStepResults>
 </TestCaseResult>)
 let $status := local:status($testcaseresults/etf:resultStatus)
-let $endmessage := prof:void(local:end('EID8e96257c-ae42-4123-b298-b8c5eda3a027',$status))
-let $logentry := local:log('Test Module ''IGNORE'' finished: ' || $status)
+let $endmessage := prof:void(local:end('EIDa2530875-5e30-4538-9ca6-3c5876c39515',$status))
 return
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-<parent ref='EID545f9e49-009b-4114-9333-7ca26413b5d4'/>
+<parent ref='EID499937ea-0590-42d2-bd7a-1cafff35ecdb'/>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampModule}</startTimestamp>
 <duration>{sum($testcaseresults/duration)}</duration>
-<resultedFrom ref='EID8e96257c-ae42-4123-b298-b8c5eda3a027'/>
+<resultedFrom ref='EIDa2530875-5e30-4538-9ca6-3c5876c39515'/>
 <testCaseResults>{$testcaseresults}</testCaseResults>
 </TestModuleResult>)
 let $status := local:status($testmoduleresults/etf:resultStatus)
-let $endmessage := prof:void(local:end('EID545f9e49-009b-4114-9333-7ca26413b5d4',$status))
-let $logentry := local:log('Test Suite ''INSPIRE GML encoding'' finished')
+let $endmessage := prof:void(local:end('EID499937ea-0590-42d2-bd7a-1cafff35ecdb',$status))
+let $logentry := local:log('Test Suite ''Information accessibility'' finished')
 return
-<TestTaskResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='d190e0d5-a82f-45fd-ba46-d770e04bb8ab'>
+<TestTaskResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='ba33df07-6508-435c-b654-c2d8c3b2e82d'>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampSuite}</startTimestamp>
 <duration>{sum($testmoduleresults/duration)}</duration>
-<resultedFrom ref='EID545f9e49-009b-4114-9333-7ca26413b5d4'/>
+<resultedFrom ref='EID499937ea-0590-42d2-bd7a-1cafff35ecdb'/>
 <testObject ref='{$testObjectId}'/>
 <attachements>
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-log.txt')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/ba33df07-6508-435c-b654-c2d8c3b2e82d-log.txt')) then 
 <Attachment>
 <label>Log file</label>
 <encoding>UTF-8</encoding>
 <mimeType>text/plain</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-log.txt'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/ba33df07-6508-435c-b654-c2d8c3b2e82d-log.txt'/>
 </Attachment>
 else ()}
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-stat.xml')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/ba33df07-6508-435c-b654-c2d8c3b2e82d-stat.xml')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/1.0'>
 <label>Feature statistics</label>
 <encoding>UTF-8</encoding>
 <mimeType>application/xml</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-stat.xml'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/ba33df07-6508-435c-b654-c2d8c3b2e82d-stat.xml'/>
 </Attachment>
 else ()}
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-query.xq')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/ba33df07-6508-435c-b654-c2d8c3b2e82d-query.xq')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/1.0'>
 <label>XQuery executed against the dataset</label>
 <encoding>UTF-8</encoding>
 <mimeType>text/plain</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/d190e0d5-a82f-45fd-ba46-d770e04bb8ab-query.xq'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/ba33df07-6508-435c-b654-c2d8c3b2e82d-query.xq'/>
 </Attachment>
 else ()}
 </attachements>

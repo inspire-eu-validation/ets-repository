@@ -134,35 +134,36 @@ let $logentry := local:log('Statistics table: ' || $duration || ' ms')
 
 
 let $timestampSuite := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EID61070ae8-13cb-4303-a340-72c8b877b00a'))
-let $logentry := local:log('Test Suite ''Data consistency'' started')
+let $startmessage := prof:void(local:start('EID63f586f0-080c-493b-8ca2-9919427440cc'))
+let $logentry := local:log('Test Suite ''Reference systems'' started')
 let $testmoduleresults := (
 let $timestampModule := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EIDcdde50c8-7645-4a51-9a91-8d7fd6c0ff0a'))
+let $startmessage := prof:void(local:start('EID047a97c5-f102-4e9e-8ad6-e8e0b39ec5e0'))
 let $testcaseresults := (
 let $timestampCase := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EID34e2a27a-e57e-486a-a612-bfa89c963116'))
-let $logentry := local:log('Test Case ''Version consistency'' started')
+let $startmessage := prof:void(local:start('EID3f6ab9e4-f76b-4043-9e0d-498293f41972'))
+let $logentry := local:log('Test Case ''Spatial reference systems'' started')
 let $dependencyResult := true()
 let $teststepresults := (
 let $timestampStep := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d')) 
+let $startmessage := prof:void(local:start('EIDa0903ed7-7a6d-427d-ab0e-6e83ff50bb48')) 
 let $assertionresults := (
 if ($dependencyResult) then
-let $startmessage := prof:void(local:start('EIDc88de361-bf4d-4fdb-8cc0-68d1a62e5eae')) 
+let $startmessage := prof:void(local:start('EIDdf2eceaf-f406-465f-80c3-61369d69e64f')) 
 let $start := prof:current-ms()
 let $timestampAssertion := fn:current-dateTime()
 let $result :=
-try { let $featuresWithErrors := $features[(*[self::*:beginLifespanVersion and not(xsi:nil='true')] and *[self::*:endLifespanVersion and not(xsi:nil='true')] and xs:dateTime(*:beginLifespanVersion[1]/text()) >= xs:dateTime(*:endLifespanVersion[1]/text()))][position() le $limitErrors]
+try { let $crsuris := (
+'http://www.opengis.net/def/crs/EPSG/0/4936', 'http://www.opengis.net/def/crs/EPSG/0/4937', 'http://www.opengis.net/def/crs/EPSG/0/4258', 'http://www.opengis.net/def/crs/EPSG/0/3035', 'http://www.opengis.net/def/crs/EPSG/0/3034', 'http://www.opengis.net/def/crs/EPSG/0/3038', 'http://www.opengis.net/def/crs/EPSG/0/3039', 'http://www.opengis.net/def/crs/EPSG/0/3040', 'http://www.opengis.net/def/crs/EPSG/0/3041', 'http://www.opengis.net/def/crs/EPSG/0/3042', 'http://www.opengis.net/def/crs/EPSG/0/3043', 'http://www.opengis.net/def/crs/EPSG/0/3044', 'http://www.opengis.net/def/crs/EPSG/0/3045', 'http://www.opengis.net/def/crs/EPSG/0/3046', 'http://www.opengis.net/def/crs/EPSG/0/3047', 'http://www.opengis.net/def/crs/EPSG/0/3048', 'http://www.opengis.net/def/crs/EPSG/0/3049', 'http://www.opengis.net/def/crs/EPSG/0/3050', 'http://www.opengis.net/def/crs/EPSG/0/3051', 'http://www.opengis.net/def/crs/EPSG/0/5730', 'http://www.opengis.net/def/crs/EPSG/0/7409')
+let $featuresWithErrors := $features[.//@srsName[not(. = $crsuris)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $begin := $feature/*[self::*:beginLifespanVersion][1]/text()
-   let $end := $feature/*[self::*:endLifespanVersion][1]/text()
+   let $srsnames := $feature//@srsName[not(. = $crsuris)]
    return
-     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
-      local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'begin': $begin, 'end': $end, 'propertyBegin': 'beginLifespanVersion', 'propertyEnd': 'endLifespanVersion' }))) } catch * {
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': string(count($srsnames)) }),
+      for $srsname in $srsnames return local:addMessage('unknownCRS1', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'crs': $srsname }))) } catch * {
   let $text := '[' || $err:code || '] ' || $err:description || ' 
 ' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
   return ('FAILED', local:addMessage('systemError', map { '$text': $text }))
@@ -171,102 +172,129 @@ let $status_returned := $result[1]
 let $messages := $result[position()>1]
 let $status := if ($status_returned = ('PASSED','FAILED','WARNING','PASSED_MANUAL','INFO','SKIPPED')) then $status_returned else 'UNDEFINED'
 let $duration := prof:current-ms()-$start
-let $endmessage := prof:void(local:end('EIDc88de361-bf4d-4fdb-8cc0-68d1a62e5eae',$status))
-let $logentry := local:log('Test Assertion ''a.1:'': ' || $status || ' - ' ||$duration || ' ms')
+let $endmessage := prof:void(local:end('EIDdf2eceaf-f406-465f-80c3-61369d69e64f',$status))
+let $logentry := local:log('Test Assertion ''a.1: Spatial reference systems in feature geometries'': ' || $status || ' - ' ||$duration || ' ms')
 return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d'/>
+    <parent ref='EIDa0903ed7-7a6d-427d-ab0e-6e83ff50bb48'/>
     <resultStatus>{$status}</resultStatus>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>{$duration}</duration>
-    <resultedFrom ref='EIDc88de361-bf4d-4fdb-8cc0-68d1a62e5eae'/>
+    <resultedFrom ref='EIDdf2eceaf-f406-465f-80c3-61369d69e64f'/>
     <messages>{$messages}</messages>
   </TestAssertionResult>
 else
-let $startmessage := prof:void(local:start('EIDc88de361-bf4d-4fdb-8cc0-68d1a62e5eae')) 
+let $startmessage := prof:void(local:start('EIDdf2eceaf-f406-465f-80c3-61369d69e64f')) 
 let $timestampAssertion := fn:current-dateTime()
 let $status := 'SKIPPED'
-let $endmessage := prof:void(local:end('EIDc88de361-bf4d-4fdb-8cc0-68d1a62e5eae',$status))
-let $logentry := local:log('Test Assertion ''a.1:'': ' || $status)
+let $endmessage := prof:void(local:end('EIDdf2eceaf-f406-465f-80c3-61369d69e64f',$status))
+let $logentry := local:log('Test Assertion ''a.1: Spatial reference systems in feature geometries'': ' || $status)
 return
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d'/>
+    <parent ref='EIDa0903ed7-7a6d-427d-ab0e-6e83ff50bb48'/>
     <resultStatus>{$status}</resultStatus>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>0</duration>
-    <resultedFrom ref='EIDc88de361-bf4d-4fdb-8cc0-68d1a62e5eae'/>
+    <resultedFrom ref='EIDdf2eceaf-f406-465f-80c3-61369d69e64f'/>
     <messages/>
   </TestAssertionResult>,
-  let $startmessage := prof:void(local:start('EIDeaa9832a-a372-484a-b25b-c67e1c808e0f')) 
-  let $endmessage := prof:void(local:end('EIDeaa9832a-a372-484a-b25b-c67e1c808e0f','PASSED_MANUAL'))
-  let $logentry := local:log('Test Assertion ''a.2: Unique identifier persistency'': PASSED_MANUAL')
-  return 
+if ($dependencyResult) then
+let $startmessage := prof:void(local:start('EID5aa4e48c-7967-49a4-bff4-cda0188a2a82')) 
+let $start := prof:current-ms()
+let $timestampAssertion := fn:current-dateTime()
+let $result :=
+try { let $crsuris := (
+'http://www.opengis.net/def/crs/EPSG/0/4936', 'http://www.opengis.net/def/crs/EPSG/0/4937', 'http://www.opengis.net/def/crs/EPSG/0/4258', 'http://www.opengis.net/def/crs/EPSG/0/3035', 'http://www.opengis.net/def/crs/EPSG/0/3034', 'http://www.opengis.net/def/crs/EPSG/0/3038', 'http://www.opengis.net/def/crs/EPSG/0/3039', 'http://www.opengis.net/def/crs/EPSG/0/3040', 'http://www.opengis.net/def/crs/EPSG/0/3041', 'http://www.opengis.net/def/crs/EPSG/0/3042', 'http://www.opengis.net/def/crs/EPSG/0/3043', 'http://www.opengis.net/def/crs/EPSG/0/3044', 'http://www.opengis.net/def/crs/EPSG/0/3045', 'http://www.opengis.net/def/crs/EPSG/0/3046', 'http://www.opengis.net/def/crs/EPSG/0/3047', 'http://www.opengis.net/def/crs/EPSG/0/3048', 'http://www.opengis.net/def/crs/EPSG/0/3049', 'http://www.opengis.net/def/crs/EPSG/0/3050', 'http://www.opengis.net/def/crs/EPSG/0/3051', 'http://www.opengis.net/def/crs/EPSG/0/5730', 'http://www.opengis.net/def/crs/EPSG/0/7409')
+let $filesWithErrors := $db[*/wfs:boundedBy/*/@srsName[not(. = $crsuris)] or */gml:boundedBy/*/@srsName[not(. = $crsuris)]][position() le $limitErrors] 
+return
+(if ($filesWithErrors) then 'FAILED' else 'PASSED',
+ for $file in $filesWithErrors
+    order by local:filename($file)
+    let $root := $file/element()
+    let $srsnames := $file/*/*[local-name() = 'boundedBy']/*/@srsName[not(. = $crsuris)]
+   return
+     (local:addMessage('errorInFile', map { 'filename': local:filename($root), 'count': string(count($srsnames)) }),
+      for $srsname in $srsnames return local:addMessage('unknownCRS2', map { 'filename': local:filename($root), 'crs': $srsname }))) } catch * {
+  let $text := '[' || $err:code || '] ' || $err:description || ' 
+' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
+  return ('FAILED', local:addMessage('systemError', map { '$text': $text }))
+}
+let $status_returned := $result[1]
+let $messages := $result[position()>1]
+let $status := if ($status_returned = ('PASSED','FAILED','WARNING','PASSED_MANUAL','INFO','SKIPPED')) then $status_returned else 'UNDEFINED'
+let $duration := prof:current-ms()-$start
+let $endmessage := prof:void(local:end('EID5aa4e48c-7967-49a4-bff4-cda0188a2a82',$status))
+let $logentry := local:log('Test Assertion ''a.2: Default spatial reference systems in feature collections'': ' || $status || ' - ' ||$duration || ' ms')
+return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d'/>
-    <resultStatus>PASSED_MANUAL</resultStatus>
-    <startTimestamp>2016-08-15T03:40:54.531+02:00</startTimestamp>
-    <duration>0</duration>
-    <resultedFrom ref='EIDeaa9832a-a372-484a-b25b-c67e1c808e0f'/>
-    <messages/>
-  </TestAssertionResult>,
-  let $startmessage := prof:void(local:start('EID2b8243c8-e2e7-402d-97f1-86110b70e55e')) 
-  let $endmessage := prof:void(local:end('EID2b8243c8-e2e7-402d-97f1-86110b70e55e','PASSED_MANUAL'))
-  let $logentry := local:log('Test Assertion ''a.3: Spatial object type stable'': PASSED_MANUAL')
-  return 
+    <parent ref='EIDa0903ed7-7a6d-427d-ab0e-6e83ff50bb48'/>
+    <resultStatus>{$status}</resultStatus>
+    <startTimestamp>{$timestampAssertion}</startTimestamp>
+    <duration>{$duration}</duration>
+    <resultedFrom ref='EID5aa4e48c-7967-49a4-bff4-cda0188a2a82'/>
+    <messages>{$messages}</messages>
+  </TestAssertionResult>
+else
+let $startmessage := prof:void(local:start('EID5aa4e48c-7967-49a4-bff4-cda0188a2a82')) 
+let $timestampAssertion := fn:current-dateTime()
+let $status := 'SKIPPED'
+let $endmessage := prof:void(local:end('EID5aa4e48c-7967-49a4-bff4-cda0188a2a82',$status))
+let $logentry := local:log('Test Assertion ''a.2: Default spatial reference systems in feature collections'': ' || $status)
+return
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d'/>
-    <resultStatus>PASSED_MANUAL</resultStatus>
-    <startTimestamp>2016-08-15T03:40:54.531+02:00</startTimestamp>
+    <parent ref='EIDa0903ed7-7a6d-427d-ab0e-6e83ff50bb48'/>
+    <resultStatus>{$status}</resultStatus>
+    <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>0</duration>
-    <resultedFrom ref='EID2b8243c8-e2e7-402d-97f1-86110b70e55e'/>
+    <resultedFrom ref='EID5aa4e48c-7967-49a4-bff4-cda0188a2a82'/>
     <messages/>
   </TestAssertionResult>)
 let $status := if ($dependencyResult) then local:status($assertionresults/etf:resultStatus) else 'SKIPPED'
-let $endmessage := prof:void(local:end('EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d',$status))
+let $endmessage := prof:void(local:end('EIDa0903ed7-7a6d-427d-ab0e-6e83ff50bb48',$status))
 return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-<parent ref='EID34e2a27a-e57e-486a-a612-bfa89c963116'/>
+<parent ref='EID3f6ab9e4-f76b-4043-9e0d-498293f41972'/>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampStep}</startTimestamp>
 <duration>{sum($assertionresults/duration)}</duration>
-<resultedFrom ref='EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d'/>
+<resultedFrom ref='EIDa0903ed7-7a6d-427d-ab0e-6e83ff50bb48'/>
 <testAssertionResults>{$assertionresults}</testAssertionResults>
 </TestStepResult>)
 let $status := if ($dependencyResult) then local:status($teststepresults/etf:resultStatus) else 'SKIPPED'
-let $endmessage := prof:void(local:end('EID34e2a27a-e57e-486a-a612-bfa89c963116',$status))
-let $logentry := local:log('Test Case ''Version consistency'' finished: ' || $status)
+let $endmessage := prof:void(local:end('EID3f6ab9e4-f76b-4043-9e0d-498293f41972',$status))
+let $logentry := local:log('Test Case ''Spatial reference systems'' finished: ' || $status)
 return 
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-<parent ref='EIDcdde50c8-7645-4a51-9a91-8d7fd6c0ff0a'/>
+<parent ref='EID047a97c5-f102-4e9e-8ad6-e8e0b39ec5e0'/>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampCase}</startTimestamp>
 <duration>{sum($teststepresults/duration)}</duration>
-<resultedFrom ref='EID34e2a27a-e57e-486a-a612-bfa89c963116'/>
+<resultedFrom ref='EID3f6ab9e4-f76b-4043-9e0d-498293f41972'/>
 <testStepResults>{$teststepresults}</testStepResults>
 </TestCaseResult>,
 let $timestampCase := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EID4ca5564d-2643-4ee3-9ec9-bf97043d3fa0'))
-let $logentry := local:log('Test Case ''Temporal consistency'' started')
+let $startmessage := prof:void(local:start('EID9d1677e1-e2e3-4776-845c-1cce60649881'))
+let $logentry := local:log('Test Case ''Temporal reference systems'' started')
 let $dependencyResult := true()
 let $teststepresults := (
 let $timestampStep := fn:current-dateTime()
-let $startmessage := prof:void(local:start('EID72a3ee32-8582-4f67-80a0-435f636f8cf3')) 
+let $startmessage := prof:void(local:start('EIDf3993dd7-ecf9-4041-a376-0ff05e42bf71')) 
 let $assertionresults := (
 if ($dependencyResult) then
-let $startmessage := prof:void(local:start('EIDcefa9614-ce69-43d4-bed5-7758e7d890a9')) 
+let $startmessage := prof:void(local:start('EID11310d1c-24e5-45da-9b50-b04f82200ffe')) 
 let $start := prof:current-ms()
 let $timestampAssertion := fn:current-dateTime()
 let $result :=
-try { let $featuresWithErrors := $features[*[self::*:validFrom and not(xsi:nil='true')] and *[self::*:validTo and not(xsi:nil='true')] and xs:dateTime(*:validFrom/text()) >= xs:dateTime(*:validTo/text())][position() le $limitErrors]
+try { let $crsuris := ( 'http://www.opengis.net/def/trs/ISO-8601' )
+let $featuresWithErrors := $features[.//gml:TimeInstance/@frame[not(. = $crsuris)] | .//gml:TimeInstance/gml:timePosition/@frame[not(. = $crsuris)] | .//gml:TimePeriod/@frame[not(. = $crsuris)] | .//gml:TimePeriod/gml:beginPosition/@frame[not(. = $crsuris)] | .//gml:TimePeriod/gml:endPosition/@frame[not(. = $crsuris)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $begin := $feature/*[self::*:validFrom][1]/text()
-   let $end := $feature/*[self::*:validTo][1]/text()
+   let $frames := $feature//@frame[not(. = $crsuris)]
    return
-     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
-      local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'begin': $begin, 'end': $end, 'propertyBegin': 'validFrom', 'propertyEnd': 'validTo' }))) } catch * {
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': string(count($frames)) }),
+      for $frame in $frames return local:addMessage('unknownTRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'trs': $frame }))) } catch * {
   let $text := '[' || $err:code || '] ' || $err:description || ' 
 ' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
   return ('FAILED', local:addMessage('systemError', map { '$text': $text }))
@@ -275,99 +303,99 @@ let $status_returned := $result[1]
 let $messages := $result[position()>1]
 let $status := if ($status_returned = ('PASSED','FAILED','WARNING','PASSED_MANUAL','INFO','SKIPPED')) then $status_returned else 'UNDEFINED'
 let $duration := prof:current-ms()-$start
-let $endmessage := prof:void(local:end('EIDcefa9614-ce69-43d4-bed5-7758e7d890a9',$status))
-let $logentry := local:log('Test Assertion ''b.1: Validity time sequence'': ' || $status || ' - ' ||$duration || ' ms')
+let $endmessage := prof:void(local:end('EID11310d1c-24e5-45da-9b50-b04f82200ffe',$status))
+let $logentry := local:log('Test Assertion ''a.1: Temporal reference systems in features'': ' || $status || ' - ' ||$duration || ' ms')
 return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EID72a3ee32-8582-4f67-80a0-435f636f8cf3'/>
+    <parent ref='EIDf3993dd7-ecf9-4041-a376-0ff05e42bf71'/>
     <resultStatus>{$status}</resultStatus>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>{$duration}</duration>
-    <resultedFrom ref='EIDcefa9614-ce69-43d4-bed5-7758e7d890a9'/>
+    <resultedFrom ref='EID11310d1c-24e5-45da-9b50-b04f82200ffe'/>
     <messages>{$messages}</messages>
   </TestAssertionResult>
 else
-let $startmessage := prof:void(local:start('EIDcefa9614-ce69-43d4-bed5-7758e7d890a9')) 
+let $startmessage := prof:void(local:start('EID11310d1c-24e5-45da-9b50-b04f82200ffe')) 
 let $timestampAssertion := fn:current-dateTime()
 let $status := 'SKIPPED'
-let $endmessage := prof:void(local:end('EIDcefa9614-ce69-43d4-bed5-7758e7d890a9',$status))
-let $logentry := local:log('Test Assertion ''b.1: Validity time sequence'': ' || $status)
+let $endmessage := prof:void(local:end('EID11310d1c-24e5-45da-9b50-b04f82200ffe',$status))
+let $logentry := local:log('Test Assertion ''a.1: Temporal reference systems in features'': ' || $status)
 return
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-    <parent ref='EID72a3ee32-8582-4f67-80a0-435f636f8cf3'/>
+    <parent ref='EIDf3993dd7-ecf9-4041-a376-0ff05e42bf71'/>
     <resultStatus>{$status}</resultStatus>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>0</duration>
-    <resultedFrom ref='EIDcefa9614-ce69-43d4-bed5-7758e7d890a9'/>
+    <resultedFrom ref='EID11310d1c-24e5-45da-9b50-b04f82200ffe'/>
     <messages/>
   </TestAssertionResult>)
 let $status := if ($dependencyResult) then local:status($assertionresults/etf:resultStatus) else 'SKIPPED'
-let $endmessage := prof:void(local:end('EID72a3ee32-8582-4f67-80a0-435f636f8cf3',$status))
+let $endmessage := prof:void(local:end('EIDf3993dd7-ecf9-4041-a376-0ff05e42bf71',$status))
 return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-<parent ref='EID4ca5564d-2643-4ee3-9ec9-bf97043d3fa0'/>
+<parent ref='EID9d1677e1-e2e3-4776-845c-1cce60649881'/>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampStep}</startTimestamp>
 <duration>{sum($assertionresults/duration)}</duration>
-<resultedFrom ref='EID72a3ee32-8582-4f67-80a0-435f636f8cf3'/>
+<resultedFrom ref='EIDf3993dd7-ecf9-4041-a376-0ff05e42bf71'/>
 <testAssertionResults>{$assertionresults}</testAssertionResults>
 </TestStepResult>)
 let $status := if ($dependencyResult) then local:status($teststepresults/etf:resultStatus) else 'SKIPPED'
-let $endmessage := prof:void(local:end('EID4ca5564d-2643-4ee3-9ec9-bf97043d3fa0',$status))
-let $logentry := local:log('Test Case ''Temporal consistency'' finished: ' || $status)
+let $endmessage := prof:void(local:end('EID9d1677e1-e2e3-4776-845c-1cce60649881',$status))
+let $logentry := local:log('Test Case ''Temporal reference systems'' finished: ' || $status)
 return 
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-<parent ref='EIDcdde50c8-7645-4a51-9a91-8d7fd6c0ff0a'/>
+<parent ref='EID047a97c5-f102-4e9e-8ad6-e8e0b39ec5e0'/>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampCase}</startTimestamp>
 <duration>{sum($teststepresults/duration)}</duration>
-<resultedFrom ref='EID4ca5564d-2643-4ee3-9ec9-bf97043d3fa0'/>
+<resultedFrom ref='EID9d1677e1-e2e3-4776-845c-1cce60649881'/>
 <testStepResults>{$teststepresults}</testStepResults>
 </TestCaseResult>)
 let $status := local:status($testcaseresults/etf:resultStatus)
-let $endmessage := prof:void(local:end('EIDcdde50c8-7645-4a51-9a91-8d7fd6c0ff0a',$status))
+let $endmessage := prof:void(local:end('EID047a97c5-f102-4e9e-8ad6-e8e0b39ec5e0',$status))
 return
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
-<parent ref='EID61070ae8-13cb-4303-a340-72c8b877b00a'/>
+<parent ref='EID63f586f0-080c-493b-8ca2-9919427440cc'/>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampModule}</startTimestamp>
 <duration>{sum($testcaseresults/duration)}</duration>
-<resultedFrom ref='EIDcdde50c8-7645-4a51-9a91-8d7fd6c0ff0a'/>
+<resultedFrom ref='EID047a97c5-f102-4e9e-8ad6-e8e0b39ec5e0'/>
 <testCaseResults>{$testcaseresults}</testCaseResults>
 </TestModuleResult>)
 let $status := local:status($testmoduleresults/etf:resultStatus)
-let $endmessage := prof:void(local:end('EID61070ae8-13cb-4303-a340-72c8b877b00a',$status))
-let $logentry := local:log('Test Suite ''Data consistency'' finished')
+let $endmessage := prof:void(local:end('EID63f586f0-080c-493b-8ca2-9919427440cc',$status))
+let $logentry := local:log('Test Suite ''Reference systems'' finished')
 return
-<TestTaskResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='e5757b1a-9e9f-4d8f-88f1-8ae41fdcda43'>
+<TestTaskResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='2a3fc5c5-689b-4a5f-b116-b764f5aaa3d8'>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampSuite}</startTimestamp>
 <duration>{sum($testmoduleresults/duration)}</duration>
-<resultedFrom ref='EID61070ae8-13cb-4303-a340-72c8b877b00a'/>
+<resultedFrom ref='EID63f586f0-080c-493b-8ca2-9919427440cc'/>
 <testObject ref='{$testObjectId}'/>
 <attachements>
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/e5757b1a-9e9f-4d8f-88f1-8ae41fdcda43-log.txt')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/2a3fc5c5-689b-4a5f-b116-b764f5aaa3d8-log.txt')) then 
 <Attachment>
 <label>Log file</label>
 <encoding>UTF-8</encoding>
 <mimeType>text/plain</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/e5757b1a-9e9f-4d8f-88f1-8ae41fdcda43-log.txt'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/2a3fc5c5-689b-4a5f-b116-b764f5aaa3d8-log.txt'/>
 </Attachment>
 else ()}
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/e5757b1a-9e9f-4d8f-88f1-8ae41fdcda43-stat.xml')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/2a3fc5c5-689b-4a5f-b116-b764f5aaa3d8-stat.xml')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/1.0'>
 <label>Feature statistics</label>
 <encoding>UTF-8</encoding>
 <mimeType>application/xml</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/e5757b1a-9e9f-4d8f-88f1-8ae41fdcda43-stat.xml'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/2a3fc5c5-689b-4a5f-b116-b764f5aaa3d8-stat.xml'/>
 </Attachment>
 else ()}
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/e5757b1a-9e9f-4d8f-88f1-8ae41fdcda43-query.xq')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/2a3fc5c5-689b-4a5f-b116-b764f5aaa3d8-query.xq')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/1.0'>
 <label>XQuery executed against the dataset</label>
 <encoding>UTF-8</encoding>
 <mimeType>text/plain</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/e5757b1a-9e9f-4d8f-88f1-8ae41fdcda43-query.xq'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/2a3fc5c5-689b-4a5f-b116-b764f5aaa3d8-query.xq'/>
 </Attachment>
 else ()}
 </attachements>

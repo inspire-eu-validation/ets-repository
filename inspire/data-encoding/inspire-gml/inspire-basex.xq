@@ -247,7 +247,7 @@ declare variable $dbCount external := 1;
 declare variable $dbDir external;
 
 (: Project internals :)
-declare variable $assertionsFile := "ets-schemas.xml";
+declare variable $assertionsFile := "ets-inspire-gml.xml"; (: "ets-inspire-gml" "ets-schemas" "ets-data-consistency" "ets-information-accessibility" "ets-reference-systems.xml" :)
 declare variable $testQueryFile := "testquery.xq";
 
 declare variable $limitMessages := xs:int( $maximum_number_of_error_messages_per_test );

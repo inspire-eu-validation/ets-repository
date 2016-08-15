@@ -155,7 +155,7 @@ let $assertionresults := (
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
     <parent ref='EID871889b6-5664-4498-8762-849fb77a084f'/>
     <resultStatus>PASSED_MANUAL</resultStatus>
-    <startTimestamp>2016-08-15T01:48:35.594+02:00</startTimestamp>
+    <startTimestamp>2016-08-15T11:59:59.95+02:00</startTimestamp>
     <duration>0</duration>
     <resultedFrom ref='EID09ad14e3-d46f-42fc-9b01-64cb6ed2134c'/>
     <messages/>
@@ -167,7 +167,7 @@ let $assertionresults := (
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='{uuid:randomUUID()}'>
     <parent ref='EID871889b6-5664-4498-8762-849fb77a084f'/>
     <resultStatus>PASSED_MANUAL</resultStatus>
-    <startTimestamp>2016-08-15T01:48:35.594+02:00</startTimestamp>
+    <startTimestamp>2016-08-15T11:59:59.95+02:00</startTimestamp>
     <duration>0</duration>
     <resultedFrom ref='EID77f090cf-48ef-46f3-901b-6ef2db4a1599'/>
     <messages/>
@@ -1054,35 +1054,35 @@ let $status := local:status($testmoduleresults/etf:resultStatus)
 let $endmessage := prof:void(local:end('EID09820daf-62b2-4fa3-a95f-56a0d2b7c4d8',$status))
 let $logentry := local:log('Test Suite ''INSPIRE GML application schemas'' finished')
 return
-<TestTaskResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='989b97c6-8375-46c9-b9c9-9e77f63c5e77'>
+<TestTaskResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='4d820861-048a-4733-8763-eba82a717289'>
 <resultStatus>{$status}</resultStatus>
 <startTimestamp>{$timestampSuite}</startTimestamp>
 <duration>{sum($testmoduleresults/duration)}</duration>
 <resultedFrom ref='EID09820daf-62b2-4fa3-a95f-56a0d2b7c4d8'/>
 <testObject ref='{$testObjectId}'/>
 <attachements>
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/989b97c6-8375-46c9-b9c9-9e77f63c5e77-log.txt')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/4d820861-048a-4733-8763-eba82a717289-log.txt')) then 
 <Attachment>
 <label>Log file</label>
 <encoding>UTF-8</encoding>
 <mimeType>text/plain</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/989b97c6-8375-46c9-b9c9-9e77f63c5e77-log.txt'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/4d820861-048a-4733-8763-eba82a717289-log.txt'/>
 </Attachment>
 else ()}
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/989b97c6-8375-46c9-b9c9-9e77f63c5e77-stat.xml')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/4d820861-048a-4733-8763-eba82a717289-stat.xml')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/1.0'>
 <label>Feature statistics</label>
 <encoding>UTF-8</encoding>
 <mimeType>application/xml</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/989b97c6-8375-46c9-b9c9-9e77f63c5e77-stat.xml'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/4d820861-048a-4733-8763-eba82a717289-stat.xml'/>
 </Attachment>
 else ()}
-{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/989b97c6-8375-46c9-b9c9-9e77f63c5e77-query.xq')) then 
+{ if (file:exists('/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/4d820861-048a-4733-8763-eba82a717289-query.xq')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/1.0'>
 <label>XQuery executed against the dataset</label>
 <encoding>UTF-8</encoding>
 <mimeType>text/plain</mimeType>
-<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/989b97c6-8375-46c9-b9c9-9e77f63c5e77-query.xq'/>
+<referencedData href='file:/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml/tmp/4d820861-048a-4733-8763-eba82a717289-query.xq'/>
 </Attachment>
 else ()}
 </attachements>
