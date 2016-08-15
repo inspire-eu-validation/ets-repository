@@ -1,0 +1,189 @@
+<ExecutableTestSuite id="EID61070ae8-13cb-4303-a340-72c8b877b00a" xmlns="http://www.interactive-instruments.de/etf/1.0">
+	<label>Data consistency</label>
+	<description><![CDATA[This test suite examines a data set against the basic requirements related to the consistency of the data. This test suite only examines requirements that are not specific to a data theme. Additional test cases will be defined per data theme, where needed.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency">Conformance Class 'Data consistency'</a>]]></description>
+	<version>0.1.0</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-15</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-15</lastUpdateDate>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/schemas</remoteResource>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
+		<label>Feature Type Statistics</label>
+		<description>The number of features per feature type and file in the dataset.</description>
+		<columnHeaderLabels>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="file"/>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureType"/>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureCount"/>
+		</columnHeaderLabels>
+		<expression>
+('all all ' || count($features),
+for $feature in $features
+	let $ft := $feature/local-name()
+	group by $ft 
+	order by $ft
+	return 'all ' || $ft || ' ' || count($feature),
+if (count($db)&lt;=1) then () else
+for $file in $db
+	let $filename := local:filename($file)
+	order by $filename
+	return
+		for $feature in $features[local:filename(.)=$filename]
+			let $ft := $feature/local-name()
+			group by $ft 
+			order by $ft
+			return $filename || ' ' || $ft || ' ' || count($feature))
+		</expression>
+	</StatisticalReportTableType>
+	<ParameterList>
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="maximum_number_of_error_messages_per_test" required="false">
+			<defaultValue>100</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="limitMessages"/>
+			<allowedValues>[1-9]+[0-9]*</allowedValues>
+			<type>integer</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+	  <testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<Dependencies>
+		<dependency>
+			<reason bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="directDependency"/>
+			<dependsOn ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
+		</dependency>
+	</Dependencies>
+	<testModules>
+	  <TestModule id="EIDcdde50c8-7645-4a51-9a91-8d7fd6c0ff0a">
+		 <parent ref="EID61070ae8-13cb-4303-a340-72c8b877b00a"/>
+		 <label>IGNORE</label>
+		 <description>IGNORE</description>
+		 <testCases>
+			<TestCase id="EID34e2a27a-e57e-486a-a612-bfa89c963116">
+			  <parent ref="EIDcdde50c8-7645-4a51-9a91-8d7fd6c0ff0a"/>
+			  <label>Version consistency</label>
+			  <description>Verify that the information about a spatial object is consistent over time.</description>
+			  <testSteps>
+				<TestStep id="EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d">
+					<parent ref="EID34e2a27a-e57e-486a-a612-bfa89c963116"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EIDc88de361-bf4d-4fdb-8cc0-68d1a62e5eae">
+						 <parent ref="EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d"/>
+						 <label>a.1: </label>
+						 <description><![CDATA[Verify that all endLifespanVersion values are from the allowed range. For all features verify that either
+<li>beginLifespanVersion or endLifespanVersion are missing or nil or</li>
+<Li>endLifespanVersion is not before the value of beginLifespanVersion.</li><br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 10 (3): Life-cycle of Spatial Objects. Where the attributes beginLifespanVersion and endLifespanVersion are used, the value of endLifespanVersion shall not be before the value of beginLifespanVersion.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency/versions">Abstract Test Case 'Version consistency'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+let $featuresWithErrors := $features[(*[self::*:beginLifespanVersion and not(xsi:nil='true')] and *[self::*:endLifespanVersion and not(xsi:nil='true')] and xs:dateTime(*:beginLifespanVersion[1]/text()) >= xs:dateTime(*:endLifespanVersion[1]/text()))][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $begin := $feature/*[self::*:beginLifespanVersion][1]/text()
+   let $end := $feature/*[self::*:endLifespanVersion][1]/text()
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'begin': $begin, 'end': $end, 'propertyBegin': 'beginLifespanVersion', 'propertyEnd': 'endLifespanVersion' })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="endTooEarly"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EIDeaa9832a-a372-484a-b25b-c67e1c808e0f">
+						 <parent ref="EID871889b6-5664-4498-8762-849fb77a084f"/>
+						 <label>a.2: Unique identifier persistency</label>
+						 <description><![CDATA[Verify that identifiers are persistent for a spatial object, i.e. inspect the documentation of the spatial data set and verify that rules for identifiers are specified in a way that the identifiers (namespace and localId) do not change during the life-cycle of a spatial object. If older versions of the data set are available compare the features and verify that the namespace and localId part of the INSPIRE identifiers have not changed between the versions.<br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 9 (2): Identifier Management. The external object identifier for the unique identification of spatial objects shall not be changed during the life-cycle of a spatial object.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency/versions">Abstract Test Case 'Version consistency'</a>]]></description>
+						 <expectedResult/>
+						 <expression/>
+						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+						 <translationTemplates/>
+					  </TestAssertion>
+					  <TestAssertion id="EID2b8243c8-e2e7-402d-97f1-86110b70e55e">
+						 <parent ref="EID871889b6-5664-4498-8762-849fb77a084f"/>
+						 <label>a.3: Spatial object type stable</label>
+						 <description><![CDATA[Verify that the type of a spatial object is unchanged for different versions, i.e. inspect the documentation of the spatial data set and verify that rules for the mapping to the INSPIRE application schema are specified in a way that the spatial object type do not change during its life-cycle. If older versions of the data set are available compare the features and verify that the types of the features has not changed between the versions.<br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 9 (2): Identifier Management. The external object identifier for the unique identification of spatial objects shall not be changed during the life-cycle of a spatial object.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency/versions">Abstract Test Case 'Version consistency'</a>]]></description>
+						 <expectedResult/>
+						 <expression/>
+						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+						 <translationTemplates/>
+					  </TestAssertion>
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+			<TestCase id="EID4ca5564d-2643-4ee3-9ec9-bf97043d3fa0">
+			  <parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+			  <label>Temporal consistency</label>
+			  <description>Verify that the temporal validity of the real-world entity is consistent.</description>
+			  <testSteps>
+				<TestStep id="EID72a3ee32-8582-4f67-80a0-435f636f8cf3">
+					<parent ref="EID4ca5564d-2643-4ee3-9ec9-bf97043d3fa0"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EIDcefa9614-ce69-43d4-bed5-7758e7d890a9">
+						 <parent ref="EID72a3ee32-8582-4f67-80a0-435f636f8cf3"/>
+						 <label>b.1: Validity time sequence</label>
+						 <description><![CDATA[For all features verify that either
+<li>validFrom or validTo are missing or nil or</li>
+<li>validTo is not before the value of validFrom.</li><br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 12 (3): Other Requirements and Rules. Where the attributes validFrom and validTo are used, the value of validTo shall not be before the value of validFrom.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency/temporal">Abstract Test Case 'Temporal consistency'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+let $featuresWithErrors := $features[*[self::*:validFrom and not(xsi:nil='true')] and *[self::*:validTo and not(xsi:nil='true')] and xs:dateTime(*:validFrom/text()) >= xs:dateTime(*:validTo/text())][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $begin := $feature/*[self::*:validFrom][1]/text()
+   let $end := $feature/*[self::*:validTo][1]/text()
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
+      local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'begin': $begin, 'end': $end, 'propertyBegin': 'validFrom', 'propertyEnd': 'validTo' })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="endTooEarly"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+		 </testCases>
+	  </TestModule>
+	</testModules>
+</ExecutableTestSuite>

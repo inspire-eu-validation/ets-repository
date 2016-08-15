@@ -1,0 +1,120 @@
+<ExecutableTestSuite id="EID499937ea-0590-42d2-bd7a-1cafff35ecdb" xmlns="http://www.interactive-instruments.de/etf/1.0">
+	<label>Information accessibility</label>
+	<description><![CDATA[This test suite examines a data set against the basic requirements related to the accessibility of resources referenced by the data. This test suite only examines requirements that are not specific to a data theme. Additional test cases will be defined per data theme, where needed.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/information-accessibility">Conformance Class 'Information accessibility'</a>]]></description>
+	<version>0.1.0</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-15</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-15</lastUpdateDate>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/schemas</remoteResource>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
+		<label>Feature Type Statistics</label>
+		<description>The number of features per feature type and file in the dataset.</description>
+		<columnHeaderLabels>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="file"/>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureType"/>
+			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureCount"/>
+		</columnHeaderLabels>
+		<expression>
+('all all ' || count($features),
+for $feature in $features
+	let $ft := $feature/local-name()
+	group by $ft 
+	order by $ft
+	return 'all ' || $ft || ' ' || count($feature),
+if (count($db)&lt;=1) then () else
+for $file in $db
+	let $filename := local:filename($file)
+	order by $filename
+	return
+		for $feature in $features[local:filename(.)=$filename]
+			let $ft := $feature/local-name()
+			group by $ft 
+			order by $ft
+			return $filename || ' ' || $ft || ' ' || count($feature))
+		</expression>
+	</StatisticalReportTableType>
+	<ParameterList>
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="maximum_number_of_error_messages_per_test" required="false">
+			<defaultValue>100</defaultValue>
+			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="limitMessages"/>
+			<allowedValues>[1-9]+[0-9]*</allowedValues>
+			<type>integer</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+	  <testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<Dependencies>
+		<dependency>
+			<reason bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="directDependency"/>
+			<dependsOn ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
+		</dependency>
+	</Dependencies>
+	<testModules>
+	  <TestModule id="EIDa2530875-5e30-4538-9ca6-3c5876c39515">
+		 <parent ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+		 <label>IGNORE</label>
+		 <description>IGNORE</description>
+		 <testCases>
+			<TestCase id="EIDf27df7ae-e6de-4d30-b189-230850ec78a2">
+			  <parent ref="EIDa2530875-5e30-4538-9ca6-3c5876c39515"/>
+			  <label>Coordinate reference systems</label>
+			  <description>Verify that referenced coordinate reference systems can be accessed.</description>
+			  <testSteps>
+				<TestStep id="EID1e8dd827-c0f4-4004-aa0d-475155895ca4">
+					<parent ref="EIDf27df7ae-e6de-4d30-b189-230850ec78a2"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EID0bb601c0-8bde-4cbf-972a-aa4425669649">
+						 <parent ref="EID1e8dd827-c0f4-4004-aa0d-475155895ca4"/>
+						 <label>a.1: </label>
+						 <description><![CDATA[Verify that any coordinate reference system is publicly accessible via HTTP, i.e. inspect links to coordinate reference systems. Verify that a HTTP GET request to the URI of each unique link (srsName, frame) retrieves a document.<br/><br/>
+Relevant requirements:<br/>
+<li>IR Requirement Article 10 (3): Life-cycle of Spatial Objects. Where the attributes beginLifespanVersion and endLifespanVersion are used, the value of endLifespanVersion shall not be before the value of beginLifespanVersion.</li><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency/versions">Abstract Test Case 'Version consistency'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+let $uris := distinct-values(($features//@srsName,$features//@frame))
+let $baduris := for $uri in $uris return if (doc-available($uri)) then () else $uri
+let $featuresWithErrors := $features[.//@srsName[. = $baduris] or .//@frame[. = $baduris]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $featureuris := ($feature//@srsName[. = $baduris]|$feature//@frame[. = $baduris])
+   return
+     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': string(count($featureuris)) }),
+      for $uri in $featureuris return local:addMessage('brokenLinkCRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'rsid': $uri })))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="brokenLinkCRS"/>
+							<translationTemplate ref="errorInFeature"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+		 </testCases>
+	  </TestModule>
+	</testModules>
+</ExecutableTestSuite>
