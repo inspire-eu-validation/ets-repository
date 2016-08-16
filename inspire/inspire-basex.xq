@@ -249,7 +249,7 @@ declare variable $dbDir external;
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
 
-declare variable $etsno := 11;
+declare variable $etsno := 1;
 declare variable $etsFile := 
   if ($etsno = 1) then "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml"
   else if ($etsno = 2) then "data" || file:dir-separator() || "schemas" || file:dir-separator() || "ets-schemas.xml"
@@ -322,12 +322,14 @@ let $db := for $i in 0 to $count return db:open($dbBaseName || '-' || $i)[matche
 
 let $features := $db/wfs:FeatureCollection/wfs:member/* | $db/gml:FeatureCollection/gml:featureMember/* | $db/gml:FeatureCollection/gml:featureMembers/* | $db/base:SpatialDataSet/base:member/* | $db/base3:SpatialDataSet/base3:member/*
 
-let $stat := if (not($ets//etf:StatisticalReportTableType)) then () else "
+let $staturi := $ets/etf:statisticalReportTableType
+let $stattmpl := if (not($staturi)) then () else doc($staturi)
+let $stat := if (not($stattmpl)) then "let $logentry := local:log('Statistics table: " || string($staturi) || "')" else "
 let $start := prof:current-ms()
-let $entries := (" || string-join($ets//etf:StatisticalReportTableType[1]/etf:rowExpressions/etf:expression,', ') || ")
+let $entries := (" || string-join($stattmpl//etf:StatisticalReportTableType[1]/etf:rowExpressions/etf:expression,', ') || ")
 let $statTable :=
 <StatisticalReportTable xmlns='http://www.interactive-instruments.de/etf/1.0'>
-<type ref='" || $ets//etf:StatisticalReportTableType[1]/@id || "'/>
+<type ref='" || $stattmpl//etf:StatisticalReportTableType[1]/@id || "'/>
 <entries>
 { for $entry in $entries return <entry xmlns='http://www.interactive-instruments.de/etf/1.0'>{$entry}</entry> }
 </entries>

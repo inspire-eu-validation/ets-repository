@@ -9,58 +9,23 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
 	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/schemas</remoteResource>
 	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
-	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
-		<label>Feature Type Statistics</label>
-		<description>The number of features per feature type and file in the dataset.</description>
-		<version>0.1.0</version>
-		<author>interactive instruments GmbH</author>
-		<creationDate>2016-08-15T00:00:00Z</creationDate>
-		<lastEditor>interactive instruments GmbH</lastEditor>
-		<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
-		<columnHeaderLabels>
-			<label>Filename</label>
-			<label>Feature Type</label>
-			<label>Feature Count</label>
-		</columnHeaderLabels>
-		<rowExpressions>
-			<expression>'all; all; ' || count($features)</expression>
-			<expression>
-for $feature in $features 
-	let $ft := $feature/local-name()
-	group by $ft 
-	order by $ft
-	return 'all; ' || $ft || '; ' || count($feature)
-			</expression>
-			<expression>
-if (count($db)&lt;=1) then () else
-for $file in $db
-	let $filename := local:filename($file)
-	order by $filename
-	return
-		for $feature in $features[local:filename(.)=$filename]
-			let $ft := $feature/local-name()
-			group by $ft 
-			order by $ft
-			return $filename || '; ' || $ft || '; ' || count($feature)
-			</expression>
-		</rowExpressions>
-	</StatisticalReportTableType>
+	<statisticalReportTableType>http://portele.de/EID8bb8f162-1082-434f-bd06-23d6507634b8.xml</statisticalReportTableType>
 	<ParameterList name="ETF Standard Parameters for XML test objects">
 		<parameter name="files_to_test" required="true">
 			<defaultValue>.*</defaultValue>
-			<description ref="filesToTest"/>
+			<description ref="TR.filesToTest"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
 		<parameter name="tests_to_execute" required="false">
 			<defaultValue>.*</defaultValue>
-			<description ref="testsToExecute"/>
+			<description ref="TR.testsToExecute"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
 		<parameter name="maximum_number_of_error_messages_per_test" required="false">
 			<defaultValue>100</defaultValue>
-			<description ref="limitMessages"/>
+			<description ref="TR.limitMessages"/>
 			<allowedValues>[1-9]+[0-9]*</allowedValues>
 			<type>integer</type>
 		</parameter>
@@ -159,8 +124,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="noSchemaLocation"/>
-							<translationTemplate ref="filesWithErrors"/>
+							<translationTemplate ref="TR.noSchemaLocation"/>
+							<translationTemplate ref="TR.filesWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EID0eaac0f2-9ab3-44ab-9f02-4ee0a1587d14">
@@ -197,8 +162,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="invalidSchema"/>
-							<translationTemplate ref="errorInFile"/>
+							<translationTemplate ref="TR.invalidSchema"/>
+							<translationTemplate ref="TR.errorInFile"/>
 						 </translationTemplates>
 					  </TestAssertion>					  
 					</testAssertions>
@@ -244,8 +209,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="emptyValue"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.emptyValue"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>			
 					  <TestAssertion id="EIDb62f96a5-349f-40dd-b777-1e52ea09b686">
@@ -275,8 +240,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="nilMissing"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.nilMissing"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EIDabc9199e-d5a8-4829-80bd-09b7e49e2a76">
@@ -315,8 +280,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="incorrectReason"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.incorrectReason"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>					  			
 					</testAssertions>
@@ -358,8 +323,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="spatialTopologyTypeFound"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.spatialTopologyTypeFound"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>			
 					  <TestAssertion id="EID44cf3e26-809e-49a9-8ec0-750a373e9ff1">
@@ -385,8 +350,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="invalidInterpolationFound"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.invalidInterpolationFound"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EID3d7ad0b2-c9f5-4910-aa09-b3226b720f7d">
@@ -412,8 +377,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="invalidSurfaceElementFound"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.invalidSurfaceElementFound"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>			
 					  <TestAssertion id="EID008b7c4f-b315-4596-b5e9-4a29910eb43f">
@@ -439,8 +404,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="invalidSurfacePatchElementFound"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.invalidSurfacePatchElementFound"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>			
 					  <TestAssertion id="EID4f2f9722-897a-4bad-b11e-d4e119b6690d">
@@ -466,8 +431,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="invalidGeometryElementFound"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.invalidGeometryElementFound"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EIDbc49770c-4eab-4330-8462-af0664ae0b80">
@@ -493,8 +458,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="invalidPositionElementFound"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.invalidPositionElementFound"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EID894c6a96-4fb2-4921-ad98-1d2a52985887">
@@ -520,8 +485,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="invalidPositionElementFound"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.invalidPositionElementFound"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EID160e4f83-e9c3-45c5-b684-20027f8f191a">
@@ -547,8 +512,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="arrayElementFound"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.arrayElementFound"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EIDf9e92525-152a-41fa-9990-42691f39b1ce">
@@ -574,8 +539,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="tooManyDimensions"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.tooManyDimensions"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>					  
 					  <TestAssertion id="EID79aec969-3ca0-4190-a6e9-8b49682f414a">
@@ -602,8 +567,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="invalidGeometry"/>
-							<translationTemplate ref="featuresWithErrors"/>
+							<translationTemplate ref="TR.invalidGeometry"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>					  
 					</testAssertions>

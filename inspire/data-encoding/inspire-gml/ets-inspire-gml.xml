@@ -9,58 +9,23 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
 	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-encoding/inspire-gml</remoteResource>
 	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
-	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
-		<label>Feature Type Statistics</label>
-		<description>The number of features per feature type and file in the dataset.</description>
-		<version>0.1.0</version>
-		<author>interactive instruments GmbH</author>
-		<creationDate>2016-08-15T00:00:00Z</creationDate>
-		<lastEditor>interactive instruments GmbH</lastEditor>
-		<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
-		<columnHeaderLabels>
-			<label>Filename</label>
-			<label>Feature Type</label>
-			<label>Feature Count</label>
-		</columnHeaderLabels>
-		<rowExpressions>
-			<expression>'all; all; ' || count($features)</expression>
-			<expression>
-for $feature in $features 
-	let $ft := $feature/local-name()
-	group by $ft 
-	order by $ft
-	return 'all; ' || $ft || '; ' || count($feature)
-			</expression>
-			<expression>
-if (count($db)&lt;=1) then () else
-for $file in $db
-	let $filename := local:filename($file)
-	order by $filename
-	return
-		for $feature in $features[local:filename(.)=$filename]
-			let $ft := $feature/local-name()
-			group by $ft 
-			order by $ft
-			return $filename || '; ' || $ft || '; ' || count($feature)
-			</expression>
-		</rowExpressions>
-	</StatisticalReportTableType>
+	<statisticalReportTableType>http://portele.de/EID8bb8f162-1082-434f-bd06-23d6507634b8.xml</statisticalReportTableType>
 	<ParameterList name="ETF Standard Parameters for XML test objects">
 		<parameter name="files_to_test" required="true">
 			<defaultValue>.*</defaultValue>
-			<description ref="filesToTest"/>
+			<description ref="TR.filesToTest"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
 		<parameter name="tests_to_execute" required="false">
 			<defaultValue>.*</defaultValue>
-			<description ref="testsToExecute"/>
+			<description ref="TR.testsToExecute"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
 		<parameter name="maximum_number_of_error_messages_per_test" required="false">
 			<defaultValue>100</defaultValue>
-			<description ref="limitMessages"/>
+			<description ref="TR.limitMessages"/>
 			<allowedValues>[1-9]+[0-9]*</allowedValues>
 			<type>integer</type>
 		</parameter>
@@ -102,7 +67,7 @@ for $file in $db
 						 <expression>if (not($validationErrors)) then 'PASSED' else ('FAILED', for $error in $validationErrors return (local:addMessage('valdiationError', map { 'text': $error })))</expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="valdiationError"/>
+							<translationTemplate ref="TR.valdiationError"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EID928d8204-3015-4811-82fd-f4779b35385b">
@@ -135,8 +100,8 @@ return
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
-							<translationTemplate ref="incorrectRoot"/>
-							<translationTemplate ref="filesWithErrors"/>
+							<translationTemplate ref="TR.incorrectRoot"/>
+							<translationTemplate ref="TR.filesWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009">
@@ -154,8 +119,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
                    </expression>
 						 <type ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
 						 <translationTemplates>
-							<translationTemplate ref="notUTF8"/>
-							<translationTemplate ref="filesWithErrors"/>
+							<translationTemplate ref="TR.notUTF8"/>
+							<translationTemplate ref="TR.filesWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					</testAssertions>
