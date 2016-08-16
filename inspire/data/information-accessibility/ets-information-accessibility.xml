@@ -70,12 +70,12 @@ let $baduris := for $uri in $uris return if (doc-available($uri)) then () else $
 let $featuresWithErrors := $features[.//@srsName[. = $baduris] or .//@frame[. = $baduris]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $featureuris := ($feature//@srsName[. = $baduris]|$feature//@frame[. = $baduris])
    return
-     for $uri in $featureuris return local:addMessage('brokenLinkCRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'rsid': string($uri) }))
+     for $uri in $featureuris return local:addMessage('TR.brokenLinkCRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'rsid': string($uri) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>

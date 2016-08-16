@@ -93,13 +93,13 @@ let $valuesCode := ( 'bothDirections', 'inDirection', 'inOppositeDirection' )
 let $featuresWithErrors := $features[(self::hy-n:WatercourseLink and hy-n:flowDirection/@xlink:href and not(hy-n:flowDirection/@xlink:href = $valuesURI)) or (self::hy-n3:WatercourseLink and hy-n3:flowDirection and not(hy-n3:flowDirection = $valuesCode))][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $v4 := namespace-uri($feature/*:flowDirection)='http://inspire.ec.europa.eu/schemas/hy-n/4.0'
    let $value := if ($v4) then $feature/*:flowDirection/@xlink:href else $feature/*:flowDirection 
    return
-     local:addMessage('disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'flowDirection', 'value': string($value), 'codelist' : 'http://inspire.ec.europa.eu/codelist/LinkDirectionValue' }))
+     local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'flowDirection', 'value': string($value), 'codelist' : 'http://inspire.ec.europa.eu/codelist/LinkDirectionValue' }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -147,13 +147,13 @@ let $valuesCode := ( 'boundary', 'flowConstriction', 'flowRegulation', 'junction
 let $featuresWithErrors := $features[(self::hy-n:HydroNode and hy-n:hydroNodeCategory/@xlink:href and not(hy-n:hydroNodeCategory/@xlink:href = $valuesURI)) or (self::hy-n3:HydroNode and hy-n3:hydroNodeCategory and not(hy-n3:hydroNodeCategory = $valuesCode))][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $v4 := namespace-uri($feature/*:hydroNodeCategory)='http://inspire.ec.europa.eu/schemas/hy-n/4.0'
    let $value := if ($v4) then $feature/*:hydroNodeCategory/@xlink:href else $feature/*:hydroNodeCategory 
    return
-     local:addMessage('disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'hydroNodeCategory', 'value': string($value), 'codelist' : 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue' }))
+     local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'hydroNodeCategory', 'value': string($value), 'codelist' : 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue' }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -206,11 +206,11 @@ return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else
 return if (not($touches)) then $candidate else ())[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    return
-     local:addMessage('freeNode', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+     local:addMessage('TR.freeNode', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>

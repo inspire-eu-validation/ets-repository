@@ -112,12 +112,12 @@ let $crsuris := (
 let $featuresWithErrors := $features[.//@srsName[not(. = $crsuris)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $srsnames := $feature//@srsName[not(. = $crsuris)]
    return
-     for $srsname in $srsnames return local:addMessage('unknownCRS1', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'crs': string($srsname) }))
+     for $srsname in $srsnames return local:addMessage('TR.unknownCRS1', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'crs': string($srsname) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -181,13 +181,13 @@ let $crsuris := (
 let $filesWithErrors := $db[*/wfs:boundedBy/*/@srsName[not(. = $crsuris)] or */gml:boundedBy/*/@srsName[not(. = $crsuris)]][position() le $limitErrors] 
 return
 (if ($filesWithErrors) then 'FAILED' else 'PASSED',
- if ($filesWithErrors) then local:addMessage('filesWithErrors', map { 'count': string(count($filesWithErrors)) }) else (),
+ local:error-statistics('TR.filesWithErrors', count($filesWithErrors)),
  for $file in $filesWithErrors
     order by local:filename($file)
     let $root := $file/element()
     let $srsnames := $file/*/*[local-name() = 'boundedBy']/*/@srsName[not(. = $crsuris)]
    return
-     for $srsname in $srsnames return local:addMessage('unknownCRS2', map { 'filename': local:filename($root), 'crs': string($srsname) }))
+     for $srsname in $srsnames return local:addMessage('TR.unknownCRS2', map { 'filename': local:filename($root), 'crs': string($srsname) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -225,12 +225,12 @@ let $crsuris := ( 'http://www.opengis.net/def/trs/ISO-8601' )
 let $featuresWithErrors := $features[.//gml:TimeInstance/@frame[not(. = $crsuris)] | .//gml:TimeInstance/gml:timePosition/@frame[not(. = $crsuris)] | .//gml:TimePeriod/@frame[not(. = $crsuris)] | .//gml:TimePeriod/gml:beginPosition/@frame[not(. = $crsuris)] | .//gml:TimePeriod/gml:endPosition/@frame[not(. = $crsuris)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $frames := $feature//@frame[not(. = $crsuris)]
    return
-     for $frame in $frames return local:addMessage('unknownTRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'trs': string($frame) }))
+     for $frame in $frames return local:addMessage('TR.unknownTRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'trs': string($frame) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>

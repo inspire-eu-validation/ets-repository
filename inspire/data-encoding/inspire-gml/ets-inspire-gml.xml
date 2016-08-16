@@ -64,7 +64,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
 						 <label>a.1: Errors loading the XML documents</label>
 						 <description><![CDATA[Report errors that occurred during loading the documents in the test object. A typical example is an XML document that is not well-formed and therefore cannot be processed.]]></description>
 						 <expectedResult/>
-						 <expression>if (not($validationErrors)) then 'PASSED' else ('FAILED', for $error in $validationErrors return (local:addMessage('valdiationError', map { 'text': $error })))</expression>
+						 <expression>if (not($validationErrors)) then 'PASSED' else ('FAILED', for $error in $validationErrors return (local:addMessage('TR.valdiationError', map { 'text': $error })))</expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
 							<translationTemplate ref="TR.valdiationError"/>
@@ -91,12 +91,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
 let $filesWithErrors := $db[not(wfs:FeatureCollection or gml:FeatureCollection or base32:SpatialDataSet or base:SpatialDataSet or gml:AbstractFeature)][position() le $limitErrors]
 return 
 (if ($filesWithErrors) then 'FAILED' else 'PASSED',
- if ($filesWithErrors) then local:addMessage('filesWithErrors', map { 'count': string(count($filesWithErrors)) }) else (),
+ local:error-statistics('TR.filesWithErrors', count($filesWithErrors)),
  for $file in $filesWithErrors
     order by local:filename($file)
     let $root := $file/element()
     return
-   	local:addMessage('incorrectRoot', map { 'filename': local:filename($root), 'elementName': local-name($root), 'namespace': namespace-uri($root) }))
+   	local:addMessage('TR.incorrectRoot', map { 'filename': local:filename($root), 'elementName': local-name($root), 'namespace': namespace-uri($root) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>

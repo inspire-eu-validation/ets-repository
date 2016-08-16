@@ -51,11 +51,6 @@ declare function local:filename($element as node()) as xs:string
   local:strippath(db:path($element))
 };
 
-declare function local:passed($id as xs:string) as xs:boolean
-{
-	true() (: TODO :)
-};
-
 declare function local:log($text as xs:string) as empty-sequence()
 {
   let $dummy := file:append($logFile, $text || file:line-separator(), map { "method": "text", "media-type": "text/plain" })
@@ -79,6 +74,17 @@ declare function local:addMessage($templateId as xs:string, $map as map(*)) as e
     { for $key in map:keys($map) return <argument><token>{$key}</token><value>{map:get($map,$key)}</value></argument>}
    </translationArguments>
   </message>
+};
+
+declare function local:passed($id as xs:string) as xs:boolean
+{
+	true() (: TODO :)
+};
+
+declare function local:error-statistics($template as xs:string, $count as xs:integer) as element()*
+{
+	(if ($count>=$limitErrors) then local:addMessage('TR.tooManyErrors', map { 'count': string($count) }) else (),
+	 if ($count>0) then local:addMessage($template, map { 'count': string($count) }) else ())
 };
 
 declare function local:status($stati as xs:string*) as xs:string 

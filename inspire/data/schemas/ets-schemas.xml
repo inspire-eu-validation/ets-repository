@@ -115,12 +115,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/schema-v
 let $filesWithErrors := $db[not(/*/@xsi:schemaLocation)][position() le $limitErrors]
 return
 (if ($filesWithErrors) then 'FAILED' else 'PASSED',
- if ($filesWithErrors) then local:addMessage('filesWithErrors', map { 'count': string(count($filesWithErrors)) }) else (),
+ local:error-statistics('TR.filesWithErrors', count($filesWithErrors)),
  for $file in $filesWithErrors
     order by local:filename($file)
     let $root := $file/element()
     return
-     local:addMessage('noSchemaLocation', map { 'filename': local:filename($root) }))
+     local:addMessage('TR.noSchemaLocation', map { 'filename': local:filename($root) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -153,12 +153,12 @@ let $errors := for $file in $db
   let $root := $file/element()
   return
    if ($errors>0) then
-    (local:addMessage('errorInFile', map { 'filename': local:filename($root), 'count': string($errors) }),
-     local:addMessage('invalidSchema', map { 'filename': local:filename($root), 'issues': fn:string-join($messages,file:line-separator()) }))
+    local:addMessage('TR.invalidSchema', map { 'filename': local:filename($root), 'count': string($errors), 'issues': file:line-separator() || fn:string-join($messages,file:line-separator()) })
    else ()						 
 return
 (if ($errors) then 'FAILED' else 'PASSED',
- $errors)
+ local:error-statistics('TR.filesWithErrors', count($errors)),
+ $errors[position() le $limitErrors])
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -195,17 +195,15 @@ Relevant requirements:
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/gml-model">Abstract Test Case 'GML model'</a>]]></description>
 						 <expectedResult/>
 						 <expression>
-let $propertiesWithErrors := $features/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))>0) or @xsi:nil eq 'true')][position() le $limitErrors]
-let $featureIdsWithErrors := fn:distinct-values($propertiesWithErrors/../@gml:id)
+let $featuresWithErrors := $features[*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))>0) or @xsi:nil eq 'true')]][position() le $limitErrors]
 return
-(if ($propertiesWithErrors) then 'FAILED' else 'PASSED',
- if (count($featureIdsWithErrors)>0) then local:addMessage('featuresWithErrors', map { 'count': string(count($featureIdsWithErrors)) }) else (),
- for $gmlid in $featureIdsWithErrors
-   order by $gmlid
-   let $feature := $features[@gml:id=$gmlid]
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
    let $properties := $feature/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))>0) or @xsi:nil eq 'true')]
    return
-     local:addMessage('emptyValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($gmlid), 'propertyNames': fn:string-join($properties/local-name(),', ') }))
+     local:addMessage('TR.emptyValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'propertyNames': fn:string-join($properties/local-name(),', ') }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -226,17 +224,15 @@ Relevant requirements:
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/gml-model">Abstract Test Case 'GML model'</a>]]></description>
 						 <expectedResult/>
 						 <expression>
-let $propertiesWithErrors := $features/*[@nilReason and not(@xsi:nil eq 'true')][position() le $limitErrors]
-let $featureIdsWithErrors := fn:distinct-values($propertiesWithErrors/../@gml:id)
+let $featuresWithErrors := $features[*[@nilReason and not(@xsi:nil eq 'true')]][position() le $limitErrors]
 return
-(if ($propertiesWithErrors) then 'FAILED' else 'PASSED',
- if (count($featureIdsWithErrors)>0) then local:addMessage('featuresWithErrors', map { 'count': string(count($featureIdsWithErrors)) }) else (),
- for $gmlid in $featureIdsWithErrors
-   order by $gmlid
-   let $feature := $features[@gml:id=$gmlid]
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
    let $properties := $feature/*[@nilReason and not(@xsi:nil eq 'true')]
    return
-     local:addMessage('nilMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($gmlid), 'propertyNames': fn:string-join($properties/local-name(),', ') }))
+     local:addMessage('TR.nilMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'propertyNames': fn:string-join($properties/local-name(),', ') }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -266,17 +262,15 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/gml-mode
 						 <expectedResult/>
 						 <expression>
 let $values := ( 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Unknown', 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Unpopulated', 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Withheld', 'unknown', 'other:unpopulated', 'withheld' )
-let $propertiesWithErrors := $features/*[@xsi:nil eq 'true' and not(@nilReason =  $values)][position() le $limitErrors]
-let $featureIdsWithErrors := fn:distinct-values($propertiesWithErrors/../@gml:id)
+let $featuresWithErrors := $features[*[@xsi:nil eq 'true' and not(@nilReason =  $values)]][position() le $limitErrors]
 return
-(if ($propertiesWithErrors) then 'FAILED' else 'PASSED',
- if (count($featureIdsWithErrors)>0) then local:addMessage('featuresWithErrors', map { 'count': string(count($featureIdsWithErrors)) }) else (),
- for $gmlid in $featureIdsWithErrors
-   order by $gmlid
-   let $feature := $features[@gml:id=$gmlid]
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
    let $properties := $feature/*[@xsi:nil eq 'true' and not(@nilReason =  $values)]
    return
-     local:addMessage('incorrectReason', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($gmlid), 'propertyNames': fn:string-join($properties/local-name(),', ') }))
+     local:addMessage('TR.incorrectReason', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'propertyNames': fn:string-join($properties/local-name(),', ') }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -314,12 +308,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:Node|self::gml:Edge|self::gml:Face|self::gml:TopoSolid|self::gml:TopoPoint|self::gml:TopoCurve|self::gml:TopoSurface|self::gml:TopoVolume|self::gml:TopoComplex]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $element := $feature//*[self::gml:Node|self::gml:Edge|self::gml:Face|self::gml:TopoSolid|self::gml:TopoPoint|self::gml:TopoCurve|self::gml:TopoSurface|self::gml:TopoVolume|self::gml:TopoComplex][1]
    return
-     local:addMessage('spatialTopologyTypeFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
+     local:addMessage('TR.spatialTopologyTypeFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -341,12 +335,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//gml:Curve/gml:segments/*[not(self::gml:LineStringSegment)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $element := $feature//gml:Curve/gml:segments/*[not(self::gml:LineStringSegment)][1]
    return
-     local:addMessage('invalidInterpolationFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
+     local:addMessage('TR.invalidInterpolationFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -368,12 +362,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:OrientableSurface|self::gml:CompositeSurface|self::gml:PolyhedralSurface|self::gml:Tin|self::gml:TriangulatedSurface]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $element := $feature//*[self::gml:OrientableSurface|self::gml:CompositeSurface|self::gml:PolyhedralSurface|self::gml:Tin|self::gml:TriangulatedSurface][1]
    return
-     local:addMessage('invalidSurfaceElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
+     local:addMessage('TR.invalidSurfaceElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -395,12 +389,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//gml:Surface/gml:patches/*[not(self::gml:PolygonPatch)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $element := $feature//gml:Surface/gml:patches/*[not(self::gml:PolygonPatch)][1]
    return
-     local:addMessage('invalidSurfacePatchElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
+     local:addMessage('TR.invalidSurfacePatchElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -422,12 +416,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:Solid|self::gml:MultiSolid|self::gml:CompositeSolid|self::gml:CompositeCurve|self::gml:Grid]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $element := $feature//*[self::gml:Solid|self::gml:MultiSolid|self::gml:CompositeSolid|self::gml:CompositeCurve|self::gml:Grid][1]
    return
-     local:addMessage('invalidGeometryElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
+     local:addMessage('TR.invalidGeometryElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -449,12 +443,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//gml:Point/*[not(self::gml:pos)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $element := $feature//gml:Point/*[not(self::gml:pos)][1]
    return
-     local:addMessage('invalidPositionElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element), 'geometryType': 'point', 'posElementName': 'gml:pos' }))
+     local:addMessage('TR.invalidPositionElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element), 'geometryType': 'point', 'posElementName': 'gml:pos' }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -476,12 +470,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:LineString|self::gml:LineStringSegment|self::gml:LinearRing]/*[not(self::gml:posList)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $element := ($feature//*[self::gml:LineString|self::gml:LineStringSegment|self::gml:LinearRing|self::gml:Arc|self::gml:Circle]/*[not(self::gml:posList)])[1]
    return
-     local:addMessage('invalidPositionElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element), 'geometryType': 'curve/surface', 'posElementName': 'gml:posList' }))
+     local:addMessage('TR.invalidPositionElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element), 'geometryType': 'curve/surface', 'posElementName': 'gml:posList' }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -503,12 +497,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:MultiPoint/gml:pointMembers|self::gml:MultiCurve/gml:curveMembers|self::gml:MultiSurface/gml:surfaceMembers|self::gml:MultiGeometry/gml:geometryMembers]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $element := ($feature//*[self::gml:MultiPoint|self::gml:MultiCurve|self::gml:MultiSurface|self::gml:MultiGeometry]/*[self::gml:pointMembers|self::gml:curveMembers|self::gml:surfaceMembers|self::gml:geometryMembers])[1]
    return
-     local:addMessage('arrayElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
+     local:addMessage('TR.arrayElementFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -530,12 +524,12 @@ let $featuresToInspect := $features[not(self::*:CadastralParcel)]
 let $featuresWithErrors := $featuresToInspect[.//*[@srsDimension > 3]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $dimension := $feature//@srsDimension[. > 3][1]
    return
-     local:addMessage('tooManyDimensions', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'dimension': string($dimension) }))
+     local:addMessage('TR.tooManyDimensions', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'dimension': string($dimension) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -559,11 +553,11 @@ let $featuresWithErrors := for $feature in $featuresToInspect
    if (contains(ggeo:validate($feature,'110'),'F')) then $feature else ()
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    return
-     local:addMessage('invalidGeometry', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+     local:addMessage('TR.invalidGeometry', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>

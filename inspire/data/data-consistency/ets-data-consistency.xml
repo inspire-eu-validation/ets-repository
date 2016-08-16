@@ -58,7 +58,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency
 					<testAssertions>
 					  <TestAssertion id="EIDc88de361-bf4d-4fdb-8cc0-68d1a62e5eae">
 						 <parent ref="EIDd42be9c8-dd7a-49f2-bb0e-fc2650d6ac5d"/>
-						 <label>a.1: </label>
+						 <label>a.1: Version lifespan plausible</label>
 						 <description><![CDATA[Verify that all endLifespanVersion values are from the allowed range. For all features verify that either
 <ul>						 
 <li>beginLifespanVersion or endLifespanVersion are missing or nil or</li>
@@ -74,13 +74,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency
 let $featuresWithErrors := $features[(*[self::*:beginLifespanVersion and not(xsi:nil='true')] and *[self::*:endLifespanVersion and not(xsi:nil='true')] and xs:dateTime(*:beginLifespanVersion[1]/text()) >= xs:dateTime(*:endLifespanVersion[1]/text()))][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $begin := $feature/*[self::*:beginLifespanVersion][1]/text()
    let $end := $feature/*[self::*:endLifespanVersion][1]/text()
    return
-     local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'begin': $begin, 'end': $end, 'propertyBegin': 'beginLifespanVersion', 'propertyEnd': 'endLifespanVersion' }))
+     local:addMessage('TR.endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'begin': $begin, 'end': $end, 'propertyBegin': 'beginLifespanVersion', 'propertyEnd': 'endLifespanVersion' }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -130,7 +130,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency
 					<testAssertions>
 					  <TestAssertion id="EIDcefa9614-ce69-43d4-bed5-7758e7d890a9">
 						 <parent ref="EID72a3ee32-8582-4f67-80a0-435f636f8cf3"/>
-						 <label>b.1: Validity time sequence</label>
+						 <label>b.1: Valid time plausible</label>
 						 <description><![CDATA[For all features verify that either
 <ul>
 <li>validFrom or validTo are missing or nil or</li>
@@ -143,13 +143,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency
 let $featuresWithErrors := $features[*[self::*:validFrom and not(xsi:nil='true')] and *[self::*:validTo and not(xsi:nil='true')] and xs:dateTime(*:validFrom/text()) >= xs:dateTime(*:validTo/text())][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $begin := $feature/*[self::*:validFrom][1]/text()
    let $end := $feature/*[self::*:validTo][1]/text()
    return
-     local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'begin': $begin, 'end': $end, 'propertyBegin': 'validFrom', 'propertyEnd': 'validTo' }))
+     local:addMessage('TR.endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'begin': $begin, 'end': $end, 'propertyBegin': 'validFrom', 'propertyEnd': 'validTo' }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>

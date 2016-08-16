@@ -249,7 +249,7 @@ declare variable $dbDir external;
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
 
-declare variable $etsno := 1;
+declare variable $etsno := 2;
 declare variable $etsFile := 
   if ($etsno = 1) then "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml"
   else if ($etsno = 2) then "data" || file:dir-separator() || "schemas" || file:dir-separator() || "ets-schemas.xml"
@@ -265,7 +265,7 @@ declare variable $etsFile :=
   else "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml";
 
 declare variable $limitMessages := xs:int( $maximum_number_of_error_messages_per_test );
-declare variable $limitErrors := 1000;
+declare variable $limitErrors := 100;
 declare variable $paramerror := xs:QName("etf:ParameterError");
 
 (: Parameter checks :)
