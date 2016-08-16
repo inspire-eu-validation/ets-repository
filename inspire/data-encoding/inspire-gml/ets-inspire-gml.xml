@@ -1,29 +1,37 @@
-<ExecutableTestSuite id="EID545f9e49-009b-4114-9333-7ca26413b5d4" xmlns="http://www.interactive-instruments.de/etf/1.0">
+<ExecutableTestSuite id="EID545f9e49-009b-4114-9333-7ca26413b5d4" xmlns="http://www.interactive-instruments.de/etf/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/1.0 ../../schema/model/test.xsd">
 	<label>INSPIRE GML encoding</label>
 	<description><![CDATA[This test suite examines GML documents against basic requirements for the GML encoding for spatial data sets in INSPIRE. This only covers application-schema-independent, generic requirements. Requirements related to specific application schemas are part of conformance classes with a dependency on this conformance class.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml">Conformance Class 'INSPIRE GML encoding'</a>]]></description>
 	<version>0.1.0</version>
 	<author>interactive instruments GmbH</author>
-	<creationDate>2016-08-09</creationDate>
+	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2016-08-09</lastUpdateDate>
+	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-encoding/inspire-gml</remoteResource>
 	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
 	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
 		<label>Feature Type Statistics</label>
 		<description>The number of features per feature type and file in the dataset.</description>
+		<version>0.1.0</version>
+		<author>interactive instruments GmbH</author>
+		<creationDate>2016-08-15T00:00:00Z</creationDate>
+		<lastEditor>interactive instruments GmbH</lastEditor>
+		<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
 		<columnHeaderLabels>
-			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="file"/>
-			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureType"/>
-			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureCount"/>
+			<label>Filename</label>
+			<label>Feature Type</label>
+			<label>Feature Count</label>
 		</columnHeaderLabels>
-		<expression>
-('all all ' || count($features),
-for $feature in $features
+		<rowExpressions>
+			<expression>'all; all; ' || count($features)</expression>
+			<expression>
+for $feature in $features 
 	let $ft := $feature/local-name()
 	group by $ft 
 	order by $ft
-	return 'all ' || $ft || ' ' || count($feature),
+	return 'all; ' || $ft || '; ' || count($feature)
+			</expression>
+			<expression>
 if (count($db)&lt;=1) then () else
 for $file in $db
 	let $filename := local:filename($file)
@@ -33,25 +41,26 @@ for $file in $db
 			let $ft := $feature/local-name()
 			group by $ft 
 			order by $ft
-			return $filename || ' ' || $ft || ' ' || count($feature))
-		</expression>
+			return $filename || '; ' || $ft || '; ' || count($feature)
+			</expression>
+		</rowExpressions>
 	</StatisticalReportTableType>
-	<ParameterList>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
 		<parameter name="files_to_test" required="true">
 			<defaultValue>.*</defaultValue>
-			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="filesToTest"/>
+			<description ref="filesToTest"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
 		<parameter name="tests_to_execute" required="false">
 			<defaultValue>.*</defaultValue>
-			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="testsToExecute"/>
+			<description ref="testsToExecute"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
 		<parameter name="maximum_number_of_error_messages_per_test" required="false">
 			<defaultValue>100</defaultValue>
-			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="limitMessages"/>
+			<description ref="limitMessages"/>
 			<allowedValues>[1-9]+[0-9]*</allowedValues>
 			<type>integer</type>
 		</parameter>
@@ -61,7 +70,6 @@ for $file in $db
 	</supportedTestObjectTypes>
 	<Dependencies>
 		<dependency>
-			<reason bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="directDependency"/>
 			<dependsOn ref="EIDbf9837b8-5b7c-4b8f-a803-c99f39d1236e"/>
 		</dependency>
 	</Dependencies>
@@ -75,12 +83,10 @@ for $file in $db
 			  <parent ref="EID8e96257c-ae42-4123-b298-b8c5eda3a027"/>
 			  <label>Basic tests</label>
 			  <description>Verify that all documents contain GML features and use the expected character encoding.</description>
-			<dependency>
-				<!-- only for testing, this test case does not have a dependency; TODO: remove -->
-				<reason bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="preCondition"/>
-				<dependsOn ref="TODO UUID of other Test Case"/>
-			</dependency>
-			<testSteps>
+			  <!-- TODO remove dependecy, just for testing
+			  <Dependency dependsOn="EIDf66872d4-3a1f-4581-a501-94200219bf13"/>
+			  -->
+			  <testSteps>
 				<TestStep id="EIDc177cf64-3a66-4ac4-92b9-61207aab8007">
 					<parent ref="EIDf66872d4-3a1f-4581-a501-94200219bf13"/>
 					<label>IGNORE</label>
@@ -88,9 +94,20 @@ for $file in $db
 					<statementForExecution>not applicable</statementForExecution>
 					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 					<testAssertions>
+					  <TestAssertion id="EIDcab35f1a-6292-44b9-ae2c-9ec62fc0f4b6">
+						 <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+						 <label>a.1: Errors loading the XML documents</label>
+						 <description><![CDATA[Report errors that occurred during loading the documents in the test object. A typical example is an XML document that is not well-formed and therefore cannot be processed.]]></description>
+						 <expectedResult/>
+						 <expression>if (not($validationErrors)) then 'PASSED' else ('FAILED', for $error in $validationErrors return (local:addMessage('valdiationError', map { 'text': $error })))</expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="valdiationError"/>
+						 </translationTemplates>
+					  </TestAssertion>
 					  <TestAssertion id="EID928d8204-3015-4811-82fd-f4779b35385b">
 						 <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
-						 <label>b.1: Document root element</label>
+						 <label>a.2: Document root element</label>
 						 <description><![CDATA[Check for each XML document that the root element is a GML feature or a GML feature collection.<br/><br/>
 For feature collections the following root elements are recognised:
 <ul>
@@ -109,22 +126,22 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
 let $filesWithErrors := $db[not(wfs:FeatureCollection or gml:FeatureCollection or base32:SpatialDataSet or base:SpatialDataSet or gml:AbstractFeature)][position() le $limitErrors]
 return 
 (if ($filesWithErrors) then 'FAILED' else 'PASSED',
+ if ($filesWithErrors) then local:addMessage('filesWithErrors', map { 'count': string(count($filesWithErrors)) }) else (),
  for $file in $filesWithErrors
     order by local:filename($file)
     let $root := $file/element()
     return
-     (local:addMessage('errorInFile', map { 'filename': local:filename($root), 'count': '1' }),
-      local:addMessage('incorrectRoot', map { 'filename': local:filename($root), 'elementName': local-name($root), 'namespace': namespace-uri($root) })))
+   	local:addMessage('incorrectRoot', map { 'filename': local:filename($root), 'elementName': local-name($root), 'namespace': namespace-uri($root) }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
 							<translationTemplate ref="incorrectRoot"/>
-							<translationTemplate ref="errorInFile"/>
+							<translationTemplate ref="filesWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009">
 						 <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
-						 <label>b.2: Character encoding</label>
+						 <label>a.3: Character encoding</label>
 						 <description><![CDATA[This test ensures that all linguistic texts can be encoded consistently and in any language – which in turn simplifies the processing of data. The use of UTF-8 also aligns with common practice and is the default character encoding for XML documents.<br/><br/>
 Inspect each XML document. If an XML declaration exists, verify that the encoding attribute has the value "UTF-8" or that the attribute is missing.<br/><br/>
 Limitations: Currently the test is disabled as the test needs an BaseX extension - the XML declaration is NOT part of the node set in XML databases.<br/><br/>
@@ -138,7 +155,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
 						 <type ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
 						 <translationTemplates>
 							<translationTemplate ref="notUTF8"/>
-							<translationTemplate ref="errorInFile"/>
+							<translationTemplate ref="filesWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					</testAssertions>

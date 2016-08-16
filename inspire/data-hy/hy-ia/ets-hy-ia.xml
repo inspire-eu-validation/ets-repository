@@ -1,13 +1,13 @@
 <ExecutableTestSuite id="EID499937ea-0590-42d2-bd7a-1cafff35ecdb" xmlns="http://www.interactive-instruments.de/etf/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/1.0 ../../schema/model/test.xsd">
-	<label>Information accessibility</label>
-	<description><![CDATA[This test suite examines a data set against the basic requirements related to the accessibility of resources referenced by the data. This test suite only examines requirements that are not specific to a data theme. Additional test cases will be defined per data theme, where needed.<br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/information-accessibility">Conformance Class 'Information accessibility'</a>]]></description>
+	<label>Information accessibility, Hydrography </label>
+	<description><![CDATA[This test suite examines a data set against the themespecific requirements related to the accessibility of resources referenced by the data.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia">Conformance Class 'Information accessibility, Hydrography'</a>]]></description>
 	<version>0.1.0</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
 	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
-	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/information-accessibility</remoteResource>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-hy/hy-ia</remoteResource>
 	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
 	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
 		<label>Feature Type Statistics</label>
@@ -70,53 +70,38 @@ for $file in $db
 	</supportedTestObjectTypes>
 	<Dependencies>
 		<dependency>
-			<dependsOn ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
+			<dependsOn ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
 		</dependency>
 	</Dependencies>
 	<testModules>
-	  <TestModule id="EIDa2530875-5e30-4538-9ca6-3c5876c39515">
-		 <parent ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+	  <TestModule id="EID21240948-ef3f-41d2-b563-f305ced25d38">
+		 <parent ref="EID893b7541-c9cb-4e0a-9f84-5d55cad1866c"/>
 		 <label>IGNORE</label>
 		 <description>IGNORE</description>
 		 <testCases>
-			<TestCase id="EIDf27df7ae-e6de-4d30-b189-230850ec78a2">
-			  <parent ref="EIDa2530875-5e30-4538-9ca6-3c5876c39515"/>
-			  <label>Coordinate reference systems (CRS)</label>
-			  <description>Verify that referenced coordinate reference systems can be accessed.</description>
+			<TestCase id="EIDaa2d89a7-5acc-4951-a67e-5f39e86f4cd0">
+			  <parent ref="EID21240948-ef3f-41d2-b563-f305ced25d38"/>
+			  <label>Code lists</label>
+			  <description>Verify that code lists extensions can be accessed.</description>
 			  <testSteps>
-				<TestStep id="EID1e8dd827-c0f4-4004-aa0d-475155895ca4">
-					<parent ref="EIDf27df7ae-e6de-4d30-b189-230850ec78a2"/>
+				<TestStep id="EIDdac77102-20ce-4f37-84ff-9e07d963f7c8">
+					<parent ref="EIDaa2d89a7-5acc-4951-a67e-5f39e86f4cd0"/>
 					<label>IGNORE</label>
 					<description>IGNORE</description>
 					<statementForExecution>not applicable</statementForExecution>
 					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 					<testAssertions>
-					  <TestAssertion id="EID0bb601c0-8bde-4cbf-972a-aa4425669649">
-						 <parent ref="EID1e8dd827-c0f4-4004-aa0d-475155895ca4"/>
-						 <label>a.1: CRS publicly accessible via HTTP </label>
-						 <description><![CDATA[Verify that any coordinate reference system is publicly accessible via HTTP, i.e. inspect links to coordinate reference systems. Verify that a HTTP GET request to the URI of each unique link (srsName, frame) retrieves a document.<br/><br/>
+					  <TestAssertion id="EID7d55e1ac-d987-49d4-9393-96a8809fbb37">
+						 <parent ref="EIDdac77102-20ce-4f37-84ff-9e07d963f7c8"/>
+						 <label>a.1: Code list extensions accessible</label>
+						 <description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+This data theme currently does not specify any extensible code lists. The test always passes.<br/><br/>
 Relevant requirements:
-<ul><li>IR Requirement Article 10 (3): Life-cycle of Spatial Objects. Where the attributes beginLifespanVersion and endLifespanVersion are used, the value of endLifespanVersion shall not be before the value of beginLifespanVersion.</li></ul>
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency/versions">Abstract Test Case 'Version consistency'</a>]]></description>
 						 <expectedResult/>
-						 <expression>
-let $uris := distinct-values(($features//@srsName,$features//@frame))
-let $baduris := for $uri in $uris return if (doc-available($uri)) then () else $uri
-let $featuresWithErrors := $features[.//@srsName[. = $baduris] or .//@frame[. = $baduris]][position() le $limitErrors]
-return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   let $featureuris := ($feature//@srsName[. = $baduris]|$feature//@frame[. = $baduris])
-   return
-     for $uri in $featureuris return local:addMessage('brokenLinkCRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'rsid': string($uri) }))
-                   </expression>
+						 <expression>'PASSED'</expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-						 <translationTemplates>
-							<translationTemplate ref="brokenLinkCRS"/>
-							<translationTemplate ref="featuresWithErrors"/>
-						 </translationTemplates>
 					  </TestAssertion>
 					</testAssertions>
 				 </TestStep>

@@ -1,0 +1,221 @@
+<ExecutableTestSuite id="EIDd0b58f38-98ae-43a8-a787-9a5084c60267" xmlns="http://www.interactive-instruments.de/etf/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/1.0 ../../schema/model/test.xsd">
+	<label>Data consistency, Hydrography</label>
+	<description><![CDATA[This test suite examines a data set against theme-specific requirements related to the consistency of the data.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc">Conformance Class 'Data consistency, Hydrography'</a>]]></description>
+	<version>0.1.0</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-15T00:00:00Z</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-hy/hy-dc</remoteResource>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
+		<label>Feature Type Statistics</label>
+		<description>The number of features per feature type and file in the dataset.</description>
+		<version>0.1.0</version>
+		<author>interactive instruments GmbH</author>
+		<creationDate>2016-08-15T00:00:00Z</creationDate>
+		<lastEditor>interactive instruments GmbH</lastEditor>
+		<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
+		<columnHeaderLabels>
+			<label>Filename</label>
+			<label>Feature Type</label>
+			<label>Feature Count</label>
+		</columnHeaderLabels>
+		<rowExpressions>
+			<expression>'all; all; ' || count($features)</expression>
+			<expression>
+for $feature in $features 
+	let $ft := $feature/local-name()
+	group by $ft 
+	order by $ft
+	return 'all; ' || $ft || '; ' || count($feature)
+			</expression>
+			<expression>
+if (count($db)&lt;=1) then () else
+for $file in $db
+	let $filename := local:filename($file)
+	order by $filename
+	return
+		for $feature in $features[local:filename(.)=$filename]
+			let $ft := $feature/local-name()
+			group by $ft 
+			order by $ft
+			return $filename || '; ' || $ft || '; ' || count($feature)
+			</expression>
+		</rowExpressions>
+	</StatisticalReportTableType>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="maximum_number_of_error_messages_per_test" required="false">
+			<defaultValue>100</defaultValue>
+			<description ref="limitMessages"/>
+			<allowedValues>[1-9]+[0-9]*</allowedValues>
+			<type>integer</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+	  <testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<Dependencies>
+		<dependency>
+			<dependsOn ref="EID61070ae8-13cb-4303-a340-72c8b877b00a"/>
+		</dependency>
+	</Dependencies>
+	<testModules>
+	  <TestModule id="EIDfb360edf-6f61-4243-a839-9cc7e74015bb">
+		 <parent ref="EIDd0b58f38-98ae-43a8-a787-9a5084c60267"/>
+		 <label>IGNORE</label>
+		 <description>IGNORE</description>
+		 <testCases>
+			<TestCase id="EIDee7a970a-be6c-4554-9693-1f86b0cf6a62">
+			  <parent ref="EIDfb360edf-6f61-4243-a839-9cc7e74015bb"/>
+			  <label>Spatial consistency</label>
+			  <description>Verify that the spatial information is consistent.</description>
+			  <testSteps>
+				<TestStep id="EID743cca00-3b22-41dc-9eb8-d9de0ebfa086">
+					<parent ref="EIDee7a970a-be6c-4554-9693-1f86b0cf6a62"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EIDc5f0d761-678d-4d86-837e-c7819042bd11">
+						 <parent ref="EID743cca00-3b22-41dc-9eb8-d9de0ebfa086"/>
+						 <label>a.1: Each Network geometry is within a physical water geometry</label>
+						 <description><![CDATA[Verify that hydrographic networks are spatially connected across data sets. If the data set contains both WatercourseLink and SurfaceWater (Watercourse or StandingWater) features, verify for each WatercourseLink that its centerlineGeometry is within the geometry of a single Watercourse or StandingWater feature. Verify for each HydroNode that its geometry is within a Watercourse or StandingWater feature, too.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 8.7.1 (1): Theme-specific Requirements – Consistency between spatial data sets. Hydrography links, centrelines and nodes shall always be located within the extent of the area representation of the same object.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/spatial">Abstract Test Case 'Spatial consistency'</a>]]></description>
+						 <expectedResult/>
+						 <expression>
+(: TODO extend with subtypes :)      
+let $surfacewaters := $features[self::*:Watercourse|self::*:StandingWater] 
+let $networkelements := $features[self::*:WatercourseLink|self::*:HydroNode]
+return
+if (count($surfacewaters) = 0 or count($networkelements) = 0) 
+then 'PASSED'
+else
+let $featuresWithErrors := 
+(for $candidate in $networkelements
+let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centerlineGeometry|self::*:geometry]/*[1])
+let $env := ggeo:envelope($candidate_geometry)
+let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+let $isWithin :=
+for $feature in $other_features[self::*:Watercourse|self::*:StandingWater]
+let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+return if (ggeo:isWithin($candidate_geometry,$other_geometry)) then $feature else ()
+return if (not($isWithin)) then $candidate else ())[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('notWithin', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+                   </expression>
+						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="notWithin"/>
+							<translationTemplate ref="featuresWithErrors"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EIDeaa9832a-a372-484a-b25b-c67e1c808e0f">
+						 <parent ref="EID871889b6-5664-4498-8762-849fb77a084f"/>
+						 <label>a.2: Manual review</label>
+						 <description><![CDATA[Verify that hydrographic networks are spatially connected across data sets. Review the data maintenance procedures and perform spot checks to verify that connectivity between hydrographic networks across state borders and – where applicable – also across regional borders (and data sets) within Member States is established and maintained by the respective authorities, using the cross-border connectivity mechanisms provided by the NetworkConnection type.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 8.7.1 (2): Theme-specific Requirements – Consistency between spatial data sets. Connectivity between hydrographic networks across state borders and – where applicable – also across regional borders (and data sets) within Member States shall be established and maintained by the respective authorities, using the cross-border connectivity mechanisms provided by the NetworkConnection type.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/spatial">Abstract Test Case 'Spatial consistency'</a>]]></description>
+						 <expectedResult/>
+						 <expression/>
+						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+					  </TestAssertion>
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+			<TestCase id="EID622dc897-1bae-4f2e-9b4e-5264de015afe">
+			  <parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+			  <label>Thematic consistency</label>
+			  <description>Verify that the thematic information is consistent.</description>
+			  <testSteps>
+				<TestStep id="EID4d44f8ec-e62f-400a-a151-21b6f5547b07">
+					<parent ref="EID622dc897-1bae-4f2e-9b4e-5264de015afe"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EID0bdbce7b-9ed3-402b-8cff-612fd5e9325c">
+						 <parent ref="EID4d44f8ec-e62f-400a-a151-21b6f5547b07"/>
+						 <label>b.1: Consistency with Water Framework Directive reporting</label>
+						 <description><![CDATA[Verify that attributes are consistent with the reporting under the Water Framework Directive, i.e. review for each feature that all attribution is the same as the equivalent property of that object used for reporting obligations under Directive 2000/60/EC.<br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Annex II Section 8.7.1 (3): Theme-specific Requirements – Consistency between spatial data sets. All attribution of objects in this schema shall be the same as the equivalent property of that object used for reporting obligations under Directive 2000/60/EC.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/thematic">Abstract Test Case 'Thematic consistency'</a>]]></description>
+						 <expectedResult/>
+						 <expression/>
+						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+					  </TestAssertion>
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+			<TestCase id="EID7064ef78-fbe6-4b6f-85ba-94f1e8bd058f">
+			  <parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+			  <label>Identifiers</label>
+			  <description>Verify that identifiers are managed properly.</description>
+			  <testSteps>
+				<TestStep id="EIDfed82929-a3b7-4e48-8e06-29f42e90ed62">
+					<parent ref="EID7064ef78-fbe6-4b6f-85ba-94f1e8bd058f"/>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<statementForExecution>not applicable</statementForExecution>
+					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EIDae6e3a80-d0cd-4502-88d4-8189058bec2f">
+						 <parent ref="EIDfed82929-a3b7-4e48-8e06-29f42e90ed62"/>
+						 <label>c.1: Reusing authoritative, pan-European sources</label>
+						 <description><![CDATA[Verify that identifiers are reusing authoritative, pan-European sources, i.e. review for each feature that, if a geographical name is used as a unique hydrologic ID for an object in this specification that it is derived, where possible, from a pan-European Gazetteer or another authoritative, pan-European source.<br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Annex II Section 8.7.2 (1): Theme-specific Requirements – Identifier management. If a geographical name is used as a unique hydrologic ID for an object in this specification then it shall be derived, where possible, from a pan-European Gazetteer or another authoritative, pan-European source.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/identifiers">Abstract Test Case 'Identifiers'</a>]]></description>
+						 <expectedResult/>
+						 <expression/>
+						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+					  </TestAssertion>
+					  <TestAssertion id="EIDf961b9d1-423e-4e89-a59e-988a9604c52e">
+						 <parent ref="EIDfed82929-a3b7-4e48-8e06-29f42e90ed62"/>
+						 <label>c.2: Consistency with Water Framework Directive reporting</label>
+						 <description><![CDATA[Verify that identifiers are consistent with the reporting under the Water Framework Directive, i.e. review for each feature that the localId attribute of the external object identifier is the same as the ID used for reporting obligations under Directive 2000/60/EC.<br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Annex II Section 8.7.2 (2): Theme-specific Requirements – Identifier management. The localId attribute of the external object identifier of a spatial object shall be the same as the ID used for reporting obligations under Directive 2000/60/EC.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/identifiers">Abstract Test Case 'Identifiers'</a>]]></description>
+						 <expectedResult/>
+						 <expression/>
+						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+					  </TestAssertion>
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
+		 </testCases>
+	  </TestModule>
+	</testModules>
+</ExecutableTestSuite>

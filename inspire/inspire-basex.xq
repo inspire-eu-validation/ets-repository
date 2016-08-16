@@ -137,7 +137,7 @@ let $logentry := local:log('Test Suite ''" || $ets/etf:label || "'' started')
 let $testmoduleresults := (" || string-join( $test-module-results, ',' ) || ")
 let $status := local:status($testmoduleresults/etf:resultStatus)
 let $endmessage := prof:void(local:end('" || $ets/@id || "',$status))
-let $logentry := local:log('Test Suite ''" || $ets/etf:label || "'' finished')
+let $logentry := local:log('Test Suite ''" || $ets/etf:label || "'' finished: ' || $status)
 return
 <TestTaskResult xmlns='http://www.interactive-instruments.de/etf/1.0' id='" || $testTaskResultId || "'>
 <resultStatus>{$status}</resultStatus>
@@ -227,7 +227,7 @@ else ()}
 declare variable $files_to_test external := ".*";
 declare variable $tests_to_execute external := ".*";
 declare variable $maximum_number_of_error_messages_per_test external := "50";
-declare variable $schema_file external := "schema.xsd";
+declare variable $schema_file external;
 
 (: ETF test driver parameters :)
 declare variable $validationErrors external := "";
@@ -236,19 +236,33 @@ declare variable $executableTestSuiteId external := 'EID545f9e49-009b-4114-9333-
 declare variable $testTaskResultId external := uuid:randomUUID();
 declare variable $testObjectTypeIds external := "FIXME" ;
 declare variable $translationTemplateBundleId external := "FIXME" ;
-declare variable $projDir external := "/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire/data-encoding/inspire-gml";
+declare variable $projDir external := "/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire";
 declare variable $tmpDir external := $projDir || file:dir-separator() || "tmp";
 declare variable $outputFile external := $tmpDir || file:dir-separator() || $testTaskResultId || "-result.xml";
 declare variable $logFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-log.txt";
 declare variable $statFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-stat.xml";
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
-declare variable $dbBaseName external := "hy-n";
+declare variable $dbBaseName external := "hy-test";
 declare variable $dbCount external := 1;
 declare variable $dbDir external;
 
 (: Project internals :)
-declare variable $assertionsFile := "ets-inspire-gml.xml"; (: "ets-inspire-gml" "ets-schemas" "ets-data-consistency" "ets-information-accessibility" "ets-reference-systems.xml" :)
 declare variable $testQueryFile := "testquery.xq";
+
+declare variable $etsno := 11;
+declare variable $etsFile := 
+  if ($etsno = 1) then "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml"
+  else if ($etsno = 2) then "data" || file:dir-separator() || "schemas" || file:dir-separator() || "ets-schemas.xml"
+  else if ($etsno = 3) then "data" || file:dir-separator() || "data-consistency" || file:dir-separator() || "ets-data-consistency.xml"
+  else if ($etsno = 4) then "data" || file:dir-separator() || "information-accessibility" || file:dir-separator() || "ets-information-accessibility.xml"
+  else if ($etsno = 5) then "data" || file:dir-separator() || "reference-systems" || file:dir-separator() || "ets-reference-systems.xml"
+  else if ($etsno = 6) then "data-hy" || file:dir-separator() || "hy-gml" || file:dir-separator() || "ets-hy-gml.xml"
+  else if ($etsno = 7) then "data-hy" || file:dir-separator() || "hy-n-as" || file:dir-separator() || "ets-hy-n-as.xml"
+  else if ($etsno = 8) then "data-hy" || file:dir-separator() || "hy-p-as" || file:dir-separator() || "ets-hy-p-as.xml"
+  else if ($etsno = 9) then "data-hy" || file:dir-separator() || "hy-dc" || file:dir-separator() || "ets-hy-dc.xml"
+  else if ($etsno = 10) then "data-hy" || file:dir-separator() || "hy-ia" || file:dir-separator() || "ets-hy-ia.xml"
+  else if ($etsno = 11) then "data-hy" || file:dir-separator() || "hy-rs" || file:dir-separator() || "ets-hy-rs.xml"
+  else "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml";
 
 declare variable $limitMessages := xs:int( $maximum_number_of_error_messages_per_test );
 declare variable $limitErrors := 1000;
@@ -288,19 +302,20 @@ if (file:exists($outputFile)) then if (file:is-file($outputFile)) then () else e
 
 for $i in 0 to $count return if (db:exists($dbBaseName || '-' || $i)) then () else error($paramerror,concat("System error: XML database '",concat($dbBaseName,"-",$i),"' was specified, but not found. Please contact an administrator.&#xa;")),
 
-let $assertionsFile := concat($projDir, file:dir-separator(),$assertionsFile)
+let $etsFile := $projDir || file:dir-separator() || $etsFile
 let $ets :=
 try{
-	doc($assertionsFile)/element()
+	doc($etsFile)/element()
 } catch * {
-	error($paramerror,concat("Systemfehler: Die Datei mit den Assertions '",data($assertionsFile),"' wurde nicht gefunden oder sie ist nicht valide. Bitte kontaktieren Sie den Administrator.&#xa;"))
+	error($paramerror,concat("System error: The Executable Test Suite file '",data($etsFile),"' was not found or is invalid. Please contact an administrator.&#xa;"))
 }
+
 let $testQueryFile := concat($projDir, file:dir-separator(),$testQueryFile)
 let $testQuery :=
 try{
 	file:read-text($testQueryFile, "UTF-8")
 } catch * {
-	error($paramerror,concat("Systemfehler: Die Testquery-Datei '",data($assertionsFile),"' konnte nicht geöffnet. Bitte kontaktieren Sie den Administrator.&#xa;"))
+	error($paramerror,concat("System error: The system file '",data($testQueryFile),"' could not be opened.  Please contact an administrator.&#xa;"))
 }
 
 let $db := for $i in 0 to $count return db:open($dbBaseName || '-' || $i)[matches(db:path(.),$files_to_test)]
@@ -309,7 +324,7 @@ let $features := $db/wfs:FeatureCollection/wfs:member/* | $db/gml:FeatureCollect
 
 let $stat := if (not($ets//etf:StatisticalReportTableType)) then () else "
 let $start := prof:current-ms()
-let $entries := " || $ets//etf:StatisticalReportTableType[1]/etf:expression || "
+let $entries := (" || string-join($ets//etf:StatisticalReportTableType[1]/etf:rowExpressions/etf:expression,', ') || ")
 let $statTable :=
 <StatisticalReportTable xmlns='http://www.interactive-instruments.de/etf/1.0'>
 <type ref='" || $ets//etf:StatisticalReportTableType[1]/@id || "'/>

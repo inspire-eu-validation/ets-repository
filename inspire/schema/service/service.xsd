@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.interactive-instruments.de/etfws/1.0"
+    targetNamespace="http://www.interactive-instruments.de/etfws/1.0" xmlns:etf="http://www.interactive-instruments.de/etf/1.0"
+    elementFormDefault="qualified" version="1.0">
+
+    <xs:annotation>
+        <!-- Author: Jon Herrmann (interactive instruments) -->
+        <xs:documentation xml:lang="en"> service.xsd, (c) 2016 interactive instruments, part of ETF, licensed under the Apache License
+            Version 2.0 </xs:documentation>
+    </xs:annotation>
+
+    <!-- =============================================================== -->
+    <!-- ================== includes and imports ======================= -->
+    <!-- =============================================================== -->
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/basicTypes.xsd"/>
+    <xs:include schemaLocation="serviceTypes.xsd"/>
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/capabilities.xsd" />
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/report.xsd"/>
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/result.xsd"/>
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/run.xsd"/>
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/specification.xsd"/>
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/run-monitoring.xsd"/>
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/test.xsd"/>
+    <xs:import namespace="http://www.interactive-instruments.de/etf/1.0" schemaLocation="../basic/user.xsd"/>
+    <!-- =============================================================== -->
+
+    <!-- ======================== elements ============================= -->
+    <xs:element name="Response" type="ResponseType"/>
+    <xs:element name="TestObjectCollection" type="TestObjectTypeCollection" substitutionGroup="Collection"/>
+    <xs:element name="TestDomainCollection" type="TestDomainCollectionType" substitutionGroup="Collection"/>
+    <xs:element name="TestRunCollection" type="TestRunCollectionType" substitutionGroup="Collection"/>
+    <xs:element name="ExecutableTestSuiteCollection" type="ExecutableTestSuiteCollectionType" substitutionGroup="Collection"/>
+    <xs:element name="MessageTemplateCollection" type="MessageTemplateCollectionType" substitutionGroup="Collection"/>
+    <xs:element name="UserCollection" type="UserCollectionType" substitutionGroup="Collection"/>
+    <xs:element name="ResultStyleCollection" type="ResultStyleCollectionType" substitutionGroup="Collection"/>
+    <xs:element name="CredentialCollection" type="CredentialCollectionType" substitutionGroup="Collection"/>
+    <xs:element name="AttachmentCollection" type="AttachmentCollectionType" substitutionGroup="Collection"/>
+    <xs:element name="ComponentCollection" type="AttachmentCollectionType" substitutionGroup="Collection"/>
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <xs:simpleType name="schemaVersionType">
+        <xs:annotation>
+            <xs:documentation> The schema version in the form MAJOR.MINOR </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="1\.[0-9]+"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="PaginationType">
+        <xs:sequence>
+            <xs:element name="previous" minOccurs="0">
+                <xs:complexType>
+                    <xs:attribute name="href" type="etf:httpUriType" use="required"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="current" minOccurs="1">
+                <xs:complexType>
+                    <xs:attribute name="href" type="etf:httpUriType" use="required"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="next" minOccurs="0">
+                <xs:complexType>
+                    <xs:attribute name="href" type="etf:httpUriType" use="required"/>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="position" type="xs:nonNegativeInteger" use="required"/>
+        <xs:attribute name="returnedItems" type="xs:nonNegativeInteger" use="required">
+            <xs:annotation>
+                <xs:documentation>Number of returned items in the paginable collection -not including the referenced
+                    items</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="ResponseType">
+        <xs:choice>
+            <xs:sequence>
+                <xs:element name="Pagination" type="PaginationType"/>
+                <xs:element ref="etf:Collection">
+                    <xs:annotation>
+                        <xs:documentation>A collection which contains multiple items. The collection may not contain all requested
+                            items but provide a URL where next/previous items can be requested (Pagination).</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:sequence>
+                <xs:element ref="etf:Item"/>
+            </xs:sequence>
+        </xs:choice>
+        <xs:attribute name="version" type="schemaVersionType" use="required"/>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="TestObjectTypeCollection">
+        <xs:annotation>
+            <xs:documentation>A collection of test objects</xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element ref="etf:TestObject"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="TestDomainCollectionType">
+        <xs:annotation>
+            <xs:documentation> Collection of test domains</xs:documentation>
+        </xs:annotation>
+
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element ref="etf:TestDomain"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="TestRunCollectionType">
+        <xs:annotation>
+            <xs:documentation>A collection of test run results</xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:sequence>
+                <xs:element ref="etf:TestRun"/>
+            </xs:sequence>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="ExecutableTestSuiteCollectionType" final="extension restriction">
+        <xs:annotation>
+            <xs:documentation>A collection of Executable Test Suites</xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element ref="etf:ExecutableTestSuite"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="MessageTemplateCollectionType">
+        <xs:annotation>
+            <xs:documentation>A collection of Message templates in a specific language</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:element ref="etf:MessageTemplate"/>
+            </xs:sequence>
+        </xs:sequence>
+        <xs:attribute name="lang" type="xs:language" use="required"/>
+        <xs:attribute ref="etf:urnBase" use="required"/>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="UserCollectionType">
+        <xs:annotation>
+            <xs:documentation>A collection of users</xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="etf:User"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="ResultStyleCollectionType">
+        <xs:annotation>
+            <xs:documentation> Collection of result styles used transform/style a test result </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element ref="etf:ResultStyle"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="CredentialCollectionType">
+        <xs:annotation>
+            <xs:documentation> Collection of Credentials </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="etf:Credential"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="AttachmentCollectionType">
+        <xs:annotation>
+            <xs:documentation> Collection of Attachments </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="etf:Attachment"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- =============================================================== -->
+    <xs:complexType name="ComponentCollectionType">
+        <xs:annotation>
+            <xs:documentation> Collection of Components </xs:documentation>
+        </xs:annotation>
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="etf:Component"/>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <!-- =============================================================== -->
+    <xs:element name="TestTaskResultsCollection" substitutionGroup="Collection">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="resultStatus" type="TestResultStatusType"/>
+                <xs:element name="startTimestamp" type="xs:dateTime"/>
+                <xs:element name="duration" type="xs:unsignedLong"/>
+                <xs:element ref="TestTaskResult" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

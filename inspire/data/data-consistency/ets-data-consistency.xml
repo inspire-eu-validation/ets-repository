@@ -1,29 +1,37 @@
-<ExecutableTestSuite id="EID61070ae8-13cb-4303-a340-72c8b877b00a" xmlns="http://www.interactive-instruments.de/etf/1.0">
+<ExecutableTestSuite id="EID61070ae8-13cb-4303-a340-72c8b877b00a" xmlns="http://www.interactive-instruments.de/etf/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/1.0 ../../schema/model/test.xsd">
 	<label>Data consistency</label>
 	<description><![CDATA[This test suite examines a data set against the basic requirements related to the consistency of the data. This test suite only examines requirements that are not specific to a data theme. Additional test cases will be defined per data theme, where needed.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency">Conformance Class 'Data consistency'</a>]]></description>
 	<version>0.1.0</version>
 	<author>interactive instruments GmbH</author>
-	<creationDate>2016-08-15</creationDate>
+	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2016-08-15</lastUpdateDate>
-	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/schemas</remoteResource>
+	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/data-consistency</remoteResource>
 	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
 	<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8">
 		<label>Feature Type Statistics</label>
 		<description>The number of features per feature type and file in the dataset.</description>
+		<version>0.1.0</version>
+		<author>interactive instruments GmbH</author>
+		<creationDate>2016-08-15T00:00:00Z</creationDate>
+		<lastEditor>interactive instruments GmbH</lastEditor>
+		<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
 		<columnHeaderLabels>
-			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="file"/>
-			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureType"/>
-			<label bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="featureCount"/>
+			<label>Filename</label>
+			<label>Feature Type</label>
+			<label>Feature Count</label>
 		</columnHeaderLabels>
-		<expression>
-('all all ' || count($features),
-for $feature in $features
+		<rowExpressions>
+			<expression>'all; all; ' || count($features)</expression>
+			<expression>
+for $feature in $features 
 	let $ft := $feature/local-name()
 	group by $ft 
 	order by $ft
-	return 'all ' || $ft || ' ' || count($feature),
+	return 'all; ' || $ft || '; ' || count($feature)
+			</expression>
+			<expression>
 if (count($db)&lt;=1) then () else
 for $file in $db
 	let $filename := local:filename($file)
@@ -33,25 +41,26 @@ for $file in $db
 			let $ft := $feature/local-name()
 			group by $ft 
 			order by $ft
-			return $filename || ' ' || $ft || ' ' || count($feature))
-		</expression>
+			return $filename || '; ' || $ft || '; ' || count($feature)
+			</expression>
+		</rowExpressions>
 	</StatisticalReportTableType>
-	<ParameterList>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
 		<parameter name="files_to_test" required="true">
 			<defaultValue>.*</defaultValue>
-			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="filesToTest"/>
+			<description ref="filesToTest"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
 		<parameter name="tests_to_execute" required="false">
 			<defaultValue>.*</defaultValue>
-			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="testsToExecute"/>
+			<description ref="testsToExecute"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
 		<parameter name="maximum_number_of_error_messages_per_test" required="false">
 			<defaultValue>100</defaultValue>
-			<description bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="limitMessages"/>
+			<description ref="limitMessages"/>
 			<allowedValues>[1-9]+[0-9]*</allowedValues>
 			<type>integer</type>
 		</parameter>
@@ -61,7 +70,6 @@ for $file in $db
 	</supportedTestObjectTypes>
 	<Dependencies>
 		<dependency>
-			<reason bundleId="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" templateName="directDependency"/>
 			<dependsOn ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
 		</dependency>
 	</Dependencies>
@@ -101,18 +109,18 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency
 let $featuresWithErrors := $features[(*[self::*:beginLifespanVersion and not(xsi:nil='true')] and *[self::*:endLifespanVersion and not(xsi:nil='true')] and xs:dateTime(*:beginLifespanVersion[1]/text()) >= xs:dateTime(*:endLifespanVersion[1]/text()))][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $begin := $feature/*[self::*:beginLifespanVersion][1]/text()
    let $end := $feature/*[self::*:endLifespanVersion][1]/text()
    return
-     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
-      local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'begin': $begin, 'end': $end, 'propertyBegin': 'beginLifespanVersion', 'propertyEnd': 'endLifespanVersion' })))
+     local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'begin': $begin, 'end': $end, 'propertyBegin': 'beginLifespanVersion', 'propertyEnd': 'endLifespanVersion' }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
 							<translationTemplate ref="endTooEarly"/>
-							<translationTemplate ref="errorInFeature"/>
+							<translationTemplate ref="featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EIDeaa9832a-a372-484a-b25b-c67e1c808e0f">
@@ -127,7 +135,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency
 						 <expectedResult/>
 						 <expression/>
 						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
-						 <translationTemplates/>
 					  </TestAssertion>
 					  <TestAssertion id="EID2b8243c8-e2e7-402d-97f1-86110b70e55e">
 						 <parent ref="EID871889b6-5664-4498-8762-849fb77a084f"/>
@@ -139,7 +146,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency
 						 <expectedResult/>
 						 <expression/>
 						 <type ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
-						 <translationTemplates/>
 					  </TestAssertion>
 					</testAssertions>
 				 </TestStep>
@@ -172,18 +178,18 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency
 let $featuresWithErrors := $features[*[self::*:validFrom and not(xsi:nil='true')] and *[self::*:validTo and not(xsi:nil='true')] and xs:dateTime(*:validFrom/text()) >= xs:dateTime(*:validTo/text())][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ if ($featuresWithErrors) then local:addMessage('featuresWithErrors', map { 'count': string(count($featuresWithErrors)) }) else (),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $begin := $feature/*[self::*:validFrom][1]/text()
    let $end := $feature/*[self::*:validTo][1]/text()
    return
-     (local:addMessage('errorInFeature', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'count': '1' }),
-      local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $feature/@gml:id, 'begin': $begin, 'end': $end, 'propertyBegin': 'validFrom', 'propertyEnd': 'validTo' })))
+     local:addMessage('endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'begin': $begin, 'end': $end, 'propertyBegin': 'validFrom', 'propertyEnd': 'validTo' }))
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
 							<translationTemplate ref="endTooEarly"/>
-							<translationTemplate ref="errorInFeature"/>
+							<translationTemplate ref="featuresWithErrors"/>
 						 </translationTemplates>
 					  </TestAssertion>
 					</testAssertions>
