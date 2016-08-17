@@ -249,7 +249,7 @@ declare variable $dbDir external;
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
 
-declare variable $etsno := 2;
+declare variable $etsno := 8;
 declare variable $etsFile := 
   if ($etsno = 1) then "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml"
   else if ($etsno = 2) then "data" || file:dir-separator() || "schemas" || file:dir-separator() || "ets-schemas.xml"

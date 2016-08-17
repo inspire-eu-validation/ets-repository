@@ -58,14 +58,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as">Conform
 					<testAssertions>
 					  <TestAssertion id="EID51ed3194-5432-48e0-9285-a4fe175c7dca">
 						 <parent ref="EIDecad630a-355f-49b6-b000-8ee404e70e97"/>
-						 <label>a.1: WatercourseLink.flowDirection</label>
-						 <description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the following values are allowed
-<ul>
-<li>bothDirections</li>
-<li>inDirection</li>
-<li>inOppositeDirection</li>
-</ul>						 
-For datasets using version 3 of the GML application schema, the value is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is prefixed with 'http://inspire.ec.europa.eu/codelist/LinkDirectionValue/'.<br/><br/>
+						 <label>a.1: flowDirection attributes</label>
+						 <description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/LinkDirectionValue'>http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects.  For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
@@ -88,18 +82,10 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/code-lis
 						 <expectedResult/>
 						 <expression>
 (: TODO: extend with subtypes :)
-let $valuesURI := ( 'http://inspire.ec.europa.eu/codelist/LinkDirectionValue/bothDirections', 'http://inspire.ec.europa.eu/codelist/LinkDirectionValue/inDirection', 'http://inspire.ec.europa.eu/codelist/LinkDirectionValue/inOppositeDirection' )
-let $valuesCode := ( 'bothDirections', 'inDirection', 'inOppositeDirection' )
-let $featuresWithErrors := $features[(self::hy-n:WatercourseLink and hy-n:flowDirection/@xlink:href and not(hy-n:flowDirection/@xlink:href = $valuesURI)) or (self::hy-n3:WatercourseLink and hy-n3:flowDirection and not(hy-n3:flowDirection = $valuesCode))][position() le $limitErrors]
-return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   let $v4 := namespace-uri($feature/*:flowDirection)='http://inspire.ec.europa.eu/schemas/hy-n/4.0'
-   let $value := if ($v4) then $feature/*:flowDirection/@xlink:href else $feature/*:flowDirection 
-   return
-     local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'flowDirection', 'value': string($value), 'codelist' : 'http://inspire.ec.europa.eu/codelist/LinkDirectionValue' }))
+let $features3 := $features[self::hy-n3:WatercourseLink]
+let $features4 := $features[self::hy-n:WatercourseLink]
+let $messages := local:check-code-list-values($features3, $features4, 'flowDirection', 'http://inspire.ec.europa.eu/codelist/LinkDirectionValue')
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -109,17 +95,8 @@ return
 					  </TestAssertion>
 					  <TestAssertion id="EID6b3de62d-5f3a-40f0-9060-568176e071be">
 						 <parent ref="EIDecad630a-355f-49b6-b000-8ee404e70e97"/>
-						 <label>a.2: HydroNode.hydroNodeCategory</label>
-						 <description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the following values are allowed
-<ul>
-<li>boundary</li>
-<li>flowConstriction</li>
-<li>flowRegulation</li>
-<li>junction</li>
-<li>outlet</li>
-<li>source</li>
-</ul>						 
-For datasets using version 3 of the GML application schema, the value is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is prefixed with 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue/'.<br/><br/>
+						 <label>a.2: hydroNodeCategory attributes</label>
+						 <description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue'>http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects.  For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
@@ -142,18 +119,10 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/code-lis
 						 <expectedResult/>
 						 <expression>
 (: TODO: extend with subtypes :)
-let $valuesURI := ( 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue/boundary', 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue/flowConstriction', 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue/flowRegulation', 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue/junction', 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue/outlet', 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue/source' )
-let $valuesCode := ( 'boundary', 'flowConstriction', 'flowRegulation', 'junction', 'outlet', 'source' )
-let $featuresWithErrors := $features[(self::hy-n:HydroNode and hy-n:hydroNodeCategory/@xlink:href and not(hy-n:hydroNodeCategory/@xlink:href = $valuesURI)) or (self::hy-n3:HydroNode and hy-n3:hydroNodeCategory and not(hy-n3:hydroNodeCategory = $valuesCode))][position() le $limitErrors]
-return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   let $v4 := namespace-uri($feature/*:hydroNodeCategory)='http://inspire.ec.europa.eu/schemas/hy-n/4.0'
-   let $value := if ($v4) then $feature/*:hydroNodeCategory/@xlink:href else $feature/*:hydroNodeCategory 
-   return
-     local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'hydroNodeCategory', 'value': string($value), 'codelist' : 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue' }))
+let $features3 := $features[self::hy-n3:WatercourseLink]
+let $features4 := $features[self::hy-n:WatercourseLink]
+let $messages := local:check-code-list-values($features3, $features4, 'hydroNodeCategory', 'http://inspire.ec.europa.eu/codelist/HydroNodeCategoryValue')
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
                    </expression>
 						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
@@ -289,7 +258,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/identifi
 					  </TestAssertion>
 					  <TestAssertion id="EID924a4b60-ddb6-4672-90c2-159e503cfd1d">
 						 <parent ref="EIDcb3f04c5-acd2-46af-a661-dd22588fa5f5"/>
-						 <label>c.2: Reuse of authoritative, pan-European identifiers</label>
+						 <label>c.2: Linear references</label>
 						 <description><![CDATA[VFor each NetworkProperty feature that links to a WatercourseLink or a WatercourseLinkSequence, verify that any linear references are consistent with the length of the geometry of the network feature.<br/><br/>
 Relevant requirements:
 <ul>

@@ -18,12 +18,13 @@ declare namespace xsi='http://www.w3.org/2001/XMLSchema-instance';
 declare namespace xlink='http://www.w3.org/1999/xlink'; 
 declare namespace etf='http://www.interactive-instruments.de/etf/1.0';
 declare namespace uuid='java.util.UUID';
+declare namespace atom='http://www.w3.org/2005/Atom';
 
 import module namespace functx = 'http://www.functx.com';
 import module namespace ggeo = 'de.interactive_instruments.etf.bsxm.GmlGeoX';
 
 declare variable $limitErrors external := 1000;
-declare variable $limitMessages external := 50;
+declare variable $limitMessages external := 100;
 declare variable $validationErrors external := ''; 
 declare variable $db external; 
 declare variable $features external; 
@@ -90,6 +91,27 @@ declare function local:error-statistics($template as xs:string, $count as xs:int
 declare function local:status($stati as xs:string*) as xs:string 
 {
 	if ($stati='FAILED') then 'FAILED' else if ($stati='SKIPPED') then 'SKIPPED' else if ($stati='WARNING') then 'WARNING' else if ($stati='INFO') then 'INFO' else if ($stati='PASSED_MANUAL') then 'PASSED_MANUAL' else if ($stati='PASSED') then 'PASSED' else if ($stati='NOT_APPLICABLE') then 'NOT_APPLICABLE' else 'UNDEFINED'
+};
+
+declare function local:check-code-list-values($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
+{
+let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
+let $cluri := $uri || '/' || $clname || '.en.atom'
+let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
+return
+if (not($clfeed)) then ('FAILED', local:addMessage('systemError', map { '$text': 'Code list ' || $uri || 'cannot be accessed.' }))
+else
+let $valuesURI := $clfeed//atom:entry/atom:id/text()
+let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
+let $featuresWithErrors := ($features3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $features4[*[local-name()=$property and not(@xsi:nil='true') and @xlink:href and not(@xlink:href=$valuesURI)]])[position() le $limitErrors]
+return
+(local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $v4 := fn:starts-with(namespace-uri($feature/*[local-name()=$property]),'http://inspire.ec.europa.eu/schemas/')
+   let $value := if ($v4) then $feature/*[local-name()=$property]/@xlink:href else $feature/*[local-name()=$property]/text()
+   return
+     local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': $property, 'value': string($value), 'codelist' : $uri }))  
 };
 
 (: Start logging :)
