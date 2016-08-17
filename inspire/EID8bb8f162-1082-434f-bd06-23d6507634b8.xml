@@ -1,6 +1,9 @@
-<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/1.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/1.0 schema/model/report.xsd">
+<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/2.0" id="EID8bb8f162-1082-434f-bd06-23d6507634b8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 schema/model/report.xsd">
+	<!--
+	TODO Including label and description does not work with the current schemas
 	<label>Feature Type Statistics</label>
 	<description>The number of features per feature type and file in the dataset.</description>
+	-->
 	<version>0.1.0</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
@@ -14,6 +17,7 @@
 	<rowExpressions>
 		<expression>'all; all; ' || count($features)</expression>
 		<expression>
+if (count($db)&lt;=1) then () else
 for $feature in $features 
 let $ft := $feature/local-name()
 group by $ft 
@@ -21,7 +25,6 @@ order by $ft
 return 'all; ' || $ft || '; ' || count($feature)
 		</expression>
 		<expression>
-if (count($db)&lt;=1) then () else
 for $file in $db
 let $filename := local:filename($file)
 order by $filename

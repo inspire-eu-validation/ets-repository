@@ -1,4 +1,6 @@
-<ExecutableTestSuite id="EID545f9e49-009b-4114-9333-7ca26413b5d4" xmlns="http://www.interactive-instruments.de/etf/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/1.0 ../../schema/model/test.xsd">
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID545f9e49-009b-4114-9333-7ca26413b5d4" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/td/testDriverResponse.xsd">
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-encoding/inspire-gml</remoteResource>
 	<label>INSPIRE GML encoding</label>
 	<description><![CDATA[This test suite examines GML documents against basic requirements for the GML encoding for spatial data sets in INSPIRE. This only covers application-schema-independent, generic requirements. Requirements related to specific application schemas are part of conformance classes with a dependency on this conformance class.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml">Conformance Class 'INSPIRE GML encoding'</a>]]></description>
@@ -7,9 +9,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
 	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
-	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-encoding/inspire-gml</remoteResource>
 	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
-	<statisticalReportTableType>http://portele.de/EID8bb8f162-1082-434f-bd06-23d6507634b8.xml</statisticalReportTableType>
 	<ParameterList name="ETF Standard Parameters for XML test objects">
 		<parameter name="files_to_test" required="true">
 			<defaultValue>.*</defaultValue>
@@ -31,49 +31,43 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gm
 		</parameter>
 	</ParameterList>
 	<supportedTestObjectTypes>
-	  <testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
 	</supportedTestObjectTypes>
-	<Dependencies>
-		<dependency>
-			<dependsOn ref="EIDbf9837b8-5b7c-4b8f-a803-c99f39d1236e"/>
-		</dependency>
-	</Dependencies>
+	<dependencies>
+		<executableTestSuite ref="EIDbf9837b8-5b7c-4b8f-a803-c99f39d1236e"/>
+	</dependencies>
 	<testModules>
-	  <TestModule id="EID8e96257c-ae42-4123-b298-b8c5eda3a027">
-		 <parent ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
-		 <label>IGNORE</label>
-		 <description>IGNORE</description>
-		 <testCases>
-			<TestCase id="EIDf66872d4-3a1f-4581-a501-94200219bf13">
-			  <parent ref="EID8e96257c-ae42-4123-b298-b8c5eda3a027"/>
-			  <label>Basic tests</label>
-			  <description>Verify that all documents contain GML features and use the expected character encoding.</description>
-			  <!-- TODO remove dependecy, just for testing
-			  <Dependency dependsOn="EIDf66872d4-3a1f-4581-a501-94200219bf13"/>
-			  -->
-			  <testSteps>
-				<TestStep id="EIDc177cf64-3a66-4ac4-92b9-61207aab8007">
-					<parent ref="EIDf66872d4-3a1f-4581-a501-94200219bf13"/>
-					<label>IGNORE</label>
-					<description>IGNORE</description>
-					<statementForExecution>not applicable</statementForExecution>
-					<type ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
-					<testAssertions>
-					  <TestAssertion id="EIDcab35f1a-6292-44b9-ae2c-9ec62fc0f4b6">
-						 <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
-						 <label>a.1: Errors loading the XML documents</label>
-						 <description><![CDATA[Report errors that occurred during loading the documents in the test object. A typical example is an XML document that is not well-formed and therefore cannot be processed.]]></description>
-						 <expectedResult/>
-						 <expression>if (not($validationErrors)) then 'PASSED' else ('FAILED', for $error in $validationErrors return (local:addMessage('TR.valdiationError', map { 'text': $error })))</expression>
-						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-						 <translationTemplates>
-							<translationTemplate ref="TR.valdiationError"/>
-						 </translationTemplates>
-					  </TestAssertion>
-					  <TestAssertion id="EID928d8204-3015-4811-82fd-f4779b35385b">
-						 <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
-						 <label>a.2: Document root element</label>
-						 <description><![CDATA[Check for each XML document that the root element is a GML feature or a GML feature collection.<br/><br/>
+		<TestModule id="EID8e96257c-ae42-4123-b298-b8c5eda3a027">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID545f9e49-009b-4114-9333-7ca26413b5d4"/>
+			<testCases>
+				<TestCase id="EIDf66872d4-3a1f-4581-a501-94200219bf13">
+					<label>Basic tests</label>
+					<description>Verify that all documents contain GML features and use the expected character encoding.</description>
+					<parent ref="EID8e96257c-ae42-4123-b298-b8c5eda3a027"/>
+					<testSteps>
+						<TestStep id="EIDc177cf64-3a66-4ac4-92b9-61207aab8007">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDf66872d4-3a1f-4581-a501-94200219bf13"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDcab35f1a-6292-44b9-ae2c-9ec62fc0f4b6">
+									<label>a.1: Errors loading the XML documents</label>
+									<description><![CDATA[Report errors that occurred during loading the documents in the test object. A typical example is an XML document that is not well-formed and therefore cannot be processed.]]></description>
+									<parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+									<expectedResult/>
+									<expression>if (not($validationErrors)) then 'PASSED' else ('FAILED', for $error in $validationErrors return (local:addMessage('TR.valdiationError', map { 'text': $error })))</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.valdiationError"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID928d8204-3015-4811-82fd-f4779b35385b">
+									<label>a.2: Document root element</label>
+									<description><![CDATA[Check for each XML document that the root element is a GML feature or a GML feature collection.<br/><br/>
 For feature collections the following root elements are recognised:
 <ul>
 <li>wfs:FeatureCollection (WFS 2.0),</li>
@@ -85,8 +79,9 @@ Limitations: Currently only feature collections are recognized as the test engin
 Relevant requirements and recommendations:
 <ul><li>Recommendation 11 - For the exchange of spatial objects in GML, an XML document with a FeatureCollection root element from ISO 19142:2010 (WFS 2.0) should be used.</li></ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml/basic">Abstract Test Case 'Basic test'</a>]]></description>
-						 <expectedResult/>
-						 <expression>
+									<parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+									<expectedResult/>
+									<expression>
 (: TODO extension to identify all feature elements :)
 let $filesWithErrors := $db[not(wfs:FeatureCollection or gml:FeatureCollection or base32:SpatialDataSet or base:SpatialDataSet or gml:AbstractFeature)][position() le $limitErrors]
 return 
@@ -97,37 +92,37 @@ return
     let $root := $file/element()
     return
    	local:addMessage('TR.incorrectRoot', map { 'filename': local:filename($root), 'elementName': local-name($root), 'namespace': namespace-uri($root) }))
-                   </expression>
-						 <type ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-						 <translationTemplates>
-							<translationTemplate ref="TR.incorrectRoot"/>
-							<translationTemplate ref="TR.filesWithErrors"/>
-						 </translationTemplates>
-					  </TestAssertion>
-					  <TestAssertion id="EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009">
-						 <parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
-						 <label>a.3: Character encoding</label>
-						 <description><![CDATA[This test ensures that all linguistic texts can be encoded consistently and in any language – which in turn simplifies the processing of data. The use of UTF-8 also aligns with common practice and is the default character encoding for XML documents.<br/><br/>
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.incorrectRoot"/>
+										<translationTemplate ref="TR.filesWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDbdfdccf3-8c0d-489c-ad96-6acb7e017009">
+									<label>a.3: Character encoding</label>
+									<description><![CDATA[This test ensures that all linguistic texts can be encoded consistently and in any language – which in turn simplifies the processing of data. The use of UTF-8 also aligns with common practice and is the default character encoding for XML documents.<br/><br/>
 Inspect each XML document. If an XML declaration exists, verify that the encoding attribute has the value "UTF-8" or that the attribute is missing.<br/><br/>
 Limitations: Currently the test is disabled as the test needs an BaseX extension - the XML declaration is NOT part of the node set in XML databases.<br/><br/>
 Relevant requirements:
 <ul><li>Requirement 12 - XML documents shall be required to be encoded using UTF-8 as character encoding.</li></ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml/char-encoding">Abstract Test Case 'Character encoding'</a>]]></description>
-						 <expectedResult/>
-						 <expression>
+									<parent ref="EIDc177cf64-3a66-4ac4-92b9-61207aab8007"/>
+									<expectedResult/>
+									<expression>
 						 () (: TODO :)
-                   </expression>
-						 <type ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
-						 <translationTemplates>
-							<translationTemplate ref="TR.notUTF8"/>
-							<translationTemplate ref="TR.filesWithErrors"/>
-						 </translationTemplates>
-					  </TestAssertion>
-					</testAssertions>
-				 </TestStep>
-			  </testSteps>
-			</TestCase>
-		 </testCases>
-	  </TestModule>
+									</expression>
+									<testItemType ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.notUTF8"/>
+										<translationTemplate ref="TR.filesWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
 	</testModules>
 </ExecutableTestSuite>
