@@ -15,14 +15,14 @@ declare function local:test($db as document-node()*, $features as element()*, $e
 for $module in $ets//*[local-name()='TestModule']
 let $test-case-results :=
 for $case in $module//*[local-name()='TestCase']
-  let $dep := if ($case/etf:dependency) 
-    then "let $dependencyResult := local:passed('" || $case/etf:dependency/etf:dependsOn/@ref || "')" 
+  let $dep := if ($case/etf:dependencies) 
+    then "let $dependencyResult := local:passed('" || $case/etf:dependencies/etf:testCase/@ref || "')" 
     else "let $dependencyResult := true()"
   let $test-step-results :=
     for $step in $case//*[local-name()='TestStep']
       let $assertion-results := 
         for $assertion in $step//*[local-name()='TestAssertion']
-          let $type := $assertion/etf:type
+          let $type := $assertion/etf:testItemType
           let $disabled := if (not(matches($assertion/etf:label,$tests_to_execute)) or $type/@ref='EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2' (:disabled :)) then 'NOT_APPLICABLE' else if ($type/@ref='EIDb48eeaa3-6a74-414a-879c-1dc708017e11' (: manual :)) then 'PASSED_MANUAL' else ()
           return
 if ($disabled) then "
@@ -220,6 +220,10 @@ else ()}
 <testModuleResults/>
 </TestTaskResult> }
 }</testTaskResults>
+<!-- TODO temporary during testing in BaseX GUI -->
+<translationTemplateBundles>
+{doc($translationTemplateBundle)}
+</translationTemplateBundles>
 </DsResultSet>
 };
 
@@ -243,6 +247,7 @@ declare variable $logFile external :=  $tmpDir || file:dir-separator() || $testT
 declare variable $statFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-stat.xml";
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
+declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
 declare variable $dbBaseName external := "ps-test";
 declare variable $dbCount external := 1;
 declare variable $dbDir external;
@@ -250,7 +255,7 @@ declare variable $dbDir external;
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
 
-declare variable $etsno := 16;
+declare variable $etsno := 2;
 declare variable $etsFile := 
   if ($etsno = 1) then "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml"
   else if ($etsno = 2) then "data" || file:dir-separator() || "schemas" || file:dir-separator() || "ets-schemas.xml"
