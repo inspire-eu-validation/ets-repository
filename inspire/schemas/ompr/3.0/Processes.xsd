@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:ompr="http://inspire.ec.europa.eu/schemas/ompr/3.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/ompr/3.0" version="3.0">
+  <annotation>
+    <documentation>-- Definition --
+Application Schema for Processes</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base2/2.0" schemaLocation="../../schemas/base2/2.0/BaseTypes2.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="Process" substitutionGroup="gml:AbstractFeature" type="ompr:ProcessType">
+    <annotation>
+      <documentation>-- Name --
+Process
+
+-- Definition --
+Description of an observation process</documentation>
+    </annotation>
+  </element>
+  <complexType name="ProcessType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+inspireId
+
+-- Definition --
+External object identifier of the spatial object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="base:Identifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="name" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+name
+
+-- Definition --
+Name of the Process</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="type" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+type
+
+-- Definition --
+Type of process.
+
+-- Description --
+EXAMPLE raingauge, numerical model.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="documentation" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+documentation
+
+-- Definition --
+Further information ( online/offline) associated with the  process .</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="base2:DocumentCitation"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="processParameter" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+process parameter
+
+-- Definition --
+Parameter controlling the application of the process and as a consequence its output.
+
+-- Description --
+Typical examples of using processParameter are: description of  instrumentation settings for a specific measurement or measurement series ; description of intial contidions in  numerical computations e.g. simulations.  
+
+NOTE   The  values of a procesParameter are stored in  OM_Observation.parameter&gt;NamedValue.value as they are specific to the event of the observation  and not to the  applied process .  The relevant OM_Observation.parameter&gt;NamedValue.name shall be the same with Process.processParameter&gt;ProcessParameter.name.
+
+EXAMPLE  Analysis time of a forecast
+&lt;ul&gt;
+	&lt;li&gt;Instance of Process&lt;/li&gt;
+&lt;/ul&gt;
+Process.processParameter&gt;ProcessParameter.name:
+&lt;i&gt;http://inspire.jrc.ec.europa.eu/inspire/processParameterValue.html#AnalysisTime&lt;/i&gt;
+&lt;ul&gt;
+	&lt;li&gt;Instance of OM_Observation&lt;/li&gt;
+&lt;/ul&gt;
+OM_OObservation.parameter&gt;NamedValue.name:
+&lt;i&gt;http://inspire.jrc.ec.europa.eu/inspire/processParameterValue.html#AnalysisTime&lt;/i&gt;
+OM_Observation.parameter&gt;NamedValue.value:
+&lt;i&gt;00z-15/05/2011&lt;/i&gt;</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="ompr:ProcessParameter"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="responsibleParty" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+responsible party
+
+-- Definition --
+Individual or organisation related to the process.
+
+-- Description --
+EXAMPLE For a numerical simulation a responsible party may be the NWP centre which conducted the simulation</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="base2:RelatedParty"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ProcessPropertyType">
+    <sequence minOccurs="0">
+      <element ref="ompr:Process"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ProcessParameter" substitutionGroup="gml:AbstractObject" type="ompr:ProcessParameterType">
+    <annotation>
+      <documentation>-- Name --
+Process Parameter
+
+-- Definition --
+Description of the given parameter</documentation>
+    </annotation>
+  </element>
+  <complexType name="ProcessParameterType">
+    <sequence>
+      <element name="name" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+name
+
+-- Definition --
+Name of the process parameter.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="description" type="string">
+        <annotation>
+          <documentation>-- Name --
+description
+
+-- Definition --
+Description of the process parameter.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="ProcessParameterPropertyType">
+    <sequence>
+      <element ref="ompr:ProcessParameter"/>
+    </sequence>
+  </complexType>
+</schema>

@@ -1,0 +1,1141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:ef="http://inspire.ec.europa.eu/schemas/ef/3.0" xmlns:ge="http://inspire.ec.europa.eu/schemas/ge-core/3.0" xmlns:ge_hg="http://inspire.ec.europa.eu/schemas/ge_hg/3.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" xmlns:omso="http://inspire.ec.europa.eu/schemas/omso/2.0" xmlns:swe="http://www.opengis.net/swe/2.0" targetNamespace="http://inspire.ec.europa.eu/schemas/ge_hg/3.0" elementFormDefault="qualified" version="3.0">
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/ef/3.0" schemaLocation="../../schemas/ef/3.0/EnvironmentalMonitoringFacilities.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/ge-core/3.0" schemaLocation="../../schemas/ge-core/3.0/GeologyCore.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/omso/2.0" schemaLocation="../../schemas/omso/2.0/SpecialisedObservations.xsd"/>
+	<import namespace="http://www.interactive-instruments.de/ShapeChange/AppInfo" schemaLocation="http://portele.de/ShapeChangeAppinfo.xsd"/>
+	<import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="http://www.opengis.net/gmlcov/1.0" schemaLocation="../../schemas/ogc/gmlcov/1.0/coverage.xsd"/>
+	<import namespace="http://www.opengis.net/swe/2.0" schemaLocation="../../schemas/ogc/sweCommon/2.0/swe.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="AquiferSystem" type="ge_hg:AquiferSystemType" substitutionGroup="ge_hg:HydrogeologicalUnit">
+		<annotation>
+			<documentation>-- Name --
+Aquifer System
+-- Definition --
+A collection of aquifers and aquitards, which together constitute the environment of groundwater - "communicating vessels", that are filled or can be filled with water. 
+
+-- Description -- 
+Attributes of Aquifer System and its components determine the feasibility of water collection, its movement, as well as the impact on its chemical state.
+NOTE: The Aquifer System components and their attributes (including geometry) are relatively stable over time except in special cases.</documentation>
+		</annotation>
+	</element>
+	<complexType name="AquiferSystemType">
+		<complexContent>
+			<extension base="ge_hg:HydrogeologicalUnitType">
+				<sequence>
+					<element name="isLayered" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Is Layered
+-- Definition --
+Indicates if the AquiferSystem consists of more than one layer.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="boolean">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="aquifer" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Aquifer
+-- Definition --
+The Aquifer(s) contained in the AquiferSystem.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:Aquifer"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="aquitard" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Aquitard
+-- Definition --
+The Aquitard(s) contained within the AquiferSystem.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:Aquitard"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="aquiclude" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Aquiclude
+-- Definition --
+An Aquiclude enclosing the AquiferSystem.
+
+-- Description --
+This acts as a barrier for groundwater flow.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:Aquiclude"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AquiferSystemPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:AquiferSystem"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="PiezometricState" type="ge_hg:PiezometricStateType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Piezometric State
+
+-- Definition --
+The piezometric state of a GroundWaterBody
+
+-- Description --
+Groundwater state (level) as a surface. It can be a set of point observations or interpolated to form a coverage.</documentation>
+		</annotation>
+	</element>
+	<complexType name="PiezometricStateType">
+		<sequence>
+			<element name="observationTime" type="dateTime">
+				<annotation>
+					<documentation>-- Name --
+Observation Time
+-- Definition --
+Date and time of groundwater state observation.</documentation>
+				</annotation>
+			</element>
+			<element name="piezometricSurface" type="ge_hg:HydrogeologicalSurfacePropertyType">
+				<annotation>
+					<documentation>-- Name --
+Piezometric Surface
+-- Definition --
+A surface that represents the level to which water will rise in tightly cased wells. 
+
+-- Description --
+If the head varies significantly with depth in the aquifer, then there may be more than one potentiometric surface. The water table is a particular potentiometric surface for an unconfined aquifer.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="PiezometricStatePropertyType">
+		<sequence>
+			<element ref="ge_hg:PiezometricState"/>
+		</sequence>
+	</complexType>
+	<element name="HydrogeologicalObjectNatural" type="ge_hg:HydrogeologicalObjectNaturalType" substitutionGroup="ge_hg:HydrogeologicalObject">
+		<annotation>
+			<documentation>-- Name --
+Hydrogeological Object Natural
+-- Definition --
+HydrogeologicalObject which was created by natural processes.
+-- Description --
+Examples of natural hydrogeological objects are: a source, vanishing point and geyser.</documentation>
+		</annotation>
+	</element>
+	<complexType name="HydrogeologicalObjectNaturalType">
+		<complexContent>
+			<extension base="ge_hg:HydrogeologicalObjectType">
+				<sequence>
+					<element name="naturalObjectType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Natural Object Type
+-- Definition --
+The type of natural hydrogeological object.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="waterPersistence" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Water Persistence
+-- Definition --
+The degree of persistence of water flow.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="approximateQuantityOfFlow" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Approximate Quantity of Flow
+-- Definition --
+An approximate value defining the water yield in a natural hydrogeological object.
+
+-- Description --
+The discharge of water flow for a certain cross-section per time unit.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:QuantityValue"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="groundWaterBody" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Groundwater Body
+-- Definition --
+The GroundWateBody with which the natural hydrogeological object interacts.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:GroundWaterBody"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="HydrogeologicalObjectNaturalPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:HydrogeologicalObjectNatural"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="HydrogeologicalObject" type="ge_hg:HydrogeologicalObjectType" abstract="true" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+Hydrogeological Object
+
+-- Definition --
+An abstract class for man-made facilities or natural features that have an interaction with the hydrogeological system.
+
+-- Description --
+Hydrogeological objects may be natural (eg. spring) or the manmade (eg. wells). The vast majority of hydrogeological objects are manmade.</documentation>
+		</annotation>
+	</element>
+	<complexType name="HydrogeologicalObjectType" abstract="true">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+INSPIRE Identifier
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="geometry" type="gml:GeometricPrimitivePropertyType">
+						<annotation>
+							<documentation>-- Name --
+Geometry
+-- Definition --
+The geometry defining the spatial location of the HydrogeologicalObject.</documentation>
+						</annotation>
+					</element>
+					<element name="name" type="gmd:PT_FreeText_PropertyType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Name
+-- Definition --
+The name or code of the HydrogeologicalObject.</documentation>
+						</annotation>
+					</element>
+					<element name="description" type="gmd:PT_FreeText_PropertyType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Description
+-- Definition --
+The description of the HydrogeologicalObject.</documentation>
+						</annotation>
+					</element>
+					<element name="beginLifespanVersion" type="dateTime">
+						<annotation>
+							<documentation>-- Name --
+Begin Life Span Version
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+					</element>
+					<element name="endLifespanVersion" type="dateTime" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+End Life Span Version
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+					</element>
+					<element name="aquifer" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Aquifer
+-- Definition --
+The Aquifer within which the HydrogeologicalObject occurs.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:Aquifer"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="HydrogeologicalObjectPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:HydrogeologicalObject"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="Aquiclude" type="ge_hg:AquicludeType" substitutionGroup="ge_hg:HydrogeologicalUnit">
+		<annotation>
+			<documentation>-- Name --
+Aquiclude
+-- Definition --
+An impermeable body of rock or stratum of sediment that acts as a barrier to the flow of groundwater.
+-- Description --
+A formation which, although porous and capable of absorbing water slowly, will not transmit water fast enough to furnish an appreciable supply for a well or spring. Aquicludes are characterized by very low values of "leakage" (the ratio of vertical &lt;i&gt;Hydraulic Conductivity &lt;/i&gt;to thickness), so that they transmit only minor inter-aquifer flow and also have very low rates of yield from compressible storage. Therefore, they constitute boundaries of aquifer flow systems.</documentation>
+		</annotation>
+	</element>
+	<complexType name="AquicludeType">
+		<complexContent>
+			<extension base="ge_hg:HydrogeologicalUnitType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AquicludePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:Aquiclude"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="HydrogeologicalUnit" type="ge_hg:HydrogeologicalUnitType" abstract="true" substitutionGroup="ge:GeologicUnit">
+		<annotation>
+			<documentation>-- Name --
+Hydrogeological Unit
+
+-- Definition --
+A part of the lithosphere with distinctive parameters for water storage and conduction. &lt;i&gt; &lt;/i&gt;</documentation>
+		</annotation>
+	</element>
+	<complexType name="HydrogeologicalUnitType" abstract="true">
+		<complexContent>
+			<extension base="ge:GeologicUnitType">
+				<sequence>
+					<element name="description" type="gmd:PT_FreeText_PropertyType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Description
+-- Definition --
+The description of the HydrogeologicalUnit</documentation>
+						</annotation>
+					</element>
+					<element name="approximateDepth" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Approximate Depth
+-- Definition --
+The approximate depth of the HydrogeologicalUnit occurrence.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:QuantityValue"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="approximateThickness" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Approximate Thickness
+-- Definition --
+The approximate thickness of the HydrogeologicalUnit.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:QuantityValue"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="beginLifespanVersion" type="dateTime">
+						<annotation>
+							<documentation>-- Name --
+Begin Life Span Version
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+					</element>
+					<element name="endLifespanVersion" type="dateTime" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+End Life Span Version
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+					</element>
+					<element name="geologicStructure" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Geologic Structure
+-- Definition --
+Relates one or many HydrogeologicalUnit(s) to a GeologicStructure.
+
+-- Description --
+Allows the description of groundwater occurrence in geological structures.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge:GeologicStructure"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="HydrogeologicalUnitPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:HydrogeologicalUnit"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="ActiveWell" type="ge_hg:ActiveWellType" substitutionGroup="ge_hg:HydrogeologicalObjectManMade">
+		<annotation>
+			<documentation>-- Name --
+Active Well
+-- Definition --
+A well influencing the groundwater resources of the aquifer.
+
+-- Description --
+The most common examples of Active Well are: extracting, artificial recharging, or dewatering wells.
+NOTE: ActiveWell by extracting, recharging or dewatering influences and changes the state of groundwater resources.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ActiveWellType">
+		<complexContent>
+			<extension base="ge_hg:HydrogeologicalObjectManMadeType">
+				<sequence>
+					<element name="activityType" type="gml:ReferenceType" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Active Well Type
+-- Definition --
+The type of activity carried out by the well.
+
+-- Description --
+Indicates if the well is used for extracting, recharging, dewatering etc of the groundwater resources.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="borehole" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Borehole
+-- Definition --
+The Borehole upon which the ActiveWell is based.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge:Borehole"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="groundWaterBody" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Groundwater Body
+-- Definition --
+The GroundWaterBody from which the ActiveWell extracts groundwater resources.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:GroundWaterBody"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="environmentalMonitoringFacility" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Environmental Monitoring Facility
+-- Definition --
+The related EnvironmentalMonitoringFacility.
+
+-- Description --
+The Environmental Monitoring Facility commonly comprises one or more Active Wells acting as groundwater observation wells.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ef:EnvironmentalMonitoringFacility"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ActiveWellPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:ActiveWell"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="HydrogeologicalSurface" type="ge_hg:HydrogeologicalSurfaceType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Hydrogeological Surface
+
+-- Definition --
+A surface that represents the interpolated groundwater table, or other surface, for a local or regional area.
+
+-- Description --
+This is the 2.5D geometry for hydrogeological surfaces and is based on hydrogeological measurements in a group of wells or other sources of data.</documentation>
+		</annotation>
+	</element>
+	<complexType name="HydrogeologicalSurfaceType">
+		<choice>
+			<element name="surfaceRectifiedGrid">
+				<annotation>
+					<documentation>-- Name --
+Surface as Rectified Grid
+-- Definition --
+A surface whose domain is a rectified grid.
+
+-- Description --
+A rectified grid is a grid for which there is an affine transformation between the grid coordinates and the coordinates of a coordinate system. It can be used for both discrete and continuous coverages.</documentation>
+				</annotation>
+				<complexType>
+					<complexContent>
+						<extension base="gml:AbstractMemberType">
+							<sequence minOccurs="0">
+								<element ref="gmlcov:RectifiedGridCoverage"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="surfaceReferencableGrid">
+				<annotation>
+					<documentation>-- Name --
+Surface as Referenceable Grid.
+-- Definition --
+Surface whose domain consists of a referenceable grid.
+-- Description --
+A referenceable grid is a grid associated with a transformation that can be used to convert grid coordinate values to values of coordinates referenced to a coordinate reference system. It can be used for both discrete and continuous coverages.</documentation>
+				</annotation>
+				<complexType>
+					<complexContent>
+						<extension base="gml:AbstractMemberType">
+							<sequence minOccurs="0">
+								<element ref="gmlcov:ReferenceableGridCoverage"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="surfacePointCollection">
+				<annotation>
+					<documentation>-- Name --
+Surface Point Collection
+-- Definition --
+Hydrogeological surface represented by collection of observations in points.</documentation>
+				</annotation>
+				<complexType>
+					<complexContent>
+						<extension base="gml:AbstractMemberType">
+							<sequence minOccurs="0">
+								<element ref="omso:PointObservationCollection"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+		</choice>
+	</complexType>
+	<complexType name="HydrogeologicalSurfacePropertyType">
+		<sequence>
+			<element ref="ge_hg:HydrogeologicalSurface"/>
+		</sequence>
+	</complexType>
+	<element name="QuantityValue" type="ge_hg:QuantityValueType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+QuantityValue
+-- Definition --
+Data container with a single quantity value or a range of quantity values .</documentation>
+		</annotation>
+	</element>
+	<complexType name="QuantityValueType">
+		<choice>
+			<element name="singleQuantity" type="swe:QuantityPropertyType">
+				<annotation>
+					<documentation>-- Name --
+Single Quantity
+-- Definition --
+Scalar component with decimal representation and a unit of measure used to store value of a continuous quantity.</documentation>
+				</annotation>
+			</element>
+			<element name="quantityInterval">
+				<annotation>
+					<documentation>-- Name --
+Quantity Interval
+-- Definition --
+Decimal pair for specifying a quantity range with a unit of measure.</documentation>
+				</annotation>
+				<complexType>
+					<complexContent>
+						<extension base="gml:AbstractMemberType">
+							<sequence minOccurs="0">
+								<element ref="swe:QuantityRange"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+		</choice>
+	</complexType>
+	<complexType name="QuantityValuePropertyType">
+		<sequence>
+			<element ref="ge_hg:QuantityValue"/>
+		</sequence>
+	</complexType>
+	<element name="Aquifer" type="ge_hg:AquiferType" substitutionGroup="ge_hg:HydrogeologicalUnit">
+		<annotation>
+			<documentation>-- Name --
+Aquifer
+-- Definition --
+A wet underground layer of water-bearing permeable rock or unconsolidated materials (gravel, sand, silt, or clay) from which groundwater can be usefully extracted using a water well.
+-- Description --
+An underground geological formation able to store and yield water.</documentation>
+		</annotation>
+	</element>
+	<complexType name="AquiferType">
+		<complexContent>
+			<extension base="ge_hg:HydrogeologicalUnitType">
+				<sequence>
+					<element name="aquiferType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Type of Aquifer
+-- Definition --
+The type of aquifer.
+
+-- Description --
+Water in an Aquifer is, or is not, under pressure. Based on that unconfined, confined, artesian, or subartesian types are distinguished.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="mediaType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Type of Media
+-- Definition --
+The classification of the medium in which the groundwater flow occurs.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="isExploited" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Is Exploited
+-- Definition --
+Indicates if groundwater from aquifer is exploited by wells or intakes</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="boolean">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="isMainInSystem" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Is Main In System
+-- Definition --
+Indicates if aquifer is the main useful aquifer in the aquifer system</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="boolean">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="vulnerabilityToPollution" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Vulnerability To Pollution
+-- Definition --
+An index value or interval of values determining the potential degree of aquifer risk arising from the geological structure, hydrogeological conditions and the existence of real or potential source of contamination.
+
+-- Description --
+A single value should be used if it is determined directly from the DRASTIC method. If attribute data comes from another data source which is expressed by categorized items, for example: low, moderate or high, interval should be used expressed by lowest and highest value of category. EXAMPLE: &amp;lsquo;Moderate&amp;rsquo; means interval from 101 to 140.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:QuantityValue"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="permeabilityCoefficient" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Permeability Coefficient
+-- Definition --
+The volume of an incompressible fluid that will flow in unit time through a unit cube of a porous substance across which a unit pressure difference is maintained.
+
+-- Description --
+The parameter represents the hydraulic conductivity of a rock container. Describes the ease with which water can move through pore spaces or fractures. It depends on the intrinsic permeability of the material and on the degree of saturation.
+NOTE: Because of their high porosity and permeability, sand and gravel have higher hydraulic conductivity than clay or unfractured granite aquifers.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:QuantityValue"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="storativityCoefficient" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Storativity Coefficient
+-- Definition --
+The ability of an aquifer to store water.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:QuantityValue"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="hydroGeochemicalRockType" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Hydrogeochemical Type of Rock
+-- Definition --
+The rock type with respect to the soluble rock components and their hydrogeochemical influence of groundwater.
+
+-- Description --
+Defines the prevailing geochemical character of natural groundwater within the Aquifer.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="aquitard" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Aquitard
+-- Definition --
+The Aquitard(s) that separates the Aquifer.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:Aquitard"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="hydrogeologicalObject" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Hydrogeological Object
+-- Definition --
+The HydrogeologicalObject(s) related to the aquifer.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:HydrogeologicalObject"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="aquiferSystem" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Aquifer System
+-- Definition --
+ The specific AquiferSystem where the Aquitard occurs.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:AquiferSystem"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AquiferPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:Aquifer"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GroundWaterBody" type="ge_hg:GroundWaterBodyType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+Groundwater Body
+-- Definition --
+A distinct volume of groundwater within an aquifer or system of aquifers, which is hydraulically isolated from nearby groundwater bodies. 
+
+-- Description --
+Groundwater bodies form the principal management units under the European Water Framework Directive (2000/60/CE, 2000). They should be hydraulically continuous entities, and must be defined on the basis of flow or abstraction, and are inextricably linked to surface water bodies.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GroundWaterBodyType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Name --
+INSPIRE Identifier
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE: An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="approximateHorizontalExtend" type="gml:SurfacePropertyType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Approximate Horizontal Extend
+-- Definition --
+The geometry defining the boundary of the GroundWaterBody.</documentation>
+						</annotation>
+					</element>
+					<element name="conditionOfGroundWaterBody" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Condition of Groundwater Body
+-- Definition --
+The approximate degree of change to groundwater as a result of human activity.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="mineralization" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Water Type
+-- Definition --
+One of the main chemical characteristics of water. A value is a sum of all water chemical concentration components.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="piezometricState" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Piezometric State
+-- Definition --
+Specifies the piezometric state of the GroundwaterBody water table</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:PiezometricState"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="beginLifespanVersion" type="dateTime">
+						<annotation>
+							<documentation>-- Name --
+Begin Life Span Version
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+					</element>
+					<element name="endLifespanVersion" type="dateTime" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+End Life Span Version
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+					</element>
+					<element name="hydrogeologicalObjectNatural" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Hydrogeological Object Natural
+-- Definition --
+A HydrogeologicalObjectNatural interacting with the GroundwaterBody.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:HydrogeologicalObjectNatural"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="activeWell" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Active Well
+-- Definition --
+The ActiveWell which changes the state of the GroundwaterBody through the extraction of groundwater resources.
+
+-- Description --
+ActiveWell by extracting groundwater resources influences the state of GroundWaterBody resources it is installed in.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:ActiveWell"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="aquiferSystem" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Aquifer System
+-- Definition --
+The AquiferSystem which includes the GroundWaterBody.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:AquiferSystem"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="observationWell" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+The observation wells which monitor the GroundWaterBody</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ef:EnvironmentalMonitoringFacility"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GroundWaterBodyPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:GroundWaterBody"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="HydrogeologicalObjectManMade" type="ge_hg:HydrogeologicalObjectManMadeType" abstract="true" substitutionGroup="ge_hg:HydrogeologicalObject">
+		<annotation>
+			<documentation>-- Name --
+Hydrogeological Object Man-made
+
+-- Definition --
+A man-made hydrogeological object.
+
+-- Description --
+Examples of manmade hydrogeological objects are: well, groundwater intake, groundwater monitoring station or monitoring well.</documentation>
+		</annotation>
+	</element>
+	<complexType name="HydrogeologicalObjectManMadeType" abstract="true">
+		<complexContent>
+			<extension base="ge_hg:HydrogeologicalObjectType">
+				<sequence>
+					<element name="validFrom" type="dateTime">
+						<annotation>
+							<documentation>-- Name --
+Valid From
+-- Definition --
+Official date and time the hydrogeological object was/will be legally established.
+
+-- Description --
+NOTE This is the date and time the register reference can be used in legal acts.</documentation>
+						</annotation>
+					</element>
+					<element name="validTo" type="dateTime" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Valid To
+-- Definition --
+Date and time at which the hydrogeological object legally ceased/will cease to be used.
+
+-- Description --
+NOTE This is the date and time the register reference can no longer be used in legal acts.</documentation>
+						</annotation>
+					</element>
+					<element name="statusCode" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Status Code
+-- Definition --
+A code defining the formal status of a man-made hydrogeological object.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="HydrogeologicalObjectManMadePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:HydrogeologicalObjectManMade"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="Aquitard" type="ge_hg:AquitardType" substitutionGroup="ge_hg:HydrogeologicalUnit">
+		<annotation>
+			<documentation>-- Name --
+Aquitard
+
+-- Definition --
+A saturated, but poorly permeable bed that impedes groundwater movement.
+
+-- Description --
+It does not yield water freely to wells, but may transmit appreciable water to or from adjacent aquifers and, where sufficiently thick, may constitute an important ground-water storage unit. Aquitards are characterized by values of leakance that may range from relatively low to relatively high. A really extensive aquitard of relatively low leakance may function regionally as boundaries of aquifer flow systems.</documentation>
+		</annotation>
+	</element>
+	<complexType name="AquitardType">
+		<complexContent>
+			<extension base="ge_hg:HydrogeologicalUnitType">
+				<sequence>
+					<element name="approximatePermeabilityCoefficient" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Approximate Permeability Coefficient
+-- Definition --
+The volume of an incompressible fluid that will flow in unit time through a unit cube of a porous substance across which a unit pressure difference is maintained.  
+
+-- Description --
+The parameter represents the hydraulic conductivity of a rock container. Describes the ease with which water can move through pore spaces or fractures. It depends on the intrinsic permeability of the material and on the degree of saturation.
+NOTE: Because of their high porosity and permeability, sand and gravel have higher hydraulic conductivity than clay or unfractured granite aquifers.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:QuantityValue"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="approximateStorativityCoefficient" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Approximate Storativity Coefficient
+-- Definition --
+The ability of an aquifer to store water.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge_hg:QuantityValue"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="aquifer" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Aquifer
+-- Definition --
+The Aquifers separated by the Aquitard.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:Aquifer"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="aquiferSystem" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Aquifer System
+-- Definition --
+The AquiferSystem of which the Aquitard is a part.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge_hg:AquiferSystem"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AquitardPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge_hg:Aquitard"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

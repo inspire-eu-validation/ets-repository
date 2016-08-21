@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gn="http://inspire.ec.europa.eu/schemas/gn/4.0" xmlns:hy="http://inspire.ec.europa.eu/schemas/hy/4.0" xmlns:hy-n="http://inspire.ec.europa.eu/schemas/hy-n/4.0" xmlns:net="http://inspire.ec.europa.eu/schemas/net/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/hy-n/4.0" version="4.0">
+  <annotation>
+    <documentation>-- Definition --
+The Network application schema contains spatial objects associated with a connected hydrographic network representation of waterways, lakes etc. This is required primarily for the 'spatial analysis and modelling' Use Case.</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/gn/4.0" schemaLocation="../../schemas/gn/4.0/GeographicalNames.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/hy/4.0" schemaLocation="../../schemas/hy/4.0/HydroBase.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/net/4.0" schemaLocation="../../schemas/net/4.0/Network.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="HydroNode" substitutionGroup="net:Node" type="hy-n:HydroNodeType">
+    <annotation>
+      <documentation>-- Definition --
+A node within the hydrographic network.
+
+-- Description --
+NOTE May represent a physical confluence, bifurcation/confluence/vanishing point etc, or it may be associated with a hydrographic point of interest or facility.</documentation>
+    </annotation>
+  </element>
+  <complexType name="HydroNodeType">
+    <complexContent>
+      <extension base="net:NodeType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="hydroNodeCategory" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Nature of the hydro node.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="HydroNodePropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-n:HydroNode"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="WatercourseLink" substitutionGroup="net:Link" type="hy-n:WatercourseLinkType">
+    <annotation>
+      <documentation>-- Definition --
+A segment of a watercourse within a hydrographic network.
+
+-- Description --
+NOTE A watercourse link may be fictitious, with no direct correspondence to a real-world object and included only to ensure a closed network.
+
+EXAMPLE Fictitious examples:
+- virtual network segment in coastal water area
+- virtual network segment in lake area
+- virtual network segment in river to connect tributary
+- virtual network segment in transitional water area</documentation>
+    </annotation>
+  </element>
+  <complexType name="WatercourseLinkType">
+    <complexContent>
+      <extension base="net:LinkType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="flowDirection" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Direction of water flow in the segment relative to digitisation of segment geometry.</documentation>
+            </annotation>
+          </element>
+          <element name="length" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Length of network segment.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:LengthType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="WatercourseLinkPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-n:WatercourseLink"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="WatercourseLinkSequence" substitutionGroup="net:LinkSequence" type="hy-n:WatercourseLinkSequenceType">
+    <annotation>
+      <documentation>-- Definition --
+A sequence of watercourse links representing a non-branching path through a hydrographic network.</documentation>
+    </annotation>
+  </element>
+  <complexType name="WatercourseLinkSequenceType">
+    <complexContent>
+      <extension base="net:LinkSequenceType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="WatercourseLinkSequencePropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-n:WatercourseLinkSequence"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="WatercourseSeparatedCrossing" substitutionGroup="net:GradeSeparatedCrossing" type="hy-n:WatercourseSeparatedCrossingType">
+    <annotation>
+      <documentation>-- Definition --
+An element in the hydrographic network used to indicate non-interacting crossing of watercourse links separated by level.
+
+-- Description --
+NOTE The crossing may legitimately break a no-intersection quality rule.</documentation>
+    </annotation>
+  </element>
+  <complexType name="WatercourseSeparatedCrossingType">
+    <complexContent>
+      <extension base="net:GradeSeparatedCrossingType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="WatercourseSeparatedCrossingPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-n:WatercourseSeparatedCrossing"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</schema>

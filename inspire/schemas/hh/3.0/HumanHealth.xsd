@@ -1,0 +1,1063 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:hh="http://inspire.ec.europa.eu/schemas/hh/3.0" xmlns:su-core="http://inspire.ec.europa.eu/schemas/su-core/3.0" targetNamespace="http://inspire.ec.europa.eu/schemas/hh/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+Human Health</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/su-core/3.0" schemaLocation="../../schemas/su-core/3.0/StatisticalUnitCore.xsd"/>
+	<import namespace="http://www.interactive-instruments.de/ShapeChange/AppInfo" schemaLocation="http://portele.de/ShapeChangeAppinfo.xsd"/>
+	<import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="HealthStatisticalData" type="hh:HealthStatisticalDataType" abstract="true" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+Health statistical data
+
+-- Definition --
+Human health related data, from recorded diseases and related health problems (according to internationally accepted code lists, such as ICD-10), expressed as morbidity and mortality, to data on general health status (BMI, self perceived health, etc.), data on health care services (health care expenditure, day cases, etc.), and data on biomarkers; these are statistical indices aggregated at different statistical units, collected/reported in different population groups. Inclusion of human biomonitoring data provides an opportunity to explore potential direct or indirect links between human health and the environment.</documentation>
+		</annotation>
+	</element>
+	<complexType name="HealthStatisticalDataType" abstract="true">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="aggregationUnit" type="su-core:StatisticalUnitPropertyType">
+						<annotation>
+							<documentation>-- Definition --
+Statistical unit to which health statistical data refers.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="HealthStatisticalDataPropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:HealthStatisticalData"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="HealthServicesStatistic" type="hh:HealthServicesStatisticType" substitutionGroup="hh:HealthStatisticalData">
+		<annotation>
+			<documentation>-- Name --
+Health services statistic
+-- Definition --
+Type of health care indicator.</documentation>
+		</annotation>
+	</element>
+	<complexType name="HealthServicesStatisticType">
+		<complexContent>
+			<extension base="hh:HealthStatisticalDataType">
+				<sequence>
+					<element name="healthServiceType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Health service type
+
+-- Definition --
+Type of  health services.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="healthServiceValue" type="double">
+						<annotation>
+							<documentation>-- Name --
+health service value
+
+-- Definition --
+Number of the type considered.</documentation>
+						</annotation>
+					</element>
+					<element name="referencePeriod" type="hh:ReferencePeriodTypePropertyType">
+						<annotation>
+							<documentation>-- Name --
+Reference period
+
+
+-- Definition -- 
+The time period to which data is referred to.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="HealthServicesStatisticPropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:HealthServicesStatistic"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="Biomarker" type="hh:BiomarkerType" substitutionGroup="hh:HealthStatisticalData">
+		<annotation>
+			<documentation>-- Name --
+Biomarker
+
+-- Definition --
+A biomarker (of exposure) is the concentration of a chemical, its metabolite or the product of an interaction between a chemical and some target molecule or cell that is measured in a compartment in an organism.</documentation>
+		</annotation>
+	</element>
+	<complexType name="BiomarkerType">
+		<complexContent>
+			<extension base="hh:HealthStatisticalDataType">
+				<sequence>
+					<element name="biomarkerName" type="hh:BiomarkerTypePropertyType">
+						<annotation>
+							<documentation>-- Name --
+Biomarker name
+
+-- Definition --
+It is the unique identifier for a biomarker, providing information on the chemical that is determined and the matrix in which the chemical was determined.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="biomarkerStatisticalParameter" type="hh:BiomarkerStatisticalParameterTypePropertyType">
+						<annotation>
+							<documentation>-- Name --
+Biomarker statistical parameter
+
+-- Definition --
+The statistical summary of a human biomonitoring study, representing the most important statistical features of a biomarker measured in that particular study.</documentation>
+						</annotation>
+					</element>
+					<element name="referencePeriod" type="hh:ReferencePeriodTypePropertyType">
+						<annotation>
+							<documentation>-- Name --
+Reference period
+
+
+-- Definition -- 
+The time period to which data is referred to.</documentation>
+						</annotation>
+					</element>
+					<element name="ageRange" type="hh:AgeRangeTypePropertyType">
+						<annotation>
+							<documentation>-- Name --
+Age range
+
+
+-- Definition --
+Age interval of a specific subpopulation expressed as starting age and an interval, both alternatively expressed in years, months or weeks.</documentation>
+						</annotation>
+					</element>
+					<element name="gender" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Gender
+
+-- Definition --
+Gender of the population considered.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="refersTo" type="hh:BiomarkerThematicMetadataPropertyType" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+biomarker data described by metadata</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">hh:describedBy</reversePropertyName>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="BiomarkerPropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:Biomarker"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="BiomarkerType" type="hh:BiomarkerTypeType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Biomarker type
+
+-- Definition --
+A biomarker is defined both by a quantified or determined chemical (e.g. cadmium, lead) or its metabolite, and a matrix (e.g. blood, urine) that is used for quantification; for example - cadmium in urine, lead in blood.</documentation>
+		</annotation>
+	</element>
+	<complexType name="BiomarkerTypeType">
+		<sequence>
+			<element name="chemical" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Name --
+Chemical
+
+-- Definition --
+Identification of the compound by name or abbreviation, chemical formula, CAS-PubChem or any other number that is quantified by the measurement.</documentation>
+					<appinfo>
+						<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="matrix" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Name --
+Matrix
+
+-- Definition --
+Type of biological material or body compartment that is sampled to determine or quantify a biomarker.</documentation>
+					<appinfo>
+						<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+					</appinfo>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="BiomarkerTypePropertyType">
+		<sequence>
+			<element ref="hh:BiomarkerType"/>
+		</sequence>
+	</complexType>
+	<element name="Age" type="hh:AgeType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Age
+
+-- Definition -- 
+Persons' age can be expressed in various ways (for instance years for adults,  months or weeks for infants).</documentation>
+		</annotation>
+	</element>
+	<complexType name="AgeType">
+		<choice>
+			<element name="month" type="integer">
+				<annotation>
+					<documentation>-- Name --
+month
+
+-- Definition --
+Time period.</documentation>
+				</annotation>
+			</element>
+			<element name="week" type="integer">
+				<annotation>
+					<documentation>-- Name --
+week
+
+-- Definition --
+Time period.</documentation>
+				</annotation>
+			</element>
+			<element name="year" type="integer">
+				<annotation>
+					<documentation>-- Name --
+year
+-- Definition --
+Time period.</documentation>
+				</annotation>
+			</element>
+		</choice>
+	</complexType>
+	<complexType name="AgePropertyType">
+		<sequence>
+			<element ref="hh:Age"/>
+		</sequence>
+	</complexType>
+	<element name="ReferencePeriodType" type="hh:ReferencePeriodTypeType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Reference period
+
+-- Definition -- 
+The time period which the refer.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ReferencePeriodTypeType">
+		<sequence>
+			<element name="startDate" type="date">
+				<annotation>
+					<documentation>-- Name --
+Start date
+
+-- Definition -- 
+Start of reference period.</documentation>
+				</annotation>
+			</element>
+			<element name="endDate" type="date">
+				<annotation>
+					<documentation>-- Name --
+End date
+
+-- Definition -- 
+End of reference period.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ReferencePeriodTypePropertyType">
+		<sequence>
+			<element ref="hh:ReferencePeriodType"/>
+		</sequence>
+	</complexType>
+	<element name="Concentration" type="hh:ConcentrationType">
+		<annotation>
+			<documentation>-- Name --
+concentration measure
+
+-- Definition --
+A measure of concentration of a specified component in a specified media.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ConcentrationType">
+		<complexContent>
+			<extension base="gml:MeasureType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ConcentrationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:Concentration"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="BiomarkerStatisticalParameterType" type="hh:BiomarkerStatisticalParameterTypeType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Biomarker statistical parameter
+
+-- Definition --
+A set of statistical features of a biomarker measured for one specific biomarker.</documentation>
+		</annotation>
+	</element>
+	<complexType name="BiomarkerStatisticalParameterTypeType">
+		<sequence>
+			<element name="geometricMean" type="gml:MeasureType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Geometric mean
+
+-- Definition --
+The geometric mean.</documentation>
+				</annotation>
+			</element>
+			<element name="CI95ofGM" type="gml:MeasureType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+CI95 geometric mean
+
+-- Definition --
+95% confidence interval of the geometric mean.</documentation>
+				</annotation>
+			</element>
+			<element name="P50" type="gml:MeasureType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Percentile 50
+
+-- Definition -- 
+The 50&lt;sup&gt;th&lt;/sup&gt; Percentile or median value. Value below which 50 percent of the observations may be found.</documentation>
+				</annotation>
+			</element>
+			<element name="P90" type="gml:MeasureType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Percentile 90
+
+-- Definition -- 
+The 90&lt;sup&gt;th&lt;/sup&gt; Percentile. The value below which 90 percent of the observations may be found.</documentation>
+				</annotation>
+			</element>
+			<element name="P95" type="gml:MeasureType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Percentile 95
+
+-- Definition -- 
+The 95&lt;sup&gt;th&lt;/sup&gt; Percentile. The value below which 95 percent of the observations may be found.</documentation>
+				</annotation>
+			</element>
+			<element name="CI95ofP95" type="gml:MeasureType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+CI95 percentile 95
+
+-- Definition --
+95% confidence interval of the percentile 95.</documentation>
+				</annotation>
+			</element>
+			<element name="maximum" type="gml:MeasureType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+maximum value
+
+-- Definition --
+The highest biomarker value determined in an individual participant in the biomonitoring survey.</documentation>
+				</annotation>
+			</element>
+			<element name="numberOfPartecipants" type="integer">
+				<annotation>
+					<documentation>-- Name --
+Number of partecipants
+
+-- Definition --
+The number of participants that have provided samples that have contributed to the calculation of the biomarker statistical parameter.</documentation>
+				</annotation>
+			</element>
+			<element name="pinLOD" type="double" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Limit of detection
+
+-- Definition --
+Proportion of individuals with undetectable levels of tested parameter (below limit of detection).</documentation>
+				</annotation>
+			</element>
+			<element name="LOQ" type="double" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Limit of quantification
+
+-- Definition --
+Limit of quantification.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="BiomarkerStatisticalParameterTypePropertyType">
+		<sequence>
+			<element ref="hh:BiomarkerStatisticalParameterType"/>
+		</sequence>
+	</complexType>
+	<element name="UomNoise" type="hh:UomNoiseType">
+		<annotation>
+			<documentation>-- Name --
+noise unit of measure
+
+-- Definition --
+A unit of measure for noise intensity.</documentation>
+		</annotation>
+	</element>
+	<complexType name="UomNoiseType">
+		<complexContent>
+			<extension base="gml:UnitOfMeasureType">
+				<sequence>
+					<element name="source" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+noise source type
+
+-- Definition --
+The noise source type.
+
+-- Description --
+EXAMPLE: Road traffic, rail traffic, air traffic, industrial activity, etc.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="UomNoisePropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:UomNoise"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="Disease" type="hh:DiseaseType" substitutionGroup="hh:HealthStatisticalData">
+		<annotation>
+			<documentation>-- Name --
+Disease
+
+-- Definition --
+Statistical information related to pathologies linked directly or indirectly to the quality of environment.
+
+-- Description --
+Statistical information related to diseases, health-related conditions and external causes of disease and injury, as classified in the International Statistical Classification of Diseases and Related Health Problems, 10th Revision (ICD-10). For practical reasons, a short term &amp;lsquo;disease&amp;rsquo; is used to label all conditions covered by this definition.</documentation>
+		</annotation>
+	</element>
+	<complexType name="DiseaseType">
+		<complexContent>
+			<extension base="hh:HealthStatisticalDataType">
+				<sequence>
+					<element name="ageRange" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Age range
+
+
+-- Definition --
+Age interval of a specific subpopulation expressed as starting age and an interval, both alternatively expressed in years, months or weeks.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="hh:AgeRangeType"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="diseaseMeasure" type="hh:DiseaseMeasurePropertyType" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Disease measure
+
+-- Definition --
+Different ways how data on diseases and related health problems in a population can be reported.</documentation>
+						</annotation>
+					</element>
+					<element name="gender" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Gender
+
+-- Definition --
+Gender of the population considered.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="referencePeriod" type="hh:ReferencePeriodTypePropertyType">
+						<annotation>
+							<documentation>-- Name --
+Reference period
+
+
+-- Definition -- 
+The time period to which data refers.</documentation>
+						</annotation>
+					</element>
+					<element name="pathology" type="gml:ReferenceType" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+International classification of diseases .
+
+
+-- Definition --
+Disease as defined in the ICD-10 update 2007  "ICD (International Classification of Diseases, 10&lt;sup&gt;th&lt;/sup&gt; revision)".
+-- Description --
+As values in the INSPIRE data, the  code could be used (e.g A00, A01, A01.1, ...).</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="COD" type="gml:ReferenceType" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Cause of death
+
+-- Definition --
+Data on causes of death (COD) that provide information on mortality patterns and form a major element of public health information.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="DiseasePropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:Disease"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="NoiseMeasure" type="hh:NoiseMeasureType">
+		<annotation>
+			<documentation>-- Name --
+noise measure
+
+-- Definition --
+A measure of noise intensity.</documentation>
+		</annotation>
+	</element>
+	<complexType name="NoiseMeasureType">
+		<complexContent>
+			<extension base="gml:MeasureType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="NoiseMeasurePropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:NoiseMeasure"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="BiomarkerThematicMetadata" type="hh:BiomarkerThematicMetadataType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Biomarker thematic metadata
+
+-- Definition --
+Thematic Metadata describing the purpose of the study, target population and the characteristic of the studied areas.</documentation>
+		</annotation>
+	</element>
+	<complexType name="BiomarkerThematicMetadataType">
+		<sequence>
+			<element name="studyType" type="gmd:PT_FreeText_PropertyType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Study type
+
+-- Definition --
+The aim of the study (hypothesis driven, general population survey, opportunistic) when these choices are predefined.</documentation>
+				</annotation>
+			</element>
+			<element name="areaType" type="gmd:PT_FreeText_PropertyType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Area type
+
+-- Definition --
+The characteristics of the sampling area (urban, rural, semi-urban) when these choices are predefined in a human biomonitoring study.</documentation>
+				</annotation>
+			</element>
+			<element name="specificSubPopulation" type="gmd:PT_FreeText_PropertyType" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Specific subpopulation
+
+-- Definition --
+The characteristics of the sampled population with respect to age, gender, and other population characteristics when these choices are predefined in a human biomonitoring survey.</documentation>
+				</annotation>
+			</element>
+			<element name="meanAge" type="hh:AgePropertyType">
+				<annotation>
+					<documentation>-- Name --
+Mean age
+
+-- Definition --
+The mean age of the specific sub population.</documentation>
+				</annotation>
+			</element>
+			<element name="describedBy" type="hh:BiomarkerPropertyType" maxOccurs="unbounded">
+				<annotation>
+					<documentation>-- Definition --
+Metadata that are linked to biomarker data</documentation>
+					<appinfo>
+						<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">hh:refersTo</reversePropertyName>
+					</appinfo>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="BiomarkerThematicMetadataPropertyType">
+		<sequence>
+			<element ref="hh:BiomarkerThematicMetadata"/>
+		</sequence>
+	</complexType>
+	<element name="EnvHealthDeterminantStatisticalData" type="hh:EnvHealthDeterminantStatisticalDataType" substitutionGroup="hh:HealthStatisticalData">
+		<annotation>
+			<documentation>-- Name --
+environmental health determinant statistical data
+
+-- Definition --
+A statistical data of interest for human health determinant analysis, resulting from the aggregation of raw measurements located within a statistical unit.</documentation>
+		</annotation>
+	</element>
+	<complexType name="EnvHealthDeterminantStatisticalDataType">
+		<complexContent>
+			<extension base="hh:HealthStatisticalDataType">
+				<sequence>
+					<element name="statisticalMethod" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+statistical method
+
+-- Definition --
+The type of statistical method used to aggregate the raw measurement data on the statistical unit.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="type" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Type
+
+-- Definition --
+The type of environmental health determinant.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="measure" type="gml:MeasureType">
+						<annotation>
+							<documentation>-- Name --
+Measure
+
+-- Definition --
+The measures</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="EnvHealthDeterminantStatisticalDataPropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:EnvHealthDeterminantStatisticalData"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="EnvHealthDeterminantMeasure" type="hh:EnvHealthDeterminantMeasureType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+environmental health determinant measure
+
+-- Definition --
+A raw measurement performed at some place that is of interest for human health determinant analysis.</documentation>
+		</annotation>
+	</element>
+	<complexType name="EnvHealthDeterminantMeasureType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="location" type="gml:GeometryPropertyType">
+						<annotation>
+							<documentation>-- Name --
+Location
+
+-- Definition --
+The location of the measurement.
+
+-- Description --
+This location should be a point geometry in most cases.</documentation>
+						</annotation>
+					</element>
+					<element name="type" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Type
+
+-- Definition --
+The type of environmental health determinant.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="measureTime" type="gml:TimePeriodPropertyType">
+						<annotation>
+							<documentation>-- Name --
+measure time
+-- Definition --
+The time period when the measure has been performed.</documentation>
+						</annotation>
+					</element>
+					<element name="beginLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+begin lifespan version
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="endLifespanVersion" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+end lifespan version
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="validFrom" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+valid from
+
+-- Definition --
+The time when the information will start being used.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="validTo" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+valid to
+
+-- Definition --
+The time when the information will stop being used.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="measure" type="gml:MeasureType">
+						<annotation>
+							<documentation>-- Name --
+Measure
+
+-- Definition --
+The measure</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="EnvHealthDeterminantMeasurePropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:EnvHealthDeterminantMeasure"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="AgeRangeType" type="hh:AgeRangeTypeType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Age range
+
+-- Definition --
+Age interval of a specific subpopulation expressed as starting age and an interval, both alternatively expressed in years, months or weeks.</documentation>
+		</annotation>
+	</element>
+	<complexType name="AgeRangeTypeType">
+		<sequence>
+			<element name="startAge" type="hh:AgePropertyType">
+				<annotation>
+					<documentation>-- Name --
+start age
+
+-- Definition -- 
+Beginning of age interval.</documentation>
+				</annotation>
+			</element>
+			<element name="range" type="hh:AgePropertyType">
+				<annotation>
+					<documentation>-- Name --
+range
+
+-- Definition -- 
+Duration of age interval.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="AgeRangeTypePropertyType">
+		<sequence>
+			<element ref="hh:AgeRangeType"/>
+		</sequence>
+	</complexType>
+	<element name="UomConcentration" type="hh:UomConcentrationType">
+		<annotation>
+			<documentation>-- Name --
+Unit of measure for concentration
+
+-- Definition --
+A unit of measure for concentration of a specified component within a specified media.</documentation>
+		</annotation>
+	</element>
+	<complexType name="UomConcentrationType">
+		<complexContent>
+			<extension base="gml:UnitOfMeasureType">
+				<sequence>
+					<element name="component" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+component
+-- Definition --
+The component whose concentration is measured.
+
+-- Description --
+EXAMPLE: SO2 in ambient air, lead in drinking water, benzo-a-pyrene in indoor air, ragweed pollens in ambient air.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="media" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+media
+-- Definition --
+The media in which the concentration is measured.
+
+-- Description --
+EXAMPLE: SO2 in ambient air, lead in drinking water, benzo-a-pyrene in indoor air, ragweed pollens in ambient air.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="UomConcentrationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:UomConcentration"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="DiseaseMeasure" type="hh:DiseaseMeasureType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Disease measure
+
+-- Definition --
+Different ways in which data on diseases and related health problems in a population can be reported.
+
+-- Description --
+There is a strong agreement between the two codelists addressed in the Data Specifications Document; the &amp;ldquo;ICD10Value&amp;rdquo; and the &amp;ldquo;CODValue&amp;rdquo; codelist. Taking into account that the main source of harmonized data is Eurostat, the reporting formats of Eurostat should be promoted in the definition of DiseaseMeasureType:
+&amp;bull; Absolute numbers: the total prevalence of a disease or mortality cause, without any further weighing or processing;
+&amp;bull; Crude death rate: describes mortality in relation to the total population. Expressed in deaths per 100,000 inhabitants, it is calculated as the number of deaths recorded in the population for a given period divided by population in the same period and then multiplied by 100,000;
+&amp;bull; Standardised death rate: weighted average of age-specific mortality rates. The weighting factor is the age distribution of a standard reference population. Standardised death rates are calculated for the age group 0-64 ('premature death') and for the total of ages. As most causes of death vary significantly with people's age and sex, the use of standardised death rates improves comparability over time and between countries.
+The reporting formats as presented above are regulated through the European Parliament&amp;rsquo;s &amp;ldquo; Regulation on Community statistics on public health and health and safety at work (EC) No 1338/2008&amp;rdquo;.</documentation>
+		</annotation>
+	</element>
+	<complexType name="DiseaseMeasureType">
+		<sequence>
+			<element name="diseaseMeasureType" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Name --
+Disease measure type
+
+
+-- Definition --
+Different ways how data on diseases and related health problems in a population can be reported.</documentation>
+					<appinfo>
+						<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="value" type="double">
+				<annotation>
+					<documentation>-- Name --
+Value
+
+-- Definition --
+Value of the measured disease indicator.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="DiseaseMeasurePropertyType">
+		<sequence>
+			<element ref="hh:DiseaseMeasure"/>
+		</sequence>
+	</complexType>
+	<element name="GeneralHealthStatistics" type="hh:GeneralHealthStatisticsType" substitutionGroup="hh:HealthStatisticalData">
+		<annotation>
+			<documentation>-- Name --
+General health statistic
+
+-- Definition --
+Numbers about some aspects of health related to a population or an area. For the purpose of this data model, 'general health' data include issues such as self-perceived health, demographic distribution of various health problems, smokers, etc., expressed as raw numbers, rates, percentage, stratified by gender, age, and/or socio-economic, cultural, ethnic or other factors.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeneralHealthStatisticsType">
+		<complexContent>
+			<extension base="hh:HealthStatisticalDataType">
+				<sequence>
+					<element name="ageRange" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Age range
+
+
+-- Definition --
+Age interval of a specific subpopulation expressed as starting age and an interval, both alternatively expressed in years, months or weeks.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="hh:AgeRangeType"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="gender" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Gender
+
+-- Definition --
+Gender of the population considered.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="generalHealthName" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+General health name
+
+-- Definition -- 
+Health status indicator.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="generalHealthValue" type="double">
+						<annotation>
+							<documentation>-- Name --
+General health value
+-- Definition -- 
+A numerical expression of a health index/indicator.</documentation>
+						</annotation>
+					</element>
+					<element name="referencePeriod" type="hh:ReferencePeriodTypePropertyType">
+						<annotation>
+							<documentation>-- Name --
+Reference period
+
+
+-- Definition -- 
+The time period to which data is referred to.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GeneralHealthStatisticsPropertyType">
+		<sequence minOccurs="0">
+			<element ref="hh:GeneralHealthStatistics"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

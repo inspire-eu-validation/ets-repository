@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:sd="http://inspire.ec.europa.eu/schemas/sd/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/sd/4.0" version="4.0">
+  <annotation>
+    <documentation>Application schema for Species Distribution</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base2/2.0" schemaLocation="../../schemas/base2/2.0/BaseTypes2.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="DistributionInfoType" substitutionGroup="gml:AbstractObject" type="sd:DistributionInfoTypeType">
+    <annotation>
+      <documentation>-- Name --
+distribution info type
+
+-- Definition --
+The description of the status of the subject of distribution within the species distribution unit, including the indication of the abundance by counting, estimation or calculation of the number of occurrences or population size of the particular species.</documentation>
+    </annotation>
+  </element>
+  <complexType name="DistributionInfoTypeType">
+    <sequence>
+      <element name="occurrenceCategory" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+occurrence category
+
+-- Definition --
+The species population density in the species distribution unit.
+
+-- Description --
+A species abundance (population density) in classes (common, rare, very rare, present or absent) in an individual species distribution unit.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="residencyStatus" nillable="true" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+residency status
+
+-- Definition --
+Information on the status of residency of a species regarding nativeness versus introduction and permanency.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="populationSize" nillable="true">
+        <annotation>
+          <documentation>-- Name --
+population size
+
+-- Definition --
+A range value indicating the counted, estimated or calculated occurrences or population sizes, using an upper and a lower limit.
+
+-- Description --
+A range density (or abundance) value for species occurrence in the individual species distribution units either counted, estimated or calculated based on defined counting units, or using upper and lower bounds.</documentation>
+        </annotation>
+        <complexType>
+          <sequence>
+            <element ref="sd:PopulationSizeType"/>
+          </sequence>
+          <attribute name="nilReason" type="gml:NilReasonType"/>
+        </complexType>
+      </element>
+      <element minOccurs="0" name="sensitiveInfo" nillable="true">
+        <annotation>
+          <documentation>-- Name --
+sensitive info
+
+-- Definition --
+Boolean value that indicates whether the location of a specific species is sensitive. 
+
+-- Description --
+This can be used to filter out or generalize sensitive data. Generalized representation can be larger spatial objects e.g. grid cells.
+
+NOTE A species location e.g. breeding location, of vulnerable, endangered or protected species may by law be excluded from distribution or spatially generalised from detailed locations to lower resolutions in more extensive grid cells to avoid environmental crime.</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="boolean">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element minOccurs="0" name="populationType" nillable="true" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+population type
+
+-- Definition --
+The permanency of populations, particularly with regard to migratory species within a given species distribution unit.
+
+-- Description --
+Kind of species occurrence or population data that are collected.
+EXAMPLE Permanent, reproducing, concentration or wintering (for migratory species).</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="collectedFrom" nillable="true">
+        <annotation>
+          <documentation>-- Name --
+collected from
+
+-- Definition --
+The date when the collecting of the original species occurrence data started.
+
+-- Description --
+The starting date for the collection/registration of the primary species occurrence data.</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="date">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element name="collectedTo" nillable="true">
+        <annotation>
+          <documentation>-- Name --
+collected to
+
+-- Definition --
+The date when the collecting of the original species occurrence data stopped.
+
+-- Description --
+The last date for the collection/registration of the primary species occurrence data.</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="date">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="DistributionInfoTypePropertyType">
+    <sequence>
+      <element ref="sd:DistributionInfoType"/>
+    </sequence>
+  </complexType>
+  <element name="PopulationSizeType" substitutionGroup="gml:AbstractObject" type="sd:PopulationSizeTypeType">
+    <annotation>
+      <documentation>-- Name --
+population size type
+
+-- Definition --
+A range value indicating the counted, estimated or calculated occurrences or population sizes, which is defined by an upper and a lower limit.
+
+-- Description --
+A range density (or abundance) value for species occurrence in the individual species distribution units either counted, estimated or calculated based on defined counting units,  or using upper and lower bounds.</documentation>
+    </annotation>
+  </element>
+  <complexType name="PopulationSizeTypeType">
+    <sequence>
+      <element name="countingMethod" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+counting method
+
+-- Definition --
+Method of providing a number for the indication of the abundance of a species within a specific species distribution unit.
+
+-- Description --
+To obtain a density or abundance estimate the data set provider can either count, estimate or calculate the population abundance.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="countingUnit" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+counting unit
+
+-- Definition --
+What has been counted, estimated or calculated when compiling information on the abundance of a species within the species distribution unit.
+
+-- Description --
+This parameter defines which species population units that has collected or retrieved.
+EXAMPLE Colonies, individuals, juvenile, larvae, pairs, shoals, shoots, tufts.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="populationSize" type="sd:RangeTypePropertyType">
+        <annotation>
+          <documentation>-- Name --
+population size
+
+-- Definition --
+A range value indicating the counted, estimated or calculated occurrences or population sizes using upper and lower bounds.
+
+-- Description --
+A range density (or abundance) value for species occurrence in the individual species distribution units either counted, estimated or calculated based on defined counting units,  or using upper and lower bounds.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="PopulationSizeTypePropertyType">
+    <sequence>
+      <element ref="sd:PopulationSizeType"/>
+    </sequence>
+  </complexType>
+  <element name="RangeType" substitutionGroup="gml:AbstractObject" type="sd:RangeTypeType">
+    <annotation>
+      <documentation>-- Name --
+range type
+
+-- Definition --
+Value indicating the upper and lower limits of the counting, estimation or calculation of occurrences.</documentation>
+    </annotation>
+  </element>
+  <complexType name="RangeTypeType">
+    <sequence>
+      <element minOccurs="0" name="upperBound" type="integer">
+        <annotation>
+          <documentation>-- Name --
+upper bound
+
+-- Definition --
+The upper limit of the range.  If the value of this attribute is null and lowerBound is populated, this implies that the value is between the lowerBound and infinity.</documentation>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="lowerBound" type="integer">
+        <annotation>
+          <documentation>-- Name --
+lower bound
+
+-- Definition --
+The lower limit of the range.  If the value of this attribute is null and upperBound is populated, this implies that the value is between the upperBound and zero.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="RangeTypePropertyType">
+    <sequence>
+      <element ref="sd:RangeType"/>
+    </sequence>
+  </complexType>
+  <element name="SpeciesDistributionDataSet" substitutionGroup="gml:AbstractFeature" type="sd:SpeciesDistributionDataSetType">
+    <annotation>
+      <documentation>-- Name --
+species  distribution data set
+
+-- Definition --
+This data set is a collection of individual spatial objects (units) in a distribution of species.
+
+-- Description --
+Collection of individual spatial objects of allowed geometry where a species occurs.</documentation>
+    </annotation>
+  </element>
+  <complexType name="SpeciesDistributionDataSetType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element minOccurs="0" name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+inspire id
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="name" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+name
+
+-- Definition --
+Name of a specific data set provided for Species Distribution.
+
+-- Description --
+A short descriptive identification name for a specific dataset provided by an institution.
+EXAMPLE 1 Redlisted_species_Norway
+EXAMPLE 2 Invasive_alien_species_ Ireland
+EXAMPLE 3 Articles17_report_Germany</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="domainExtent" nillable="true" type="gml:MultiSurfacePropertyType">
+            <annotation>
+              <documentation>-- Name --
+domain extent
+
+-- Definition --
+The geographic extent of the domain of the feature collection.</documentation>
+            </annotation>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.
+
+-- Description --
+NOTE This date is recorded to enable the generation of change only update files.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.
+
+-- Description --
+NOTE This date is recorded to enable the generation of change only update files.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="documentBasis" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+documentBasis
+
+-- Definition --
+Reference to or citation of a document describing a campaign or a legal act which is the basis for the data set.</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="base2:DocumentCitation"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="member" type="sd:SpeciesDistributionUnitPropertyType">
+            <annotation>
+              <documentation>-- Name --
+member
+
+-- Definition --
+Individual spatial objects in a collection of spatial objects.
+
+-- Description --
+Individual spatial objects of allowed geometry where a species occurs.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SpeciesDistributionDataSetPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sd:SpeciesDistributionDataSet"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="SpeciesDistributionUnit" substitutionGroup="gml:AbstractFeature" type="sd:SpeciesDistributionUnitType">
+    <annotation>
+      <documentation>-- Name --
+species distribution unit
+
+-- Definition --
+Occurrence of animal and plant species aggregated by grid, region, administrative unit or other analytical unit. 
+
+-- Description --
+Pan-European, national or local mapping initiatives, resulting in spatial data for species in terrestrial and marine environments, e.g. for birds, insects, mammals, amphibians, reptiles, fish or vascular plants. 
+
+NOTE 1 Only species are mentioned in the INSPIRE definition. But earlier INSPIRE documents (INPIRE IMS, 2003) mentions both species or species grouped e.g. to families. So we interprete species as taxa, which means taxonomic units at any systematic rank, like subspecies, species, genus, family etc.</documentation>
+    </annotation>
+  </element>
+  <complexType name="SpeciesDistributionUnitType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element minOccurs="0" name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+inspire id
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="geometry" type="gml:GeometryPropertyType">
+            <annotation>
+              <documentation>-- Name --
+geometry
+
+-- Definition --
+The geometry of each unit in a collection.
+
+-- Description --
+The geometry (e.g. line or polygon) of each individual spatial objects in the collection</documentation>
+            </annotation>
+          </element>
+          <element name="speciesName" type="sd:SpeciesNameTypePropertyType">
+            <annotation>
+              <documentation>-- Name --
+species name
+
+-- Definition --
+Identifier and scientific name, including the author, taken from an international reference list, optionally completed by a locally used name and its taxonomic concept relationship to the reference name.
+
+-- Description --
+The authorized ReferenceSpeciesScheme provides reference species list which defines the ReferenceSpeciesName with its scientific name plus author and ReferenceSpeciesId.  The LocalSpeciesName provides nomenclatural and taxonomical information about the locally used species name and the taxonomic concepts implied by the use of this name according to a given reference. If omitted the name and concept given by the referenceSpeciesId according to the referenceSpeciesScheme has been used locally.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="distributionInfo" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+distribution info
+
+-- Definition --
+The description of the subject of distribution (occurrences or population), the indication of the count of observations or population size of the particular species, species group or taxon rank and its distribution or isolation within the species distribution unit.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="sd:DistributionInfoType"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.
+
+-- Description --
+NOTE This date is recorded to enable the generation of change only update files.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.
+
+-- Description --
+NOTE This date is recorded to enable the generation of change only update files.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="spatialObject" nillable="true" type="gml:FeaturePropertyType">
+            <annotation>
+              <documentation>-- Name --
+spatial object
+
+-- Definition --
+A reference to a another spatial object defining the spatial extent of a distribution unit.
+
+-- Description --
+EXAMPLE A specific administrative area.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SpeciesDistributionUnitPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sd:SpeciesDistributionUnit"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="SpeciesNameType" substitutionGroup="gml:AbstractObject" type="sd:SpeciesNameTypeType">
+    <annotation>
+      <documentation>-- Name --
+species name type
+
+-- Definition --
+Identifier and scientific name, including the author, taken from an international reference list, optionally completed by a locally used name and its taxonomic concept relationship to the reference name.
+
+-- Description --
+The authorized ReferenceSpeciesScheme provides reference species list which defines the ReferenceSpeciesName with its scientific name plus author and ReferenceSpeciesId.  The LocalSpeciesName provides nomenclatural and taxonomical information about the locally used species name and the taxonomic concepts implied by the use of this name according to a given reference.</documentation>
+    </annotation>
+  </element>
+  <complexType name="SpeciesNameTypeType">
+    <sequence>
+      <element name="referenceSpeciesId" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+reference species id
+
+-- Definition --
+Identifier of one of the reference lists given by the referenceSpeciesScheme.
+
+-- Description --
+In the referenceSpeciesScheme the species IDs are linked to scientific names and corresponding authors using GUIDs</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="referenceSpeciesScheme" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+reference species scheme
+
+-- Definition --
+Reference list defining a nomenclatural and taxonomical standard to which all local names and taxonomic concepts shall be mapped.
+
+-- Description --
+Code list of accepted PAN-European taxonomical reference lists defining the nomenclature and taxonomical concept of a given species name. This must not be regarded as the ultimate taxonomic truth: this will always change. It serves as a definition of a taxonomic concept described by systematic and synonym relations where other names and there inherent taxonomic concepts can be mapped to. The code list comprises of Eu-Nomen, EUNIS and Natura2000. In these sources harmonized species GUIDs and names are maintained by institutions with an assignment outside INSPIRE and the species names are to be retrieved through webservices using GUIDs. Only one of these list must be used for one taxon. The priority is as follows: 1) EU-Nomen, 2) EUNIS, 3) Natura2000. This implies: if a taxon is listed in EU-Nomen, this reference must be used as first choice. If it is not listed in EU-Nomen, the second choice is EUNIS, if not in EUNIS, Natura2000 can be used.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="referenceSpeciesName" nillable="true">
+        <annotation>
+          <documentation>-- Name --
+reference species name
+
+-- Definition --
+The scientific name, including the author, used in the authorized ReferenceSpeciesScheme.
+
+-- Description --
+The authorized ReferenceSpeciesScheme (EU-Nomen, Unis and Nature Directives) provides reference species lists which defines the ReferenceSpeciesName with its scientific name plus author and ReferenceSpeciesId.</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="string">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element minOccurs="0" name="localSpeciesId" nillable="true" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+local species id
+
+-- Definition --
+Identifier used in national nomenclature.
+
+-- Description --
+The taxonID used in national nomenclature databases.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="localSpeciesScheme" nillable="true">
+        <annotation>
+          <documentation>-- Name --
+local species scheme
+
+-- Definition --
+Name of local species classification scheme (bibliographic reference).</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="string">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element minOccurs="0" name="localSpeciesName" nillable="true">
+        <annotation>
+          <documentation>-- Name --
+local species name
+
+-- Definition --
+Scientific name, including the author, used in national nomenclature with its national taxonomic concept.
+
+-- Description --
+The LocalSpeciesName provides nomenclatural and taxonomical information about the locally used species name and the taxonomic concepts implied by the use of this name according to a given reference. If omitted the name and concept given by the referenceSpeciesId according to the referenceSpeciesScheme has been used locally.</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="string">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element minOccurs="0" name="qualifier" nillable="true" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+qualifier
+
+-- Definition --
+Specifies the taxonomic concept relationship between local species identifier and the reference species identifier.
+
+-- Description --
+Defines how the local species name conceptually is related to the referenceSpeciesID, either congruent, included in, includes,  overlaps or excludes</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="SpeciesNameTypePropertyType">
+    <sequence>
+      <element ref="sd:SpeciesNameType"/>
+    </sequence>
+  </complexType>
+</schema>

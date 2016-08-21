@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/1.0" xmlns:er-b="http://inspire.ec.europa.eu/schemas/er-b/3.0" xmlns:er-c="http://inspire.ec.europa.eu/schemas/er-c/3.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" targetNamespace="http://inspire.ec.europa.eu/schemas/er-c/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+Energy Resources Coverage application schema</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base2/1.0" schemaLocation="../../schemas/base2/1.0/BaseTypes2.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/er-b/3.0" schemaLocation="../../schemas/er-b/3.0/EnergyResourcesBase.xsd"/>
+	<import namespace="http://www.interactive-instruments.de/ShapeChange/AppInfo" schemaLocation="http://portele.de/ShapeChangeAppinfo.xsd"/>
+	<import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="http://www.opengis.net/gmlcov/1.0" schemaLocation="../../schemas/ogc/gmlcov/1.0/coverage.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="RenewableAndWastePotentialCoverage" type="er-c:RenewableAndWastePotentialCoverageType" substitutionGroup="gmlcov:AbstractCoverage">
+		<annotation>
+			<documentation>-- Name --
+Renewable and waste potential coverage
+
+-- Definition --
+Function that returns an energy potential value from its range for any direct position within its spatial, temporal or spatio-temporal domain.
+
+-- Description --
+SOURCE Adapted from "Coverage" [ISO 19123:2005].</documentation>
+		</annotation>
+	</element>
+	<complexType name="RenewableAndWastePotentialCoverageType">
+		<complexContent>
+			<extension base="gmlcov:AbstractCoverageType">
+				<sequence>
+					<element name="assessmentMethod" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Assessment method
+
+-- Definition --
+A reference to the method used to assess the energy resource potential.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="base2:DocumentCitation"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="beginLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="domainExtent" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Domain extent
+
+-- Definition --
+The attribute domainExtent shall contain the extent of the spatio-temporal domain of the coverage. Extents may be specified in both space and time. 
+
+-- Description --
+NOTE 1 The domain extent shall be specified at least in space by using EX_BoundingPolygon, EX_GeographicBoundingBox or EX_GeographicDescription.  
+
+NOTE 2 In specific cases information is needed on the vertical extent e.g. wind power potential.
+SOURCE Adapted from [ISO 19123:2005].</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMetadataPropertyType">
+									<sequence minOccurs="0">
+										<element ref="gmd:EX_Extent"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="endLifespanVersion" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="name" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Name
+
+-- Definition --
+Name of the coverage.
+
+-- Description --
+EXAMPLE The name of the catchment area for which a coverage has been extracted to represent Hydroelectric potential.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="string">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="potentialType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Potential type
+
+-- Definition --
+There are various types of potential energy, each associated with a particular type of power.
+
+-- Description --
+NOTE Most detailed classification must be provided.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="typeOfResource" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Type of resource
+
+-- Definition --
+Type of renewable and waste resource to which the measured phenomenon is applicable.
+
+-- Description --
+NOTE Most detailed classification must be provided.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="validTime" type="gml:TimePeriodPropertyType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Valid time
+
+-- Definition --
+The time period for which this coverage is representative.</documentation>
+						</annotation>
+					</element>
+					<element name="verticalExtent" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Vertical extent
+
+-- Definition --
+A number or a range of height/depth values to describe the height/depth for which the range set values are valid.
+EXAMPLE wind power map represents wind power at a height of 80m above groundlevel.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="er-b:VerticalExtentType"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="RenewableAndWastePotentialCoveragePropertyType">
+		<sequence minOccurs="0">
+			<element ref="er-c:RenewableAndWastePotentialCoverage"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

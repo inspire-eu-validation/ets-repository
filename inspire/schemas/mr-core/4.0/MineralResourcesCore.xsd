@@ -1,0 +1,1133 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/2.0" xmlns:cgu="http://xmlns.geosciml.org/Utilities/3.0" xmlns:ge="http://inspire.ec.europa.eu/schemas/ge-core/4.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:mr-core="http://inspire.ec.europa.eu/schemas/mr-core/4.0" xmlns:swe="http://www.opengis.net/swe/2.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/mr-core/4.0" version="4.0">
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base2/2.0" schemaLocation="../../schemas/base2/2.0/BaseTypes2.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/ge-core/4.0" schemaLocation="../../schemas/ge-core/4.0/GeologyCore.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <import namespace="http://www.opengis.net/swe/2.0" schemaLocation="../../schemas/ogc/sweCommon/2.0/swe.xsd"/>
+  <import namespace="http://xmlns.geosciml.org/Utilities/3.0" schemaLocation="http://schemas.geosciml.org/cgiutilities/3.0/cgiUtilities.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="Commodity" substitutionGroup="gml:AbstractFeature" type="mr-core:CommodityType">
+    <annotation>
+      <documentation>-- Definition --
+The material of economic interest in the EarthResource</documentation>
+    </annotation>
+  </element>
+  <complexType name="CommodityType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="source" type="mr-core:EarthResourcePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The deposit/resource from which the commodity comes.</documentation>
+            </annotation>
+          </element>
+          <element name="commodity" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The earth resource commodity.
+
+-- Description --
+EXAMPLE: Cu, Au, Dimension Stone etc.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">mr-core:CommodityCodeValue</targetElement>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="commodityImportance" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The importance of the deposit for the commodity.
+
+-- Description --
+Several commodities may be of interest inside a deposit. A deposit may be a very large deposit for one commodity (this commodity is the main one) and only a medium-sized deposit for some other commodities. Such a ranking is based on a statistical study of a large set of deposits throughout the world to ensure that it is valid. It is made using histograms allowing for each commodity to define class boundaries and what is a super large, a large, a medium-sized etc deposit for this commodity. This classification is based on the potential or endowment: reserves + resources.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="commodityRank" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The rank of the commodity.
+
+-- Description --
+Commodity rank is based on endowment, i.e. (cumulated) past production + reserves (not including past production) + resources, or if the deposit has never been exploited, reserves + resources. A statistical comparison with a large set of deposits throughout the world enables the determination of the deposit as class A (very large), B (large), or C (medium-sized) for a particular commodity, and also which commodity is the main one, the 2nd one, etc. The rank of a commodity is thus not based on political or economic considerations.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="integer">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="CommodityPropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:Commodity"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="CommodityMeasure" substitutionGroup="gml:AbstractObject" type="mr-core:CommodityMeasureType">
+    <annotation>
+      <documentation>-- Definition --
+A measure of the amount of the commodity based on a Reserve, Resource or Endowment calculation.
+
+-- Description --
+Where OreMeasure is Resource or Reserve CommodityMeasure is mandatory</documentation>
+    </annotation>
+  </element>
+  <complexType name="CommodityMeasureType">
+    <sequence>
+      <element name="commodityAmount" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The amount of the commodity.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:QuantityRange"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element name="cutOffGrade" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The cut off grade used for calculating the commodity measure.
+
+-- Description --
+The lowest concentration of a mineralized material that qualifies as ore in a given deposit (adapted from Neuendorf, 2005).</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:QuantityRange"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element name="grade" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The grade of the commodity.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:QuantityRange"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="commodityOfInterest" type="mr-core:CommodityPropertyType">
+        <annotation>
+          <documentation>-- Definition --
+The commodity to which the CommodityMeasure refers.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="CommodityMeasurePropertyType">
+    <sequence>
+      <element ref="mr-core:CommodityMeasure"/>
+    </sequence>
+  </complexType>
+  <element abstract="true" name="EarthResource" substitutionGroup="ge:GeologicFeature" type="mr-core:EarthResourceType">
+    <annotation>
+      <documentation>-- Definition --
+The kinds of observable or inferred phenomena required to classify economic and non-economic earth resources.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="EarthResourceType">
+    <complexContent>
+      <extension base="ge:GeologicFeatureType">
+        <sequence>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanversion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="explorationHistory" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Chronological list of surveys undertaken to better define the potential of a mineral occurrence.
+
+-- Description --
+Recaps the work which has been done from regional reconnaissance, surface detailed prospecting, subsurface prospecting, assessment of the resource, to evaluation of the ore deposit. Depending on the work done on occurrences and prospects, allows an estimate of the 'still to be discovered' potential of an area. A detailed assessment with no result would lead to a pessimistic opinion.</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="mr-core:ExplorationActivity"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="commodityDescription" type="mr-core:CommodityPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The commodities present in the resource ranked by importance order.
+
+-- Description --
+ Determining the rank of a commodity is not as simple as it may look: not only the tonnage (expressed in tons of metal) has to be taken into account, but also the scarcity and thus the price of the commodity. A deposit containing 500,000 t Cu and only 50 t Au will be classified as an Au-(Cu) deposit.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="resourceExtraction" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+One or more periods of mining activity of the earth resource.
+
+-- Description --
+Indicates if this resource is the subject of exploitation, and if so of which type. Depending on several factors (type of mineralization, size, grade, shape, depth, etc.) one or several (combined) methods may be used, including off site methods, surface mining (among which methods related to the exploitation of alluvial/elluvial deposits), underground mining. Knowledge about these methods is important as it may be strongly related to the quantity and type of wastes and environmental impacts generated by the extraction.</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="mr-core:MiningActivity"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="sourceReference" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The source or reference for the Earth Resource.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">base2:DocumentCitation</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element name="dimension" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The size/volume of the earth resource.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="mr-core:EarthResourceDimension"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="expression" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An indicator of whether an EarthResource appears on the surface or has been detected under cover rocks.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="swe:Category"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="form" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The orebody's typical physical and structural relationship to wallrocks and associated rocks.
+
+-- Description --
+EXAMPLE: stratiform, stratabound, cross-cutting, vein, intrusive contact etc.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="swe:Category"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="linearOrientation" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The linear orientation of the Earth Resource.
+
+-- Description --
+EXAMPLE: Plunge etc.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="cgu:CGI_LinearOrientation"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="planarOrientation" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The planar orientation of the Earth Resource.
+
+-- Description --
+EXAMPLE: Dip/Dip Direction etc.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="cgu:CGI_PlanarOrientation"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="shape" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The typical geometrical shape of the Earth Resource.
+
+-- Description --
+EXAMPLE: lenticular, pipelike, irregular etc.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="swe:Category"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element name="classification" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Classification of the EarthResource.
+
+-- Description --
+Systematically arranged information describing the essential attributes of a class of mineral deposits. May be empirical (descriptive) or theoretical (genetic).</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="mr-core:MineralDepositModel"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="oreAmount" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The estimated or calculated amount of ore with the identification of the commodities contained and their grade.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="mr-core:OreMeasure"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="EarthResourcePropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:EarthResource"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="EarthResourceDimension" substitutionGroup="gml:AbstractObject" type="mr-core:EarthResourceDimensionType">
+    <annotation>
+      <documentation>-- Definition --
+The size and volume of the earth resource.</documentation>
+    </annotation>
+  </element>
+  <complexType name="EarthResourceDimensionType">
+    <sequence>
+      <element maxOccurs="unbounded" name="area" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The area of the Earth Resource.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:QuantityRange"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="depth" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The depth of the Earth Resource.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:QuantityRange"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="length" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The length of the Earth Resource.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:QuantityRange"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="width" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The width of the Earth Resource.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:QuantityRange"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="EarthResourceDimensionPropertyType">
+    <sequence>
+      <element ref="mr-core:EarthResourceDimension"/>
+    </sequence>
+  </complexType>
+  <element name="Endowment" substitutionGroup="mr-core:OreMeasure" type="mr-core:EndowmentType">
+    <annotation>
+      <documentation>-- Definition --
+The quantity of a mineral (or a group of minerals for industrial rocks) in accumulations (deposits) meeting specified physical characteristics such as quality, size and depth.
+
+-- Description --
+Usually includes Resources, as unlike the latter, it does not have to have prospects for "eventual economic extraction". It often includes the total amount of a commodity originally introduced to a particular location during the deposit forming processes - and thus can include resources, reserves, past production and mining and metallurgical losses.</documentation>
+    </annotation>
+  </element>
+  <complexType name="EndowmentType">
+    <complexContent>
+      <extension base="mr-core:OreMeasureType">
+        <sequence>
+          <element name="includesReserves" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A flag indicating if the estimate includes the reserves value.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="boolean">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="includesResources" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A flag indicating if the estimate includes the resources value.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="boolean">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="EndowmentPropertyType">
+    <sequence>
+      <element ref="mr-core:Endowment"/>
+    </sequence>
+  </complexType>
+  <element name="ExplorationActivity" substitutionGroup="gml:AbstractFeature" type="mr-core:ExplorationActivityType">
+    <annotation>
+      <documentation>-- Definition --
+A period of exploration activity.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ExplorationActivityType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="activityDuration" type="gml:TimePeriodPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Period, or extent in time, of  the exploration activity. 
+
+-- Description --
+The beginning of the activity links the TM_Period to the TM_Instant at which it starts.  The ending links the TM_Period to the TM_Instant at which it ends.  For a variety of reasons, the position of the TM_Instant designated by 'begin' or 'end' may be inderterminate.</documentation>
+            </annotation>
+          </element>
+          <element name="activityType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The type of exploration activity.
+
+-- Description --
+EXAMPLE: geological mapping, drilling, geophysical surveys, geochemical mapping, etc.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="explorationResult" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The result of the exploration activity.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ExplorationActivityPropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:ExplorationActivity"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Mine" substitutionGroup="mr-core:MiningFeature" type="mr-core:MineType">
+    <annotation>
+      <documentation>-- Definition --
+An excavation carried out for the extraction of mineral deposits.
+
+-- Description --
+&amp;lsquo;True&amp;rsquo; mines are underground workings and open-pit workings (also called open-sky mines) generally for the extraction of metallic commodities. The Mine feature also includes open workings generally for the extraction of industrial minerals, commonly referred to as quarries.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MineType">
+    <complexContent>
+      <extension base="mr-core:MiningFeatureType">
+        <sequence>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="relatedActivity" type="mr-core:MiningActivityPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The MiningActivity associated with the Mine.</documentation>
+            </annotation>
+          </element>
+          <element name="startDate" nillable="true" type="gml:TimeInstantPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Date on which the mine commenced operation.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="mineName" type="mr-core:MineNamePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Data type indicating the Mine Name and whether it is the preferred name.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="sourceReference" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The source reference for the mine.
+
+-- Description --
+Allows citing mine plans etc.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">base2:DocumentCitation</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element name="status" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Operational status value of the mine.
+
+-- Description --
+EXAMPLE: Care &amp; Maintenance; Pending Approval; Operating continually.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="relatedMine" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A related mine.
+
+-- Description --
+A mine currently exploited may result from the resumption and the extension of a – or several – former or older (abandoned) mine(s). Mines need not aggregate to form other mines, they may just be associated in some way or another (eg the Kalgoorlie SuperPit is associated with its preceding mines).</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="mr-core:Mine"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endDate" nillable="true" type="gml:TimeInstantPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Date on which the mine ceased operation.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MinePropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:Mine"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="MineName" substitutionGroup="gml:AbstractObject" type="mr-core:MineNameType">
+    <annotation>
+      <documentation>-- Definition --
+A  data type indicating the Mine Name and whether it is the preferred name.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MineNameType">
+    <sequence>
+      <element name="isPreferred" type="boolean">
+        <annotation>
+          <documentation>-- Definition --
+A boolean operator indicating if the value in mineName is the preferred name of the mine.</documentation>
+        </annotation>
+      </element>
+      <element name="mineName" type="string">
+        <annotation>
+          <documentation>-- Definition --
+The name of the mine.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="MineNamePropertyType">
+    <sequence>
+      <element ref="mr-core:MineName"/>
+    </sequence>
+  </complexType>
+  <element name="MineralDepositModel" substitutionGroup="gml:AbstractGML" type="mr-core:MineralDepositModelType">
+    <annotation>
+      <documentation>-- Definition --
+Systematically arranged information describing the essential attributes of a class of mineral deposits. It may be empirical (descriptive) or theoretical (genetic).</documentation>
+    </annotation>
+  </element>
+  <complexType name="MineralDepositModelType">
+    <complexContent>
+      <extension base="gml:AbstractGMLType">
+        <sequence>
+          <element maxOccurs="unbounded" name="mineralDepositGroup" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A grouping of mineral deposits defined by generic characteristics
+
+-- Description --
+EXAMPLE: host rock, host structure, commodity, association with similar mineral processes e.g. porphyry. Regional, national and more universal lists e.g. Cox and Singer 1986.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="mineralDepositType" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Style of mineral occurrence or deposit. 
+
+-- Description --
+Generally a local or regional term. Should be referenced for definitions and descriptions. Single deposit terms may form member of a Mineral Deposit Group in local and regional schemas.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MineralDepositModelPropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:MineralDepositModel"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="MineralOccurrence" substitutionGroup="mr-core:EarthResource" type="mr-core:MineralOccurrenceType">
+    <annotation>
+      <documentation>-- Definition --
+&lt;font color="#400040"&gt;A mineral accumulation in the lithosphere. &lt;/font&gt;</documentation>
+    </annotation>
+  </element>
+  <complexType name="MineralOccurrenceType">
+    <complexContent>
+      <extension base="mr-core:EarthResourceType">
+        <sequence>
+          <element name="type" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The type of mineral occurrence. 
+
+-- Description --
+EXAMPLE: prospect, occurrence, mineral deposit, ore deposit.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="endusePotential" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The end-use potential of the mineral.
+
+-- Description --
+EXAMPLE: for energy, fertilizer, building raw material.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MineralOccurrencePropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:MineralOccurrence"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="MiningActivity" substitutionGroup="mr-core:MiningFeature" type="mr-core:MiningActivityType">
+    <annotation>
+      <documentation>-- Definition --
+The process of extracting metallic, non-metallic mineral, or industrial rock deposits from the Earth. 
+
+-- Description --
+The term may also include preliminary treatment eg. cleaning or sizing.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MiningActivityType">
+    <complexContent>
+      <extension base="mr-core:MiningFeatureType">
+        <sequence>
+          <element name="processingType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The type of processing carried out during the mining activity.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="deposit" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The deposit to which the mining activity is associated.</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="mr-core:EarthResource"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+          <element name="associatedMine" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The mine where the mining activity takes, or took, place.</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="mr-core:Mine"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+          <element name="activityDuration" type="gml:TimePeriodPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Period, or extent in time, of  the mining activity. 
+
+-- Description --
+The beginning of the activity links the TM_Period to the TM_Instant at which it starts.  The ending links the TM_Period to the TM_Instant at which it ends.  For a variety of reasons, the position of the TM_Instant designated by 'begin' or 'end' may be inderterminate.</documentation>
+            </annotation>
+          </element>
+          <element name="activityType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The type of mining activity.
+
+-- Description --
+EXAMPLE: Open Pit, Underground Mine, multiple, unspecified) or processing activity (eg Ore Processing) or production.  
+Using activity to distinguish between the extraction, processing and production activities allows distinguishing between ore mined/grade/recovery, ore treated/grade/recovery and produced payable/plant recovery.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="oreProcessed" nillable="true" type="swe:QuantityPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The amount of ore processed by the activity.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MiningActivityPropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:MiningActivity"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="MiningFeature" substitutionGroup="gml:AbstractFeature" type="mr-core:MiningFeatureType">
+    <annotation>
+      <documentation>-- Definition --
+Spatial object type grouping the common properties of mines and mining activities.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="MiningFeatureType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MiningFeaturePropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:MiningFeature"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="MiningFeatureOccurrence" substitutionGroup="gml:AbstractFeature" type="mr-core:MiningFeatureOccurrenceType">
+    <annotation>
+      <documentation>-- Definition --
+A spatial representation of a MiningFeature.
+
+-- Description --
+A MiningFeatureOccurrence provides a link between a notional feature (description package) and one spatial representation of it, or part of it. The MiningFeatureOccurrence carries a geometry and the association with a Mining Feature provides specification of all the other descriptors.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MiningFeatureOccurrenceType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="shape" type="gml:GeometryPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The geometry of the MiningFeature.</documentation>
+            </annotation>
+          </element>
+          <element name="specification" type="mr-core:MiningFeaturePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Indicates the MiningFeature that the MiningFeatureOccurrence specifies.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MiningFeatureOccurrencePropertyType">
+    <sequence minOccurs="0">
+      <element ref="mr-core:MiningFeatureOccurrence"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="OreMeasure" substitutionGroup="gml:AbstractObject" type="mr-core:OreMeasureType">
+    <annotation>
+      <documentation>-- Definition --
+The estimate of the Reserve, Resource or Endowment ore amount.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="OreMeasureType">
+    <sequence>
+      <element name="classificationMethodUsed" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Definition --
+Means of calculating the measurement. 
+
+-- Description --
+EXAMPLE: JORC, PERC, Unspecified, UNESCO/World Bank and the Canadian CIM.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="date" type="gml:TimePrimitivePropertyType">
+        <annotation>
+          <documentation>-- Definition --
+Date of calculated or estimated value.
+
+-- Description --
+This may be a single date or a range.</documentation>
+        </annotation>
+      </element>
+      <element name="dimension" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+Size of the body used in the calculation.</documentation>
+        </annotation>
+        <complexType>
+          <sequence>
+            <element ref="mr-core:EarthResourceDimension"/>
+          </sequence>
+          <attribute name="nilReason" type="gml:NilReasonType"/>
+        </complexType>
+      </element>
+      <element name="proposedExtractionMethod" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The method proposed to extract the commodity.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:Category"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="sourceReference">
+        <annotation>
+          <documentation>-- Definition --
+The reference for the OreMeasure values.</documentation>
+          <appinfo>
+            <targetElement xmlns="http://www.opengis.net/gml/3.2">base2:DocumentCitation</targetElement>
+          </appinfo>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence/>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element name="ore">
+        <annotation>
+          <documentation>-- Definition --
+Amount of ore.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="swe:QuantityRange"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="measureDetails" type="mr-core:CommodityMeasurePropertyType">
+        <annotation>
+          <documentation>-- Definition --
+A measure of the amount of each commodity, based on a reserve, resource or endowment calculation. 
+
+-- Description --
+This measure is obtained by multiplying the ore tonnage by the average grade of the commodity within the ore (generally expressed in tons of metal).</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="OreMeasurePropertyType">
+    <sequence>
+      <element ref="mr-core:OreMeasure"/>
+    </sequence>
+  </complexType>
+  <element name="Reserve" substitutionGroup="mr-core:OreMeasure" type="mr-core:ReserveType">
+    <annotation>
+      <documentation>-- Definition --
+The economically mineable part of a Measured and/or Indicated Mineral Resource.
+
+-- Description --
+It includes diluting materials and allowances for losses, which may occur when the material is mined. &amp;lsquo;Marketable Coal Reserves&amp;rsquo; maybe reported in conjunction with, but not instead of, reports of Ore (Coal) Reserves. &amp;lsquo;Saleable product&amp;rsquo; (e.g. for industrial minerals) can be reported in conjunction with ore reserve.
+Synonyms: Ore Reserve; Coal Reserve (s); Diamond (or gemstone) Ore Reserve; Mineral Reserves (not preferred, should be stated that used to mean the same as JORC&amp;rsquo;s Ore Reserve); Mineable production estimates</documentation>
+    </annotation>
+  </element>
+  <complexType name="ReserveType">
+    <complexContent>
+      <extension base="mr-core:OreMeasureType">
+        <sequence>
+          <element name="category" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The level of confidence of the estimate (proved, probable).</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ReservePropertyType">
+    <sequence>
+      <element ref="mr-core:Reserve"/>
+    </sequence>
+  </complexType>
+  <element name="Resource" substitutionGroup="mr-core:OreMeasure" type="mr-core:ResourceType">
+    <annotation>
+      <documentation>-- Definition --
+An accumulation of material of intrinsic economic interest in or on the Earth&amp;rsquo;s crust in such form, quality and quantity that there are reasonable prospects for economic extraction.
+
+-- Description --
+Synonyms: Mineral Resource; Coal Resource (s); Diamond (Gemstone) Resource; Potentially Mineable Mineralisation.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ResourceType">
+    <complexContent>
+      <extension base="mr-core:OreMeasureType">
+        <sequence>
+          <element name="category" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Indication of whether the resource is measured, indicated, or inferred.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="includesReserves" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A flag indicating whether the estimate of resources includes reserve values.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="boolean">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ResourcePropertyType">
+    <sequence>
+      <element ref="mr-core:Resource"/>
+    </sequence>
+  </complexType>
+</schema>

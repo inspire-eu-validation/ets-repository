@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- THIS SCHEMA IS STILL A BETA VERSION
+26-APR-2011 1.0.1 Conformity element:
+                    Restricted allowed citations to "INSPIRE interoperability of spatial data sets and services", according to the MD regulation,
+                    requirements for the conformity element (page 17 of the MD regulation).
+                  Inspire Themes:
+                    Removed leading blank for German, Bulgarian, Czech and Danish translations
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://inspire.ec.europa.eu/schemas/geoportal/1.0" xmlns:inspire_common="http://inspire.ec.europa.eu/schemas/common/1.0" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" xmlns:xhtml="http://www.w3.org/1999/xhtml" targetNamespace="http://inspire.ec.europa.eu/schemas/geoportal/1.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0.0" jaxb:version="2.0">
+	<xs:annotation>
+		<xs:appinfo>
+			<jaxb:globalBindings typesafeEnumMaxMembers="1000"/>
+		</xs:appinfo>
+	</xs:annotation>
+	<xs:import namespace="http://inspire.ec.europa.eu/schemas/common/1.0" schemaLocation="../../common/1.0/common.xsd"/>
+	<!--	
+	<xs:include schemaLocation="http://www.w3.org/MarkUp/SCHEMA/xhtml-rdfa-modules-1.xsd">
+		<xs:annotation>
+			<xs:documentation> Schema that includes all modules (and redefinitions) for XHTML1.1
+                Document Type. </xs:documentation>
+		</xs:annotation>
+	</xs:include>
+-->
+	<!--	
+	<xs:import namespace="http://www.w3.org/1999/xhtml" schemaLocation="http://www.w3.org/MarkUp/SCHEMA/xhtml-rdfa-1.xsd"/>
+	<xs:import namespace="http://www.w3.org/1999/xhtml/datatypes/"  schemaLocation="http://www.w3.org/MarkUp/SCHEMA/xhtml-datatypes-1.xsd"/>
+	<xs:import namespace="http://www.w3.org/1999/xhtml/datatypes/"  schemaLocation="http://www.w3.org/MarkUp/SCHEMA/xhtml-link-1.xsd"/>
+-->
+	<!--	
+	<xs:element name="ViewService" type="viewService"/>
+	<xs:element name="DiscoveryService" type="discoveryService"/>
+	<xs:element name="TransformationService" type="transformationService"/>
+	<xs:element name="InvokeService" type="invokeService"/>
+	<xs:element name="OtherService" type="otherService"/>
+	<xs:element name="ViewServiceClient" type="viewServiceClient"/>
+-->
+	<xs:element name="Resource" type="geoportalResource"/>
+	<xs:complexType name="geoportalResource">
+		<xs:sequence>
+			<!--
+			<xs:element name="link" type="xhtml:xhtml.link.type" minOccurs="0" maxOccurs="unbounded"/>
+-->
+			<xs:choice>
+				<xs:element ref="inspire_common:SpatialDataSet"/>
+				<xs:element ref="inspire_common:SpatialDataSetSeries"/>
+				<xs:element ref="inspire_common:SpatialDataService"/>
+				<xs:element ref="inspire_common:DiscoveryService"/>
+				<xs:element ref="inspire_common:ViewService"/>
+				<xs:element ref="inspire_common:DownloadService"/>
+				<xs:element ref="inspire_common:TransformationService"/>
+				<xs:element ref="inspire_common:OtherService"/>
+			</xs:choice>
+			<xs:element name="MetadataLocator" type="inspire_common:resourceLocatorType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--INSPIRE Geoportal Specific-->
+	<xs:complexType name="viewServiceClient">
+		<xs:complexContent>
+			<xs:extension base="inspire_common:viewService">
+				<xs:sequence>
+					<xs:element name="WMSVersion" type="xs:string"/>
+					<xs:element name="WMSType" type="xs:string"/>
+					<xs:element name="LayerLimit" type="xs:byte"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

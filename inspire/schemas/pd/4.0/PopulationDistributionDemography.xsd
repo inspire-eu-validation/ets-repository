@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/2.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:pd="http://inspire.ec.europa.eu/schemas/pd/4.0" xmlns:su-core="http://inspire.ec.europa.eu/schemas/su-core/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/pd/4.0" version="4.0">
+  <annotation>
+    <documentation>-- Name --
+Population distribution - demography</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base2/2.0" schemaLocation="../../schemas/base2/2.0/BaseTypes2.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/su-core/4.0" schemaLocation="../../schemas/su-core/4.0/StatisticalUnitCore.xsd"/>
+  <import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="Classification" substitutionGroup="gml:AbstractObject" type="pd:ClassificationType">
+    <annotation>
+      <documentation>-- Name --
+Classification
+
+-- Definition --
+A classification used for a statistical distribution.
+
+-- Description --
+This code list describes the classification of the provided statistical values. It is the composition of the classification items.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ClassificationType">
+    <sequence>
+      <element name="type" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+Type
+
+-- Definition --
+The classification type.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element maxOccurs="unbounded" name="item" type="pd:ClassificationItemPropertyType">
+        <annotation>
+          <documentation>-- Name --
+Item
+
+-- Definition --
+The items composing the classification.
+
+-- Description --
+EXAMPLE: The classification with a type "gender" is composed of the items "female", "male" and "unknown".</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="ClassificationPropertyType">
+    <sequence>
+      <element ref="pd:Classification"/>
+    </sequence>
+  </complexType>
+  <element name="ClassificationItem" substitutionGroup="gml:AbstractObject" type="pd:ClassificationItemType">
+    <annotation>
+      <documentation>-- Name --
+Classification item
+
+-- Definition --
+An item composing a classification.
+
+-- Description --
+EXAMPLE: The classification with a type "gender" is composed of the items "female", "male" and "unknown".</documentation>
+    </annotation>
+  </element>
+  <complexType name="ClassificationItemType">
+    <sequence>
+      <element name="type" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+Type
+
+-- Definition --
+The classification item type.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="ClassificationItemPropertyType">
+    <sequence>
+      <element ref="pd:ClassificationItem"/>
+    </sequence>
+  </complexType>
+  <element name="Dimensions" substitutionGroup="gml:AbstractObject" type="pd:DimensionsType">
+    <annotation>
+      <documentation>-- Name --
+Dimensions
+
+-- Definition --
+The identification of what the piece of datum refers to in terms of geographic location or individual characteristics.</documentation>
+    </annotation>
+  </element>
+  <complexType name="DimensionsType">
+    <sequence>
+      <element name="spatial" type="su-core:StatisticalUnitPropertyType">
+        <annotation>
+          <documentation>-- Name --
+Spatial
+
+-- Definition --
+The spatial dimension of the statistical value.</documentation>
+        </annotation>
+      </element>
+      <element maxOccurs="unbounded" minOccurs="0" name="thematic" type="pd:ClassificationItemPropertyType">
+        <annotation>
+          <documentation>-- Name --
+Thematic
+
+-- Definition --
+The thematic dimensions of the statistical value.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="DimensionsPropertyType">
+    <sequence>
+      <element ref="pd:Dimensions"/>
+    </sequence>
+  </complexType>
+  <element name="StatisticalDistribution" substitutionGroup="gml:AbstractFeature" type="pd:StatisticalDistributionType">
+    <annotation>
+      <documentation>-- Name --
+Statistical distribution
+
+-- Definition --
+Set of measures describing how a phenomenon is spread within some part of the 2D world.</documentation>
+    </annotation>
+  </element>
+  <complexType name="StatisticalDistributionType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element minOccurs="0" name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+INSPIRE identifier
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="areaOfDissemination" type="gml:SurfacePropertyType">
+            <annotation>
+              <documentation>-- Name --
+Area of dissemination
+
+-- Definition --
+The part of the 2D world the StatisticalDataDistribution describes.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="universe" type="gmd:PT_FreeText_PropertyType">
+            <annotation>
+              <documentation>-- Name --
+Universe
+
+-- Definition --
+When distribution is related to a subset of the population and not the population in its whole, the literal description of the way this subset was defined.
+
+EXAMPLE : A dataset can give the population distribution of the unemployed persons under 25. The variable will be &amp;ldquo;unemployedPopulation&amp;rdquo;, the measure a &amp;ldquo;count &amp;ldquo; and the measurementUnit &amp;ldquo;person&amp;rdquo;. The only way to express that the distribution doesn&amp;rsquo;t cover the whole unemployed population would be to describe that situation in the Unviverse attribute.</documentation>
+            </annotation>
+          </element>
+          <element name="domain" type="gmd:PT_FreeText_PropertyType">
+            <annotation>
+              <documentation>-- Name --
+Domain
+
+-- Definition --
+The part of statistical knowledge the data refers to.
+
+-- Description --
+EXAMPLES: Demography, activity, etc.</documentation>
+            </annotation>
+          </element>
+          <element name="measure" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+Measure
+
+-- Definition --
+The measure concerned by the distribution.
+
+-- Description --
+EXAMPLE: Population by age and gender, households by size, etc.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="measurementMethod" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+Measurement method
+
+-- Definition --
+The description of the statistic measurement method.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="measurementUnit" type="gml:UnitOfMeasureType">
+            <annotation>
+              <documentation>-- Name --
+Measurement unit
+
+-- Definition --
+The unit of the measurement.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="notCountedProportion" type="double">
+            <annotation>
+              <documentation>-- Name --
+Not counted proportion
+
+-- Definition --
+The proportion of population of the area of interest that is not counted in any of its spatial components.
+
+-- Description --
+EXAMPLE: This situation can occur when the total population of the area of interest is collected by some process (e.g. administrative register) but population in the spatial components of the area of interest by another process (e.g. estimation).</documentation>
+            </annotation>
+          </element>
+          <element name="periodOfMeasurement" type="gml:TimePeriodPropertyType">
+            <annotation>
+              <documentation>-- Name --
+Period of measurement
+
+-- Definition --
+The date or period the observation has been taken, the data was collected.</documentation>
+            </annotation>
+          </element>
+          <element name="periodOfReference" type="gml:TimePeriodPropertyType">
+            <annotation>
+              <documentation>-- Name --
+Period of reference
+
+-- Definition --
+The period when the data is supposed to give a picture of the area of interest.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="periodOfValidity" type="gml:TimePeriodPropertyType">
+            <annotation>
+              <documentation>-- Name --
+Period of validity
+
+-- Definition --
+The period in which the data remains relevant.
+
+-- Description --
+Outside this period the data will not be used and must be replaced by new data. In most cases this is forever and the 2nd date is left empty.</documentation>
+            </annotation>
+          </element>
+          <element name="beginLifeSpanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+Begin life span version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifeSpanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+End life span version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="generalStatus" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+general status
+
+-- Definition --
+The status of the statistical data distribution.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="value" type="pd:StatisticalValuePropertyType">
+            <annotation>
+              <documentation>-- Name --
+Value
+
+-- Definition --
+The statistical values composing the distribution.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="classification" type="pd:ClassificationPropertyType">
+            <annotation>
+              <documentation>-- Name --
+Classification
+
+-- Definition --
+Additional classifications used to split a total value of the described phenomenon. The StatisticalDistribution object will provide actually several distributions, one for each item of the used classification.
+
+NB: When no classification is provided, the statistical value is the total population.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="StatisticalDistributionPropertyType">
+    <sequence minOccurs="0">
+      <element ref="pd:StatisticalDistribution"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="StatisticalValue" substitutionGroup="gml:AbstractObject" type="pd:StatisticalValueType">
+    <annotation>
+      <documentation>-- Name --
+Statistical value
+
+-- Definition --
+The pieces of datum of the distribution.</documentation>
+    </annotation>
+  </element>
+  <complexType name="StatisticalValueType">
+    <sequence>
+      <element minOccurs="0" name="value" type="double">
+        <annotation>
+          <documentation>-- Name --
+Value
+
+-- Definition --
+The value for the piece of datum.</documentation>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="specialValue" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+Special value
+
+-- Definition --
+Some conventional string when value for the piece of datum cannot be provided: missing value, value hidden because of confidentiality.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="conventionallyLocatedProportion" type="double">
+        <annotation>
+          <documentation>-- Name --
+Conventionally located proportion
+
+-- Definition --
+The proportion of population counted in the piece of datum but that cannot actually be physically located anywhere within the area of interest.
+
+EXAMPLE: This proportion will include homeless people who where given the address of the organisation that distributes social benefis to them.</documentation>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="approximatelyLocatedPopulationProportion" type="double">
+        <annotation>
+          <documentation>-- Name --
+Approximately located proportion
+
+-- Definition --
+The proportion of population count that doesn&amp;rsquo;t follow the common rule for location. &amp;ldquo;Population&amp;rdquo; can be persons if persons are counted, dwellings if the StatisticalDatadistribution is about dwellings, etc.
+
+EXAMPLE : A statistical distribution of the people is supposed to have been produced after the people were located in the cadastral parcel they live in. For some incorrectness in the registers used, the actual location of the cadastral parcel was not found fro some of them and an estimated location was computed. The number of people in this case must be reported in the attribute.</documentation>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="comment" type="gmd:PT_FreeText_PropertyType">
+        <annotation>
+          <documentation>-- Name --
+Comment
+
+-- Definition --
+Free style comment about the value.</documentation>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="flags" type="gmd:PT_FreeText_PropertyType">
+        <annotation>
+          <documentation>-- Name --
+Flags
+
+-- Definition --
+A set of one-character encoded comments about the data.</documentation>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="periodOfMeasurement" nillable="true" type="gml:TimePeriodPropertyType">
+        <annotation>
+          <documentation>-- Name --
+Period of measurement
+
+-- Definition --
+The collection period of the statistical value. This period overrides the period specified in the associated statistical distribution.</documentation>
+        </annotation>
+      </element>
+      <element name="status" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+Status
+
+-- Definition --
+The status of the statistical data.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="dimensions" type="pd:DimensionsPropertyType">
+        <annotation>
+          <documentation>-- Name --
+Dimensions
+
+-- Definition --
+The part of the world the piece of datum refers to. Dimensions contains a description of the geographic location (2D dimension) together with possible additional dimensions when population counts are produced simultaneously for different individual characteristics.
+
+EXAMPLE: A simple population count for each part of the area of Dissemination will need only identification of these parts, while population count by gender will require and additional dimension (gender) to make a difference between the male and the female.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="StatisticalValuePropertyType">
+    <sequence>
+      <element ref="pd:StatisticalValue"/>
+    </sequence>
+  </complexType>
+</schema>

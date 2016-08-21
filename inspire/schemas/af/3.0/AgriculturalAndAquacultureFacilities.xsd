@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:act-core="http://inspire.ec.europa.eu/schemas/act-core/3.0" xmlns:af="http://inspire.ec.europa.eu/schemas/af/3.0" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://inspire.ec.europa.eu/schemas/af/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Description --
+
+core model, harmonised toward the the core general faciclity model.</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/act-core/3.0" schemaLocation="../../schemas/act-core/3.0/ActivityComplex_Core.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="FarmAnimalSpecies" type="af:FarmAnimalSpeciesType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+farm animal
+
+-- Definition --
+Identifies an animal or group of animals of the same species kept on the specific site.</documentation>
+		</annotation>
+	</element>
+	<complexType name="FarmAnimalSpeciesType">
+		<sequence>
+			<element name="livestock" type="gml:ReferenceType" nillable="true" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>-- Name --
+livestock 
+
+-- Definition --
+Define the presence of livestock species in the site.
+
+-- Description --
+The terrestic species are coded specified  according to  regulation (EC) No 1165/2008.</documentation>
+				</annotation>
+			</element>
+			<element name="aquaculture" type="gml:ReferenceType" nillable="true" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>-- Name --
+aquaculture 
+
+-- Definition --
+Define the presence of aquaculture species in the site.
+
+-- Description --
+Aquaculture species  are listed in aquacultureSpecies attribute.
+The allowed values for this code list comprise only the values specified in the February 2012 version of the ASFIS (Aquatic Sciences and Fisheries Information System) List of Species for Fishery Statistics Purposes maintained by FAO.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="FarmAnimalSpeciesPropertyType">
+		<sequence>
+			<element ref="af:FarmAnimalSpecies"/>
+		</sequence>
+	</complexType>
+	<element name="Site" type="af:SiteType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+Site
+-- Definition --
+All land  at a same or distinct geographic location under the management control of a holding covering activities, products and services. This includes all infrastructure, equipment and materials. The geometry of the site  must be a point or a surface. Mulitpoint or multisurface is not allowed.
+
+-- Description --
+The  site  can be represented by a point or by a surface.
+the site can have only one geometry.</documentation>
+		</annotation>
+	</element>
+	<complexType name="SiteType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="geometry" type="gml:GeometryPropertyType">
+						<annotation>
+							<documentation>-- Name --
+geometry
+-- Definition --
+The geometry defining the extent or position of the site.
+
+-- Description --
+The geometry must be a GM_surface, when it includes installations, plots or buildings with a polygon type geometry.
+In case the site only includes single object  with a point type geometry, the site can have a GM_point geometry.</documentation>
+						</annotation>
+					</element>
+					<element name="activity" type="gml:ReferenceType" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+activity
+-- Definition --
+The classification of the economic activity of the site, according to the NACE rev. 2.0 coding.
+
+-- Description --
+Accessible at Eurostat repository from URL 
+http://ec.europa.eu/eurostat/ramon/nomenclatures/index.cfm?
+TargetUrl=LST_CLS_DLD&amp;StrNom=NACE_REV2
+&amp;StrLanguageCode=EN&amp;StrLayoutCode=HIERARCHIC.
+
+
+The valid nace codes are 
+first level
+01 and 03
+second level
+01.1 - 01.6  and 03.2
+third level 
+01.11 -  01.64  and 03.21 - 03.22</documentation>
+						</annotation>
+					</element>
+					<element name="includesAnimal" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<complexType>
+							<sequence>
+								<element ref="af:FarmAnimalSpecies"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="SitePropertyType">
+		<sequence minOccurs="0">
+			<element ref="af:Site"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="Holding" type="af:HoldingType" substitutionGroup="act-core:ActivityComplex">
+		<annotation>
+			<documentation>-- Name --
+Holding
+-- Definition --
+The whole area and all infrastructures included on it, covering the same or different  "sites", under the control  of an operator to perform  agricultural or aquaculture activities. 
+The holding includes one specialisation of ActivityComplex, ie. Activity. the values of ActivityType are expressed conform the classification of the economic activity of the holding, according to the NACE rev. 2.0 coding.
+Holding is a thematic extension of the generic Class &amp;ldquo;Activity Complex&amp;rdquo; shared with other thematic areas describing entities related with Economical Activities (Legal Entity Class &amp;ndash; Business).
+
+-- Description --
+Accessible at Eurostat repository from URL  
+http://ec.europa.eu/eurostat/ramon/nomenclatures/index.cfm? 
+TargetUrl=LST_CLS_DLD&amp;StrNom=NACE_REV2 
+&amp;StrLanguageCode=EN&amp;StrLayoutCode=HIERARCHIC. 
+
+The valid nace codes are 
+first level
+01 and 03
+second level
+01.1 - 01.6  and 03.2
+third level 
+01.11 -  01.64  and 03.21 - 03.22
+
+
+01.7  hunting trapping an related services is exclude.
+02.    forestry and logging are excluded
+03.1  fishing is excluded.</documentation>
+		</annotation>
+	</element>
+	<complexType name="HoldingType">
+		<complexContent>
+			<extension base="act-core:ActivityComplexType">
+				<sequence>
+					<element name="contains" type="af:SitePropertyType" maxOccurs="unbounded"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="HoldingPropertyType">
+		<sequence minOccurs="0">
+			<element ref="af:Holding"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

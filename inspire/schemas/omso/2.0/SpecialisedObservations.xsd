@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:om="http://www.opengis.net/om/2.0" xmlns:omor="http://inspire.ec.europa.eu/schemas/omor/2.0" xmlns:omso="http://inspire.ec.europa.eu/schemas/omso/2.0" xmlns:wml2="http://www.opengis.net/waterml/2.0" targetNamespace="http://inspire.ec.europa.eu/schemas/omso/2.0" elementFormDefault="qualified" version="2.0">
+	<annotation>
+		<documentation>-- Definition --
+Application schema for specialist types of Observations</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/omor/2.0" schemaLocation="../../schemas/omor/2.0/ObservationReferences.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="http://www.opengis.net/om/2.0" schemaLocation="../../schemas/ogc/om//2.0/observation.xsd"/>
+	<import namespace="http://www.opengis.net/waterml/2.0" schemaLocation="http://inspire.ec.europa.eu/draft-schemas/waterml/2.0rfc/waterml2.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="ProfileObservation" type="omso:ProfileObservationType" substitutionGroup="om:OM_Observation">
+		<annotation>
+			<documentation>-- Name --
+ProfileObservation
+
+-- Definition --
+Observation representing  the measurement of a property along a vertical profile in space at a single time instant.
+
+-- Description --
+A ProfileObservatation is an Observation representing  the measurement of a property along a vertical profice in space at a single time instant. For example a CTD profile measuring salinty at different depths in the ocean.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ProfileObservationType">
+		<complexContent>
+			<extension base="om:OM_ObservationType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ProfileObservationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="omso:ProfileObservation"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="TimeLocationValueTriple" type="omso:TimeLocationValueTripleType" substitutionGroup="wml2:TimeValuePair">
+		<annotation>
+			<documentation>-- Name --
+TimeLocationValue Triple
+
+-- Definition --
+A triple set of Time, location, value (measurement). For example, at a point along a trajectory.</documentation>
+		</annotation>
+	</element>
+	<complexType name="TimeLocationValueTripleType">
+		<complexContent>
+			<extension base="wml2:TimeValuePairType">
+				<sequence>
+					<element name="location" type="gml:PointPropertyType">
+						<annotation>
+							<documentation>-- Name --
+location
+
+-- Definition --
+Geographic location where value is valid.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="TimeLocationValueTriplePropertyType">
+		<sequence>
+			<element ref="omso:TimeLocationValueTriple"/>
+		</sequence>
+	</complexType>
+	<element name="GridObservation" type="omso:GridObservationType" substitutionGroup="om:OM_Observation">
+		<annotation>
+			<documentation>-- Name --
+GridObservation
+
+-- Definition --
+Observation representing a gridded field at a single time instant.
+-- Description --
+A GridObservation is an observation of some phenomenon (or phenomena) over a gridded field. E.g. Output from a model, or rectified, georeferenced satellite data.
+The result of a GridObservation is a discrete coverage within a compound spatiotemporal CRS where the domain consists of a two- or three-dimensional grid of points, all having the same time instant temporal component.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GridObservationType">
+		<complexContent>
+			<extension base="om:OM_ObservationType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GridObservationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="omso:GridObservation"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GridSeriesObservation" type="omso:GridSeriesObservationType" substitutionGroup="om:OM_Observation">
+		<annotation>
+			<documentation>-- Name --
+GridSeriesObservation
+
+-- Definition --
+Observation representing an evolving gridded field at a succession of time instants.
+-- Description --
+A GridSeriesObservation is a time series of gridded fields representing the same phenomenon (or phenomena) over a series of times. E.g. Ocean model output.
+The result of a GridSeriesObservation is a discrete coverage within a compound spatiotemporal CRS where the domain consists of a series of two- or three-dimensional grids of points, each at a successive time instant.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GridSeriesObservationType">
+		<complexContent>
+			<extension base="om:OM_ObservationType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GridSeriesObservationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="omso:GridSeriesObservation"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="PointObservation" type="omso:PointObservationType" substitutionGroup="om:OM_Observation">
+		<annotation>
+			<documentation>-- Name --
+Point Observation
+-- Definition --
+Observation that represents a measurement of a property at a single point in time and space.
+-- Description --
+The PointObservation represents a single measurement or estimation of a property at a single point in time and space. For example a single temperture measurement at a fixed weather station.</documentation>
+		</annotation>
+	</element>
+	<complexType name="PointObservationType">
+		<complexContent>
+			<extension base="om:OM_ObservationType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="PointObservationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="omso:PointObservation"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="MultiPointObservation" type="omso:MultiPointObservationType" substitutionGroup="om:OM_Observation">
+		<annotation>
+			<documentation>-- Name --
+MultiPointObservation 
+-- Definition --
+Observation that represents a set of measurements all made at exactly the same time but at different locations
+-- Description --
+The MultiPointObservation is an Observation that represents a set of measurements all made at exactly the same time but at different locations, for example a distributed sensor network reporting the temperature at 10am. The result of this observation is a MultiPointCoverage.</documentation>
+		</annotation>
+	</element>
+	<complexType name="MultiPointObservationType">
+		<complexContent>
+			<extension base="om:OM_ObservationType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="MultiPointObservationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="omso:MultiPointObservation"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="PointTimeSeriesObservation" type="omso:PointTimeSeriesObservationType" substitutionGroup="om:OM_Observation">
+		<annotation>
+			<documentation>-- Name --
+PointTimeSeriesObservation 
+-- Definition --
+Observation that represents a time-series of point measurements of a property at a fixed location in space
+-- Description --
+A PointTimeSeriesObservation is a time series of observations made at the same fixed spatial location e.g. Measurements made repeatedly by a fixed monitoring instrument.</documentation>
+		</annotation>
+	</element>
+	<complexType name="PointTimeSeriesObservationType">
+		<complexContent>
+			<extension base="om:OM_ObservationType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="PointTimeSeriesObservationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="omso:PointTimeSeriesObservation"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="PointObservationCollection" type="omso:PointObservationCollectionType" substitutionGroup="omor:ObservationSet">
+		<annotation>
+			<documentation>-- Name --
+PointObservationCollection
+-- Definition --
+A collection of Point Observations.
+-- Description --
+The PointObservationCollection is a collection of separate PointObservations. In the case where it is useful to group together a set of otherwise independent PointObservations the PointObservationCollection should be used to make this grouping. The grouping may be made on any basis e.g. it may be useful to group together PointObservations made by the same instrument or Environmental Facility, or in a particular measurement campaign. Each member of the PointObservationCollection must be a single PointObservation.</documentation>
+		</annotation>
+	</element>
+	<complexType name="PointObservationCollectionType">
+		<complexContent>
+			<extension base="omor:ObservationSetType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="PointObservationCollectionPropertyType">
+		<sequence minOccurs="0">
+			<element ref="omso:PointObservationCollection"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="TrajectoryObservation" type="omso:TrajectoryObservationType" substitutionGroup="om:OM_Observation">
+		<annotation>
+			<documentation>-- Name --
+TrajectoryObservation
+
+-- Definition --
+Observation representing  the measurement of a property along a meandering curve in time and space.
+
+-- Description --
+A TrajectoryObservatation is an Observation representing  the measurement of a property along a meandering curve in time and space. For example a Pollutant concentration from a mobile air quality sensor.</documentation>
+		</annotation>
+	</element>
+	<complexType name="TrajectoryObservationType">
+		<complexContent>
+			<extension base="om:OM_ObservationType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="TrajectoryObservationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="omso:TrajectoryObservation"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

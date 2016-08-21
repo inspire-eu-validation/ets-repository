@@ -27,7 +27,6 @@ import module namespace http = 'http://expath.org/ns/http-client';
 import module namespace ggeo = 'de.interactive_instruments.etf.bsxm.GmlGeoX';
 
 declare variable $limitErrors external := 1000;
-declare variable $limitMessages external := 100;
 declare variable $validationErrors external := ''; 
 declare variable $db external; 
 declare variable $features external; 
@@ -52,7 +51,7 @@ declare function local:strippath($path as xs:string) as xs:string
 
 declare function local:filename($element as node()) as xs:string
 {
-  local:strippath(db:path($element))
+  db:path($element)
 };
 
 declare function local:log($text as xs:string) as empty-sequence()
@@ -75,7 +74,7 @@ declare function local:addMessage($templateId as xs:string, $map as map(*)) as e
 {
   <message xmlns='http://www.interactive-instruments.de/etf/2.0' ref='{$templateId}'>
    <translationArguments>
-    { for $key in map:keys($map) return <argument><token>{$key}</token><value>{map:get($map,$key)}</value></argument>}
+    { for $key in map:keys($map) return <argument token='{$key}'>{map:get($map,$key)}</argument> }
    </translationArguments>
   </message>
 };

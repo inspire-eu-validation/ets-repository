@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:er-b="http://inspire.ec.europa.eu/schemas/er-b/3.0" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://inspire.ec.europa.eu/schemas/er-b/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+Energy Resources Base application schema</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://www.interactive-instruments.de/ShapeChange/AppInfo" schemaLocation="http://portele.de/ShapeChangeAppinfo.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="VerticalExtentRangeType" type="er-b:VerticalExtentRangeTypeType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Vertical extent range type
+
+-- Definition --
+Value indicating the upper and lower bounds of the height/depth range.
+
+-- Description --
+In the case of depth, the range between the deepest (lower bound) and most shallow (upper bound) aspect of the deposit body, where the depth is true vertical depth below a chosen vertical reference level.</documentation>
+		</annotation>
+	</element>
+	<complexType name="VerticalExtentRangeTypeType">
+		<sequence>
+			<element name="lowerBound" nillable="true">
+				<annotation>
+					<documentation>-- Name --
+Lower bound
+
+-- Definition --
+Value indicating the lower bound of the height/depth range.
+
+-- Description --
+In the case of subsurface resources, true vertical depth below a chosen vertical reference level to the deepest vertex of the deposit body.</documentation>
+				</annotation>
+				<complexType>
+					<simpleContent>
+						<extension base="gml:LengthType">
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
+			<element name="upperBound" type="gml:LengthType">
+				<annotation>
+					<documentation>-- Name --
+Upper bound
+
+-- Definition --
+Value indicating the upper bound of the height/depth range.
+
+-- Description --
+In the case of subsurface resources, depth is the true vertical depth below a chosen vertical reference level to the shallowest vertex of the deposit body.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="VerticalExtentRangeTypePropertyType">
+		<sequence>
+			<element ref="er-b:VerticalExtentRangeType"/>
+		</sequence>
+	</complexType>
+	<element name="VerticalExtentValue" type="er-b:VerticalExtentValueType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Vertical extent value
+
+-- Definition --
+Either a single number or a range of height/depth values to describe the height/depth position of an Energy Resource.</documentation>
+		</annotation>
+	</element>
+	<complexType name="VerticalExtentValueType">
+		<choice>
+			<element name="range" type="er-b:VerticalExtentRangeTypePropertyType">
+				<annotation>
+					<documentation>-- Name --
+Range
+
+-- Definition --
+Range of numbers representing the height or depth range of an Energy Resource.
+
+-- Description --
+NOTE depth values are represented by negative numbers.</documentation>
+				</annotation>
+			</element>
+			<element name="scalar" type="gml:LengthType">
+				<annotation>
+					<documentation>-- Name --
+Scalar
+
+-- Definition --
+Number representing the height or depth of an Energy Resource.
+
+-- Description --
+NOTE depth values are represented by negative numbers.</documentation>
+				</annotation>
+			</element>
+		</choice>
+	</complexType>
+	<complexType name="VerticalExtentValuePropertyType">
+		<sequence>
+			<element ref="er-b:VerticalExtentValue"/>
+		</sequence>
+	</complexType>
+	<element name="VerticalExtentType" type="er-b:VerticalExtentTypeType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Vertical extent type
+
+-- Definition --
+Vertical dimensional property consisting of an absolute measure or range of measures referenced to a well-defined vertical reference level which is commonly taken as origin (ground level, mean sea level, etc.).</documentation>
+		</annotation>
+	</element>
+	<complexType name="VerticalExtentTypeType">
+		<sequence>
+			<element name="verticalExtent" type="er-b:VerticalExtentValuePropertyType">
+				<annotation>
+					<documentation>-- Name --
+Vertical extent
+
+-- Definition --
+Extent of the vertical dimension represented by a scalar or by a range of values.</documentation>
+				</annotation>
+			</element>
+			<element name="verticalReference" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Name --
+Vertical Reference
+
+-- Definition --
+Reference level that was chosen to determine the vertical height/depth.</documentation>
+					<appinfo>
+						<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+					</appinfo>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="VerticalExtentTypePropertyType">
+		<sequence>
+			<element ref="er-b:VerticalExtentType"/>
+		</sequence>
+	</complexType>
+</schema>

@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:au="urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/1.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gn="urn:x-inspire:specification:gmlas:GeographicalNames:3.0" xmlns:su-core="http://inspire.ec.europa.eu/schemas/su-core/3.0" xmlns:su-vector="http://inspire.ec.europa.eu/schemas/su-vector/3.0" targetNamespace="http://inspire.ec.europa.eu/schemas/su-vector/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+Statistical Units Vector
+
+-- Definition --
+Package containing classes to represent statistical units with vector geometries.</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base2/1.0" schemaLocation="../../schemas/base2/1.0/BaseTypes2.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/su-core/3.0" schemaLocation="../../schemas/su-core/3.0/StatisticalUnitCore.xsd"/>
+	<import namespace="http://www.interactive-instruments.de/ShapeChange/AppInfo" schemaLocation="http://portele.de/ShapeChangeAppinfo.xsd"/>
+	<import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0" schemaLocation="../../schemas/au/3.0/AdministrativeUnits.xsd"/>
+	<import namespace="urn:x-inspire:specification:gmlas:GeographicalNames:3.0" schemaLocation="../../schemas/gn/3.0/GeographicalNames.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="StatisticalTessellation" type="su-vector:StatisticalTessellationType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+Statistical tesselation
+
+-- Definition --
+A tesselation composed of area statistical units.
+
+-- Description --
+EXAMPLE A NUTS regions coverage.</documentation>
+		</annotation>
+	</element>
+	<complexType name="StatisticalTessellationType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Name --
+INSPIRE identifier
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="units" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+The units composing a tesselation.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:tesselation</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="su-vector:AreaStatisticalUnit"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="lower" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+The immediately lower statistical tessellation.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:upper</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:StatisticalTessellation"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="upper" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+The immediately upper statistical tessellation.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:lower</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:StatisticalTessellation"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="StatisticalTessellationPropertyType">
+		<sequence minOccurs="0">
+			<element ref="su-vector:StatisticalTessellation"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="VectorStatisticalUnitGeometry" type="su-vector:VectorStatisticalUnitGeometryType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Vector statistical unit geometry
+
+-- Definition --
+A geometrical representation for vector statistical units.
+
+-- Description --
+Vector statistical units can have several representations depending on the context they are used for. It is adviced to produce at least one reference geometry.
+
+EXAMPLE1: A vector statistical units may be represented both by an area and a point geometry. Such point can be the center of gravity or a label location.
+
+EXAMPLE2: For mapping, different generalised representations of vector statistical units are required. These geometries depend on the visualisation scale.</documentation>
+		</annotation>
+	</element>
+	<complexType name="VectorStatisticalUnitGeometryType">
+		<sequence>
+			<element name="geometry" type="gml:GeometryPropertyType">
+				<annotation>
+					<documentation>-- Name --
+Geometry
+
+-- Definition --
+The geometry.</documentation>
+				</annotation>
+			</element>
+			<element name="geometryDescriptor" type="su-vector:GeometryDescriptorPropertyType">
+				<annotation>
+					<documentation>-- Name --
+Geometry descriptor
+
+-- Definition --
+The statistical unit geometry descriptor.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="VectorStatisticalUnitGeometryPropertyType">
+		<sequence>
+			<element ref="su-vector:VectorStatisticalUnitGeometry"/>
+		</sequence>
+	</complexType>
+	<element name="VectorStatisticalUnit" type="su-vector:VectorStatisticalUnitType" substitutionGroup="su-core:StatisticalUnit">
+		<annotation>
+			<documentation>-- Name --
+Vector statistical unit
+
+-- Definition --
+Statistical unit represented as a vector geometry (point, line or surface).</documentation>
+		</annotation>
+	</element>
+	<complexType name="VectorStatisticalUnitType">
+		<complexContent>
+			<extension base="su-core:StatisticalUnitType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Name --
+INSPIRE identifier
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="thematicId" type="base2:ThematicIdentifierPropertyType" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Thematic identifier
+
+-- Definition --
+Descriptive unique object identifier applied to spatial objects in a defined information theme. 
+
+-- Description --
+Some statistical units may be assigned multiple thematic identifiers.
+
+EXAMPLE: NUTS codes are thematic identifiers.</documentation>
+						</annotation>
+					</element>
+					<element name="country" type="gmd:Country_PropertyType">
+						<annotation>
+							<documentation>-- Name --
+Country
+
+-- Definition --
+The code of the country the object belongs to.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="geographicalName" type="gn:GeographicalNamePropertyType" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Geographical name
+
+-- Definition --
+Possible geographical names of the object.</documentation>
+						</annotation>
+					</element>
+					<element name="beginLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="endLifespanVersion" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+End lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="validityPeriod" type="gml:TimePeriodPropertyType" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Validity period
+
+-- Definition --
+The period when the statistical unit is supposed to be preferably used and not.</documentation>
+						</annotation>
+					</element>
+					<element name="referencePeriod" type="gml:TimePeriodPropertyType">
+						<annotation>
+							<documentation>-- Name --
+Reference period
+
+-- Definition --
+The period when the data is supposed to give a picture of the territorial division in statistical units.</documentation>
+						</annotation>
+					</element>
+					<element name="geometry" type="su-vector:VectorStatisticalUnitGeometryPropertyType" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+Geometries
+
+-- Definition --
+Geometrical representations of the vector statistical unit.</documentation>
+						</annotation>
+					</element>
+					<element name="evolutions" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+All the evolutions the statistical unit has encountered.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:units</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:Evolution"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="VectorStatisticalUnitPropertyType">
+		<sequence minOccurs="0">
+			<element ref="su-vector:VectorStatisticalUnit"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="Evolution" type="su-vector:EvolutionType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+Evolution
+
+-- Definition --
+Representation of vector statistical unit evolution.</documentation>
+		</annotation>
+	</element>
+	<complexType name="EvolutionType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="date" type="dateTime">
+						<annotation>
+							<documentation>-- Name --
+Date
+
+-- Definition --
+The date when the change occured.</documentation>
+						</annotation>
+					</element>
+					<element name="evolutionType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+Evolution type
+
+-- Definition --
+The type of evolution.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="areaVariation" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Area variation
+
+-- Definition --
+The area variation during the evolution. This attribute has to be populated only if the type is "change".</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="gml:AreaType">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="populationVariation" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Population variation
+
+-- Definition --
+The population variation during the evolution. This attribute has to be populated only if the type is "change".</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="integer">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="finalUnitVersions" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+All the final unit versions concerned by the evolution.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:VectorStatisticalUnit"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="units" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+All the units concerned by the evolution.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:evolutions</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:VectorStatisticalUnit"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="initialUnitVersions" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+All the initial unit versions concerned by the evolution.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:VectorStatisticalUnit"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="EvolutionPropertyType">
+		<sequence minOccurs="0">
+			<element ref="su-vector:Evolution"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="AreaStatisticalUnit" type="su-vector:AreaStatisticalUnitType" substitutionGroup="su-vector:VectorStatisticalUnit">
+		<annotation>
+			<documentation>-- Name --
+Area statistical unit
+
+-- Definition --
+Vector statistical unit with a surfacic reference geometry.
+
+-- Description --
+Such object can be composed of other area statistical unit.
+
+EXAMPLE A country area, an administrative unit, a NUTS region.</documentation>
+		</annotation>
+	</element>
+	<complexType name="AreaStatisticalUnitType">
+		<complexContent>
+			<extension base="su-vector:VectorStatisticalUnitType">
+				<sequence>
+					<element name="areaValue" type="gml:AreaType">
+						<annotation>
+							<documentation>-- Name --
+Area value
+
+-- Definition --
+The area of the reference geometry.</documentation>
+						</annotation>
+					</element>
+					<element name="landAreaValue" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Land area value
+
+-- Definition --
+The area of the above-water part.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="gml:AreaType">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="livableAreaValue" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Livable area value
+
+-- Definition --
+The area of the livable part.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="gml:AreaType">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="administrativeUnit" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Administrative units used to buid the area statistical unit.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="au:AdministrativeUnit"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="lowers" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+The area statistical units of the next lower level.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:uppers</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="su-vector:AreaStatisticalUnit"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="uppers" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+The area statistical units of the next upper level.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:lowers</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:AreaStatisticalUnit"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="successors" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Successors of the area statistical unit.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:predecessors</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:AreaStatisticalUnit"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="predecessors" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Predecessors of the area statistical unit.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:successors</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:AreaStatisticalUnit"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="tesselation" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+The tesselation composed of units.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-vector:units</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-vector:StatisticalTessellation"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AreaStatisticalUnitPropertyType">
+		<sequence minOccurs="0">
+			<element ref="su-vector:AreaStatisticalUnit"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GeometryDescriptor" type="su-vector:GeometryDescriptorType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Geometry descriptor
+
+-- Definition --
+A descriptor for vector statistical unit geometry.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeometryDescriptorType">
+		<sequence>
+			<element name="geometryType" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Name --
+Geometry type
+
+-- Definition --
+The geometry type.</documentation>
+					<appinfo>
+						<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="mostDetailedScale" type="integer" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Most detailed scale
+
+-- Definition --
+The most detailed scale the generalised geometry is supposed to be suitable for (expressed as the inverse of an indicative scale).</documentation>
+				</annotation>
+			</element>
+			<element name="leastDetailedScale" type="integer" minOccurs="0">
+				<annotation>
+					<documentation>-- Name --
+Least detailed scale
+
+-- Definition --
+The least detailed scale the generalised geometry is supposed to be suitable for (expressed as the inverse of an indicative scale).</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="GeometryDescriptorPropertyType">
+		<sequence>
+			<element ref="su-vector:GeometryDescriptor"/>
+		</sequence>
+	</complexType>
+</schema>

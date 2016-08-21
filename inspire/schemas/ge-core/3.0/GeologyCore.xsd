@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/1.0" xmlns:ge="http://inspire.ec.europa.eu/schemas/ge-core/3.0" xmlns:ge_gp="http://inspire.ec.europa.eu/schemas/ge_gp/3.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:swe="http://www.opengis.net/swe/2.0" targetNamespace="http://inspire.ec.europa.eu/schemas/ge-core/3.0" elementFormDefault="qualified" version="3.0">
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base2/1.0" schemaLocation="../../schemas/base2/1.0/BaseTypes2.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/ge_gp/3.0" schemaLocation="../../schemas/ge_gp/3.0/GeophysicsCore.xsd"/>
+	<import namespace="http://www.interactive-instruments.de/ShapeChange/AppInfo" schemaLocation="http://portele.de/ShapeChangeAppinfo.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="http://www.opengis.net/swe/2.0" schemaLocation="../../schemas/ogc/sweCommon/2.0/swe.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="Borehole" type="ge:BoreholeType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Definition --
+A borehole is the generalized term for any narrow shaft drilled in the ground.</documentation>
+		</annotation>
+	</element>
+	<complexType name="BoreholeType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Definition --
+External object identifier of the spatial object.</documentation>
+						</annotation>
+					</element>
+					<element name="downholeGeometry" type="gml:CurvePropertyType" nillable="true">
+						<annotation>
+							<documentation>The downhole geometry of the borehole</documentation>
+						</annotation>
+					</element>
+					<element name="boreholeLength" type="swe:QuantityPropertyType" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+The distance along a borehole.
+
+-- Description --
+This will be determined by the data provider (ie, "length" can have different sources, like drillers measurement, loggers measurement, survey).</documentation>
+						</annotation>
+					</element>
+					<element name="elevation" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+The vertical height above datum of the borehole collar.
+
+-- Description --
+This is a compromise approach to supply elevation explictly for location; this is to allow for software that cannot process 3-D GM_Point. Use null if elevation is unknown. Direct position shall have a dimension of 1, and CRS will be a "vertical" CRS (e.g. EPSG CRSs in the range 5600-5799).</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="gml:DirectPositionType">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="location" type="gml:PointPropertyType">
+						<annotation>
+							<documentation>-- Definition --
+The location of the borehole collar.</documentation>
+						</annotation>
+					</element>
+					<element name="purpose" type="gml:ReferenceType" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+The purpose for which the borehole was drilled.
+
+-- Description --
+EXAMPLE: site investigation, mineral exploration, hydrocarbon exploration, water resources.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="logElement" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+1-D MappedFeature instances that are logged (interpreted) intervals within a borehole.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge:MappedInterval"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="BoreholePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:Borehole"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GeologicStructure" type="ge:GeologicStructureType" abstract="true" substitutionGroup="ge:GeologicFeature">
+		<annotation>
+			<documentation>-- Definition --
+A configuration of matter in the Earth based on describable inhomogeneity, pattern, or fracture in an earth material. 
+
+-- Description --
+The identity of a GeologicStructure is independent of the material that is the substrate for the structure.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeologicStructureType" abstract="true">
+		<complexContent>
+			<extension base="ge:GeologicFeatureType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GeologicStructurePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:GeologicStructure"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="ShearDisplacementStructure" type="ge:ShearDisplacementStructureType" substitutionGroup="ge:GeologicStructure">
+		<annotation>
+			<documentation>-- Definition --
+Brittle to ductile style structures along which displacement has occurred.
+
+-- Description --
+These range from from a simple, single 'planar' brittle or ductile surface to a fault system comprised of tens of strands of both brittle and ductile nature.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ShearDisplacementStructureType">
+		<complexContent>
+			<extension base="ge:GeologicStructureType">
+				<sequence>
+					<element name="faultType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Definition --
+Refers to a vocabulary of terms describing the type of shear displacement structure.
+
+-- Description --
+EXAMPLE: thrust fault, normal fault, wrench fault.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ShearDisplacementStructurePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:ShearDisplacementStructure"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="MappedFeature" type="ge:MappedFeatureType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Definition --
+A spatial representation of a GeologicFeature.
+
+-- Description --
+A MappedFeature is part of a geological interpretation. 
+It provides a link between a notional feature (description package) and one spatial representation of it, or part of it (exposures, surface traces and intercepts, etc) which forms the specific bounded occurrence, such as an outcrop or map polygon.</documentation>
+		</annotation>
+	</element>
+	<complexType name="MappedFeatureType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="shape" type="gml:GeometryPropertyType">
+						<annotation>
+							<documentation>-- Definition --
+The geometry of the mapped feature.</documentation>
+						</annotation>
+					</element>
+					<element name="mappingFrame" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Definition --
+The surface on which the mapped feature is projected.
+
+-- Description --
+EXAMPLE: Topographic surface, Bedrock surface, Base of Permian</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="specification" type="ge:GeologicFeaturePropertyType">
+						<annotation>
+							<documentation>-- Definition --
+A description association that links a mapped feature to a notional geologic feature.  
+
+-- Description --
+A geologic feature, such as a geologic unit may be linked to mapped features from a number of different maps.  A mapped feature, however is always associated with only a single description (geologic feature).</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="MappedFeaturePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:MappedFeature"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="ThematicClass" type="ge:ThematicClassType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Definition --
+A generic thematic classifier to enable the reclassification of Geologic Features with user defined classes appropriate to thematic maps.
+
+-- Description --
+This datatype allows Geologic Features to be classified against thematic classes. This provides a generic means of delivering geological thematic map data.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ThematicClassType">
+		<sequence>
+			<element name="themeClassification" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Definition --
+The used classification.</documentation>
+				</annotation>
+			</element>
+			<element name="themeClass" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Definition --
+The value of the thematic class.
+
+-- Description --
+The thematic class value should be constrained by a codelist of defined terms, but these will commonly be specific to a particular thematic map.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ThematicClassPropertyType">
+		<sequence>
+			<element ref="ge:ThematicClass"/>
+		</sequence>
+	</complexType>
+	<element name="GeologicCollection" type="ge:GeologicCollectionType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Definition --
+A collection of geological or geophysical objects.
+
+-- Description --
+Geologic objects are commonly grouped into collections such as geological maps, thematic maps, or the required input to a geological model.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeologicCollectionType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Definition --
+External object identifier of the spatial object.</documentation>
+						</annotation>
+					</element>
+					<element name="name" type="string">
+						<annotation>
+							<documentation>-- Definition --
+The name of the collection.</documentation>
+						</annotation>
+					</element>
+					<element name="collectionType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Definition --
+The type of the collection.
+
+-- Description --
+Refers to a vocabulary of types.
+EXAMPLE: geological map, thematic map etc.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="reference" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+A reference for the collection.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="base2:DocumentCitation"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="beginLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="endLifespanVersion" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="mapMember" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+A Mapped Feature member of a Geologic Collection.
+
+-- Description --
+Association that allows MappedFeature objects to be included as members in a GML Collection, through the use of the GeologicCollection class.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="ge:MappedFeature"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="boreholeMember" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+A Borehole member of a Geologic Collection.
+
+-- Description --
+Association that allows Borehole objects to be included as members in a GML Collection, through the use of the GeologicCollection class.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="ge:Borehole"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="geophObjectSet" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+A GeophObjectSet member of a Geologic Collection.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="ge_gp:GeophObjectSet"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="geophObjectMember" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+A GeophObject member of a Geologic Collection.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="ge_gp:GeophObject"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GeologicCollectionPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:GeologicCollection"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GeomorphologicFeature" type="ge:GeomorphologicFeatureType" abstract="true" substitutionGroup="ge:GeologicFeature">
+		<annotation>
+			<documentation>-- Definition --
+An abstract spatial object type describing the shape and nature of the Earth's land surface (ie, a landform).  
+
+-- Description --
+These landforms may be created by natural Earth processes (eg, river channel, beach, moraine, mountain) or through human (anthropogenic) activity (eg, dredged channel, reclaimed land, mine waste dumps).</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeomorphologicFeatureType" abstract="true">
+		<complexContent>
+			<extension base="ge:GeologicFeatureType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GeomorphologicFeaturePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:GeomorphologicFeature"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GeologicFeature" type="ge:GeologicFeatureType" abstract="true" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Definition --
+A conceptual geological feature that is hypothesized to exist coherently in the world.
+
+-- Description --
+This corresponds with a "legend item" from a traditional geologic map. While the bounding coordinates of a Geologic Feature may be described, its shape is not.
+The implemented Geologic Feature instance acts as the "description package"</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeologicFeatureType" abstract="true">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Definition --
+External object identifier of the spatial object.</documentation>
+						</annotation>
+					</element>
+					<element name="name" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+The name of the geologic feature.
+
+-- Description --
+EXAMPLE: a lithostratigraphic unit, mineral occurrence, or major fault. 
+Not all GeologicFeatures will have names, for example minor faults.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="string">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="geologicHistory" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+An association that relates one or more geologic events to a geologic feature to describe their age or geologic history.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="ge:GeologicEvent"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="themeClass" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+A thematic classification of the geologic feature.
+
+-- Description --
+A GeologicFeature may be classified according to one or more thematic schema, for example ground stability or mineral resource potential.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge:ThematicClass"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GeologicFeaturePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:GeologicFeature"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="CompositionPart" type="ge:CompositionPartType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Definition --
+The composition of a geologic unit in terms of lithological constituents.</documentation>
+		</annotation>
+	</element>
+	<complexType name="CompositionPartType">
+		<sequence>
+			<element name="material" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Definition --
+The material that comprises part or all of the geologic unit. 
+
+-- Description --
+This refers to a vocabulary of lithological terms.</documentation>
+					<appinfo>
+						<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+					</appinfo>
+				</annotation>
+			</element>
+			<element name="proportion" nillable="true">
+				<annotation>
+					<documentation>-- Definition --
+Quantity that specifies the fraction of the geologic unit composed of the material.</documentation>
+				</annotation>
+				<complexType>
+					<complexContent>
+						<extension base="gml:AbstractMemberType">
+							<sequence minOccurs="0">
+								<element ref="swe:QuantityRange"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="role" type="gml:ReferenceType">
+				<annotation>
+					<documentation>-- Definition --
+The relationship of the composition part to the geologic unit composition as a whole.
+
+-- Description --
+EXAMPLE: vein, interbedded constituent, layers, dominant constituent.</documentation>
+					<appinfo>
+						<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+					</appinfo>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="CompositionPartPropertyType">
+		<sequence>
+			<element ref="ge:CompositionPart"/>
+		</sequence>
+	</complexType>
+	<element name="GeologicEvent" type="ge:GeologicEventType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Definition --
+An identifiable event during which one or more geological processes act to modify geological entities. 
+
+-- Description --
+A GeologicEvent should have a specified geologic age and process, and may have a specified environment. An example might be a cratonic uplift event during which erosion, sedimentation, and volcanism all take place. A GeologicEvent age can represent an instant in time or an interval of time.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeologicEventType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="name" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+The name of the Geologic Event.
+
+-- Description --
+
+Only major Geologic Events, such as orogenies, are likely to have names.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="string">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="eventEnvironment" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+The physical setting within which the geologic event takes place.  
+
+-- Description --
+GeologicEnvironment is construed broadly to include physical settings on the Earth surface specified by climate, tectonics, physiography or geography, and settings in the Earth&amp;rsquo;s interior specified by pressure, temperature, chemical environment, or tectonics.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="eventProcess" type="gml:ReferenceType" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+The process or processes that occurred during the geologic event. 
+
+-- Description --
+EXAMPLE: deposition, extrusion, intrusion, cooling.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="olderNamedAge" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+Older boundary of the age of the event.
+
+-- Description --
+This is expressed using a geochronologic era defined in a vocabulary of recognised units, such as those of the International Commission on Stratigraphy (ICS) Stratigraphic Chart.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="youngerNamedAge" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+Younger boundary of the age of the event.
+
+-- Description --
+This is expressed using a geochronologic era defined in a vocabulary of recognised units, such as those of the International Commission on Stratigraphy (ICS) Stratigraphic Chart.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GeologicEventPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:GeologicEvent"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GeologicUnit" type="ge:GeologicUnitType" substitutionGroup="ge:GeologicFeature">
+		<annotation>
+			<documentation>-- Definition --
+A volume of rock with distinct characteristics.
+
+-- Description --
+Includes both formal units (i.e. formally adopted and named in an official lexicon) and informal units (i.e. named but not promoted to the lexicon) and unnamed units (i.e. recognisable and described and delineable in the field but not otherwise formalised).
+Spatial properties are only available through association with a MappedFeature.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeologicUnitType">
+		<complexContent>
+			<extension base="ge:GeologicFeatureType">
+				<sequence>
+					<element name="geologicUnitType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Definition --
+The type of geological the unit. 
+
+-- Description --
+Logical constraints of definition of unit and valid property cardinalities should be contained in the definition.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="composition" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Describes the composition of the geologic unit.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="ge:CompositionPart"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GeologicUnitPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:GeologicUnit"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="MappedInterval" type="ge:MappedIntervalType" substitutionGroup="ge:MappedFeature">
+		<annotation>
+			<documentation>-- Definition --
+A special kind of mapped feature whose shape is a 1-D interval and which uses the SRS of the containing borehole.</documentation>
+		</annotation>
+	</element>
+	<complexType name="MappedIntervalType">
+		<complexContent>
+			<extension base="ge:MappedFeatureType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="MappedIntervalPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:MappedInterval"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="AnthropogenicGeomorphologicFeature" type="ge:AnthropogenicGeomorphologicFeatureType" substitutionGroup="ge:GeomorphologicFeature">
+		<annotation>
+			<documentation>-- Definition --
+A geomorphologic feature (ie, landform) which has been created by human activity.
+
+-- Description --
+EXAMPLE: dredged channel, midden, open pit, reclaimed land.</documentation>
+		</annotation>
+	</element>
+	<complexType name="AnthropogenicGeomorphologicFeatureType">
+		<complexContent>
+			<extension base="ge:GeomorphologicFeatureType">
+				<sequence>
+					<element name="anthropogenicGeomorphologicFeatureType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Definition --
+Terms describing the type of a geomorphologic feature.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AnthropogenicGeomorphologicFeaturePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:AnthropogenicGeomorphologicFeature"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="Fold" type="ge:FoldType" substitutionGroup="ge:GeologicStructure">
+		<annotation>
+			<documentation>-- Definition --
+One or more systematically curved layers, surfaces, or lines in a rock body. 
+
+-- Description --
+A fold denotes a structure formed by the deformation of a Geologic Structure to form a structure that may be described by the translation of an abstract line (the fold axis) parallel to itself along some curvilinear path (the fold profile). Folds have a hinge zone (zone of maximum curvature along the surface) and limbs (parts of the deformed surface not in the hinge zone).</documentation>
+		</annotation>
+	</element>
+	<complexType name="FoldType">
+		<complexContent>
+			<extension base="ge:GeologicStructureType">
+				<sequence>
+					<element name="profileType" type="gml:ReferenceType" nillable="true">
+						<annotation>
+							<documentation>-- Definition --
+The type of the fold.
+
+-- Description --
+Folds are typed according to the concave/convex geometry of the fold relative to the earth surface, and the relationship to younging direction in folded strata if known.
+EXAMPLE:  antiform, synform, anticline, syncline, etc.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="FoldPropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:Fold"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="NaturalGeomorphologicFeature" type="ge:NaturalGeomorphologicFeatureType" substitutionGroup="ge:GeomorphologicFeature">
+		<annotation>
+			<documentation>-- Definition --
+A geomorphologic feature (ie, landform) that has been created by natural Earth processes. 
+
+-- Description --
+EXAMPLE: river channel, beach ridge, caldera, canyon, moraine, mud flat.</documentation>
+		</annotation>
+	</element>
+	<complexType name="NaturalGeomorphologicFeatureType">
+		<complexContent>
+			<extension base="ge:GeomorphologicFeatureType">
+				<sequence>
+					<element name="naturalGeomorphologicFeatureType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Definition --
+The type of the natural geomorphologic feature.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="activity" type="gml:ReferenceType" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+The level of activity of the natural geomorphologic feature.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="NaturalGeomorphologicFeaturePropertyType">
+		<sequence minOccurs="0">
+			<element ref="ge:NaturalGeomorphologicFeature"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

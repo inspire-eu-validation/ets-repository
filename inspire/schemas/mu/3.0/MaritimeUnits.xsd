@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:au="http://inspire.ec.europa.eu/schemas/au/4.0" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gn="http://inspire.ec.europa.eu/schemas/gn/4.0" xmlns:mu="http://inspire.ec.europa.eu/schemas/mu/3.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/mu/3.0" version="3.0">
+  <import namespace="http://inspire.ec.europa.eu/schemas/au/4.0" schemaLocation="../../schemas/au/4.0/AdministrativeUnits.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/gn/4.0" schemaLocation="../../schemas/gn/4.0/GeographicalNames.xsd"/>
+  <import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="Baseline" substitutionGroup="gml:AbstractFeature" type="mu:BaselineType">
+    <annotation>
+      <documentation>-- Name --
+baseline
+
+-- Definition --
+The line from which the outer limits of the territorial sea and certain other outer limits are measured.
+
+-- Description --
+SOURCE IHO Dictionary, S-32, Fifth Edition.
+
+NOTE The baseline comprises of one or more baseline segments.
+According to United Nations Convention on the Law of the Sea (UNCLOS), the baseline segment can be normal, straight or archipelagic depending on the method used to determine the baseline segment. 
+
+COMMENT: For this moment there is no clearly identified use-case that would require Baseline spatial object types, therefore it is not strictly necessary to include these objects in the dataset.</documentation>
+    </annotation>
+  </element>
+  <complexType name="BaselineType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="beginLifespanVersion" type="dateTime">
+            <annotation>
+              <documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" type="dateTime">
+            <annotation>
+              <documentation>-- Name --
+end lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+inspire id
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="segment" type="mu:BaselineSegmentPropertyType">
+            <annotation>
+              <documentation>-- Name --
+segment
+
+-- Definition --
+Segment of a baseline.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="BaselinePropertyType">
+    <sequence minOccurs="0">
+      <element ref="mu:Baseline"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="BaselineSegment" substitutionGroup="gml:AbstractObject" type="mu:BaselineSegmentType">
+    <annotation>
+      <documentation>-- Name --
+baseline segment
+
+-- Definition --
+Segment of the baseline from which the outer limits of the territorial sea and certain other outer limits are measured.</documentation>
+    </annotation>
+  </element>
+  <complexType name="BaselineSegmentType">
+    <sequence>
+      <element name="geometry" type="gml:CurvePropertyType">
+        <annotation>
+          <documentation>-- Name --
+geometry
+
+-- Definition --
+Geometric representation of the baseline segment.</documentation>
+        </annotation>
+      </element>
+      <element name="segmentType" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+segment type
+
+-- Definition --
+The baseline type used for this segment.
+
+-- Description --
+The type can be 'normal', 'straight' or 'archipelagic'.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="BaselineSegmentPropertyType">
+    <sequence>
+      <element ref="mu:BaselineSegment"/>
+    </sequence>
+  </complexType>
+  <element name="MaritimeBoundary" substitutionGroup="gml:AbstractFeature" type="mu:MaritimeBoundaryType">
+    <annotation>
+      <documentation>-- Name --
+maritime boundary
+
+-- Definition --
+A line depicting the separation of any type of maritime jurisdiction.
+
+-- Description --
+SOURCE IHO Dictionary, S-32, Fifth Edition.
+
+NOTE 1 Maritime boundary represents either:
+1) the seaward outer limits of the maritime zones of a coastal State, such as territorial sea, contiguous zone, exclusive economic zone and continental shelf;
+2) the limits of the maritime zones of States with opposite or adjacent coasts.
+
+Maritime boundaries are a politically sensitive subject, because it affects coastal State's jurisdiction concerning fishery, petroleum and other resources of the sea as well as other uses of the sea. [Source: "Maritime Boundary", S.P. Jagota]</documentation>
+    </annotation>
+  </element>
+  <complexType name="MaritimeBoundaryType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="beginLifespanVersion" type="dateTime">
+            <annotation>
+              <documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="2" name="country" type="gmd:Country_PropertyType">
+            <annotation>
+              <documentation>-- Name --
+country
+
+-- Definition --
+The country that the maritime zone of this boundary belongs to.
+
+-- Description --
+NOTE If the boundary divides two maritime zones belonging to the same country, only this country should be specified. If the boundary divides maritime zones belonging to neigbouring countries, both countries should be specified.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" type="dateTime">
+            <annotation>
+              <documentation>-- Name --
+end lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+          </element>
+          <element name="geometry" type="gml:CurvePropertyType">
+            <annotation>
+              <documentation>-- Name --
+geometry
+
+-- Definition --
+Geometric representation of the maritime boundary.</documentation>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+inspire id
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="legalStatus" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+legal status
+
+-- Definition --
+Legal status of this maritime boundary. 
+
+-- Description --
+NOTE The legal status is considered in terms of political agreement or disagreement of the maritime boundary.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="au:LegalStatusValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="technicalStatus" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+technical status
+
+-- Definition --
+The technical status of the maritime boundary.
+
+-- Description --
+NOTE The technical status of the maritime boundary is considered in terms of its topological matching or not-matching with the borders of maritime zones separated by this boundary. Edge-matched means that the same set of coordinates is used.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="au:TechnicalStatusValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MaritimeBoundaryPropertyType">
+    <sequence minOccurs="0">
+      <element ref="mu:MaritimeBoundary"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="MaritimeZone" substitutionGroup="gml:AbstractFeature" type="mu:MaritimeZoneType">
+    <annotation>
+      <documentation>-- Name --
+maritime zone
+
+-- Definition --
+A belt of sea defined by international treaties and conventions, where coastal State executes jurisdictional rights.
+
+-- Description --
+NOTE 1 The zone is established for e.g. cadastral, administrative, economic, security or safety purposes. It is not established for environmental management or regulation, which is covered by the theme Area management/restriction/regulation zones and reporting areas, or for environmental protection, which is covered by the theme Protected sites.
+
+NOTE 2 The maritime zone can be either internal waters, territorial sea, contiguous zone, exclusive economic zone or continental shelf.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MaritimeZoneType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="beginLifeSpanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="country" type="gmd:Country_PropertyType">
+            <annotation>
+              <documentation>-- Name --
+country
+
+-- Definition --
+The country that this maritime zone belongs to.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="endLifepanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+end lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="geometry" type="gml:MultiSurfacePropertyType">
+            <annotation>
+              <documentation>-- Name --
+geometry
+
+-- Definition --
+Geometric representation of spatial area covered by this maritime zone.</documentation>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+inspire id
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="name" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+name
+
+-- Definition --
+Name(s) of the maritime zone.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element name="zoneType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+zone type
+
+-- Definition --
+Type of maritime zone.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="baseline" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+baseline
+
+-- Definition --
+Baseline or baselines used for the delineation of this maritime zone.</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="mu:Baseline"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="boundary" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+boundary
+
+-- Definition --
+The boundary or boundaries of this maritime zone.</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="mu:MaritimeBoundary"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MaritimeZonePropertyType">
+    <sequence minOccurs="0">
+      <element ref="mu:MaritimeZone"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</schema>

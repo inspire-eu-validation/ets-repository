@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:su-core="http://inspire.ec.europa.eu/schemas/su-core/3.0" xmlns:su-grid="http://inspire.ec.europa.eu/schemas/su-grid/3.0" targetNamespace="http://inspire.ec.europa.eu/schemas/su-grid/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+Statistical Units Grid
+
+-- Definition --
+Package containing classes to represent statistical grids.</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/su-core/3.0" schemaLocation="../../schemas/su-core/3.0/StatisticalUnitCore.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="StatisticalGrid" type="su-grid:StatisticalGridType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+Statistical grid
+
+-- Definition --
+A grid composed of statistical cells.
+
+-- Description --
+Such grid is associated with an upper grid, that has a bigger resolution, and a lower grid that has a lower resolution. Some statistical grids are organised into a hierarchy of grids with different resolutions. The cells composing two linked grids have to satisfy some topological constraints: each cell of the upper grid should be the aggregation of cells of the lower grid.
+
+EXAMPLE The hierarchical structure is a quadtree if the grids are composed of quadrilateral cells and each cell is composed of less than four cells of the lower level.</documentation>
+		</annotation>
+	</element>
+	<complexType name="StatisticalGridType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Name --
+INSPIRE identifier
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="EPSGCode" type="integer" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+EPSGCode
+
+-- Definition --
+The EPSG code to identify the grid Coordinate Referencing System.
+
+-- Description --
+This information is relevant only if all cells of the grid have the same CRS.</documentation>
+						</annotation>
+					</element>
+					<element name="resolution" type="su-grid:StatisticalGridResolutionPropertyType" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Resolution
+
+-- Definition --
+The grid resolution.
+
+-- Description --
+This information is relevant only if all cells of the grid have the same resolution.</documentation>
+						</annotation>
+					</element>
+					<element name="origin" type="gml:DirectPositionType" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Origin
+
+-- Definition --
+The position of the origin point of the grid in the specified coordinate reference system (if defined).
+
+-- Description --
+The origin point is the lower left grid point.</documentation>
+						</annotation>
+					</element>
+					<element name="width" type="integer" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Width
+
+-- Definition --
+The grid width, in cell number (if defined).</documentation>
+						</annotation>
+					</element>
+					<element name="height" type="integer" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Height
+
+-- Definition --
+The grid height, in cell number (if defined).</documentation>
+						</annotation>
+					</element>
+					<element name="cells" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+The cells composing a grid.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-grid:grid</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="su-grid:StatisticalGridCell"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="lower" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+The immediately lower statistical grid.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-grid:upper</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-grid:StatisticalGrid"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="upper" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+The immediately upper statistical grid.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-grid:lower</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-grid:StatisticalGrid"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="StatisticalGridPropertyType">
+		<sequence minOccurs="0">
+			<element ref="su-grid:StatisticalGrid"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="StatisticalGridResolution" type="su-grid:StatisticalGridResolutionType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Statistical grid resolution
+
+-- Definition --
+A statistical unit resolution value.
+
+-- Definition --
+The resolution can be a distance or an angle.</documentation>
+		</annotation>
+	</element>
+	<complexType name="StatisticalGridResolutionType">
+		<choice>
+			<element name="lengthResolution" type="gml:LengthType">
+				<annotation>
+					<documentation>-- Name --
+Length resolution
+
+-- Definition --
+A distance resolution.</documentation>
+				</annotation>
+			</element>
+			<element name="angleResolution" type="gml:AngleType">
+				<annotation>
+					<documentation>-- Name --
+Angle resolution
+
+-- Definition --
+An angle resolution.</documentation>
+				</annotation>
+			</element>
+		</choice>
+	</complexType>
+	<complexType name="StatisticalGridResolutionPropertyType">
+		<sequence>
+			<element ref="su-grid:StatisticalGridResolution"/>
+		</sequence>
+	</complexType>
+	<element name="StatisticalGridCell" type="su-grid:StatisticalGridCellType" substitutionGroup="su-core:StatisticalUnit">
+		<annotation>
+			<documentation>-- Name --
+Statistical grid cell
+
+-- Definition --
+Unit for dissemination or use of statistical information that is represented as a grid cell.
+
+-- Description --
+A statistical grid cell is associated with:
+- the unique statistical grid cell of its upper level (if any) it is covered by,
+- the statistical grid cells of its lower level (if any) it covers.
+
+NB Statistical grid cells are squares.
+
+EXAMPLE In a quadtree structure, some cells are associated with the four cells they are decomposed into.</documentation>
+		</annotation>
+	</element>
+	<complexType name="StatisticalGridCellType">
+		<complexContent>
+			<extension base="su-core:StatisticalUnitType">
+				<sequence>
+					<element name="code" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Code
+
+-- Definition --
+A cell code.
+
+-- Description --
+This code is composed of:
+1. A coordinate reference system part, represented by the word CRS, followed by the EPSG code.
+2. A resolution and position part:
+- If the coordinate reference system is projected, the word RES followed by the grid resolution in meters and the letter m. Then, the letter N followed by the northing value in meters, and the letter E followed by the easting value in meters too.
+- If the coordinate reference system is not projected, the word RES followed by the grid resolution in degree-minute-second, followed by the word dms. Then the word LON followed by the longitude value in degree-minute-second, and word LAT followed by the latitude value in degree-minute-second.
+For both cases, the given position is the position of the lower left cell corner.
+
+NOTE: This code acts like an identifier.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="string">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="geographicalPosition" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Geographical position
+
+-- Definition --
+The grid cell lower left corner geographical position.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="gml:DirectPositionType">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="gridPosition" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+Grid position
+
+-- Definition --
+The grid cell position within the grid based on the grid coordinates.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="su-grid:GridPosition"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="geometry" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+Geometry
+
+-- Definition --
+The grid cell geometry.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="gml:PolygonPatch"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="lowers" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+The immediately lower statistical grid cells.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-grid:upper</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="su-grid:StatisticalGridCell"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="upper" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Definition --
+The immediately upper statistical grid cell.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-grid:lowers</reversePropertyName>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="su-grid:StatisticalGridCell"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="grid" type="su-grid:StatisticalGridPropertyType">
+						<annotation>
+							<documentation>-- Definition --
+The grid made up of cells.</documentation>
+							<appinfo>
+								<reversePropertyName xmlns="http://www.opengis.net/gml/3.2">su-grid:cells</reversePropertyName>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="StatisticalGridCellPropertyType">
+		<sequence minOccurs="0">
+			<element ref="su-grid:StatisticalGridCell"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GridPosition" type="su-grid:GridPositionType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+Grid position
+
+-- Definition --
+A grid cell position within a grid.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GridPositionType">
+		<sequence>
+			<element name="x" type="integer">
+				<annotation>
+					<documentation>-- Name --
+x-axis value
+
+-- Definition --
+The position of the cell on the horizontal axis, starting from the left side, toward the right, from 0 to the grid width -1.</documentation>
+				</annotation>
+			</element>
+			<element name="y" type="integer">
+				<annotation>
+					<documentation>-- Name --
+y-axis value
+
+-- Definition --
+The position of the cell on the vertical axis, starting from the bottom toward the top, from 0 to the grid height -1.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="GridPositionPropertyType">
+		<sequence>
+			<element ref="su-grid:GridPosition"/>
+		</sequence>
+	</complexType>
+</schema>
