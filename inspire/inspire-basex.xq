@@ -1,4 +1,4 @@
-declare namespace base3='http://inspire.ec.europa.eu/schemas/base/3.2';
+declare namespace base32='http://inspire.ec.europa.eu/schemas/base/3.2';
 declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3';
 declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace wfs='http://www.opengis.net/wfs/2.0';
@@ -291,7 +291,7 @@ declare variable $statFile external :=  $tmpDir || file:dir-separator() || $test
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
-declare variable $dbBaseName external := "hy-test";
+declare variable $dbBaseName external := "es";
 declare variable $dbCount external := 1;
 declare variable $dbDir external;
 declare variable $etsno external := 9;
@@ -370,7 +370,7 @@ try{
 
 let $db := for $i in 0 to $count return db:open($dbBaseName || '-' || $i)[matches(db:path(.),$files_to_test)]
 
-let $features := $db/wfs:FeatureCollection/wfs:member/* | $db/gml:FeatureCollection/gml:featureMember/* | $db/gml:FeatureCollection/gml:featureMembers/* | $db/base:SpatialDataSet/base:member/* | $db/base3:SpatialDataSet/base3:member/*
+let $features := $db/wfs:FeatureCollection/wfs:member/* | $db/gml:FeatureCollection/gml:featureMember/* | $db/gml:FeatureCollection/gml:featureMembers/* | $db/base:SpatialDataSet/base:member/* | $db/base32:SpatialDataSet/base32:member/*
 
 let $stattmpl := if (not($statisticalReportTableType) or not(fn:doc-available($statisticalReportTableType))) then () else doc($statisticalReportTableType)
 let $stat := if (not($stattmpl)) then "let $logentry := local:log('Statistics table: " || string($statisticalReportTableType) || "')" else "
