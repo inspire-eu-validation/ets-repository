@@ -90,7 +90,7 @@ let $timestampAssertion := fn:current-dateTime()
 let $result :=
 try { " || $assertion/etf:expression || " } catch * {
   let $text := '[' || $err:code || '] ' || $err:description || ' &#xa;' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
-  return ('FAILED', local:addMessage('systemError', map { '$text': $text }))
+  return ('FAILED', local:addMessage('TR.systemError', map { 'text': $text }))
 }
 let $status_returned := $result[1]
 let $messages := $result[position()>1]
@@ -222,7 +222,7 @@ else ()}
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
 
 return try {
-  xquery:eval($query, map {'features' := $features, 'idMap' := map:new($features ! map:entry(fn:string(gml:identifier), .)), 'validationErrors' := $validationErrors, 'db' := $db, 'files_to_test' := $files_to_test, 'tests_to_execute' := $tests_to_execute, 'limitErrors' := $limitErrors, 'testObjectId' := $testObjectId, 'executableTestSuiteId' := $executableTestSuiteId, 'testTaskResultId' := $testTaskResultId, 'testObjectTypeIds' := $testObjectTypeIds, 'translationTemplateBundleId' := $translationTemplateBundleId, 'logFile' := $logFile, 'statFile' := $statFile })
+  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(gml:identifier), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'executableTestSuiteId': $executableTestSuiteId, 'testTaskResultId': $testTaskResultId, 'testObjectTypeIds': $testObjectTypeIds, 'translationTemplateBundleId': $translationTemplateBundleId, 'logFile': $logFile, 'statFile': $statFile })
 } catch * {      
 <TestTaskResult xmlns="http://www.interactive-instruments.de/etf/2.0" id='{$testTaskResultId}'>
 <parent ref="{$testTaskId}"/>
@@ -291,10 +291,10 @@ declare variable $statFile external :=  $tmpDir || file:dir-separator() || $test
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
-declare variable $dbBaseName external := "hy-elf";
+declare variable $dbBaseName external := "hy-test";
 declare variable $dbCount external := 1;
 declare variable $dbDir external;
-declare variable $etsno external := 2;
+declare variable $etsno external := 9;
 
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
@@ -349,6 +349,9 @@ if (file:exists($outputFile)) then if (file:is-file($outputFile)) then () else e
 
 for $i in 0 to $count return if (db:exists($dbBaseName || '-' || $i)) then () else error($paramerror,concat("System error: XML database '",concat($dbBaseName,"-",$i),"' was specified, but not found. Please contact an administrator.&#xa;")),
 
+let $startlog := "let $startlog := local:log('Executing Test Suite: " || $etsFile || "')
+"
+
 let $etsFile := $projDir || file:dir-separator() || $etsFile
 let $ets :=
 try{
@@ -364,9 +367,6 @@ try{
 } catch * {
 	error($paramerror,concat("System error: The system file '",data($testQueryFile),"' could not be opened.  Please contact an administrator.&#xa;"))
 }
-
-let $startlog := "let $startlog := local:log('Executing Test Suite: " || $etsFile || "')
-"
 
 let $db := for $i in 0 to $count return db:open($dbBaseName || '-' || $i)[matches(db:path(.),$files_to_test)]
 

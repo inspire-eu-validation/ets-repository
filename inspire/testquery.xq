@@ -105,7 +105,7 @@ declare function local:check-resource-uri($uri as xs:string) as xs:boolean
 
 declare function local:check-resource-uris($uris as xs:string*) as map(*)
 {
-	map:new( for $uri in $uris return map { $uri : local:check-resource-uri($uri) } )
+	map:merge( for $uri in $uris return map { $uri : local:check-resource-uri($uri) } )
 };
 
 declare function local:check-code-list-values($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
@@ -114,7 +114,7 @@ let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
 let $cluri := $uri || '/' || $clname || '.en.atom'
 let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
 return
-if (not($clfeed)) then ('FAILED', local:addMessage('systemError', map { '$text': 'Code list ' || $uri || 'cannot be accessed.' }))
+if (not($clfeed)) then ('FAILED', local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' }))
 else
 let $valuesURI := $clfeed//atom:entry/atom:id/text()
 let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
@@ -159,7 +159,7 @@ declare function local:getAllowedValuesURI( $uri as xs:string ) as xs:string*
 	let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
 	return
 		if (not($clfeed)) then 
-			let $dummy := local:addMessage('systemError', map { '$text': 'Code list ' || $uri || 'cannot be accessed.' })
+			let $dummy := local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' })
 			return ()
 		else
 			let $valuesURI := $clfeed//atom:entry/atom:id/text()
