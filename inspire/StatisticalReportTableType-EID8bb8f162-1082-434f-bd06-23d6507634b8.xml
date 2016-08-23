@@ -10,20 +10,23 @@
 	<lastEditor>interactive instruments GmbH</lastEditor>
 	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
 	<columnHeaderLabels>
+	<!--
 		<label>Filename</label>
+	-->
 		<label>Feature Type</label>
 		<label>Feature Count</label>
 	</columnHeaderLabels>
 	<rowExpressions>
-		<expression>'all; all; ' || count($features)</expression>
+		<expression>'all; ' || count($features)</expression>
 		<expression>
 if (count($db)&lt;=1) then () else
 for $feature in $features 
 let $ft := $feature/local-name()
 group by $ft 
 order by $ft
-return 'all; ' || $ft || '; ' || count($feature)
+return '' || $ft || '; ' || count($feature)
 		</expression>
+		<!--
 		<expression>
 for $file in $db
 let $filename := db:path($file)
@@ -35,5 +38,6 @@ return
 		order by $ft
 		return $filename || '; ' || $ft || '; ' || count($feature)
 		</expression>
+		-->
 	</rowExpressions>
 </StatisticalReportTableType>
