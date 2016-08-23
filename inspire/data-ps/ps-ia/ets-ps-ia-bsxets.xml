@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDb529e8fa-b9f8-4758-acea-1d2af744599f" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/td/testDriverResponse.xsd">
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDb529e8fa-b9f8-4758-acea-1d2af744599f" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-ps/ps-ia</remoteResource>
+	<localPath>/auto</localPath>
 	<label>Conformance class: Information accessibility, Protected Sites</label>
 	<description><![CDATA[This test suite examines a data set against the themespecific requirements related to the accessibility of resources referenced by the data.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ps/3.1/ps-ia" target="_blank">Conformance Class 'Information accessibility, Protected Sites'</a><br/><br/>
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
+  <reference>../../inspire-bsxets.xq</reference>
 	<version>0.1.0</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
 	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
 	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
 	<ParameterList name="ETF Standard Parameters for XML test objects">
 		<parameter name="files_to_test" required="true">
@@ -64,16 +68,16 @@ Relevant requirements:
 <ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Version consistency'</a>]]></description>
 									<parent ref="EID0a59a45d-e834-40c0-9017-e7936d799c83"/>
-									<expectedResult/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 (: TODO: extend with subtypes :)
 let $featuresToInspect := $features[self::ps:ProtectedSite]
-let $uris := 
-	fn:distinct-values( 
+let $uris :=
+	fn:distinct-values(
 		for $clv in $featuresToInspect/*:siteDesignation/*/*[self::*:designationScheme or self::*:designation]
 			return $clv/@xlink:href) (: $clv/@codeSpace || '/' || $clv/text() :)
 let $urimap := local:check-resource-uris( $uris )
-let $featuresWithErrors := 
+let $featuresWithErrors :=
 	$featuresToInspect[*:siteDesignation/*/*:designationScheme[map:get($urimap,@xlink:href)=false()] or
 		*:siteDesignation/*/*:designation[map:get($urimap,@xlink:href)=false()]][position() le $limitErrors]
 return
@@ -84,7 +88,7 @@ return
    let $values := $feature/*:siteDesignation/*/*:designationScheme[map:get($urimap,@xlink:href)=false()] |
 		$feature/*:siteDesignation/*/*:designation[map:get($urimap,@xlink:href)=false()]
    return
-   	for $value in $values 
+   	for $value in $values
    		let $uri := $value/@xlink:href
      		return local:addMessage('TR.brokenLink', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': local-name($value), 'uri': string($uri) }))
 						 </expression>
