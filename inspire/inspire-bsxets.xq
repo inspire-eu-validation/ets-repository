@@ -177,7 +177,7 @@ else ()}
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
 
 return try {
-  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(gml:identifier), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'executableTestSuiteId': $ets/@id, 'testTaskResultId': $testTaskResultId, 'testObjectTypeIds': $testObjectTypeIds, 'translationTemplateBundleId': $translationTemplateBundleId, 'logFile': $logFile, 'statFile': $statFile })
+  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(gml:identifier), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile })
 } catch * {      
 <TestTaskResult xmlns="http://www.interactive-instruments.de/etf/2.0" id='{$testTaskResultId}'>
 <parent ref="{$testTaskId}"/>
@@ -230,7 +230,7 @@ declare variable $schema_file external;
 (: ETF test driver parameters :)
 declare variable $validationErrors external := "";
 declare variable $testRunId external;
-declare variable $testObjectId external;
+declare variable $testObjectId external := 'EID' || uuid:randomUUID();
 declare variable $testObjectTypeIds external;
 declare variable $executableTestSuiteId external;
 declare variable $testTaskId external := 'EID' || uuid:randomUUID();
@@ -247,7 +247,7 @@ declare variable $translationTemplateBundle external := $projDir || file:dir-sep
 declare variable $dbDir external;
 declare variable $dbBaseName external := "errors";
 declare variable $dbCount external := 1;
-declare variable $etsno external := 1;
+declare variable $etsno external := 2;
 
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";

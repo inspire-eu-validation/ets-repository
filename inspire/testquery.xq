@@ -32,10 +32,6 @@ declare variable $db external;
 declare variable $features external; 
 declare variable $idMap external;
 declare variable $testObjectId external;
-declare variable $executableTestSuiteId external;
-declare variable $testTaskResultId external;
-declare variable $testObjectTypeIds external;
-declare variable $translationTemplateBundleId external;
 declare variable $logFile external;
 declare variable $statFile external;
 
