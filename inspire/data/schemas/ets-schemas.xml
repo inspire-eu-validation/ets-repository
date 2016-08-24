@@ -512,7 +512,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></
 									<expression>
 (: TODO: add other feature types to exclude; extend with subtypes :)
 let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
-let $featuresWithErrors := $featuresToInspect[.//*[@srsDimension &gt; 3]][position() le $limitErrors]
+let $featuresWithErrors := $featuresToInspect[.//@srsDimension &gt; 3][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -529,7 +529,7 @@ return
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID79aec969-3ca0-4190-a6e9-8b49682f414a">
-									<label>gmlas.d.10: Validate geometries</label>
+									<label>gmlas.d.10: Validate geometries (1)</label>
 									<description><![CDATA[Verify that in curves and surfaces only gml:posList is used for coordinates, i.e. validate all geometry elements of a feature from the application schema using a geometry library.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
@@ -553,6 +553,26 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.invalidGeometry"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID9aeba9b2-4b29-46bd-9bf7-7999eea9a173">
+									<label>gmlas.d.11: Validate geometries (2)</label>
+									<description><![CDATA[Report any errors found while parsing GML geometries.<br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
+									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
+									<expectedResult/>
+									<expression>
+if (map:size($geometryParsingErrors)=0) then 'PASSED' else
+('FAILED',
+ local:error-statistics('TR.featuresWithErrors', map:size($geometryParsingErrors)),
+ map:for-each($geometryParsingErrors, function($gmlid, $errdesc) { local:addMessage('TR.invalidGmlGeometry', map { 'filename': local:filename($features[@gml:id=$gmlid]), 'featureType': local-name($features[@gml:id=$gmlid]), 'gmlid': $gmlid, 'description': $errdesc })}))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.invalidGmlGeometry"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>

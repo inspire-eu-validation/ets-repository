@@ -177,15 +177,18 @@ let $logentry := local:log('Testing ' || count($features) || ' features')
 
 (: Index geometries :)
 let $start := prof:current-ms()
-let $indexedFeatures :=
-	for $feature in $features
+let $geometryParsingErrors :=
+	map:merge(for $feature in $features
 		let $geom := $feature//*[self::gml:Point or self::gml:LineString or self::gml:Curve or self::gml:Polygon or self::gml:PolyhedralSurface or self::gml:Surface or self::gml:MultiPoint or self::gml:MultiCurve or self::gml:MultiLineString or self::gml:MultiSurface or self::gml:MultiPolygon or self::gml:MultiGeometry][1]
 		return 
 		if ($geom) then 
-			let $void := prof:void(ggeo:index(db:node-pre($feature),db:name($feature),$feature/@gml:id,$geom))
-			return $feature 
-		else ()
+			try { 
+				prof:void(ggeo:index(db:node-pre($feature),db:name($feature),$feature/@gml:id,$geom)) } 
+			catch * { 
+				map:entry($feature/@gml:id,$err:description)
+			}
+		else ())
 let $duration := prof:current-ms()-$start
-let $logentry := local:log('Indexing ' || count($indexedFeatures) || ' features: ' || $duration || ' ms')
+let $logentry := local:log('Indexing features (parsing errors: ' || map:size($geometryParsingErrors) || '): ' || $duration || ' ms')
 
 (: Statistics and assertions follow below :)

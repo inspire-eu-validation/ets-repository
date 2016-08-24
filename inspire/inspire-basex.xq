@@ -291,10 +291,10 @@ declare variable $statFile external :=  $tmpDir || file:dir-separator() || $test
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
-declare variable $dbBaseName external := "es";
+declare variable $dbBaseName external := "gn";
 declare variable $dbCount external := 1;
 declare variable $dbDir external;
-declare variable $etsno external := 9;
+declare variable $etsno external := 2;
 
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
