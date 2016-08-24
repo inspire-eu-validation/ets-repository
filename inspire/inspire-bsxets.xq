@@ -289,9 +289,9 @@ declare variable $outputFile external := $tmpDir || file:dir-separator() || $tes
 declare variable $logFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-log.txt";
 declare variable $statFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-stat.xml";
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
-declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
-declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
-declare variable $dbBaseName external := "gn";
+declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8-esrtt.xml";
+declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52-ettb.xml";
+declare variable $dbBaseName external := "es";
 declare variable $dbCount external := 1;
 declare variable $dbDir external;
 declare variable $etsno external := 2;
@@ -300,23 +300,23 @@ declare variable $etsno external := 2;
 declare variable $testQueryFile := "testquery.xq";
 
 declare variable $etsFile := 
-  if ($etsno = 1) then "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml"
-  else if ($etsno = 2) then "data" || file:dir-separator() || "schemas" || file:dir-separator() || "ets-schemas.xml"
-  else if ($etsno = 3) then "data" || file:dir-separator() || "data-consistency" || file:dir-separator() || "ets-data-consistency.xml"
-  else if ($etsno = 4) then "data" || file:dir-separator() || "information-accessibility" || file:dir-separator() || "ets-information-accessibility.xml"
-  else if ($etsno = 5) then "data" || file:dir-separator() || "reference-systems" || file:dir-separator() || "ets-reference-systems.xml"
-  else if ($etsno = 6) then "data-hy" || file:dir-separator() || "hy-gml" || file:dir-separator() || "ets-hy-gml.xml"
-  else if ($etsno = 7) then "data-hy" || file:dir-separator() || "hy-n-as" || file:dir-separator() || "ets-hy-n-as.xml"
-  else if ($etsno = 8) then "data-hy" || file:dir-separator() || "hy-p-as" || file:dir-separator() || "ets-hy-p-as.xml"
-  else if ($etsno = 9) then "data-hy" || file:dir-separator() || "hy-dc" || file:dir-separator() || "ets-hy-dc.xml"
-  else if ($etsno = 10) then "data-hy" || file:dir-separator() || "hy-ia" || file:dir-separator() || "ets-hy-ia.xml"
-  else if ($etsno = 11) then "data-hy" || file:dir-separator() || "hy-rs" || file:dir-separator() || "ets-hy-rs.xml"
-  else if ($etsno = 12) then "data-ps" || file:dir-separator() || "ps-dc" || file:dir-separator() || "ets-ps-dc.xml"
-  else if ($etsno = 13) then "data-ps" || file:dir-separator() || "ps-gml" || file:dir-separator() || "ets-ps-gml.xml"
-  else if ($etsno = 14) then "data-ps" || file:dir-separator() || "ps-ia" || file:dir-separator() || "ets-ps-ia.xml"
-  else if ($etsno = 15) then "data-ps" || file:dir-separator() || "ps-rs" || file:dir-separator() || "ets-ps-rs.xml"
-  else if ($etsno = 16) then "data-ps" || file:dir-separator() || "ps-as" || file:dir-separator() || "ets-ps-as.xml"
-  else "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml.xml";
+  if ($etsno = 1) then "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml-bsxets.xml"
+  else if ($etsno = 2) then "data" || file:dir-separator() || "schemas" || file:dir-separator() || "ets-schemas-bsxets.xml"
+  else if ($etsno = 3) then "data" || file:dir-separator() || "data-consistency" || file:dir-separator() || "ets-data-consistency-bsxets.xml"
+  else if ($etsno = 4) then "data" || file:dir-separator() || "information-accessibility" || file:dir-separator() || "ets-information-accessibility-bsxets.xml"
+  else if ($etsno = 5) then "data" || file:dir-separator() || "reference-systems" || file:dir-separator() || "ets-reference-systems-bsxets.xml"
+  else if ($etsno = 6) then "data-hy" || file:dir-separator() || "hy-gml" || file:dir-separator() || "ets-hy-gml-bsxets.xml"
+  else if ($etsno = 7) then "data-hy" || file:dir-separator() || "hy-n-as" || file:dir-separator() || "ets-hy-n-as-bsxets.xml"
+  else if ($etsno = 8) then "data-hy" || file:dir-separator() || "hy-p-as" || file:dir-separator() || "ets-hy-p-as-bsxets.xml"
+  else if ($etsno = 9) then "data-hy" || file:dir-separator() || "hy-dc" || file:dir-separator() || "ets-hy-dc-bsxets.xml"
+  else if ($etsno = 10) then "data-hy" || file:dir-separator() || "hy-ia" || file:dir-separator() || "ets-hy-ia-bsxets.xml"
+  else if ($etsno = 11) then "data-hy" || file:dir-separator() || "hy-rs" || file:dir-separator() || "ets-hy-rs-bsxets.xml"
+  else if ($etsno = 12) then "data-ps" || file:dir-separator() || "ps-dc" || file:dir-separator() || "ets-ps-dc-bsxets.xml"
+  else if ($etsno = 13) then "data-ps" || file:dir-separator() || "ps-gml" || file:dir-separator() || "ets-ps-gml-bsxets.xml"
+  else if ($etsno = 14) then "data-ps" || file:dir-separator() || "ps-ia" || file:dir-separator() || "ets-ps-ia-bsxets.xml"
+  else if ($etsno = 15) then "data-ps" || file:dir-separator() || "ps-rs" || file:dir-separator() || "ets-ps-rs-bsxets.xml"
+  else if ($etsno = 16) then "data-ps" || file:dir-separator() || "ps-as" || file:dir-separator() || "ets-ps-as-bsxets.xml"
+  else "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml-bsxets.xml";
 
 declare variable $limitErrors := 1000;
 declare variable $paramerror := xs:QName("etf:ParameterError");
