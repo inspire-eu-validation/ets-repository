@@ -29,13 +29,12 @@ if ($disabled) then "
   let $endmessage := prof:void(local:end('" || $assertion/@id || "','" || $disabled || "'))
   let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': " || $disabled || "')
   return 
-  <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{uuid:randomUUID()}'>
+  <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
     <parent ref='" || $step/@id || "'/>
     <status>" || $disabled || "</status>
     <startTimestamp>" || fn:current-dateTime() || "</startTimestamp>
     <duration>0</duration>
     <resultedFrom ref='" || $assertion/@id || "'/>
-    <messages/>
   </TestAssertionResult>" 
 else "
 if ($dependencyResult) then
@@ -54,13 +53,13 @@ let $duration := prof:current-ms()-$start
 let $endmessage := prof:void(local:end('" || $assertion/@id || "',$status))
 let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': ' || $status || ' - ' ||$duration || ' ms')
 return 
-  <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{uuid:randomUUID()}'>
+  <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
     <parent ref='" || $step/@id || "'/>
     <status>{$status}</status>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>{$duration}</duration>
     <resultedFrom ref='" || $assertion/@id || "'/>
-    <messages>{$messages}</messages>
+    { if (empty($messages)) then () else <messages>{$messages}</messages> }
   </TestAssertionResult>
 else
 let $startmessage := prof:void(local:start('" || $assertion/@id || "')) 
@@ -69,13 +68,12 @@ let $status := 'SKIPPED'
 let $endmessage := prof:void(local:end('" || $assertion/@id || "',$status))
 let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': ' || $status)
 return
-  <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{uuid:randomUUID()}'>
+  <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
     <parent ref='" || $step/@id || "'/>
     <status>{$status}</status>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>0</duration>
     <resultedFrom ref='" || $assertion/@id || "'/>
-    <messages/>
   </TestAssertionResult>"
 
       return "
@@ -85,7 +83,7 @@ let $assertionresults := (" || string-join( $assertion-results, ',' ) || ")
 let $status := if ($dependencyResult) then local:status($assertionresults/etf:status) else 'SKIPPED'
 let $endmessage := prof:void(local:end('" || $step/@id || "',$status))
 return 
-<TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{uuid:randomUUID()}'>
+<TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
 <parent ref='" || $case/@id || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampStep}</startTimestamp>
@@ -104,7 +102,7 @@ let $status := if ($dependencyResult) then local:status($teststepresults/etf:sta
 let $endmessage := prof:void(local:end('" || $case/@id || "',$status))
 let $logentry := local:log('Test Case ''" || $case/etf:label || "'' finished: ' || $status)
 return 
-<TestCaseResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{uuid:randomUUID()}'>
+<TestCaseResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
 <parent ref='" || $module/@id || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampCase}</startTimestamp>
@@ -120,7 +118,7 @@ let $testcaseresults := (" || string-join( $test-case-results, ',' ) || ")
 let $status := local:status($testcaseresults/etf:status)
 let $endmessage := prof:void(local:end('" || $module/@id || "',$status))
 return
-<TestModuleResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{uuid:randomUUID()}'>
+<TestModuleResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
 <parent ref='" || $ets/@id || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampModule}</startTimestamp>
@@ -145,9 +143,9 @@ return
 <duration>{sum($testmoduleresults/duration)}</duration>
 <resultedFrom ref='" || $ets/@id || "'/>
 <testObject ref='{$testObjectId}'/>
-<attachements>
+<attachments>
 { if (file:exists('" || $logFile || "')) then 
-<Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='LogFile'>
+<Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='LogFile' id='EID{uuid:randomUUID()}'>
 <label>Log file</label>
 <encoding>UTF-8</encoding>
 <mimeType>text/plain</mimeType>
@@ -155,7 +153,7 @@ return
 </Attachment>
 else ()}
 { if (file:exists('" || $statFile || "')) then 
-<Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='StatisticalReport'>
+<Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='StatisticalReport' id='EID{uuid:randomUUID()}'>
 <label>Feature statistics</label>
 <encoding>UTF-8</encoding>
 <mimeType>application/xml</mimeType>
@@ -163,14 +161,14 @@ else ()}
 </Attachment>
 else ()}
 { if (file:exists('" || $queryFile || "')) then 
-<Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='Query'>
+<Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='Query' id='EID{uuid:randomUUID()}'>
 <label>XQuery executed against the dataset</label>
 <encoding>UTF-8</encoding>
 <mimeType>text/plain</mimeType>
 <referencedData href='" || file:path-to-uri($queryFile) || "'/>
 </Attachment>
 else ()}
-</attachements>
+</attachments>
 <testModuleResults>{$testmoduleresults}</testModuleResults>
 </TestTaskResult>")
 
@@ -247,29 +245,10 @@ declare variable $translationTemplateBundle external := $projDir || file:dir-sep
 declare variable $dbDir external;
 declare variable $dbBaseName external := "errors";
 declare variable $dbCount external := 1;
-declare variable $etsno external := 2;
+declare variable $etsFile external;
 
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
-
-declare variable $etsFile := 
-  if ($etsno = 1) then "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml-bsxets.xml"
-  else if ($etsno = 2) then "data" || file:dir-separator() || "schemas" || file:dir-separator() || "ets-schemas-bsxets.xml"
-  else if ($etsno = 3) then "data" || file:dir-separator() || "data-consistency" || file:dir-separator() || "ets-data-consistency-bsxets.xml"
-  else if ($etsno = 4) then "data" || file:dir-separator() || "information-accessibility" || file:dir-separator() || "ets-information-accessibility-bsxets.xml"
-  else if ($etsno = 5) then "data" || file:dir-separator() || "reference-systems" || file:dir-separator() || "ets-reference-systems-bsxets.xml"
-  else if ($etsno = 6) then "data-hy" || file:dir-separator() || "hy-gml" || file:dir-separator() || "ets-hy-gml-bsxets.xml"
-  else if ($etsno = 7) then "data-hy" || file:dir-separator() || "hy-n-as" || file:dir-separator() || "ets-hy-n-as-bsxets.xml"
-  else if ($etsno = 8) then "data-hy" || file:dir-separator() || "hy-p-as" || file:dir-separator() || "ets-hy-p-as-bsxets.xml"
-  else if ($etsno = 9) then "data-hy" || file:dir-separator() || "hy-dc" || file:dir-separator() || "ets-hy-dc-bsxets.xml"
-  else if ($etsno = 10) then "data-hy" || file:dir-separator() || "hy-ia" || file:dir-separator() || "ets-hy-ia-bsxets.xml"
-  else if ($etsno = 11) then "data-hy" || file:dir-separator() || "hy-rs" || file:dir-separator() || "ets-hy-rs-bsxets.xml"
-  else if ($etsno = 12) then "data-ps" || file:dir-separator() || "ps-dc" || file:dir-separator() || "ets-ps-dc-bsxets.xml"
-  else if ($etsno = 13) then "data-ps" || file:dir-separator() || "ps-gml" || file:dir-separator() || "ets-ps-gml-bsxets.xml"
-  else if ($etsno = 14) then "data-ps" || file:dir-separator() || "ps-ia" || file:dir-separator() || "ets-ps-ia-bsxets.xml"
-  else if ($etsno = 15) then "data-ps" || file:dir-separator() || "ps-rs" || file:dir-separator() || "ets-ps-rs-bsxets.xml"
-  else if ($etsno = 16) then "data-ps" || file:dir-separator() || "ps-as" || file:dir-separator() || "ets-ps-as-bsxets.xml"
-  else "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml-bsxets.xml";
 
 declare variable $limitErrors := 1000;
 declare variable $paramerror := xs:QName("etf:ParameterError");
@@ -305,7 +284,6 @@ for $i in 0 to $count return if (db:exists($dbBaseName || '-' || $i)) then () el
 let $startlog := "let $startlog := local:log('Executing Test Suite: " || $etsFile || "')
 "
 
-let $etsFile := $projDir || file:dir-separator() || $etsFile
 let $ets :=
 try{
 	doc($etsFile)/element()
