@@ -9,53 +9,8 @@ declare namespace uuid='java.util.UUID';
 
 declare function local:test($db as document-node()*, $features as element()*, $ets as element()*, $testQuery as xs:string) as element()
 {
-<DsResultSet xmlns="http://www.interactive-instruments.de/etf/2.0">
-<executableTestSuites>{$ets}</executableTestSuites>
-<!-- TODO temporary during testing in BaseX GUI -->
-<testObjects>
-<TestObject id="{$testObjectId}">
-<label>Sample data set</label>
-<description>An INSPIRE data set encoded in GML.</description>
-<version>1.0.0</version>
-<author>unknown</author>
-<creationDate>{fn:current-dateTime()}</creationDate>
-<testObjectTypes>
-<testObjectType xsi:type="loc" ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
-</testObjectTypes>
-</TestObject>
-</testObjects>
-<testObjectTypes>
-<TestObjectType id="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e">
-<label>INSPIRE data set in GML</label>
-<description>A set of XML documents. Each document is either a WFS 2.0 FeatureCollection, a GML 3.2 Feature Collection or an INSPIRE Base 3.2 or 3.3 SpatialDataSet. All features are GML 3.2 Features.</description>
-</TestObjectType>
-</testObjectTypes>
-<translationTemplateBundles>
-{doc($translationTemplateBundle)}
-</translationTemplateBundles>
-<testRuns>
-<TestRun id="{$testRunId}">
-<label>Test Run in BaseX GUI</label>
-<defaultLang>en</defaultLang>
-<startTimestamp>{fn:current-dateTime()}</startTimestamp>
-<testTasks>
-<TestTask id="{$testTaskId}">
-<parent ref="{$testRunId}"/>
-<executableTestSuite ref="{$executableTestSuiteId}"/>
-<testObject ref="{$testObjectId}"/>
-<ArgumentList>
-<arguments>
-<argument name="files_to_test">{$files_to_test}</argument>
-<argument name="tests_to_execute">{$tests_to_execute}</argument>
-</arguments>
-</ArgumentList>
-<testTaskResult ref="{$testTaskResultId}"/>
-</TestTask>
-</testTasks>
-</TestRun>
-</testRuns>
-<!-- TODO END temporary during testing in BaseX GUI -->
-<testTaskResults>{let $query := $testQuery || (let $test-module-results :=
+let $query := $testQuery || 
+(let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
 let $test-case-results :=
 for $case in $module//*[local-name()='TestCase']
@@ -265,8 +220,6 @@ else ()}
 </attachements>
 <testModuleResults/>
 </TestTaskResult> }
-}</testTaskResults>
-</DsResultSet>
 };
 
 (: Parameters as strings :)
@@ -291,10 +244,10 @@ declare variable $statFile external :=  $tmpDir || file:dir-separator() || $test
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8-esrtt.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52-ettb.xml";
-declare variable $dbBaseName external := "es";
+declare variable $dbBaseName external := "errors";
 declare variable $dbCount external := 1;
 declare variable $dbDir external;
-declare variable $etsno external := 2;
+declare variable $etsno external := 1;
 
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
