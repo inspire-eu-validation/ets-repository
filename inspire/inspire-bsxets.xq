@@ -177,7 +177,7 @@ else ()}
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
 
 return try {
-  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(gml:identifier), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'executableTestSuiteId': $executableTestSuiteId, 'testTaskResultId': $testTaskResultId, 'testObjectTypeIds': $testObjectTypeIds, 'translationTemplateBundleId': $translationTemplateBundleId, 'logFile': $logFile, 'statFile': $statFile })
+  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(gml:identifier), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'executableTestSuiteId': $ets/@id, 'testTaskResultId': $testTaskResultId, 'testObjectTypeIds': $testObjectTypeIds, 'translationTemplateBundleId': $translationTemplateBundleId, 'logFile': $logFile, 'statFile': $statFile })
 } catch * {      
 <TestTaskResult xmlns="http://www.interactive-instruments.de/etf/2.0" id='{$testTaskResultId}'>
 <parent ref="{$testTaskId}"/>
@@ -186,7 +186,7 @@ return try {
 <duration>0</duration>
 <resultedFrom ref='{$ets/@id}'/>
 <testObject ref='{$testObjectId}'/>
-<attachements>
+<attachments>
 { 
 let $text := 'System error in the Executable Test Suite. Please contact a system administrator. Error information:
 [' || $err:code || '] ' || $err:description || ' 
@@ -217,7 +217,7 @@ else ()}
 <referencedData href='{file:path-to-uri($queryFile)}'/>
 </Attachment>
 else ()}
-</attachements>
+</attachments>
 <testModuleResults/>
 </TestTaskResult> }
 };
@@ -229,13 +229,13 @@ declare variable $schema_file external;
 
 (: ETF test driver parameters :)
 declare variable $validationErrors external := "";
-declare variable $testRunId external := uuid:randomUUID();
-declare variable $testObjectId external := uuid:randomUUID();
-declare variable $executableTestSuiteId external := 'EID545f9e49-009b-4114-9333-7ca26413b5d4';
-declare variable $testTaskId external := uuid:randomUUID();
-declare variable $testTaskResultId external := uuid:randomUUID();
-declare variable $testObjectTypeIds external := "FIXME" ;
-declare variable $translationTemplateBundleId external := "FIXME" ;
+declare variable $testRunId external;
+declare variable $testObjectId external;
+declare variable $testObjectTypeIds external;
+declare variable $executableTestSuiteId external;
+declare variable $testTaskId external := 'EID' || uuid:randomUUID();
+declare variable $testTaskResultId external := 'EID' || uuid:randomUUID();
+declare variable $translationTemplateBundleId external := "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" ;
 declare variable $projDir external := "/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire";
 declare variable $tmpDir external := $projDir || file:dir-separator() || "tmp";
 declare variable $outputFile external := $tmpDir || file:dir-separator() || $testTaskResultId || "-result.xml";
@@ -244,9 +244,9 @@ declare variable $statFile external :=  $tmpDir || file:dir-separator() || $test
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8-esrtt.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52-ettb.xml";
+declare variable $dbDir external;
 declare variable $dbBaseName external := "errors";
 declare variable $dbCount external := 1;
-declare variable $dbDir external;
 declare variable $etsno external := 1;
 
 (: Project internals :)
