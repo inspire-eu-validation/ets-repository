@@ -12,16 +12,16 @@ declare function local:test($db as document-node()*, $features as element()*, $e
 let $query := $testQuery || 
 (let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
-let $moduleresultid := uuid:randomUUID()
+let $moduleresultid := 'EID' || uuid:randomUUID()
 let $test-case-results :=
 for $case in $module//*[local-name()='TestCase']
   let $dep := if ($case/etf:dependencies) 
     then "let $dependencyResult := local:passed('" || $case/etf:dependencies/etf:testCase/@ref || "')" 
     else "let $dependencyResult := true()"
-  let $caseresultid := uuid:randomUUID()
+  let $caseresultid := 'EID' || uuid:randomUUID()
   let $test-step-results :=
     for $step in $case//*[local-name()='TestStep']
-      let $stepresultid := uuid:randomUUID()
+      let $stepresultid := 'EID' || uuid:randomUUID()
       let $assertion-results := 
         for $assertion in $step//*[local-name()='TestAssertion']
           let $type := $assertion/etf:testItemType
@@ -181,13 +181,13 @@ return try {
 } catch * {
 let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
-let $moduleresultid := uuid:randomUUID()
+let $moduleresultid := 'EID' || uuid:randomUUID()
 let $test-case-results :=
 for $case in $module//*[local-name()='TestCase']
-let $caseresultid := uuid:randomUUID()
+let $caseresultid := 'EID' || uuid:randomUUID()
   let $test-step-results :=
     for $step in $case//*[local-name()='TestStep']
-      let $stepresultid := uuid:randomUUID()
+      let $stepresultid := 'EID' || uuid:randomUUID()
       let $assertion-results := 
         for $assertion in $step//*[local-name()='TestAssertion']
           return            
