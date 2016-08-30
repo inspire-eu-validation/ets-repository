@@ -94,7 +94,7 @@ declare function local:status($stati as xs:string*) as xs:string
 declare function local:check-resource-uri($uri as xs:string) as xs:boolean
 {
 	if (starts-with($uri,'http://') or starts-with($uri,'https://')) then
-		(http:send-request(<http:request method='head' status-only='true'/>, $uri)/@status=('300','204'))
+		(http:send-request(<http:request method='head' status-only='true'/>, $uri)/@status=('200','204'))
 	else
 		false()
 };
