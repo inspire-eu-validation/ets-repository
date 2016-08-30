@@ -100,7 +100,7 @@ let $errors := (for $file in $db
            for $info in $infos return local:addMessage('TR.xmlSchemaError', map { 'filename': local:filename($file), 'error': $info }))
         else ()
     else
-      for $record in $records
+      for $record in $records[db:path(.)=db:path($file/element())]
         let $id := $record/gmd:fileIdentifier/gco:CharacterString/text()
         let $infos := if ($encoding eq 'ISO/TS 19139' and $s19139) then validate:xsd-info($record,$s19139) else if ($sisoap) then validate:xsd-info($record,$sisoap) else validate:xsd-info($record)
         let $errors := count($infos)

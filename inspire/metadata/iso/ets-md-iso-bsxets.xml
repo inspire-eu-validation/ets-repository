@@ -101,7 +101,7 @@ return
 				</TestCase>
 				<TestCase id="EIDb5b5b5c0-c021-4b90-9c76-9603bf17ed4c">
 					<label>Dataset (series) tests</label>
-					<description>Verify that each metadata record has a resource type. This is a pre-condition for many other tests.</description>
+					<description>Execute tests that apply for all dataset / dataset series metadata records.</description>
 					<parent ref="EID4c5d8006-3ac6-43d9-a1a3-1e19bf163ff3"/>
 					<dependencies>
 						<testCase ref="EID31c568d6-1073-4ff5-a5b2-f0e6b9683177"/>
@@ -143,10 +143,12 @@ let $messages := (for $record in $recordsToInspect
     local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
   else
   for $url in $urls
-    let $doc := if (fn:doc-available($url)) then fn:doc($url) else ()
+    let $doc := try { if (fn:doc-available($url)) then fn:doc($url) else () } catch * { () }
     return
     if (not($doc)) then
-      if (local:check-resource-uri($url)) then
+      let $validuri := try { local:check-resource-uri($url) } catch * { false() }
+      return
+      if ($validuri) then
 	      local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
       else
 	      local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
