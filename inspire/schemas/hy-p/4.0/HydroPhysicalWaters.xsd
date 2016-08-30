@@ -1,0 +1,1581 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gn="http://inspire.ec.europa.eu/schemas/gn/4.0" xmlns:hy="http://inspire.ec.europa.eu/schemas/hy/4.0" xmlns:hy-p="http://inspire.ec.europa.eu/schemas/hy-p/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/hy-p/4.0" version="4.0">
+  <annotation>
+    <documentation>-- Definition --
+The 'PhysicalWaters' application schema is concerned primarily with the 'mapping' Use Case</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/gn/4.0" schemaLocation="../../schemas/gn/4.0/GeographicalNames.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/hy/4.0" schemaLocation="../../schemas/hy/4.0/HydroBase.xsd"/>
+  <import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="Crossing" substitutionGroup="hy-p:ManMadeObject" type="hy-p:CrossingType">
+    <annotation>
+      <documentation>-- Definition --
+A man-made object allowing the passage of water above or below an obstacle.
+
+-- Description --
+EXAMPLE Aqueduct, bridge, culvert, siphon.</documentation>
+    </annotation>
+  </element>
+  <complexType name="CrossingType">
+    <complexContent>
+      <extension base="hy-p:ManMadeObjectType">
+        <sequence>
+          <element name="type" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The type of physical crossing.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="CrossingPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Crossing"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="DamOrWeir" substitutionGroup="hy-p:ManMadeObject" type="hy-p:DamOrWeirType">
+    <annotation>
+      <documentation>-- Definition --
+A permanent barrier across a watercourse used to impound water or to control its flow.
+
+-- Description --
+SOURCE [EuroRegionalMap].</documentation>
+    </annotation>
+  </element>
+  <complexType name="DamOrWeirType">
+    <complexContent>
+      <extension base="hy-p:ManMadeObjectType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="DamOrWeirPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:DamOrWeir"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="DrainageBasin" substitutionGroup="gml:AbstractFeature" type="hy-p:DrainageBasinType">
+    <annotation>
+      <documentation>-- Definition --
+Area having a common outlet for its surface runoff.
+
+-- Description --
+SOURCE [UNESCO/WMO International Glossary of Hydrology].
+
+NOTE 1 Regarding the different classifications of drainage basins, no distinction is made between drainage basins / sub-basins since this will vary with application. It is possible to build basins from other basins.
+
+NOTE 2 The outlet of a drainage basin may be a canal or a lake.
+
+NOTE 3 Synonyms for drainage basin include: catchment; catchment area; drainage area; river basin; watershed.</documentation>
+    </annotation>
+  </element>
+  <complexType name="DrainageBasinType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="area" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Size of the drainage basin area.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:AreaType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="basinOrder" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Number (or code) expressing the degree of branching/dividing in a drainage basin system.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy-p:HydroOrderCode"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="geometry" type="gml:SurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The geometry of the drainage basin, as a surface.</documentation>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="origin" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Origin of the drainage basin.
+
+-- Description --
+EXAMPLE Natural, man-made, etc.
+
+NOTE A polder is a drainage basin of man-made origin.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="hy-p:OriginValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="containsBasin" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A smaller sub-basin contained within a larger basin.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy-p:DrainageBasin</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="outlet" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The surface water outlet(s) of a drainage basin.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy-p:SurfaceWater</targetElement>
+                <reversePropertyName xmlns="http://www.opengis.net/gml/3.2">hy-p:drainsBasin</reversePropertyName>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="DrainageBasinPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:DrainageBasin"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Embankment" substitutionGroup="hy-p:ManMadeObject" type="hy-p:EmbankmentType">
+    <annotation>
+      <documentation>-- Definition --
+A man-made raised long mound of earth or other material.
+
+-- Description --
+SOURCE [DFDD].
+
+NOTE 1 Includes retaining walls, harbours, dikes.
+
+NOTE 2 Regarded as a candidate spatial object in Annex III theme 'Natural risk zones' due to its role in limiting flooding.</documentation>
+    </annotation>
+  </element>
+  <complexType name="EmbankmentType">
+    <complexContent>
+      <extension base="hy-p:ManMadeObjectType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="EmbankmentPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Embankment"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Falls" substitutionGroup="hy-p:FluvialPoint" type="hy-p:FallsType">
+    <annotation>
+      <documentation>-- Definition --
+A vertically descending part of a watercourse where it falls from a height.
+
+-- Description --
+SOURCE [Based on DFDD].
+
+EXAMPLE Waterfalls over a rock or a precipice.</documentation>
+    </annotation>
+  </element>
+  <complexType name="FallsType">
+    <complexContent>
+      <extension base="hy-p:FluvialPointType">
+        <sequence>
+          <element name="height" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Distance measured from the lowest point of the base at ground or water level (downhill side/downstream side) to the tallest point of the spatial object.
+
+-- Description --
+SOURCE [DFDD].</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:LengthType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="FallsPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Falls"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="FluvialPoint" substitutionGroup="hy-p:HydroPointOfInterest" type="hy-p:FluvialPointType">
+    <annotation>
+      <documentation>-- Definition --
+A hydro point of interest that affects the flow of a watercourse.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="FluvialPointType">
+    <complexContent>
+      <extension base="hy-p:HydroPointOfInterestType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="FluvialPointPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:FluvialPoint"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Ford" substitutionGroup="hy-p:ManMadeObject" type="hy-p:FordType">
+    <annotation>
+      <documentation>-- Definition --
+A shallow part of a watercourse used as a road crossing.
+
+-- Description --
+SOURCE [DFDD].</documentation>
+    </annotation>
+  </element>
+  <complexType name="FordType">
+    <complexContent>
+      <extension base="hy-p:ManMadeObjectType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="FordPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Ford"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="HydroOrderCode" substitutionGroup="gml:AbstractObject" type="hy-p:HydroOrderCodeType">
+    <annotation>
+      <documentation>-- Definition --
+A hydrologically meaningful 'order code' for ordering hierarchies of watercourses and drainage basins.</documentation>
+    </annotation>
+  </element>
+  <complexType name="HydroOrderCodeType">
+    <sequence>
+      <element name="order" type="string">
+        <annotation>
+          <documentation>-- Definition --
+Number (or code) expressing the degree of branching or dividing in a stream or drainage basin system.
+
+-- Description --
+SOURCE [Based on UNESCO/WMO International Glossary of Hydrology].</documentation>
+        </annotation>
+      </element>
+      <element name="orderScheme" type="string">
+        <annotation>
+          <documentation>-- Definition --
+A description of the concept for ordering.
+
+-- Description --
+EXAMPLE Strahler, Horton, Pfaffstetter etc.</documentation>
+        </annotation>
+      </element>
+      <element name="scope" type="string">
+        <annotation>
+          <documentation>-- Definition --
+An indicator of the scope or origin for an order code (including whether it is national, supranational or European).
+
+-- Description --
+NOTE In the case of a national hydrographic identifier it may start with a two-letter country code as per ISO 3166-1-Alpha-2.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="HydroOrderCodePropertyType">
+    <sequence>
+      <element ref="hy-p:HydroOrderCode"/>
+    </sequence>
+  </complexType>
+  <element abstract="true" name="HydroPointOfInterest" substitutionGroup="gml:AbstractFeature" type="hy-p:HydroPointOfInterestType">
+    <annotation>
+      <documentation>-- Definition --
+A natural place where water appears, disappears or changes its flow.
+
+-- Description --
+EXAMPLE Fluvial points (waterfall, cascade, rapids, breaker), spring/water hole (spring, source, geyser, thermal spring, natural fountain, well, also fumarole, artesian), sinkhole (sinkhole, drainage loss).
+
+NOTE A hydro point of interest may create a flow constriction in the network.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="HydroPointOfInterestType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="geometry" nillable="true" type="gml:GeometricPrimitivePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The geometry of the hydro point of interest, as a point, curve or surface.</documentation>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="levelOfDetail">
+            <annotation>
+              <documentation>-- Definition --
+Resolution, expressed as the inverse of an indicative scale or a ground distance.
+
+-- Description --
+NOTE The object is captured at a scale of this level of detail; rules apply for portrayal and visualisation.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMetadataPropertyType">
+                  <sequence>
+                    <element ref="gmd:MD_Resolution"/>
+                  </sequence>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="HydroPointOfInterestPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:HydroPointOfInterest"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="LandWaterBoundary" substitutionGroup="gml:AbstractFeature" type="hy-p:LandWaterBoundaryType">
+    <annotation>
+      <documentation>-- Definition --
+The line where a land mass is in contact with a body of water.
+
+-- Description --
+SOURCE [DFDD].
+
+NOTE The plane of reference for the land-water boundary should be a high water datum, such as 'Mean High Water Springs', 'High Water' or 'Mean Higher High Water'. Where there is little appreciable change in waterlevels / tide at the adjacent shore, then 'Mean Sea Level' or 'Local Datum' may be used.</documentation>
+    </annotation>
+  </element>
+  <complexType name="LandWaterBoundaryType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="geometry" type="gml:CurvePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The geometry of the land-water boundary, as a curve.</documentation>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="origin" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Origin of the land-water boundary.
+
+-- Description --
+EXAMPLE Natural, man-made, etc.; a sea defence is a land-water boundary of man-made origin.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="hy-p:OriginValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="waterLevelCategory" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Water-level defining the land-water boundary.
+
+-- Description --
+EXAMPLE High water, low water, etc.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="LandWaterBoundaryPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:LandWaterBoundary"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Lock" substitutionGroup="hy-p:ManMadeObject" type="hy-p:LockType">
+    <annotation>
+      <documentation>-- Definition --
+An enclosure with a pair or series of gates used for raising or lowering vessels as they pass from one water level to another.
+
+-- Description --
+SOURCE [DFDD].</documentation>
+    </annotation>
+  </element>
+  <complexType name="LockType">
+    <complexContent>
+      <extension base="hy-p:ManMadeObjectType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="LockPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Lock"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="ManMadeObject" substitutionGroup="gml:AbstractFeature" type="hy-p:ManMadeObjectType">
+    <annotation>
+      <documentation>-- Definition --
+An artificial object which lies inside a body of water and has one of the following types of function:
+- Retains the water;
+- Regulates the quantity of water;
+- Alters the course of the water;
+- Allows watercourses to cross each other.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="ManMadeObjectType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="condition" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The state of planning, construction, repair, and/or maintenance of the structures and/or equipment comprising a facility and/or located at a site, as a whole.
+
+-- Description --
+SOURCE [DFDD].</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="geometry" nillable="true" type="gml:GeometricPrimitivePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The geometry of the man-made object, as a point, curve or surface.</documentation>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="levelOfDetail">
+            <annotation>
+              <documentation>-- Definition --
+Resolution, expressed as the inverse of an indicative scale or a ground distance.
+
+-- Description --
+NOTE The object is captured at a scale of this level of detail; rules apply for portrayal and visualisation.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMetadataPropertyType">
+                  <sequence>
+                    <element ref="gmd:MD_Resolution"/>
+                  </sequence>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ManMadeObjectPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:ManMadeObject"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <simpleType name="OriginValueType">
+    <annotation>
+      <documentation>-- Definition --
+An enumeration type specifying a set of hydrographic 'origin' categories (natural, man-made) for various hydrographic objects.</documentation>
+    </annotation>
+    <restriction base="string">
+      <enumeration value="natural">
+        <annotation>
+          <documentation>-- Definition --
+An indication that a spatial object is natural.</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="manMade">
+        <annotation>
+          <documentation>-- Definition --
+An indication that a spatial object is man-made.
+
+-- Description --
+SOURCE [DFDD].</documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>
+  <element name="Rapids" substitutionGroup="hy-p:FluvialPoint" type="hy-p:RapidsType">
+    <annotation>
+      <documentation>-- Definition --
+Portions of a stream with accelerated current where it descends rapidly but without a break in the slope of the bed sufficient to form a waterfall.
+
+-- Description --
+SOURCE [DFDD].</documentation>
+    </annotation>
+  </element>
+  <complexType name="RapidsType">
+    <complexContent>
+      <extension base="hy-p:FluvialPointType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="RapidsPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Rapids"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="RiverBasin" substitutionGroup="hy-p:DrainageBasin" type="hy-p:RiverBasinType">
+    <annotation>
+      <documentation>-- Definition --
+The area of land from which all surface run-off flows through a sequence of streams, rivers and, possibly, lakes into the sea at a single river mouth, estuary or delta.
+
+-- Description --
+SOURCE [2000/60/EC Art. 2(13)].</documentation>
+    </annotation>
+  </element>
+  <complexType name="RiverBasinType">
+    <complexContent>
+      <extension base="hy-p:DrainageBasinType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="RiverBasinPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:RiverBasin"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Shore" substitutionGroup="gml:AbstractFeature" type="hy-p:ShoreType">
+    <annotation>
+      <documentation>-- Definition --
+The narrow strip of land in immediate contact with any body of water including the area between high and low water lines.
+
+-- Description --
+SOURCE [IHO S-32].
+
+NOTE Regarded as a candidate spatial object in Annex II theme 'Land cover' due to unconsolidated shore inclusion in coastal land-cover classificaction schemes.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ShoreType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="geometry" type="gml:MultiSurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The geometry of the shore.</documentation>
+            </annotation>
+          </element>
+          <element name="composition" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+&lt;font color="#1a1a1a"&gt;The primary type(s) of material composing a spatial object, exclusive of the surface.&lt;/font&gt;
+
+-- Description --
+&lt;font color="#1a1a1a"&gt;SOURCE  [Based on DFDD].&lt;/font&gt;
+
+&lt;font color="#1a1a1a"&gt;NOTE The basis for 'primary' may be, for example, compositional dominance or structural organization.&lt;/font&gt;</documentation>
+            </annotation>
+          </element>
+          <element name="delineationKnown" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An indication that the delineation (for example: limits and information) of a spatial object is known.
+
+-- Description --
+SOURCE [Based on DFDD].</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="boolean">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ShorePropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Shore"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ShorelineConstruction" substitutionGroup="hy-p:ManMadeObject" type="hy-p:ShorelineConstructionType">
+    <annotation>
+      <documentation>-- Definition --
+An artificial structure attached to land bordering a body of water and fixed in position.
+
+-- Description --
+SOURCE [DFDD].
+
+NOTE 1 It is usually fixed to the waterbody bottom (for example: a mole) but may occasionally be fixed in position (for example: attached to the shore at one end and held between pilings at the other) but floating. Shoreline constructions are normally used for berthing and/or protection.
+
+NOTE 2 Includes breakwater/groyne/wharf; but has more flexibility - also applies to inland waters.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ShorelineConstructionType">
+    <complexContent>
+      <extension base="hy-p:ManMadeObjectType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ShorelineConstructionPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:ShorelineConstruction"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Sluice" substitutionGroup="hy-p:ManMadeObject" type="hy-p:SluiceType">
+    <annotation>
+      <documentation>-- Definition --
+An open, inclined conduit fitted with a gate for regulating water flow.
+
+-- Description --
+SOURCE [DFDD].</documentation>
+    </annotation>
+  </element>
+  <complexType name="SluiceType">
+    <complexContent>
+      <extension base="hy-p:ManMadeObjectType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SluicePropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Sluice"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="StandingWater" substitutionGroup="hy-p:SurfaceWater" type="hy-p:StandingWaterType">
+    <annotation>
+      <documentation>-- Definition --
+A body of water that is entirely surrounded by land.
+
+-- Description --
+SOURCE [DFDD].
+
+NOTE It may occur in a natural terrain depression in which water collects, or may be impounded by a dam, or formed by its bed being hollowed out of the soil, or formed by embanking and/or damming up a natural hollow (for example: by a beaver dam). It may be connected to inflowing / outflowing watercourses or other standing waters.</documentation>
+    </annotation>
+  </element>
+  <complexType name="StandingWaterType">
+    <complexContent>
+      <extension base="hy-p:SurfaceWaterType">
+        <sequence>
+          <element name="elevation" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Elevation above mean sea level.
+
+-- Description --
+SOURCE [Based on EuroRegionalMap].</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:LengthType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="meanDepth" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Average depth of the body of water.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:LengthType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="surfaceArea" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Surface area of the body of water.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:AreaType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="StandingWaterPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:StandingWater"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="SurfaceWater" substitutionGroup="gml:AbstractFeature" type="hy-p:SurfaceWaterType">
+    <annotation>
+      <documentation>-- Definition --
+Any known inland waterway body.
+
+-- Description --
+SOURCE [Based on DFDD].
+
+EXAMPLE Lake/pond, reservoir, river/stream, etc.
+
+NOTE May include islands, represented as 'holes' in its geometry. Islands may be surrounded by a shore and / or land-ware boundary.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="SurfaceWaterType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="geometry" type="gml:GeometricPrimitivePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The geometry of the surface water:
+- either a curve or surface for a watercourse;
+- either a point or surface for a standing water.</documentation>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="levelOfDetail">
+            <annotation>
+              <documentation>-- Definition --
+Resolution, expressed as the inverse of an indicative scale or a ground distance.
+
+-- Description --
+NOTE The object is captured at a scale of this level of detail; rules apply for portrayal and visualisation.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMetadataPropertyType">
+                  <sequence>
+                    <element ref="gmd:MD_Resolution"/>
+                  </sequence>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="localType" nillable="true" type="gmd:LocalisedCharacterString_PropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Provides 'local' name for the type of surface water.
+
+-- Description --
+EXAMPLE Canal, channel, ditch, etc.</documentation>
+            </annotation>
+          </element>
+          <element name="origin" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Origin of the surface water.
+
+-- Description --
+SOURCE [Based on EuroRegionalMap].
+
+EXAMPLE Natural, man-made, etc.
+
+NOTE 1 Natural surface waters are natural watercourses (e.g. rivers, streams) and standing waters (e.g. pools, lakes) naturally preserved and that have been canalised and / or dammed either for navigation or for preventing flood disaster.
+
+NOTE 2 A man-made surface water is a surface water entirely created by man for drainage, storage or transportation purpose, this includes canals, ditches and reservoirs.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="hy-p:OriginValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="persistence" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The degree of persistence of water.
+
+-- Description --
+SOURCE [Based on DFDD].</documentation>
+            </annotation>
+          </element>
+          <element name="tidal" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Identifies whether the surface water is affected by tidal water.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="boolean">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="bank" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The bank(s) associated to a surface water.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy-p:Shore</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="drainsBasin" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The basin(s) drained by a surface water.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy-p:DrainageBasin</targetElement>
+                <reversePropertyName xmlns="http://www.opengis.net/gml/3.2">hy-p:outlet</reversePropertyName>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="neighbour" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+An association to another instance of the same real-world surface water in another data set.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy-p:SurfaceWater</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SurfaceWaterPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:SurfaceWater"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Watercourse" substitutionGroup="hy-p:SurfaceWater" type="hy-p:WatercourseType">
+    <annotation>
+      <documentation>-- Definition --
+A natural or man-made flowing watercourse or stream.
+
+-- Description --
+SOURCE [EuroRegionalMap].</documentation>
+    </annotation>
+  </element>
+  <complexType name="WatercourseType">
+    <complexContent>
+      <extension base="hy-p:SurfaceWaterType">
+        <sequence>
+          <element minOccurs="0" name="condition" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+The state of planning, construction, repair, and/or maintenance of a watercourse. 
+
+-- Description --
+SOURCE [Based on DFDD].
+
+NOTE Only relevant for a man-made watercourse.</documentation>
+            </annotation>
+          </element>
+          <element name="delineationKnown" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An indication that the delineation (for example: limits and information) of a spatial object is known.
+
+-- Description --
+SOURCE [DFDD].
+
+EXAMPLE The delineation may not be known in the following situations:
+- an underground watercourse
+- real underground network segment (pipeline or natural network section)
+- transition area between a broad river and a smaller tributary</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="boolean">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="length" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Length of the watercourse.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:LengthType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="level" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Vertical location of watercourse relative to ground.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="base:VerticalPositionValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="streamOrder" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Number (or code) expressing the degree of branching in a stream system.
+
+-- Description --
+SOURCE [Based on UNESCO/WMO International Glossary of Hydrology].</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy-p:HydroOrderCode"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element name="width" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Width of watercourse (as a range) along its length.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy-p:WidthRange"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="WatercoursePropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Watercourse"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Wetland" substitutionGroup="gml:AbstractFeature" type="hy-p:WetlandType">
+    <annotation>
+      <documentation>-- Definition --
+A poorly drained or periodically flooded area where the soil is saturated with water, and vegetation is supported.
+
+-- Description --
+SOURCE [EuroRegionalMap].
+
+EXAMPLE Marsh/swamp, bog/moor.
+
+NOTE Regarded as a candidate spatial object in Annex II theme 'Land cover' due to explicit mention in 2007/2/EC Ann. II 2.</documentation>
+    </annotation>
+  </element>
+  <complexType name="WetlandType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="geometry" type="gml:SurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The geometry of the wetland, as a surface.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="localType" nillable="true" type="gmd:LocalisedCharacterString_PropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Provides 'local' name for the type of wetland.
+
+-- Description --
+EXAMPLE Bog, swamp.</documentation>
+            </annotation>
+          </element>
+          <element name="tidal" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Identifies whether the wetland is affected by tidal water.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="boolean">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="WetlandPropertyType">
+    <sequence minOccurs="0">
+      <element ref="hy-p:Wetland"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="WidthRange" substitutionGroup="gml:AbstractObject" type="hy-p:WidthRangeType">
+    <annotation>
+      <documentation>-- Definition --
+The range of a watercourse's horizontal width along its length.</documentation>
+    </annotation>
+  </element>
+  <complexType name="WidthRangeType">
+    <sequence>
+      <element name="lower" type="gml:LengthType">
+        <annotation>
+          <documentation>-- Definition --
+Lower bound of width.</documentation>
+        </annotation>
+      </element>
+      <element name="upper" type="gml:LengthType">
+        <annotation>
+          <documentation>-- Definition --
+Upper bound of width.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="WidthRangePropertyType">
+    <sequence>
+      <element ref="hy-p:WidthRange"/>
+    </sequence>
+  </complexType>
+</schema>

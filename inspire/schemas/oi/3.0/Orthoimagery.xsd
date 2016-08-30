@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" xmlns:oi="http://inspire.ec.europa.eu/schemas/oi/3.0" targetNamespace="http://inspire.ec.europa.eu/schemas/oi/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+orthoimagery</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://www.interactive-instruments.de/ShapeChange/AppInfo" schemaLocation="http://portele.de/ShapeChangeAppinfo.xsd"/>
+	<import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="http://www.opengis.net/gmlcov/1.0" schemaLocation="../../schemas/ogc/gmlcov/1.0/coverage.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="OrthoimageCoverage" type="oi:OrthoimageCoverageType" substitutionGroup="gmlcov:RectifiedGridCoverage">
+		<annotation>
+			<documentation>-- Name --
+orthoimage coverage
+
+-- Definition --
+Raster image of the Earth surface that has been geometrically corrected ("orthorectified") to remove distortion caused by differences in elevation, sensor tilt and, optionally, by sensor optics.
+
+-- Description --
+NOTE 1 An orthoimage coverage is a continuous coverage based on a rectified quadrilateral grid. It is provided with an interpolation method to evaluate value records at any direct position within its domain. 
+
+NOTE 2 An orthoimage coverage can be derived from one single input image or from different input images which have been mosaicked and merged together.
+
+NOTE 3 An orthoimage coverage may be an aggregation of subsets extracted from other orthoimage coverages. For the avoidance of data duplication, this kind of aggregated orthoimage is dynamically constructed thanks to references to the contributing orthoimage coverages .</documentation>
+		</annotation>
+	</element>
+	<complexType name="OrthoimageCoverageType">
+		<complexContent>
+			<extension base="gmlcov:AbstractDiscreteCoverageType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Name --
+inspire identifier
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="domainExtent" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+domain extent
+
+-- Definition --
+Extent of the spatiotemporal domain of the coverage.
+
+-- Description --
+SOURCE [ISO 19123]
+
+NOTE 1 The data type EX_Extent is defined in ISO 19103. Extents may be specified in both space and time.
+
+NOTE 2 The domain extent shall be specified in space at least by using a subtype of EX_GeographicExtent (EX_BoundingPolygon, EX_GeographicBoundingBox or EX_GeographicDescription).  The whole geographic extent of the orthoimage coverage is affected, including areas where grid points hold nil reason values.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMetadataPropertyType">
+									<sequence minOccurs="0">
+										<element ref="gmd:EX_Extent"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="footprint" type="gml:MultiSurfacePropertyType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+footprint
+
+-- Definition --
+Geographic area enclosing valid data of the orthoimage coverage.
+
+-- Description --
+NOTE 1 The footprint shall be enclosed in the geographic domain extent that it refines.
+
+NOTE 2 This property is mandatory if the OrthoimageCoverage instance is an aggregation of other OrthoimageCoverage instances or if mosaic elements are provided.</documentation>
+						</annotation>
+					</element>
+					<element name="interpolationType" type="gml:ReferenceType">
+						<annotation>
+							<documentation>-- Name --
+interpolation type
+
+-- Definition --
+Mathematical method which shall be used to evaluate a continuous coverage, i.e. determine the values of the coverage at any direct position within the domain of the coverage.
+
+-- Description --
+NOTE 1 Nearestneighbor is set as a default value in case where this information is omitted by data producers.
+
+NOTE 2 A continuous grid coverage that uses nearest neighbour interpolation acts as a discrete surface coverage.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="name" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+name
+
+-- Definition --
+Free text name of the orthoimage coverage.
+
+-- Description --
+NOTE This field is intended to hold a name that a data provider may use in addition to the inspire identifier
+
+EXAMPLE 1 "Orthofoto's, middenschalig, kleur, provincie Limburg, opname 2011" is the name used by the Flemish Geographic Information Agency (AGIV) to indicate the OrthoImageCoverage Instance holding the orthophotomosaic covering the administrative unit 'provincie Limburg' at a resolution of 25 cm 'middenschalig' acquired in the year 2011 'opname 2011'
+
+EXAMPLE 2  "BDOrtho coverage on Savoie at 50 cm - 2011" could be the name of an OrthoimageCoverage instance corresponding to a subset of the BDOrtho product of IGN France, the orthophoto of the "department" Savoie (an administrative unit) at a resolution of 50 cm.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="string">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="phenomenonTime" type="gml:TimePeriodPropertyType" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+phenomenon time
+
+-- Definition --
+Description of the observation/acquisition extent in time.
+
+-- Description --
+NOTE 1 This temporal extent refers to the range in time in which the image(s) contributing to the orthoImage coverage has/have been acquired.
+
+NOTE 2 When the acquisition is considered as instantaneous, despite the exposure time, the end date and time can be identical to the begin date and time.
+
+EXAMPLE 1 begin: 2011-10-30 end: 2011-10-30
+
+EXAMPLE 2 begin: 2011-06-07T14:31:02Z end: 2011-06-07T16:10:54Z.</documentation>
+						</annotation>
+					</element>
+					<element name="beginLifespanVersion" type="gml:TimePositionType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Temporal position at which this version of the spatial object was inserted or changed in the spatial data set.
+
+-- Description --
+NOTE Since this information is not always automatically recorded by a system, but can be captured manually, the provision of the time is not required here. That is the reason why TM_Position was chosen as value type instead of DateTime, which is, however, commonly used in other INSPIRE data specifications.</documentation>
+						</annotation>
+					</element>
+					<element name="endLifespanVersion" type="gml:TimePositionType" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+end lifespan version
+
+-- Definition --
+Temporal position at which this version of the spatial object was superseded or retired from the spatial data set.
+
+-- Description --
+NOTE Since this information is not always automatically recorded by a system, but can be captured manually, the provision of the time is not required here. That is the reason why TM_Position was chosen as value type instead of DateTime, which is, however, commonly used in other INSPIRE data specifications.</documentation>
+						</annotation>
+					</element>
+					<element name="contributingOrthoimageCoverage" type="oi:OrthoimageAggregationPropertyType" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Reference to the orthoimage coverages that compose an aggregated orthoimage coverage.</documentation>
+						</annotation>
+					</element>
+					<element name="mosaicElement" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Spatial representation of the acquisition time of a mosaicked orthoimage coverage.
+
+-- Description --
+NOTE This association shall be used only when the orthoimage coverage is a mosaic.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="oi:MosaicElement"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="OrthoimageCoveragePropertyType">
+		<sequence minOccurs="0">
+			<element ref="oi:OrthoimageCoverage"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="SingleMosaicElement" type="oi:SingleMosaicElementType" substitutionGroup="oi:MosaicElement">
+		<annotation>
+			<documentation>-- Name --
+single mosaic element
+
+-- Definition --
+Mosaic element relating to a single input image.
+
+-- Description --
+NOTE The geometry of a single mosaic element corresponds exactly to the contributing area, in the mosaic, of the single input image.</documentation>
+		</annotation>
+	</element>
+	<complexType name="SingleMosaicElementType">
+		<complexContent>
+			<extension base="oi:MosaicElementType">
+				<sequence>
+					<element name="imageSourceReference" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+image source reference
+
+-- Definition --
+Reference to the input image.
+
+-- Description --
+NOTE 1 There is no restriction on the nature of the input image. It can be raw or pre-processed or orthorectified, for instance.
+
+NOTE 2 modelling and delivery of input images lie outside the scope of the present specification.
+
+NOTE 3 Identifiers of the input images should be URIs in the &amp;ldquo;http&amp;rdquo; scheme (See D2.7) though full national or local codes are allowed.
+
+EXAMPLE: http://land.data.gov.uk/id/imagery/2011-5864726.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="string">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="SingleMosaicElementPropertyType">
+		<sequence minOccurs="0">
+			<element ref="oi:SingleMosaicElement"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="MosaicElement" type="oi:MosaicElementType" abstract="true" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+mosaic element
+
+-- Definition --
+Abstract type identifying both the contributing area and the acquisition time of one or several input images used to generate a mosaicked orthoimage coverage.
+
+-- Description --
+NOTE The main purpose of this feature type is the provision of a mechanism for describing the spatial distribution of the acquisition dates and times over a mosaicked orthoimage. The acquisition time can be supplied either for each individual input image, or for sets of input images grouped together according to temporal criteria.</documentation>
+		</annotation>
+	</element>
+	<complexType name="MosaicElementType" abstract="true">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+inspire identifier
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE 1 An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.
+
+NOTE 2 This property should be used to reference indirect MosaicElement instances from Orthoimage instances unambiguously.</documentation>
+						</annotation>
+					</element>
+					<element name="geometry" type="gml:MultiSurfacePropertyType">
+						<annotation>
+							<documentation>-- Name --
+geometry
+
+-- Definition --
+Geometric representation spatially delineating the date and time of acquisition of the several input images that contribute to the final mosaic.
+
+-- Description --
+NOTE The boundaries of the geometries are commonly based on the seamlines used for the mosaicking process.</documentation>
+						</annotation>
+					</element>
+					<element name="phenomenonTime" type="gml:TimePeriodPropertyType">
+						<annotation>
+							<documentation>-- Name --
+phenomenon time
+
+-- Definition --
+Description of the observation/acquisition extent in time of the input image(s).
+
+-- Description --
+NOTE 1 This temporal extent refers to the interval of time in wich the input image(s) was/were acquired by the sensor.
+
+NOTE 2 When the acquisition is considered as instantaneous, despite the exposure time, the end date and time can be identical to the begin date and time.
+
+EXAMPLE 1 begin: 2011-10-30 end: 2011-10-30
+
+EXAMPLE 2 begin: 2011-06-07T14:31:02Z end: 2011-06-07T16:10:54Z.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="MosaicElementPropertyType">
+		<sequence minOccurs="0">
+			<element ref="oi:MosaicElement"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="AggregatedMosaicElement" type="oi:AggregatedMosaicElementType" substitutionGroup="oi:MosaicElement">
+		<annotation>
+			<documentation>-- Name --
+aggregated mosaic element
+
+-- Definition --
+Mosaic element relating to several input images that share the same acquisition time at a given level of definition (e.g. day, month).
+
+-- Description --
+NOTE The geometry of an aggregated mosaic element corresponds to the union of the contributing areas, in the mosaic, of several input images.</documentation>
+		</annotation>
+	</element>
+	<complexType name="AggregatedMosaicElementType">
+		<complexContent>
+			<extension base="oi:MosaicElementType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AggregatedMosaicElementPropertyType">
+		<sequence minOccurs="0">
+			<element ref="oi:AggregatedMosaicElement"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="OrthoimageAggregation" type="oi:OrthoimageAggregationType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+orthoimage aggregation
+
+-- Definition --
+Geometrical characteristics of the orthoimage aggregation.</documentation>
+		</annotation>
+	</element>
+	<complexType name="OrthoimageAggregationType">
+		<sequence>
+			<element name="contributingFootprint" type="gml:MultiSurfacePropertyType">
+				<annotation>
+					<documentation>-- Name --
+contributing footprint
+
+-- Definition --
+Geometric representation delineating the geographic area of an orthoimage coverage that contributes to the aggregated orthoimage coverage.</documentation>
+				</annotation>
+			</element>
+			<element name="contributingOrthoimageCoverage" type="oi:OrthoimageCoveragePropertyType">
+				<annotation>
+					<documentation>-- Definition --
+Reference to the orthoimage coverages that compose an aggregated orthoimage coverage.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="OrthoimageAggregationPropertyType">
+		<sequence>
+			<element ref="oi:OrthoimageAggregation"/>
+		</sequence>
+	</complexType>
+</schema>

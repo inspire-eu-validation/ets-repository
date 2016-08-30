@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gn="http://inspire.ec.europa.eu/schemas/gn/4.0" xmlns:hy="http://inspire.ec.europa.eu/schemas/hy/4.0" xmlns:hy-p="http://inspire.ec.europa.eu/schemas/hy-p/4.0" xmlns:omop="http://inspire.ec.europa.eu/schemas/omop/3.0" xmlns:omor="http://inspire.ec.europa.eu/schemas/omor/3.0" xmlns:sr="http://inspire.ec.europa.eu/schemas/sr/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/sr/4.0" version="4.0">
+  <annotation>
+    <documentation>-- Name --
+Sea Regions Application Schema
+
+-- Definition --
+Physical conditions of seas and saline water bodies divided into regions and sub-regions with common characteristics. (2007/2/EC)
+
+A historical version of the theme definition is found in the INSPIRE IMS paper:
+&amp;bull; Seas and saline water bodies divided into regions and sub-regions. Each region with common characteristics, concerning water flow/ circulation, adjacent river catchments, bio-chemical or temperature of water, based on scientific criteria. Detailed information at regional level exist. (INSPIRE IMS, 2003)
+
+Both 'Oceanographic geographical features' and 'Sea-regions' are concerned with physical conditions of marine water-masses. (This is a similar overlap to that which exists for themes 7.13 "Atmospheric Conditions" and 7.14 "Meteorological geographical features".) To resolve the ambiguity, we consider the multi-level approach to data needs assessment applied in ETC. Data at local or regional level are often needed for management and policy implementation, while lower resolution ('smaller scale') data are often required for reporting and policy development/evaluation. The latter includes summaries and integrated data products.
+
+We regard the "Sea regions" theme as focussing on the local/regional level coastal zone.
+
+Whereas 7.15 'Oceanographic geographical features' focuses on physical conditions and general circulation of offshore oceanic waters, the 'Sea regions' theme is concerned with marine features of the coastal zone ? regions defined as 'transitional waters' and 'coastal waters' in the Water Framework Directive:
+&amp;bull; transitional waters: bodies of surface water in the vicinity of river mouths which are partly saline in character as a result of their proximity to coastal waters but which are substantially influenced by freshwater flows
+&amp;bull; coastal waters: surface water on the landward side of a line, every point of which is at a distance of one nautical mile on the seaward side from the nearest point of the baseline from which the breadth of territorial waters is measured, extending where appropriate up to the outer limit of transitional waters
+
+The World Meteorological Organisation also has a geometry-based sea region classification, dividing the ocean into Marsden Squares.
+Both biotic and physical parameters and indicators are important in the classification and delineation of sea regions. Physical data requirements for important indicators defined in the WFD and the Integrated Coastal Zone Management policy are outlined in the ETC paper. These include:
+&amp;bull; nutrients (nitrate, phosphate and nitrogen: phosphorus ratio) by regional sea and water body type
+&amp;bull; concentrations of hazardous substances and pollutants (incl. heavy metals, persistent organic pollutants)
+&amp;bull; productivity indicators (incl. surface cholorophyll-a)
+&amp;bull; biological classification of waters
+&amp;bull; water masses/layers characterised by bulk temperature and salinity properties
+&amp;bull; polar area features (incl. pack ice)
+&amp;bull; wind (climatological and meteorolog&amp;bull; benthic parameters (sediment, benthic communities/habitats)
+&amp;bull; sea level
+&amp;bull; chemical species and concentrations
+&amp;bull; physical characteristics (incl. temperature, salinity)
+&amp;bull; currents (including surface currents)
+&amp;bull; tidal zones
+&amp;bull; wavesrequired</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/gn/4.0" schemaLocation="../../schemas/gn/4.0/GeographicalNames.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/hy-p/4.0" schemaLocation="../../schemas/hy-p/4.0/HydroPhysicalWaters.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/hy/4.0" schemaLocation="../../schemas/hy/4.0/HydroBase.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/omop/3.0" schemaLocation="../../schemas/omop/3.0/ObservableProperties.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/omor/3.0" schemaLocation="../../schemas/omor/3.0/ObservationReferences.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="Coastline" substitutionGroup="sr:Shoreline" type="sr:CoastlineType">
+    <annotation>
+      <documentation>-- Name --
+Coastline
+
+-- Definition --
+A special case of a shoreline defined as the shoreline at Mean High Water (MHW). Where there is not significant variation in water level, Mean Sea Level (MSL) can be used as a substitute for MHW. 
+
+-- Description --
+This feature type is designed for the general use case where the land:sea boundary is required to support general discovery and viewing of datasets.  It is not designed to infer any political boundaries.  The purpose is to provide a consistent overview of European marine extent and for this reason a single tidal extent is selected.  This is consistent with IHO-57 definitions</documentation>
+    </annotation>
+  </element>
+  <complexType name="CoastlineType">
+    <complexContent>
+      <extension base="sr:ShorelineType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="CoastlinePropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:Coastline"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="InterTidalArea" substitutionGroup="hy-p:Shore" type="sr:InterTidalAreaType">
+    <annotation>
+      <documentation>-- Name --
+Intertidal Area
+
+-- Definition --
+The part of the marine environment that is exposed (not covered in water) during a normal tidal cycle; defined as the difference between any high and any low water level.
+
+-- Description --
+The part of the marine environment that is exposed (not covered in water) during a normal tidal cycle.</documentation>
+    </annotation>
+  </element>
+  <complexType name="InterTidalAreaType">
+    <complexContent>
+      <extension base="hy-p:ShoreType">
+        <sequence>
+          <element name="highWaterLevel" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+high water level
+-- Definition --
+The high water level which was used to define the upper limit of the Intertidal Area, e.g. 'meanHighWater'.</documentation>
+            </annotation>
+          </element>
+          <element name="lowWaterLevel" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+low water level
+-- Definition --
+The low water level which was used to define the lower limit of the Intertidal Area, e.g. 'meanLowWater'.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">IR</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="InterTidalAreaPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:InterTidalArea"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="MarineCirculationZone" substitutionGroup="sr:SeaArea" type="sr:MarineCirculationZoneType">
+    <annotation>
+      <documentation>-- Name --
+Marine Circulation Zone
+
+-- Definition --
+A sea area defined by its physical and chemical circulation patterns.
+
+-- Description --
+Typically used for management and reporting of the marine environment or marine environmental classification.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MarineCirculationZoneType">
+    <complexContent>
+      <extension base="sr:SeaAreaType">
+        <sequence>
+          <element name="zoneType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+Zone Type
+
+-- Definition --
+The type of the Marine Circulation Zone, e.g. sedimentCell.
+
+-- Description --</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MarineCirculationZonePropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:MarineCirculationZone"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="MarineContour" substitutionGroup="gml:AbstractFeature" type="sr:MarineContourType">
+    <annotation>
+      <documentation>-- Name --
+Marine Contour
+
+-- Definition --
+A set of isolines representing the value of some phenomenon at a particular time.
+-- Description --
+A representation of any physical or chemical phenomenon related to the SeaArea.  MarineContour should be derived from an OceanGeographicFeature of the same phenomenon.  The source observations used to derive this feature may be linked to via the sourceObservations association. MarineContour is an abstraction of the ‘real world’ to provide an overview of the expected conditions of a SeaArea.  Examples would include salinity contours, depth contours, significant wave height.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MarineContourType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" name="isoline" type="sr:MarineIsolinePropertyType">
+            <annotation>
+              <documentation>-- Name --
+isoline
+
+-- Definition --
+Isoline used to generate the contour.</documentation>
+            </annotation>
+          </element>
+          <element name="phenomenon">
+            <annotation>
+              <documentation>-- Name --
+Phenomeneon
+
+-- Definition --
+The property represented by the isolines (e.g. wave height).</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="omop:AbstractObservableProperty"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element name="validTime" type="gml:TimeInstantPropertyType">
+            <annotation>
+              <documentation>-- Name --
+Valid Time
+
+-- Definition --
+The time at which this contour  is representative.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="sourceObservations" type="omor:ObservationSetPropertyType">
+            <annotation>
+              <documentation>-- Name --
+Source observations
+
+-- Definition --
+Used to link to a collection of underlying observations which were used to define a marine isoline.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MarineContourPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:MarineContour"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="MarineExtent" substitutionGroup="gml:AbstractObject" type="sr:MarineExtentType">
+    <annotation>
+      <documentation>-- Name --
+Marine Extent
+
+-- Definition --
+The extent of a sea area for a given tidal state
+
+-- Description --
+The expected 2D geometric extent of a SeaArea for a particular tidal state.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MarineExtentType">
+    <sequence>
+      <element name="geometry" type="gml:MultiSurfacePropertyType">
+        <annotation>
+          <documentation>-- Name --
+geometry
+
+-- Definition -- 
+The geometry of the Marine Extent.
+
+-- Description --
+A GM_MultiSurface is used as at different tidal states, areas of sea may become land-locked and therefore unconnected even though they are still part of the sea.  This is primarily a consideration for local scale seas.</documentation>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="waterLevel" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+water level
+
+-- Definition --
+Water level at which the extent is valid.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">IR</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="MarineExtentPropertyType">
+    <sequence>
+      <element ref="sr:MarineExtent"/>
+    </sequence>
+  </complexType>
+  <element name="MarineIsoline" substitutionGroup="gml:AbstractObject" type="sr:MarineIsolineType">
+    <annotation>
+      <documentation>-- Name --
+Marine Isoline
+
+-- Definition --
+An isoline representing a particular value of some marine physical or chemical phenomenon such as temperature, salinity or wave height.
+
+-- Description --
+A Marine Contour representing a particular value of some phenomenon. The geometry of the contour is a GM_Multicurve, i.e. may be formulated from several curves, all representing  the same value e.g. 15 degrees celsius.</documentation>
+    </annotation>
+  </element>
+  <complexType name="MarineIsolineType">
+    <sequence>
+      <element name="geometry" type="gml:MultiCurvePropertyType">
+        <annotation>
+          <documentation>-- Name --
+Geometry
+
+-- Definition --
+Geometry of the isolines.</documentation>
+        </annotation>
+      </element>
+      <element name="value" type="gml:MeasureType">
+        <annotation>
+          <documentation>-- Name --
+Value
+
+--- Definition --
+Values attributed to the isolines.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="MarineIsolinePropertyType">
+    <sequence>
+      <element ref="sr:MarineIsoline"/>
+    </sequence>
+  </complexType>
+  <element abstract="true" name="MarineLayer" substitutionGroup="gml:AbstractFeature" type="sr:MarineLayerType">
+    <annotation>
+      <documentation>-- Name --
+Marine Layer
+-- Definition --
+A Marine Layer describes any layer that may cover any part of a sea surface or sea bottom.
+-- Description --
+
+Examples of surface layers identified in the reference material include oil, algal blooms and ice.  Examples of seabed layer identified in the reference material include sediment type and presence or absence of vegetation.
+As these phenomena have a dynamic characteristic, the extent they describe (GM_Surface) has a validity period. A marineLayer may not be associated with a particular SeaArea. A SeaArea may have multiple MarineLayers and MarineLayers can overlap each other.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="MarineLayerType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element minOccurs="0" name="geometry" type="gml:GeometryPropertyType">
+            <annotation>
+              <documentation>-- Name --
+Geometry
+
+-- Definition --
+Geometry of the marine layer.</documentation>
+            </annotation>
+          </element>
+          <element name="validTime" type="gml:TimePeriodPropertyType">
+            <annotation>
+              <documentation>-- Name --
+Valid Time
+
+-- Definition --
+Time period for which the marine layer is valid.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="subLayer">
+            <annotation>
+              <documentation>-- Name --
+Sub layer
+
+-- Definition --
+A marine layer may have a sub-layer, for example an Oil Slick may have a main slick with several smaller sub-slicks.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="sr:MarineLayer"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="MarineLayerPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:MarineLayer"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ParameterValuePair" substitutionGroup="gml:AbstractObject" type="sr:ParameterValuePairType">
+    <annotation>
+      <documentation>-- Name --
+Parameter Value Pair
+-- Definition --
+A parameter value pair contains a value of some observed property. e.g. Annual Mean Sea Surface Temperature.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ParameterValuePairType">
+    <sequence>
+      <element name="parameter">
+        <annotation>
+          <documentation>-- Name --
+parameter
+
+-- Definition --
+A definition of the observed parameter (e.g. mean temperature).</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="omop:AbstractObservableProperty"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element name="value" type="gml:MeasureType">
+        <annotation>
+          <documentation>-- Name --
+value
+-- Definition --
+the value of the observed parameter, e.g. 12 degrees Celsius.</documentation>
+        </annotation>
+      </element>
+      <element name="validTime" nillable="true">
+        <annotation>
+          <documentation>-- Name --
+valid time
+
+-- Definition --
+The time for which the attributed value is valid. This may be a time instant or a duration.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="gml:AbstractTimeObject"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="ParameterValuePairPropertyType">
+    <sequence>
+      <element ref="sr:ParameterValuePair"/>
+    </sequence>
+  </complexType>
+  <element name="Sea" substitutionGroup="sr:SeaArea" type="sr:SeaType">
+    <annotation>
+      <documentation>-- Name --
+Sea
+-- Definition --
+Extent of sea at High Water (meanHighWater).
+-- Description --
+An area of sea, bounded by land and adjacent sea regions.  May contain smaller scale sea regions. Has common large scale circulation patterns, in part defined by its land boundaries.  High Water is taken to be mean high water.  Applies to common names areas of sea, e.g. North Sea, Agean Sea etc. (Source: IHO S23 SeaRegion)</documentation>
+    </annotation>
+  </element>
+  <complexType name="SeaType">
+    <complexContent>
+      <extension base="sr:SeaAreaType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SeaPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:Sea"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="SeaArea" substitutionGroup="gml:AbstractFeature" type="sr:SeaAreaType">
+    <annotation>
+      <documentation>-- Name --
+Sea Area
+
+-- Definition --
+An area of sea defined according to its physical and chemical characteristics. It may have multiple geometries (extent) to represent different tidal states.
+
+-- Description --
+A SeaArea is a type of HydroObject as described in the Annex1 theme Hydrography. It has geometry described by one or more GM_MultiSurfaces. Multiple geometries are allowed  to enable a SeaArea to be described according to different tidal states. 
+Typically however, specialisations of SeaArea will restrict the geometry to a particular tidal state or set of tidal states.  SeaAreas include named seas such as ‘Baltic Sea’ and also un-named areas of sea that have particular chemical and physical characteristics.  SeaAreas are 2D objects and carry no explicit information about the depth of the sea, this is specified in the INSPIRE Elevation Theme.</documentation>
+    </annotation>
+  </element>
+  <complexType name="SeaAreaType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+inspire ID
+
+-- Definition --
+"External object identifier of the spatial object.".
+-- Description --
+"An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.".</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="seaAreaType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+Sea Area Type
+
+-- Definition --
+Type of the sea area according to the classifications in the SeaAreaTypeClassificationValue codelist. e.g. Estuary</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">TG</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="extent" type="sr:MarineExtentPropertyType">
+            <annotation>
+              <documentation>-- Name --
+extent
+
+-- Definition --
+The extent of the Sea Area at a particular tidal state.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="parameterValue" type="sr:ParameterValuePairPropertyType">
+            <annotation>
+              <documentation>-- Name --
+parameter value
+-- Definition --
+A value of some parameter assigned to the SeaArea. E.g. Annual Mean Sea Surface Temperature = 12 degrees Celsius
+-- Description --
+A SeaArea may be attributed with any number of values that are relevant for the sea area polygon as a whole. More detailed observations, such as grids and point data are the subject of the Oceanographic Geographical Features specification.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">TG</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+Begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+End lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="subArea">
+            <annotation>
+              <documentation>-- Definition --
+SeaAreas can consist of sub areas.
+e.g. A SeaArea defining all european seas could be an aggregation of multiple SeaAreas (North Sea, Mediterranean Sea etc)</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">sr:SeaArea</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SeaAreaPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:SeaArea"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="SeaBedArea" substitutionGroup="sr:MarineLayer" type="sr:SeaBedAreaType">
+    <annotation>
+      <documentation>-- Name --
+Sea Bed Area
+
+-- Definition -- 
+An area of the sea bed with some identified type of cover. e.g. an area of vegetation or sediment type.
+
+-- Description --
+This describes a sea region according to the characteristics of the sea bed  rather than characteristics of the water column in general.  It does not include the subsea geology and is analogous to the concept of LandCover (INSPIRE Annex III).</documentation>
+    </annotation>
+  </element>
+  <complexType name="SeaBedAreaType">
+    <complexContent>
+      <extension base="sr:MarineLayerType">
+        <sequence>
+          <element maxOccurs="unbounded" name="surfaceType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+Surface Type
+
+-- Definition --
+Surface type of sea bed. 
+
+-- Description --
+Surface type of sea bed.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">TG</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SeaBedAreaPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:SeaBedArea"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="SeaSurfaceArea" substitutionGroup="sr:MarineLayer" type="sr:SeaSurfaceAreaType">
+    <annotation>
+      <documentation>-- Name --
+Sea Surface Area
+
+-- Definition -- 
+An area of the sea surface with some type of cover e.g. an area of sea ice.
+-- Description --
+This describes a sea region according to the characteristics of the sea surface rather than characteristics of the water column in general. It is analogous to the concept of LandCover (INSPIRE Annex III).</documentation>
+    </annotation>
+  </element>
+  <complexType name="SeaSurfaceAreaType">
+    <complexContent>
+      <extension base="sr:MarineLayerType">
+        <sequence>
+          <element name="surfaceType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+surface type
+
+-- Definition --
+Surface type of sea area.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SeaSurfaceAreaPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:SeaSurfaceArea"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ShoreSegment" substitutionGroup="gml:AbstractFeature" type="sr:ShoreSegmentType">
+    <annotation>
+      <documentation>-- Name -- 
+Shore Segment
+
+-- Definition --
+
+A Shore Segment is a section of shore line.
+
+-- Description --
+Where it is possible to provide attributes about shore stability (eroding, stable etc) and/or shore type (sand, rock, harbour etc). Then the Shore Segment should be used in place of the GML LineString element to describe curve segments.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ShoreSegmentType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="geometry" type="gml:CurvePropertyType">
+            <annotation>
+              <documentation>-- Name --
+geometry
+
+-- Definition --
+The geometry of the ShoreSegment.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="shoreClassification" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+shore classification
+
+-- Definition --
+The primary type of the shore segment, taken from the ShoreTypeClassification codelist.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">TG</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="shoreStability" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+shore stability
+
+-- Definition --
+The primary stability type of the shore segment, taken from the ShoreStability codelist.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">TG</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ShoreSegmentPropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:ShoreSegment"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Shoreline" substitutionGroup="gml:AbstractFeature" type="sr:ShorelineType">
+    <annotation>
+      <documentation>-- Name --
+Shoreline
+
+-- Definition --
+Any Boundary between a Sea Area and land.
+-- Description --</documentation>
+    </annotation>
+  </element>
+  <complexType name="ShorelineType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="geographicalName" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+A geographical name that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+EXAMPLE A standing water in a mapping view may share the same geographical name as a WFD lake in a reporting view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="gn:GeographicalName"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="hydroId" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+An identifier that is used to identify a hydrographic object in the real world. It provides a 'key' for implicitly associating different representations of the object.
+
+-- Description --
+NOTE 1 The identifier may be a national hydrological identification code.
+
+NOTE 2 More than one identifier may be required, for instance a watercourse may be assigned different identifying codes under national and European schemes.
+
+EXAMPLE A lock in a mapping view may share the same identifier as a hydro node in a network view, implying they are both representations of the same real world object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="hy:HydroIdentifier"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="relatedHydroObject" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+A related hydrographic object representing the same real-world entity.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">hy:HydroObject</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="segment">
+            <annotation>
+              <documentation>-- Name --
+segment
+
+-- Definition -- 
+A section of shoreline.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="sr:ShoreSegment"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element name="waterLevel" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+water level
+-- Definition --
+The water level used when defining this shoreline (e.g. meanHighWater)</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">IR</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ShorelinePropertyType">
+    <sequence minOccurs="0">
+      <element ref="sr:Shoreline"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</schema>

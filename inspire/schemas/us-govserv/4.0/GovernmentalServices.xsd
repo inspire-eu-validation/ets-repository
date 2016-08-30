@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:act-core="http://inspire.ec.europa.eu/schemas/act-core/4.0" xmlns:ad="http://inspire.ec.europa.eu/schemas/ad/4.0" xmlns:au="http://inspire.ec.europa.eu/schemas/au/4.0" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/2.0" xmlns:bu-core2d="http://inspire.ec.europa.eu/schemas/bu-core2d/4.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gn="http://inspire.ec.europa.eu/schemas/gn/4.0" xmlns:net="http://inspire.ec.europa.eu/schemas/net/4.0" xmlns:us-govserv="http://inspire.ec.europa.eu/schemas/us-govserv/4.0" xmlns:us-net-common="http://inspire.ec.europa.eu/schemas/us-net-common/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/us-govserv/4.0" version="4.0">
+  <import namespace="http://inspire.ec.europa.eu/schemas/act-core/4.0" schemaLocation="../../schemas/act-core/4.0/ActivityComplex_Core.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/ad/4.0" schemaLocation="../../schemas/ad/4.0/Addresses.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/au/4.0" schemaLocation="../../schemas/au/4.0/AdministrativeUnits.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base2/2.0" schemaLocation="../../schemas/base2/2.0/BaseTypes2.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/bu-core2d/4.0" schemaLocation="../../schemas/bu-core2d/4.0/BuildingsCore2D.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/gn/4.0" schemaLocation="../../schemas/gn/4.0/GeographicalNames.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/net/4.0" schemaLocation="../../schemas/net/4.0/Network.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/us-net-common/4.0" schemaLocation="../../schemas/us-net-common/4.0/UtilityNetworksCommon.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="AreaOfResponsibilityType" substitutionGroup="gml:AbstractObject" type="us-govserv:AreaOfResponsibilityTypeType">
+    <annotation>
+      <documentation>-- Name --
+area of responsibility type
+
+-- Definition --
+Set of types for the description of spatial responsibility.</documentation>
+    </annotation>
+  </element>
+  <complexType name="AreaOfResponsibilityTypeType">
+    <choice>
+      <element maxOccurs="unbounded" name="areaOfResponsibilityByAdministrativeUnit">
+        <annotation>
+          <documentation>-- Name --
+area of responsibility by administrative unit
+
+-- Definition --
+Administrative unit describing the geographic extent of the responsibility of a service.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="au:AdministrativeUnit"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="areaOfResponsibilityByNamedPlace">
+        <annotation>
+          <documentation>-- Name --
+area of responsibility by named place
+
+-- Definition --
+Geographical object describing the geographic extent of the responsibility of a service.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="gn:NamedPlace"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="areaOfResponsibilityByNetwork" type="net:NetworkReferencePropertyType">
+        <annotation>
+          <documentation>-- Name --
+area of responsibility by network
+
+-- Definition --
+Part of a network describing the geographic extent of the competence of a service.</documentation>
+        </annotation>
+      </element>
+      <element name="areaOfResponsibilityByPolygon" type="gml:MultiSurfacePropertyType">
+        <annotation>
+          <documentation>-- Name --
+area of responsibility by polygon
+
+-- Definition --
+Polygon describing the geographic extent of the responsibility of a service.</documentation>
+        </annotation>
+      </element>
+    </choice>
+  </complexType>
+  <complexType name="AreaOfResponsibilityTypePropertyType">
+    <sequence>
+      <element ref="us-govserv:AreaOfResponsibilityType"/>
+    </sequence>
+  </complexType>
+  <element name="GovernmentalService" substitutionGroup="gml:AbstractFeature" type="us-govserv:GovernmentalServiceType">
+    <annotation>
+      <documentation>-- Name --
+governmental service
+
+-- Definition --
+Administrative and social governmental services such as public administrations, civil protection sites, schools and hospitals provided by Public Administrative Bodies or by private institutions as far as they are covered by the scope of the INSPIRE directive. This scope is mapped to the values of the corresponding code list serviceType Value.
+
+-- Description --
+The accordant sites are commonly presented in governmental and municipal portals and map systems as "point of interest"-data, and may be point-based locations of a variety of categories of municipal and governmental services and social infrastructure. The spatial object type itself is generic in terms of the modelling approach, that the concrete type of a GovernmentalService is determined by the value of the attribute serviceType.</documentation>
+    </annotation>
+  </element>
+  <complexType name="GovernmentalServiceType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element minOccurs="0" name="areaOfResponsibility" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+area of responsibility
+
+-- Definition --
+The spatial responsibility of a service instance.
+
+-- Description --
+EXAMPLE 1: An administration is responsible for a municipality;
+EXEMPLE 2: A specialized hospital is responsible for a region.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="us-govserv:AreaOfResponsibilityType"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.
+
+-- Description --
+Related to the life-cycle of the spatial object in the data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+end lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.
+
+-- Description --
+Related to the life-cycle of the spatial object in the data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+INSPIRE identifier
+
+-- Definition --
+External object identifier of the governmental service.
+
+-- Description --
+NOTE: An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object.
+The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="pointOfContact" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+point of contact
+
+-- Definition --
+Contains necessary information to get access to a service and/or initial information regarding a service.
+
+-- Description --
+In some cases this information will coincide with the contact information of the service authority, owner or operator (i.e. specific position or role of the responsible party, described in the relatedParty attribute of the GovernmentalServiceExtended in the extended profile).</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="base2:Contact"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element name="serviceLocation" type="us-govserv:ServiceLocationTypePropertyType">
+            <annotation>
+              <documentation>-- Name --
+service location
+
+-- Definition --
+Location where the service is offered.</documentation>
+            </annotation>
+          </element>
+          <element name="serviceType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+service type value
+
+-- Definition --
+Type of an administrative and governmental service.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="GovernmentalServicePropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-govserv:GovernmentalService"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ServiceLocationType" substitutionGroup="gml:AbstractObject" type="us-govserv:ServiceLocationTypeType">
+    <annotation>
+      <documentation>-- Name --
+service location type
+
+-- Definition --
+Set of types of references to locate a service.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ServiceLocationTypeType">
+    <choice>
+      <element name="serviceLocationByAddress">
+        <annotation>
+          <documentation>-- Name --
+service location by address
+
+-- Definition --
+Location of the service by referring to an address.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="ad:Address"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element maxOccurs="unbounded" name="serviceLocationByBuilding">
+        <annotation>
+          <documentation>-- Name --
+service location by building
+
+-- Definition --
+Location of the service by referring to a building.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="bu-core2d:Building"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element name="serviceLocationByActivityComplex">
+        <annotation>
+          <documentation>-- Name --
+service location by activity complex
+
+-- Definition --
+Location of the service by referring to an activity complex.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="act-core:ActivityComplex"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+      <element name="serviceLocationByGeometry" type="gml:GeometryPropertyType">
+        <annotation>
+          <documentation>-- Name --
+service location by geometry
+
+-- Definition --
+Location of the service by referring to a geometry.</documentation>
+        </annotation>
+      </element>
+      <element name="serviceLocationByUtilityNode">
+        <annotation>
+          <documentation>-- Name --
+location service by utility node
+
+-- Definition --
+Location of the service by referring to a node related to a utility network (water, telecommunication, etc.), e.g. hydrant or emergency call point.</documentation>
+        </annotation>
+        <complexType>
+          <complexContent>
+            <extension base="gml:AbstractMemberType">
+              <sequence minOccurs="0">
+                <element ref="us-net-common:UtilityNode"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+            </extension>
+          </complexContent>
+        </complexType>
+      </element>
+    </choice>
+  </complexType>
+  <complexType name="ServiceLocationTypePropertyType">
+    <sequence>
+      <element ref="us-govserv:ServiceLocationType"/>
+    </sequence>
+  </complexType>
+</schema>

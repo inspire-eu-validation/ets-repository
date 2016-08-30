@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:act-core="http://inspire.ec.europa.eu/schemas/act-core/4.0" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/2.0" xmlns:bu-base="http://inspire.ec.europa.eu/schemas/bu-base/4.0" xmlns:bu-core2d="http://inspire.ec.europa.eu/schemas/bu-core2d/4.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:pf="http://inspire.ec.europa.eu/schemas/pf/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/pf/4.0" version="4.0">
+  <annotation>
+    <documentation>-- Name --
+Production And Industrial Facilities - Core</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/act-core/4.0" schemaLocation="../../schemas/act-core/4.0/ActivityComplex_Core.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base2/2.0" schemaLocation="../../schemas/base2/2.0/BaseTypes2.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/bu-base/4.0" schemaLocation="../../schemas/bu-base/4.0/BuildingsBase.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/bu-core2d/4.0" schemaLocation="../../schemas/bu-core2d/4.0/BuildingsCore2D.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="ProductionBuilding" type="pf:ProductionBuildingType" substitutionGroup="gml:AbstractFeature">
+    <annotation>
+      <documentation>-- Name --
+production building
+
+-- Definition --
+Artificial construction, part of the production facility that are useful to host or provide shelter to activity development.
+
+-- Description --
+Inside a facility, and in relation with the definition of building, this entity should represent a construction under responsibility of the facility, either as an independent unit or as a functional infrastructure for an installation.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ProductionBuildingType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element minOccurs="0" name="thematicId" type="base2:ThematicIdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Thematic object identifier (e.g. ICAO location identifiers for airports or NUTS codes for administrative areas).
+
+-- Description --
+It may be the identification code provided by the Member States to identify the object on their own databases.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="typeOfBuilding" nillable="true">
+            <annotation>
+              <documentation>-- Definition -- 
+Descriptive classification about the production and industrial building.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="pf:TypeOfProductionBuildingValue"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="status" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The state or condition of the production and industrial building, with regard to the functional and operational order, in which it is arranged for a limited or extended time period.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="pf:StatusType"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="geometry" nillable="true" type="gml:GeometryPropertyType"/>
+          <element maxOccurs="unbounded" minOccurs="0" name="building" nillable="true">
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="bu-base:AbstractBuilding"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ProductionBuildingPropertyType">
+    <sequence minOccurs="0">
+      <element ref="pf:ProductionBuilding"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ProductionFacility" substitutionGroup="act-core:ActivityComplex" type="pf:ProductionFacilityType">
+    <annotation>
+      <documentation>-- Name --
+production facility
+
+-- Definition --
+
+One or more installations on the same site operated by the same natural or legal person,
+designed, built or installed to serve specific production or industrial purposes, comprehending
+all infrastructure, equipment and materials.
+
+-- Description --
+A production facility groups together a single installation, set of installations or production processes (stationary or mobile), which can be defined within a single geographical boundary, organizational unit or production process. A production facility can also be identified as one or more installations located on the same site that are operated by the same natural or legal person and in which production activities are being carried out. Such a facility groups potentially the land, buildings, and equipment used in carrying on an industrial business or other undertaking or service.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ProductionFacilityType">
+    <complexContent>
+      <extension base="act-core:ActivityComplexType">
+        <sequence>
+          <element minOccurs="0" name="surfaceGeometry" nillable="true" type="gml:SurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Spatial property of the spatial object with a value that is a vector geometry type from ISO 19107.
+
+-- Description --
+This is the secondary geometry property for the Production Facility and it is set as an optional property to identify the location area for the Facility. It is intended, if available, to furnish a more detailed spatial information in addition to the basic mandatory geometry.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="riverBasinDistrict">
+            <annotation>
+              <documentation>-- Definition -- 
+Code identifier and/or name assigned to the basin district of a watercourse. 
+
+-- Description --
+NOTE  Information required (not registered in the Hydrography Theme) according to Article 3(1) of Directive 2000/60/EC of the European Parliament and of the Council of 23 October 2000 establishing
+a framework for Community action in the field of water policy (OJ L 327, 22.12.2000, p. 1). Directive as amended by Decision
+No 2455/2001/EC (OJ L 331, 15.12.2001, p. 1).</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="status" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The state or condition of the facility, with regard to the functional and operational order, in which it is arranged for a limited or extended time period.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="pf:StatusType"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="groupedPlot" nillable="true">
+            <annotation>
+              <documentation>A Plot is grouped by one or more Facilities (this means a Plot may be shared by different Facilities)</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="pf:ProductionPlot"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="hostingSite" nillable="true">
+            <annotation>
+              <documentation>A Site hosts one or more Facilities</documentation>
+            </annotation>
+            <complexType>
+              <sequence minOccurs="0">
+                <element ref="pf:ProductionSite"/>
+              </sequence>
+              <attributeGroup ref="gml:AssociationAttributeGroup"/>
+              <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="groupedInstallation" nillable="true">
+            <annotation>
+              <documentation>An Installation is grouped by one Facility</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="pf:ProductionInstallation"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="groupedBuilding" nillable="true">
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="pf:ProductionBuilding"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ProductionFacilityPropertyType">
+    <sequence minOccurs="0">
+      <element ref="pf:ProductionFacility"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ProductionInstallation" substitutionGroup="gml:AbstractFeature" type="pf:ProductionInstallationType">
+    <annotation>
+      <documentation>-- Name --
+production installation
+
+-- Definition --
+A technical unit, such as machinery,  apparatus, devices or equipment placed in position or connected for use.
+
+-- Description --
+Stationary technical unit part of a facility where one or more activities are carried out, and any other directly associated activities which have a technical connection to the activities carried out on that site and which could have an effect on the environment.
+May be a technical unit within an establishment in which dangerous substances are produced, used, handled or stored.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ProductionInstallationType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE  An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="thematicId" type="base2:ThematicIdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Thematic object identifier (e.g. ICAO location identifiers for airports or NUTS codes for administrative areas).
+
+-- Description --
+It may be the identification code provided by the Member States to identify the object on their own databases.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="pointGeometry" type="gml:PointPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Spatial property of the spatial object with a value that is a vector geometry type from ISO 19107.
+
+-- Description --
+This is the basic geometry property for the Production Installation and it is set as an optional property to identify the location point for the Installation. It is intended, if available, to furnish an additional spatial information beside the basic mandatory geometry fixed for the Production Facility.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="surfaceGeometry" nillable="true" type="gml:SurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Spatial property of the spatial object with a value that is a vector geometry type from ISO 19107.
+
+-- Description --
+This is the secondary geometry property for the Production Installation and it is set as an optional property to identify the location area for the Installation. It is intended, if available, to furnish a detailed spatial information beside the basic mandatory geometry fixed for the Production Facility.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="name" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Official denomination or proper or conventional name of the installation.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="description" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Descriptive statement about the installation.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="status" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The state or condition of the installation, with regard to its functional and operational order, in which it is arranged for a limited or extended time period.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="pf:StatusType"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element name="type" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Special kind of an installation, denoting the operative function which has to be performed.
+
+-- Description --
+EXAMPLE  Radiological installation, containing radiological equipment.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="groupedInstallationPart" nillable="true">
+            <annotation>
+              <documentation>An InstallationPart is grouped by one Installation</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="pf:ProductionInstallationPart"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ProductionInstallationPropertyType">
+    <sequence minOccurs="0">
+      <element ref="pf:ProductionInstallation"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ProductionInstallationPart" substitutionGroup="gml:AbstractFeature" type="pf:ProductionInstallationPartType">
+    <annotation>
+      <documentation>-- Name --
+production installation part
+
+-- Definition --
+A single engineered facility that performs specific functionalities related with a production activity.
+
+--Description --
+
+This level of description covers specific parts of the Production Installation which must be registered by the legal mandate of the competent authorities. Points of emission as chimneys (for pollutants) or tanks (for special products), will be included in this definition.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ProductionInstallationPartType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE  An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="thematicId" type="base2:ThematicIdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Thematic object identifier (e.g. ICAO location identifiers for airports or NUTS codes for administrative areas).
+
+-- Description --
+It may be the identification code provided by the Member States to identify the object on their own databases.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="pointGeometry" type="gml:PointPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Spatial property of the spatial object with a value that is a vector geometry type from ISO 19107.
+
+-- Description --
+This is the basic geometry property for the Production Installation Part and it is set as an optional property to identify the location point for the Installation Part. It is intended, if available, to furnish an additional spatial information beside the basic mandatory geometry fixed for the Production Facility.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="surfaceGeometry" nillable="true" type="gml:SurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Spatial property of the spatial object with a value that is a vector geometry type from ISO 19107.
+
+-- Description --
+This is the secondary geometry property for the Production Installation Part and it is set as an optional property to identify the location area for the Installation Part. It is intended, if available, to furnish a detailed spatial information beside the basic mandatory geometry fixed for the Production Facility.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="name" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Official denomination or proper or conventional name of the installation part.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="description" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Descriptive statement about the installation part.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="status" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The state or condition of the installation part, with regard to the functional and operational order, in which it is arranged for a limited or extended time period.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="pf:StatusType"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element name="type" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Special kind of an installation part, denoting the operative function which has to be performed.
+
+-- Description --
+EXAMPLE  Chimney, pump.</documentation>
+            </annotation>
+          </element>
+          <element name="technique" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Method to reduce pollutant concentration due to the emissions of a technical component, tipically a chimney.
+
+-- Description --
+This information is referring to a list of predefined potential values.
+The reference values are holded in the PollutionAbatementTechnique code list.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">IR</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ProductionInstallationPartPropertyType">
+    <sequence minOccurs="0">
+      <element ref="pf:ProductionInstallationPart"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ProductionSite" substitutionGroup="gml:AbstractFeature" type="pf:ProductionSiteType">
+    <annotation>
+      <documentation>-- Name --
+production site
+
+-- Definition --
+All land at a distinct geographic location where the production facility was, is, or is intended to be located. This includes all infrastructure, equipment and materials;
+
+-- Description --
+An area of land or water that one or more process plants is or may be situated on, or else a single location, in which, if there is more than one manufacturer of (a) substance(s), certain infrastructure and facilities are shared.
+A continuous surface, maritime or terrestrial in which production facilities have been already implanted or urban and/or engineering activities have been developed for production purposes. The location will be defined by means of geographical boundaries within which activities under the control of an organization may be carried out. The geographical boundaries may be on land and in water, and include above and below surface structures, both natural and man-made.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ProductionSiteType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE  An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="thematicId" type="base2:ThematicIdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Thematic object identifier (e.g. ICAO location identifiers for airports or NUTS codes for administrative areas).
+
+-- Description --
+It may be the identification code provided by the Member States to identify the object on their own databases.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="geometry" type="gml:MultiSurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Spatial property of the spatial object with a value that is a vector geometry type from ISO 19107.
+
+-- Description --
+This is the geometry property for the Production Site and it is set as an optional property to identify the location area for the Site. It is intended, if available, to furnish a detailed spatial information beside the basic mandatory geometry fixed for the Production Facility.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="sitePlan" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+External reference to documentation concerning the configuration and organisation of the site ((Site Plans, technical descriptions, ...).</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="base2:DocumentCitation"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="name" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Official denomination or proper or conventional name of the site.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="description" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Descriptive statement about the site.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="string">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="status" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The state or condition of the site, with regard to the functional and operational order, in which it is arranged for a limited or extended time period.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="pf:StatusType"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ProductionSitePropertyType">
+    <sequence minOccurs="0">
+      <element ref="pf:ProductionSite"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="ProductionPlot" substitutionGroup="gml:AbstractFeature" type="pf:ProductionPlotType">
+    <annotation>
+      <documentation>-- Name --
+Production Plot
+
+-- Definition --
+A portion of land or water part of a production facility destined to functional purposes.
+-- Description --
+A potential sub-division of a major site as delimited extension of land in which are performed extensive operations related with the activity or one of the activities performed by a facility.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ProductionPlotType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE  An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="thematicId" type="base2:ThematicIdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Thematic object identifier (e.g. ICAO location identifiers for airports or NUTS codes for administrative areas).
+
+-- Description --
+It may be the identification code provided by the Member States to identify the object on their own databases.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="geometry" type="gml:SurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Spatial property of the spatial object with a value that is a vector geometry type from ISO 19107.
+
+-- Description --
+This is the geometry property for the Parcel and it is set as a optional property to identify the location area for the Parcel. It is intended, if available, to furnish a detailed spatial information beside the basic mandatory geometry fixed for the Production Facility.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="status" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The state or condition of the plot, with regard to the functional and operational order, in which it is arranged for a limited or extended time period.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="pf:StatusType"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ProductionPlotPropertyType">
+    <sequence minOccurs="0">
+      <element ref="pf:ProductionPlot"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="StatusType" substitutionGroup="gml:AbstractObject" type="pf:StatusTypeType">
+    <annotation>
+      <documentation>-- Definition --
+The state or condition of a technical component, with regard to the functional and operational order, in which it is arranged for a limited or extended time period.
+
+-- Description --
+It applies equally to the technical unit (facility, installation or installation part), to the production site, to the parcel and to the production building.</documentation>
+    </annotation>
+  </element>
+  <complexType name="StatusTypeType">
+    <sequence>
+      <element name="statusType" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Definition --
+The state or condition of a technical component referring to a list of predefined potential values.
+
+-- Description --
+The reference values are holded in the ConditionOfFacilityValue code list.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">IR</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="description" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+Descriptive statement about the declared status.</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="string">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element name="validFrom" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The starting time of validity for a status type.
+
+-- Description --
+A date gives values for year, month and day.</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="date">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+      <element minOccurs="0" name="validTo" nillable="true">
+        <annotation>
+          <documentation>-- Definition --
+The ending time of validity for a status type.
+
+-- Description --
+A date gives values for year, month and day.</documentation>
+        </annotation>
+        <complexType>
+          <simpleContent>
+            <extension base="date">
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </extension>
+          </simpleContent>
+        </complexType>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="StatusTypePropertyType">
+    <sequence>
+      <element ref="pf:StatusType"/>
+    </sequence>
+  </complexType>
+  <element abstract="true" name="TechnicalUnit" substitutionGroup="gml:AbstractFeature" type="pf:TechnicalUnitType">
+    <annotation>
+      <documentation>-- Name --
+technical unit
+
+-- Definition --
+Represents the common "abstract level" for production infrastructures: facilities, installations, installation parts. 
+
+
+-- Description --
+It applies since the production infrastructures (facility, installation, installation part) may have an UML "equivalent behaviour": this means they have properties in common and the same associations to be reused.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="TechnicalUnitType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="TechnicalUnitPropertyType">
+    <sequence minOccurs="0">
+      <element ref="pf:TechnicalUnit"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="TypeOfProductionBuildingValue" substitutionGroup="gml:AbstractGML" type="pf:TypeOfProductionBuildingValueType">
+    <annotation>
+      <appinfo>
+        <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="extensibility">any</taggedValue>
+        <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="vocabulary">http://inspire.ec.europa.eu/code List/TypeOfProductionBuildingType</taggedValue>
+      </appinfo>
+    </annotation>
+  </element>
+  <complexType name="TypeOfProductionBuildingValueType">
+    <complexContent>
+      <extension base="gml:AbstractGMLType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="TypeOfProductionBuildingValuePropertyType">
+    <sequence minOccurs="0">
+      <element ref="pf:TypeOfProductionBuildingValue"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</schema>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:cvbase="http://inspire.ec.europa.eu/schemas/cvbase/1.0" xmlns:el-bas="http://inspire.ec.europa.eu/schemas/el-bas/3.0" xmlns:el-cov="http://inspire.ec.europa.eu/schemas/el-cov/3.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" xmlns:ns1="http://inspire.ec.europa.eu/schemas/cvbase/1.0" targetNamespace="http://inspire.ec.europa.eu/schemas/el-cov/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+elevation - grid coverage
+
+-- Definition --
+Elevation - Grid Coverage application schema.</documentation>
+		<appinfo>
+			<gmlProfileSchema xmlns="http://www.opengis.net/gml/3.2">EMPTY</gmlProfileSchema>
+		</appinfo>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/cvbase/1.0" schemaLocation="../../schemas/cvbase/1.0/CoverageBase.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/el-bas/3.0" schemaLocation="../../schemas/el-bas/3.0/ElevationBaseTypes.xsd"/>
+	<import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="http://www.opengis.net/gmlcov/1.0" schemaLocation="../../schemas/ogc/gmlcov/1.0/coverage.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="ElevationGridCoverageAggregation" type="el-cov:ElevationGridCoverageAggregationType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+elevation grid coverage aggregation
+
+-- Definition --
+Geometrical characteristics of the elevation grid coverage aggregation.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ElevationGridCoverageAggregationType">
+		<sequence>
+			<element name="contributingFootprint" type="gml:MultiSurfacePropertyType">
+				<annotation>
+					<documentation>-- Name --
+contributing footprint
+
+-- Definition --
+Multi polygon delineating the geographic area of the elevation grid coverage that contributes to the aggregated elevation grid coverage.</documentation>
+				</annotation>
+			</element>
+			<element name="contributingElevationGridCoverage">
+				<annotation>
+					<documentation>-- Name --
+contributing elevation grid coverage
+
+-- Definition --
+Reference to the elevation grid coverages that compose an aggregated elevation grid coverage.
+
+The association has additional properties as defined in the association class ElevationGridCoverageAggregation.</documentation>
+					<appinfo>
+						<targetElement xmlns="http://www.opengis.net/gml/3.2">el-cov:ElevationGridCoverage</targetElement>
+					</appinfo>
+				</annotation>
+				<complexType>
+					<complexContent>
+						<extension base="gml:AbstractMemberType">
+							<sequence/>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ElevationGridCoverageAggregationPropertyType">
+		<sequence>
+			<element ref="el-cov:ElevationGridCoverageAggregation"/>
+		</sequence>
+	</complexType>
+	<element name="ElevationGridCoverage" type="el-cov:ElevationGridCoverageType" substitutionGroup="gmlcov:RectifiedGridCoverage">
+		<annotation>
+			<documentation>-- Name --
+elevation grid coverage
+
+-- Definition --
+Continuous coverage which uses a systematic tessellation based on a regular rectified quadrilateral grid to cover its domain, where the elevation property value is usually known for each of the grid points forming this domain.
+
+-- Description --
+SOURCE Adapted from [ISO 19123:2005].</documentation>
+		</annotation>
+	</element>
+	<complexType name="ElevationGridCoverageType">
+		<complexContent>
+			<extension base="gmlcov:AbstractDiscreteCoverageType">
+				<sequence>
+					<element name="beginLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="domainExtent" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+domain extent
+
+-- Definition --
+Extent of the spatiotemporal domain of the coverage.
+
+-- Description --
+SOURCE [ISO 19123:2005].
+
+NOTE 1 The data type EX_Extent, is defined in ISO 19103.  Extents may be specified in both space and time. 
+
+NOTE 2 The domain extent shall be specified at least in space by using EX_BoundingPolygon, EX_GeographicBoundingBox or EX_GeographicDescription.  The whole geographic extent of the elevation coverage is affected, including areas where grid points hold nil reason values.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMetadataPropertyType">
+									<sequence minOccurs="0">
+										<element ref="gmd:EX_Extent"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="endLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+end lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Name --
+inspire ID
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="propertyType" type="el-bas:ElevationPropertyTypeValueType">
+						<annotation>
+							<documentation>-- Name --
+property type
+
+-- Definition --
+Attribute determining the elevation property represented by the elevation grid coverage.
+
+-- Description --
+EXAMPLE  Height, depth.</documentation>
+						</annotation>
+					</element>
+					<element name="surfaceType" type="el-bas:SurfaceTypeValueType">
+						<annotation>
+							<documentation>-- Name --
+surface type
+
+-- Definition --
+Attribute indicating the type of elevation surface that the coverage describes in relation to the Earth's bare surface.</documentation>
+						</annotation>
+					</element>
+					<element name="contributingElevationGridCoverage" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+contributing elevation grid coverage
+
+-- Definition --
+Reference to the elevation grid coverages that compose an aggregated elevation grid coverage.
+
+The association has additional properties as defined in the association class ElevationGridCoverageAggregation.</documentation>
+							<appinfo>
+								<targetElement xmlns="http://www.opengis.net/gml/3.2">el-cov:ElevationGridCoverage</targetElement>
+							</appinfo>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence/>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ElevationGridCoveragePropertyType">
+		<sequence minOccurs="0">
+			<element ref="el-cov:ElevationGridCoverage"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

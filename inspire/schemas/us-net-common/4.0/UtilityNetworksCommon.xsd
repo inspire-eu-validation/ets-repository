@@ -1,0 +1,1300 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:act-core="http://inspire.ec.europa.eu/schemas/act-core/4.0" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/2.0" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:net="http://inspire.ec.europa.eu/schemas/net/4.0" xmlns:us-govserv="http://inspire.ec.europa.eu/schemas/us-govserv/4.0" xmlns:us-net-common="http://inspire.ec.europa.eu/schemas/us-net-common/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/us-net-common/4.0" version="4.0">
+  <annotation>
+    <documentation>-- Name --
+common utility network elements
+
+-- Definition --
+Common Utility Network Elements</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/act-core/4.0" schemaLocation="../../schemas/act-core/4.0/ActivityComplex_Core.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base2/2.0" schemaLocation="../../schemas/base2/2.0/BaseTypes2.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/net/4.0" schemaLocation="../../schemas/net/4.0/Network.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/us-govserv/4.0" schemaLocation="../../schemas/us-govserv/4.0/GovernmentalServices.xsd"/>
+  <import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="Appurtenance" substitutionGroup="us-net-common:UtilityNode" type="us-net-common:AppurtenanceType">
+    <annotation>
+      <documentation>-- Name --
+appurtenance
+
+-- Definition --
+An appurtenance is a node object that is described by its type (via the attribute "appurtenanceType").
+
+-- Description --
+The "appurtenanceType" attribute uses the "AppurtenanceTypeValue" codelist for its values. But this is an empty codelist that needs to be extended by a concrete codelist of appurtenance types for each utility network type. 
+So e.g. for the electricity network, the "ElectricityAppurtenanceTypeValue" codelist should be used.</documentation>
+    </annotation>
+  </element>
+  <complexType name="AppurtenanceType">
+    <complexContent>
+      <extension base="us-net-common:UtilityNodeType">
+        <sequence>
+          <element name="appurtenanceType" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+appurtenance type value
+
+-- Definition --
+
+Type of appurtenance
+
+-- Description --
+The "AppurtenanceTypeValue" codelist is an abstract codelist that can be replaced by the various appurtenance type value codelists for each utility network.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="specificAppurtenanceType" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+specific appurtenance type
+
+-- Definition --
+Type of appurtenance according to a domain-specific classification.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="AppurtenancePropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:Appurtenance"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Cabinet" substitutionGroup="us-net-common:UtilityNodeContainer" type="us-net-common:CabinetType">
+    <annotation>
+      <documentation>-- Name --
+cabinet
+
+-- Definition --
+Simple cabinet object which may carry utility objects belonging to either single or multiple utility networks.
+
+-- Description --
+Cabinets represent mountable node objects that can contain smaller utility devices and cables.</documentation>
+    </annotation>
+  </element>
+  <complexType name="CabinetType">
+    <complexContent>
+      <extension base="us-net-common:UtilityNodeContainerType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="CabinetPropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:Cabinet"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="Cable" substitutionGroup="us-net-common:UtilityLinkSet" type="us-net-common:CableType">
+    <annotation>
+      <documentation>-- Name --
+cable
+
+-- Definition --
+A utility link or link sequence used to convey electricity or data from one location to another.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="CableType">
+    <complexContent>
+      <extension base="us-net-common:UtilityLinkSetType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="CablePropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:Cable"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Duct" substitutionGroup="us-net-common:UtilityLinkSet" type="us-net-common:DuctType">
+    <annotation>
+      <documentation>-- Name --
+duct
+
+-- Definition --
+A utility link or link sequence used to protect and guide cable and pipes via an encasing construction.
+
+-- Description --
+A Duct (or Conduit, or Duct-bank, or Wireway) is a linear object which belongs to the structural network. It is the outermost casing. A Duct may contain Pipe(s), Cable(s) or other Duct(s). 
+Duct is a concrete feature class that contains information about the position and characteristics of ducts as seen from a manhole, vault, or a cross section of a trench and duct.</documentation>
+    </annotation>
+  </element>
+  <complexType name="DuctType">
+    <complexContent>
+      <extension base="us-net-common:UtilityLinkSetType">
+        <sequence>
+          <element name="ductWidth" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+duct width
+
+-- Definition --
+The width of the duct.
+
+-- Description --
+The measurement of the object - in this case, the duct - from side to side.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:LengthType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="cables" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+cables
+
+-- Definition --
+A duct may contain one or more cables.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-net-common:Cable</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="ducts" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+ducts
+
+-- Definition --
+A single duct or set of ducts that constitute the inner-duct.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-net-common:Duct</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="pipes" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+pipes
+
+-- Definition --
+The set of pipes that constitute the duct bank.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-net-common:Pipe</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="DuctPropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:Duct"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Manhole" substitutionGroup="us-net-common:UtilityNodeContainer" type="us-net-common:ManholeType">
+    <annotation>
+      <documentation>-- Name --
+manhole
+
+-- Definition --
+Simple container object which may contain either single or multiple utility networks objects.
+
+-- Description --
+Manholes perform following functions:
+&lt;ul&gt;
+	&lt;li&gt;Provide drainage for the conduit system so that freezing water does not damage the conduit or wires. &lt;/li&gt;
+	&lt;li&gt;Provide a location for bending the conduit run without damaging the wires. &lt;/li&gt;
+	&lt;li&gt;Provide a junction for conduits coming from different directions. &lt;/li&gt;
+	&lt;li&gt;Provide access to the system for maintenance. &lt;/li&gt;
+&lt;/ul&gt;</documentation>
+    </annotation>
+  </element>
+  <complexType name="ManholeType">
+    <complexContent>
+      <extension base="us-net-common:UtilityNodeContainerType">
+        <sequence/>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ManholePropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:Manhole"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Pipe" substitutionGroup="us-net-common:UtilityLinkSet" type="us-net-common:PipeType">
+    <annotation>
+      <documentation>-- Name --
+pipe
+
+-- Definition --
+A utility link or link sequence for the conveyance of solids, liquids, chemicals or gases from one location to another.
+
+A pipe can also be used as an object to encase several cables (a bundle of cables) or other (smaller) pipes.</documentation>
+    </annotation>
+  </element>
+  <complexType name="PipeType">
+    <complexContent>
+      <extension base="us-net-common:UtilityLinkSetType">
+        <sequence>
+          <element name="pipeDiameter" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+pipe diameter
+
+-- Definition --
+Pipe outer diameter.
+
+-- Description --
+For convex shaped objects (e.g. a circle) the diameter is defined to be the largest distance that can be formed between two opposite parallel lines tangent to its boundery.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:MeasureType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="pressure" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+pressure
+
+-- Definition --
+The maximum allowable operating pressure at which a product is conveyed through a pipe.
+
+-- Description --
+The unit of measure for pressure is commonly expressed in "bar".</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:MeasureType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="cables" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+cables
+
+-- Definition --
+A pipe may contain one or more cables.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-net-common:Cable</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="pipes" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+pipes
+
+-- Definition --
+A pipe may contain one or more pipes.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-net-common:Pipe</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="PipePropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:Pipe"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Pole" substitutionGroup="us-net-common:UtilityNodeContainer" type="us-net-common:PoleType">
+    <annotation>
+      <documentation>-- Name --
+pole
+
+-- Definition --
+Simple pole (mast) object which may carry utility objects belonging to either single or multiple utility networks.
+
+-- Description --
+Poles represent node objects that can support utility devices and cables.</documentation>
+    </annotation>
+  </element>
+  <complexType name="PoleType">
+    <complexContent>
+      <extension base="us-net-common:UtilityNodeContainerType">
+        <sequence>
+          <element name="poleHeight" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+pole height
+
+-- Definition --
+The height of the pole.
+
+-- Description --
+The height is the vertical extend measuring accross the object - in this case, the pole - at right angles to the lenght.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:LengthType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="PolePropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:Pole"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Tower" substitutionGroup="us-net-common:UtilityNodeContainer" type="us-net-common:TowerType">
+    <annotation>
+      <documentation>-- Name --
+tower
+
+-- Definition --
+Simple tower object which may carry utility objects belonging to either single or multiple utility networks.
+
+-- Description --
+Towers represent node objects that support reservoirs, cables or antennas.</documentation>
+    </annotation>
+  </element>
+  <complexType name="TowerType">
+    <complexContent>
+      <extension base="us-net-common:UtilityNodeContainerType">
+        <sequence>
+          <element name="towerHeight" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+tower height
+
+-- Definition --
+The height of the tower.
+
+-- Description --
+The height is the vertical extend measuring accross the object - in this case, the tower - at right angles to the lenght.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="gml:LengthType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="TowerPropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:Tower"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="UtilityLink" substitutionGroup="net:Link" type="us-net-common:UtilityLinkType">
+    <annotation>
+      <documentation>-- name --
+
+utility Link
+
+-- definition --
+
+A linear spatial object that describes the geometry and connectivity of a utility network between two points in the network.</documentation>
+    </annotation>
+  </element>
+  <complexType name="UtilityLinkType">
+    <complexContent>
+      <extension base="net:LinkType">
+        <sequence>
+          <element name="currentStatus" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+current status
+
+-- Definition --
+The status of an utility object with regards to its completion and use.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="validFrom" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid from
+
+-- Definition --
+The time when the utility network element started to exist in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validTo" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid to
+
+-- Definition --
+The time from which the utility network element no longer exists in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="verticalPosition" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+vertical position
+
+-- Definition --
+Vertical position of the utility object relative to ground.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="base:VerticalPositionValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="utilityFacilityReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+utility facility reference
+
+-- Definition --
+Reference to a facility activity complex that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a utility facility - having a more complex geometry - to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">act-core:ActivityComplex</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="governmentalServiceReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+governmental service reference
+
+-- Definition --
+Reference to a governmental service object that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a governmental service object to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-govserv:GovernmentalService</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="UtilityLinkPropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:UtilityLink"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="UtilityLinkSequence" substitutionGroup="net:LinkSequence" type="us-net-common:UtilityLinkSequenceType">
+    <annotation>
+      <documentation>-- name --
+utility Link Sequence
+-- description --
+A linear spatial object, composed of an ordered collection of utility links, which represents a continuous path in the utility network without any branches. The element has a defined beginning and end and every position on the utility link sequence is identifiable with one single parameter.</documentation>
+    </annotation>
+  </element>
+  <complexType name="UtilityLinkSequenceType">
+    <complexContent>
+      <extension base="net:LinkSequenceType">
+        <sequence>
+          <element name="currentStatus" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+current status
+
+-- Definition --
+The status of an utility object with regards to its completion and use.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="validFrom" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid from
+
+-- Definition --
+The time when the utility network element started to exist in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validTo" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid to
+
+-- Definition --
+The time from which the utility network element no longer exists in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="verticalPosition" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+vertical position
+
+-- Definition --
+Vertical position of the utility object relative to ground.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="base:VerticalPositionValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="utilityFacilityReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+utility facility reference
+
+-- Definition --
+Reference to a facility activity complex that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a utility facility - having a more complex geometry - to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">act-core:ActivityComplex</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="governmentalServiceReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+governmental service reference
+
+-- Definition --
+Reference to a governmental service object that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a governmental service object to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-govserv:GovernmentalService</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="UtilityLinkSequencePropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:UtilityLinkSequence"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="UtilityLinkSet" substitutionGroup="net:LinkSet" type="us-net-common:UtilityLinkSetType">
+    <annotation>
+      <documentation>-- Name --
+utility linkset
+
+-- Definition --
+&lt;font color="#1a1a1a"&gt;An abstract utility network class which groups common properties of Cable, Pipe and Duct featureTypes.&lt;/font&gt;
+
+-- Description --
+&lt;font color="#1a1a1a"&gt;This class also extends the LinkSet featureType, which allows Cable, Pipe and Duct classes to use either the (more complex) LinkSequence or (more simple) Link class.&lt;/font&gt;</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="UtilityLinkSetType">
+    <complexContent>
+      <extension base="net:LinkSetType">
+        <sequence>
+          <element name="currentStatus" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+current status
+
+-- Definition --
+The status of an utility object with regards to its completion and use.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="validFrom" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid from
+
+-- Definition --
+The time when the utility network element started to exist in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validTo" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid to
+
+-- Definition --
+The time from which the utility network element no longer exists in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="verticalPosition" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+vertical position
+
+-- Definition --
+Vertical position of the utility object relative to ground.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="base:VerticalPositionValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="utilityFacilityReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+utility facility reference
+
+-- Definition --
+Reference to a facility activity complex that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a utility facility - having a more complex geometry - to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">act-core:ActivityComplex</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="governmentalServiceReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+governmental service reference
+
+-- Definition --
+Reference to a governmental service object that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a governmental service object to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-govserv:GovernmentalService</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="utilityDeliveryType" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+utility delivery type
+
+-- Definition --
+Kind of utility delivery network e.g. transport, distribution, collection ...</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="warningType" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+warning type
+
+-- Definition --
+Kind of overground visible warning mechanism used to indicate an underground utility network element.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="UtilityLinkSetPropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:UtilityLinkSet"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="UtilityNetwork" substitutionGroup="net:Network" type="us-net-common:UtilityNetworkType">
+    <annotation>
+      <documentation>-- Name --
+utility network
+
+-- Definition --
+Collection of network elements that belong to a single type of utility network.
+
+-- Description --
+In the real world, objects are connected to each other: an optical cable is connected to a multiplexer that in turn is connected to copper cables connecting into our homes to provide cable TV, telephony and internet access. Using GIS to support network utility management typically involves many types of features that may have connectivity to each other. Topology in GIS is generally defined as the spatial relationship between connecting or adjacent features, and is an essential prerequisite for many spatial operations such as network analysis. Utility networks can be described as NaN (Node-Arc-Node) network using two basic geometric types: points (aka &lt;i&gt;nodes&lt;/i&gt;) and polylines (aka &lt;i&gt;arcs&lt;/i&gt;). NaN topologies can be directed or un-directed, depending on specific type of network (i.e. water networks are directed, while telecommunications networks are not). Such topology structure provides an automated way to handle digitising and editing errors, and enable advanced spatial analyses such as adjacency, connectivity and containment. Infrastructure networks rely on Generic network model developed during Annex I.
+
+Note: 
+Via the attribute "utilityNetworkType", that uses the "UtilityNetworkTypeValue" codelist, the type of utility network can be defined. E.g. by selecting the "sewer" value, the utility network becomes a "sewer utility network".
+Using the "crossTheme" value, a utility network can be created that contains e.g. ducts, which can contain pipes and cables from various utility network types.</documentation>
+    </annotation>
+  </element>
+  <complexType name="UtilityNetworkType">
+    <complexContent>
+      <extension base="net:NetworkType">
+        <sequence>
+          <element name="utilityNetworkType" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+utility network type
+
+-- Definition --
+The type of utility network or the utilily network theme.
+
+-- Description --
+Uses the codelist "UtilityNetworkTypeValue" to describe the possible utility networks. This also contains the "crossTheme" value to be used for utility networks that can contain cables or pipes from various themes, typically used by utility network providers that provide ducts.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="authorityRole" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+authority role
+
+-- Definition --
+Parties authorized to manage a utility network, such as maintainers, operators or owners.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">base2:RelatedParty</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="utilityFacilityReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+utility facility reference
+
+-- Definition --
+Reference to a facility activity complex that is linked to (e.g. part of) this utility network.
+
+-- Description --
+This reference can be used to link utility facilities - having a more complex geometry - to a utility network.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">act-core:ActivityComplex</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="disclaimer" nillable="true" type="gmd:PT_FreeText_PropertyType">
+            <annotation>
+              <documentation>-- Name --
+disclaimer
+
+-- Definition --
+Legal text describing confidentiality clauses applying to the utility network information.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="networks" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+networks
+
+-- Definition --
+A single sub-network that can be considered as part of a higher-order utility network.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-net-common:UtilityNetwork</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="UtilityNetworkPropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:UtilityNetwork"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <complexType name="UtilityNetworkElementPropertyType">
+    <choice minOccurs="0">
+      <element ref="us-net-common:UtilityLink"/>
+      <element ref="us-net-common:UtilityLinkSequence"/>
+      <element ref="us-net-common:UtilityLinkSet"/>
+      <element ref="us-net-common:UtilityNode"/>
+      <element ref="us-net-common:UtilityNodeContainer"/>
+    </choice>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="UtilityNode" substitutionGroup="net:Node" type="us-net-common:UtilityNodeType">
+    <annotation>
+      <documentation>-- Name --
+utility node
+
+-- Definition --
+A point spatial object which is used for connectivity.
+
+-- Description --
+Nodes are found at both ends of the UtilityLink.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="UtilityNodeType">
+    <complexContent>
+      <extension base="net:NodeType">
+        <sequence>
+          <element name="currentStatus" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+current status
+
+-- Definition --
+The status of an utility object with regards to its completion and use.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="validFrom" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid from
+
+-- Definition --
+The time when the utility network element started to exist in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validTo" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid to
+
+-- Definition --
+The time from which the utility network element no longer exists in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="verticalPosition" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+vertical position
+
+-- Definition --
+Vertical position of the utility object relative to ground.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="base:VerticalPositionValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="utilityFacilityReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+utility facility reference
+
+-- Definition --
+Reference to a facility activity complex that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a utility facility - having a more complex geometry - to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">act-core:ActivityComplex</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="governmentalServiceReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+governmental service reference
+
+-- Definition --
+Reference to a governmental service object that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a governmental service object to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-govserv:GovernmentalService</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="UtilityNodePropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:UtilityNode"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element abstract="true" name="UtilityNodeContainer" substitutionGroup="gml:AbstractFeature" type="us-net-common:UtilityNodeContainerType">
+    <annotation>
+      <documentation>-- Name --
+utility node container
+
+-- Definition --
+A point spatial object which is used for connectivity, and also may contain other spatial objects (not neccessarily belonging to the same utility network).
+
+-- Description --
+Nodes are found at either end of the UtilityLink.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="UtilityNodeContainerType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="currentStatus" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+current status
+
+-- Definition --
+The status of an utility object with regards to its completion and use.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element name="validFrom" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid from
+
+-- Definition --
+The time when the utility network element started to exist in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validTo" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+valid to
+
+-- Definition --
+The time from which the utility network element no longer exists in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="verticalPosition" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+vertical position
+
+-- Definition --
+Vertical position of the utility object relative to ground.</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="base:VerticalPositionValueType">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="utilityFacilityReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+utility facility reference
+
+-- Definition --
+Reference to a facility activity complex that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a utility facility - having a more complex geometry - to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">act-core:ActivityComplex</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="governmentalServiceReference" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+governmental service reference
+
+-- Definition --
+Reference to a governmental service object that is linked (related) to this utility network element.
+
+-- Description --
+This reference can be used to link a governmental service object to a utility network element.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">us-govserv:GovernmentalService</targetElement>
+              </appinfo>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence/>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element name="geometry" type="gml:PointPropertyType">
+            <annotation>
+              <documentation>-- Name --
+geometry
+
+-- Definition --
+Location of the utility node container.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the spatial object.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="nodes" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+nodes
+
+-- Definition --
+Contained utility nodes.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="us-net-common:UtilityNode"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="UtilityNodeContainerPropertyType">
+    <sequence minOccurs="0">
+      <element ref="us-net-common:UtilityNodeContainer"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</schema>

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:lunom="http://inspire.ec.europa.eu/schemas/lunom/4.0" xmlns:selu="http://inspire.ec.europa.eu/schemas/selu/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/selu/4.0" version="4.0">
+  <annotation>
+    <documentation>-- Name --
+sampled land use</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://inspire.ec.europa.eu/schemas/lunom/4.0" schemaLocation="../../schemas/lunom/4.0/LandUseNomenclature.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="ExistingLandUseSample" substitutionGroup="gml:AbstractFeature" type="selu:ExistingLandUseSampleType">
+    <annotation>
+      <documentation>-- Name --
+existing land use sample
+-- Definition --
+Description of the existing land use that is present at the specific location.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ExistingLandUseSampleType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the land use sample.
+-- Description --
+An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="location" type="gml:PointPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+Location where the land use sample is taken.</documentation>
+            </annotation>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="hilucsLandUse" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Land use HILUCS classes that are present in this existing land use sample.
+-- Description --
+NOTE The Sampled Existing Land Use model enables the provision of information on land uses inside one land use object. The ExistingLandUseObject may be associated with 1 to many HILUCSLandUse that represents the Land Uses for the polygon from the economical point of view. It makes possible the assignment of more than one HILUCSLandUse existences when they cannot be managed by HILUCSPresences.</documentation>
+            </annotation>
+          </element>
+          <element name="hilucsPresence" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+land use presence
+-- Definition --
+Actual presence of a land use category according to HILUCS within the object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="lunom:HILUCSPresence"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="specificLandUse" nillable="true" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Land Use Category according to the nomenclature specific to this data set.
+-- Description --
+Reference to an entry in the classfication that is part of the SpecificLandUseClassification provided by the data producer.</documentation>
+            </annotation>
+          </element>
+          <element name="observationDate" nillable="true">
+            <annotation>
+              <documentation>-- Name --
+Observation Date.
+-- Definition --
+The observation date associated to a description.
+-- Description --
+Defines the observation date of the description. It could be the date of an aerial/satellital acquisition or a field survey. The observation date allows the user to have accurate date of when the description was made in the real word. In a database, not all object informations are necessarily captured at the same time.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="date">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="specificPresence" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Actual presence of a land use category within the object.</documentation>
+            </annotation>
+            <complexType>
+              <sequence>
+                <element ref="lunom:SpecificPresence"/>
+              </sequence>
+              <attribute name="nilReason" type="gml:NilReasonType"/>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validFrom" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The time when the phenomenon started to exist in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="date">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validTo" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The time from which the phenomenon no longer exists in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="date">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element name="dataset" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Data set to which this sample belongs.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">selu:SampledExistingLandUseDataSet</targetElement>
+                <reversePropertyName xmlns="http://www.opengis.net/gml/3.2">selu:member</reversePropertyName>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ExistingLandUseSamplePropertyType">
+    <sequence minOccurs="0">
+      <element ref="selu:ExistingLandUseSample"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="SampledExistingLandUseDataSet" substitutionGroup="gml:AbstractFeature" type="selu:SampledExistingLandUseDataSetType">
+    <annotation>
+      <documentation>-- Name --
+sampled existing land use data set
+-- Definition --
+A sampled existing land use data set is a collection of locations for which information on existing (present or past) land uses is provided.</documentation>
+    </annotation>
+  </element>
+  <complexType name="SampledExistingLandUseDataSetType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Definition --
+External object identifier of the sampled land use data set.
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+            </annotation>
+          </element>
+          <element name="extent" type="gml:MultiSurfacePropertyType">
+            <annotation>
+              <documentation>-- Definition --
+The convex hull of all the instances of the spatial object type ExistingLandUseSample.</documentation>
+            </annotation>
+          </element>
+          <element name="name" type="string">
+            <annotation>
+              <documentation>-- Definition --
+Human readable name of the data set.</documentation>
+            </annotation>
+          </element>
+          <element name="beginLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="endLifespanVersion" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="dateTime">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validFrom" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+First date at which this data set is valid in reality.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="date">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="validTo" nillable="true">
+            <annotation>
+              <documentation>-- Definition --
+The time from which the data set no longer exists in the real world.</documentation>
+            </annotation>
+            <complexType>
+              <simpleContent>
+                <extension base="date">
+                  <attribute name="nilReason" type="gml:NilReasonType"/>
+                </extension>
+              </simpleContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="member" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Definition --
+Reference to the members of the sampled existing land use data set.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">selu:ExistingLandUseSample</targetElement>
+                <reversePropertyName xmlns="http://www.opengis.net/gml/3.2">selu:dataset</reversePropertyName>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="SampledExistingLandUseDataSetPropertyType">
+    <sequence minOccurs="0">
+      <element ref="selu:SampledExistingLandUseDataSet"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</schema>

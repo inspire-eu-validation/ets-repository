@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:cvbase="http://inspire.ec.europa.eu/schemas/cvbase/1.0" xmlns:cvgvp="http://inspire.ec.europa.eu/schemas/cvgvp/0.1" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" targetNamespace="http://inspire.ec.europa.eu/schemas/cvgvp/0.1" elementFormDefault="qualified" version="0.1">
+	<annotation>
+		<documentation>-- Definition --
+application schema for coverages with a geometry/value pair representation 
+
+-- Description --
+NOTE	This application schema has been specified to be conceptually consistent with the coverage model used by the OGC Best Practice document 06-188r1 "GML Encoding of Discrete Coverages (interleaved pattern)".</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/cvbase/1.0" schemaLocation="../../schemas/cvbase/1.0/CoverageBase.xsd"/>
+	<import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="http://www.opengis.net/gmlcov/1.0" schemaLocation="../../schemas/ogc/gmlcov/1.0/coverage.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="MultiTimeInstantCoverage" type="cvgvp:MultiTimeInstantCoverageType" substitutionGroup="cvgvp:DiscreteCoverageGeometryValuePairs">
+		<annotation>
+			<documentation>-- Name --
+multi time instant coverage
+
+-- Definition --
+coverage characterized by a finite domain consisting of time instants
+
+-- Description --
+NOTE	This type provides a representation of the time instant/value pairs, i.e. represents a time series.</documentation>
+		</annotation>
+	</element>
+	<complexType name="MultiTimeInstantCoverageType">
+		<complexContent>
+			<extension base="cvgvp:DiscreteCoverageGeometryValuePairsType">
+				<sequence/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="MultiTimeInstantCoveragePropertyType">
+		<sequence minOccurs="0">
+			<element ref="cvgvp:MultiTimeInstantCoverage"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+	<element name="GeometryValuePair" type="cvgvp:GeometryValuePairType" substitutionGroup="gml:AbstractObject">
+		<annotation>
+			<documentation>-- Name --
+geometry-value pair
+
+-- Definition --
+describes an element of a set that defines the relationships of a discrete coverage
+
+-- Description --
+Each instance consists of two parts: a domain object from the domain of the coverage to which it belongs and a record of feature attribute values from the range of the coverage to which it belongs.</documentation>
+		</annotation>
+	</element>
+	<complexType name="GeometryValuePairType">
+		<sequence>
+			<element name="geometry">
+				<annotation>
+					<documentation>-- Name --
+geometry
+
+-- Definition --
+the domain object</documentation>
+				</annotation>
+				<complexType>
+					<complexContent>
+						<extension base="gml:AbstractMemberType">
+							<sequence minOccurs="0">
+								<element ref="gml:AbstractObject"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="value">
+				<annotation>
+					<documentation>-- Name --
+value
+
+-- Definition --
+holds the record of feature attribute values associated with the domain object in the property "geometry"</documentation>
+				</annotation>
+				<complexType>
+					<complexContent>
+						<extension base="gml:AbstractMemberType">
+							<sequence minOccurs="0">
+								<element ref="gml:AbstractObject"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="GeometryValuePairPropertyType">
+		<sequence>
+			<element ref="cvgvp:GeometryValuePair"/>
+		</sequence>
+	</complexType>
+	<element name="DiscreteCoverageGeometryValuePairs" type="cvgvp:DiscreteCoverageGeometryValuePairsType" substitutionGroup="gmlcov:AbstractCoverage">
+		<annotation>
+			<documentation>-- Name --
+coverage (geometry-value pair representation)
+
+-- Definition --
+coverage which provides the geometry value pairs</documentation>
+		</annotation>
+	</element>
+	<complexType name="DiscreteCoverageGeometryValuePairsType">
+		<complexContent>
+			<extension base="gmlcov:AbstractCoverageType">
+				<sequence>
+					<element name="domainExtent" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+domain extent
+
+-- Definition --
+contains the extent of the domain of the coverage
+
+-- Description --
+NOTE	Extents may be specified in space, time or space-time.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMetadataPropertyType">
+									<sequence minOccurs="0">
+										<element ref="gmd:EX_Extent"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="element" type="cvgvp:GeometryValuePairPropertyType" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+alement
+
+-- Definition --
+list of the geometry/value pairs of the coverage</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="DiscreteCoverageGeometryValuePairsPropertyType">
+		<sequence minOccurs="0">
+			<element ref="cvgvp:DiscreteCoverageGeometryValuePairs"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

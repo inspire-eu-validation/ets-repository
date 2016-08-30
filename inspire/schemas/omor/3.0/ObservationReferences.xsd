@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:om="http://www.opengis.net/om/2.0" xmlns:omor="http://inspire.ec.europa.eu/schemas/omor/3.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/omor/3.0" version="3.0">
+  <annotation>
+    <documentation>-- Definition --
+Application Schema for Observation References</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://www.isotc211.org/2005/gmd" schemaLocation="../../schemas/iso/19139/20070417/gmd/gmd.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <import namespace="http://www.opengis.net/om/2.0" schemaLocation="../../schemas/ogc/om//2.0/observation.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="ObservationSet" substitutionGroup="gml:AbstractFeature" type="omor:ObservationSetType">
+    <annotation>
+      <documentation>-- Name --
+ObservationSet
+
+-- Definition --
+Links a set of Observations
+
+-- Description --
+This class is used to link multiple related Observations together</documentation>
+    </annotation>
+  </element>
+  <complexType name="ObservationSetType">
+    <complexContent>
+      <extension base="gml:AbstractFeatureType">
+        <sequence>
+          <element name="inspireId" type="base:IdentifierPropertyType">
+            <annotation>
+              <documentation>-- Name --
+inspireId
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --</documentation>
+            </annotation>
+          </element>
+          <element name="extent">
+            <annotation>
+              <documentation>-- Name --
+extent
+
+-- Definition --
+Information about the spatial and temporal extent.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMetadataPropertyType">
+                  <sequence minOccurs="0">
+                    <element ref="gmd:EX_Extent"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element maxOccurs="unbounded" name="member" type="om:OM_ObservationPropertyType">
+            <annotation>
+              <documentation>-- Name --
+member
+-- Definition --
+One member of the ObservationSet</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ObservationSetPropertyType">
+    <sequence minOccurs="0">
+      <element ref="omor:ObservationSet"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</schema>

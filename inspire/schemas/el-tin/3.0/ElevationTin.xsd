@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:el-bas="http://inspire.ec.europa.eu/schemas/el-bas/3.0" xmlns:el-tin="http://inspire.ec.europa.eu/schemas/el-tin/3.0" xmlns:gml="http://www.opengis.net/gml/3.2" targetNamespace="http://inspire.ec.europa.eu/schemas/el-tin/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+elevation - tin
+
+-- Definition --
+Elevation - TIN application schema.</documentation>
+		<appinfo>
+			<gmlProfileSchema xmlns="http://www.opengis.net/gml/3.2">EMPTY</gmlProfileSchema>
+		</appinfo>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/el-bas/3.0" schemaLocation="../../schemas/el-bas/3.0/ElevationBaseTypes.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="ElevationTIN" type="el-tin:ElevationTINType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+elevation TIN
+
+-- Definition --
+Collection of elevation spatial objects forming a particular tessellation of the space based on a Triangulated Irregular Network (TIN) according the geometry GM_Tin (defined in ISO 19107:2003). Its components are a set of control points whose elevation property values are known, and a set of break lines and stop lines.
+
+-- Description --
+NOTE The TIN can be calculated using any triangulation method, which determines the spatial relationships between the spatial objects in the collection.
+
+EXAMPLE An elevation TIN model calculated by means of the Delaunay triangulation method.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ElevationTINType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="beginLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="endLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+end lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="geometries">
+						<annotation>
+							<documentation>-- Name --
+geometries
+
+-- Definition --
+Represents the collection of geometric properties of the elevation TIN spatial object.</documentation>
+						</annotation>
+						<complexType>
+							<complexContent>
+								<extension base="gml:AbstractMemberType">
+									<sequence minOccurs="0">
+										<element ref="gml:Tin"/>
+									</sequence>
+									<attributeGroup ref="gml:AssociationAttributeGroup"/>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Name --
+inspire ID
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description --
+NOTE An external object identifier is a unique object identifier published by the responsible body, which may be used by external applications to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.</documentation>
+						</annotation>
+					</element>
+					<element name="propertyType" type="el-bas:ElevationPropertyTypeValueType">
+						<annotation>
+							<documentation>-- Name --
+property type
+
+-- Definition --
+Attribute determining the elevation property represented by the elevation TIN.
+
+-- Description --
+EXAMPLE  Height, depth.</documentation>
+						</annotation>
+					</element>
+					<element name="surfaceType" type="el-bas:SurfaceTypeValueType">
+						<annotation>
+							<documentation>-- Name --
+surface type
+
+-- Definition --
+Attribute indicating the type of elevation surface that the elevation TIN describes in relation to the Earth's bare surface.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ElevationTINPropertyType">
+		<sequence minOccurs="0">
+			<element ref="el-tin:ElevationTIN"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

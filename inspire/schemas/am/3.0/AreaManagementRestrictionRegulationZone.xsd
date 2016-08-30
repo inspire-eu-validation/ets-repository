@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 sp1 (x64) (http://www.altova.com) by Chris Schubert (European Commission DG JRC - IES) -->
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:am="http://inspire.ec.europa.eu/schemas/am/3.0" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:base2="http://inspire.ec.europa.eu/schemas/base2/1.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gn="urn:x-inspire:specification:gmlas:GeographicalNames:3.0" targetNamespace="http://inspire.ec.europa.eu/schemas/am/3.0" elementFormDefault="qualified" version="3.0">
+	<annotation>
+		<documentation>-- Name --
+area management restriction and regulation zones
+
+-- Definition --
+The Area Management Restriction and Regulation Zones application schema contains the spatial object that represents zones or areas established to protect the environment via management, restriction or regulation.</documentation>
+	</annotation>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+	<import namespace="http://inspire.ec.europa.eu/schemas/base2/1.0" schemaLocation="../../schemas/base2/1.0/BaseTypes2.xsd"/>
+	<import namespace="http://www.interactive-instruments.de/ShapeChange/AppInfo" schemaLocation="http://portele.de/ShapeChangeAppinfo.xsd"/>
+	<import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+	<import namespace="urn:x-inspire:specification:gmlas:GeographicalNames:3.0" schemaLocation="../../schemas/gn/3.0/GeographicalNames.xsd"/>
+	<!--XML Schema document created by ShapeChange-->
+	<element name="ManagementRestrictionOrRegulationZone" type="am:ManagementRestrictionOrRegulationZoneType" substitutionGroup="gml:AbstractFeature">
+		<annotation>
+			<documentation>-- Name --
+management restriction or regulation zone
+
+-- Definition --
+Area managed, restricted or regulated in accordance with a legal requirement related to an environmental policy or a policy or activity that may have an impact on the environment at any level of administration (or used for reporting at international, European, national, regional and local) levels.</documentation>
+		</annotation>
+	</element>
+	<complexType name="ManagementRestrictionOrRegulationZoneType">
+		<complexContent>
+			<extension base="gml:AbstractFeatureType">
+				<sequence>
+					<element name="inspireId" type="base:IdentifierPropertyType">
+						<annotation>
+							<documentation>-- Name --
+inspireID
+
+-- Definition --
+External object identifier of the spatial object.
+
+-- Description -- 
+An external object identifier is a unique object identifier published by the responsible body, which may be used by external application to reference the spatial object. The identifier is an identifier of the spatial object, not an identifier of the real-world phenomenon.
+
+NOTE: ManagementRestrictionOrRegulationZone spatial objects commonly perform the role/function of &lt;i&gt;"Reporting Unit"&lt;/i&gt; for non-spatial reported data. The reported data shall contain object references to ManagementRestrictionOrRegulationZones. Therefore, all spatial objects shall be assigned an inspireID.</documentation>
+						</annotation>
+					</element>
+					<element name="thematicId" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+thematic identifier
+
+-- Definition --
+Descriptive unique object identifier applied to spatial objects in a defined information theme. 
+
+-- Description --
+Some management, restriction or regulation zones may be assigned multiple thematic identifiers. These may have been established to meet the reporting requirements of different legislative instruments at International, European or at Member State levels.  
+
+Where multiple thematicIDs exist all should be provided. This shall allow any external dataset that uses thematicIDs to referencing to the zone to continue to be linked to the spatial object.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="base2:ThematicIdentifier"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="name" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+name
+
+-- Definition --
+A geographical name that is used to identify the management, restriction or  regulation zone in the real world. It provides a 'key' for implicitly associating different representations of the object.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="gn:GeographicalName"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="geometry" type="gml:GeometryPropertyType">
+						<annotation>
+							<documentation>-- Name
+geometry
+
+-- Definition --
+The geometry representing the spatial extent of the spatial object.
+
+-- Description --
+The geometry of a Management Area, Restriction or Regulation Zone can be defined using any geometry representation. Typically this shall be either a GM_Surface or GM_MultiSurface. 
+
+NOTE: Where a zone forms as a polygon, this should be encoded as a GM_Surface or GM_MultiSurface not a GM_Curve.</documentation>
+						</annotation>
+					</element>
+					<element name="zoneType" type="gml:ReferenceType" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+zone type
+
+-- Definition --
+High level classification defining the type of management, restriction or regulation zone.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="specialisedZoneType" type="gml:ReferenceType" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+specialised zone type
+
+-- Definition --
+Additional classification value which further specialises the type of management, regulation or restriction zone relevant to the domain. 
+
+-- Description -- 
+NOTE: This value should be derived from a relevant domain-specific controlled vocabulary, where available.
+
+EXAMPLE 1: A ManagementRestrictionOrRegulationZone where the zoneType value = airQualityManagementZone could be further classified as either:
+&lt;ul&gt;
+	&lt;li&gt; specialisedZoneType = agglomeration or &lt;/li&gt;
+	&lt;li&gt; specialisedZoneType =nonAgglomeration&lt;/li&gt;
+&lt;/ul&gt;
+
+EXAMPLE 2: A ManagementRestrictionOrRegulationZone where the zoneType value = sensitiveArea could be further classified as either:
+ specialisedZoneType = lessSensitiveArea
+ specialisedZoneType = lessSensitiveNitrates
+ specialisedZoneType = lessSensitiveEutrophic
+ specialisedZoneType = lessSensitiveShellfish</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="designationPeriod" type="gml:TimePeriodPropertyType" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+designation period
+
+-- Definition --
+Time period defining when the management, restriction or regulation zone was legally designated or became effective in the real world.
+
+-- Description --
+NOTE: designationPeriod uses the ISO 19108 TM_Period which is comprised of two properties - gml:beginPosition and gml:endPosition. 
+If the zone shall remain in force for an indeterminate period of time then the endPosition/indeterminatePosition="unknown" can be used to state that the zone is still effective.</documentation>
+						</annotation>
+					</element>
+					<element name="environmentalDomain" type="gml:ReferenceType" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+environmental domain
+
+-- Definition --
+Classification of the environment domain(s) for which, through the establishment of the zone, certain environmental objectives shall be reached.
+
+-- Description --
+A zone may be established within one environmental domain (e.g. water) or may to cover a wide range of environmental objectives that cross-cut several domains. For example, Marine Regions may relate to water,  land use, sustainable development.</documentation>
+							<appinfo>
+								<taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+							</appinfo>
+						</annotation>
+					</element>
+					<element name="competentAuthority" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Name --
+competent authority
+
+-- Definition --
+Description of the organisation(s) responsible for managing, restricting or regulating measures or activities within the zone.</documentation>
+						</annotation>
+						<complexType>
+							<sequence>
+								<element ref="base2:RelatedParty"/>
+							</sequence>
+							<attribute name="nilReason" type="gml:NilReasonType"/>
+						</complexType>
+					</element>
+					<element name="beginLifespanVersion" nillable="true">
+						<annotation>
+							<documentation>-- Name --
+begin lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was inserted or changed in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="endLifespanVersion" nillable="true" minOccurs="0">
+						<annotation>
+							<documentation>-- Name --
+end lifespan version
+
+-- Definition --
+Date and time at which this version of the spatial object was superseded or retired in the spatial data set.</documentation>
+						</annotation>
+						<complexType>
+							<simpleContent>
+								<extension base="dateTime">
+									<attribute name="nilReason" type="gml:NilReasonType"/>
+								</extension>
+							</simpleContent>
+						</complexType>
+					</element>
+					<element name="plan" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Reference to, or citation of a plan (management or action plan) that describes the environmental objectives and measures that shall be undertaken in the zone to protect the environment.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="base2:DocumentCitation"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="legalBasis" nillable="true" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Reference to, or citation of the legal instrument or document that required the establishment of the zone.</documentation>
+						</annotation>
+						<complexType>
+							<sequence minOccurs="0">
+								<element ref="base2:LegislationCitation"/>
+							</sequence>
+							<attributeGroup ref="gml:AssociationAttributeGroup"/>
+							<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+						</complexType>
+					</element>
+					<element name="relatedZone" type="gml:ReferenceType" nillable="true" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>-- Definition --
+Reference to a related management, regulation or restriction zone.  
+
+-- Description --
+EXAMPLE 1: River basin districts (RBD) exist at three levels:
+1) International River Basin District
+2) National River Basin District
+3) River Basin District Sub units.
+
+An international RBD may contain one or more national RBD and/or River Basin Sub Units.
+
+A national RBD may be related to an International RBD and one or more RBD sub-units.
+
+EXAMPLE 2:  A WFDWaterBody may be related to a River Basin District.</documentation>
+							<appinfo>
+								<targetElement xmlns="http://www.opengis.net/gml/3.2">am:ManagementRestrictionOrRegulationZone</targetElement>
+							</appinfo>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ManagementRestrictionOrRegulationZonePropertyType">
+		<sequence minOccurs="0">
+			<element ref="am:ManagementRestrictionOrRegulationZone"/>
+		</sequence>
+		<attributeGroup ref="gml:AssociationAttributeGroup"/>
+		<attributeGroup ref="gml:OwnershipAttributeGroup"/>
+	</complexType>
+</schema>

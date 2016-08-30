@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:base="http://inspire.ec.europa.eu/schemas/base/3.3" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmlcov="http://www.opengis.net/gmlcov/1.0" xmlns:lunom="http://inspire.ec.europa.eu/schemas/lunom/4.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/lunom/4.0" version="4.0">
+  <annotation>
+    <documentation>-- Name --
+land use nomenclature</documentation>
+  </annotation>
+  <import namespace="http://inspire.ec.europa.eu/schemas/base/3.3" schemaLocation="../../schemas/base/3.3/BaseTypes.xsd"/>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <import namespace="http://www.opengis.net/gmlcov/1.0" schemaLocation="../../schemas/ogc/gmlcov/1.0/coverage.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element name="HILUCSPercentage" substitutionGroup="gml:AbstractObject" type="lunom:HILUCSPercentageType">
+    <annotation>
+      <documentation>-- Name --
+HILUCS percentage
+-- Definition --
+Percentage of land use object that is covered by this HILUCS presence.
+-- Description --
+NOTE1:The percentage is according to the socio-economic or functional importance of the use.
+
+NOTE2:examples are provided in the narrative description part of the data specification.</documentation>
+    </annotation>
+  </element>
+  <complexType name="HILUCSPercentageType">
+    <sequence>
+      <element name="hilucsValue" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Definition --
+HILUCS category for this HILUCS percentage.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="percentage" type="integer">
+        <annotation>
+          <documentation>-- Definition --
+Percentage of land use object that is covered by this specific presence.
+-- Description --
+NOTE The percentage is according to the socio-economic importance of the use. In section 5.2.1.1.2. examples of the use of percentages are given.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="HILUCSPercentagePropertyType">
+    <sequence>
+      <element ref="lunom:HILUCSPercentage"/>
+    </sequence>
+  </complexType>
+  <element name="HILUCSPresence" substitutionGroup="gml:AbstractObject" type="lunom:HILUCSPresenceType">
+    <annotation>
+      <documentation>-- Name --
+HILUCS presence
+
+-- Definition --
+Presence of one or several HILUCS values in an area, indicated either as the percentage covered for each value or as the values listed in their order of importance.
+
+-- Description --
+The HILUCS presence data type  enables the provision of information on land uses inside one land use object in order  to collect more than one land use existence perfectly identifiable by importance order or percentages. 
+NOTE 1: The order of land use value presence without percentages enable providing  an order of dominance/importance of each land use present in the land use object
+NOTE 2: The sum of the percentages can be  below 100%, or above. The order is provided according to the respective importance when the percentages are not known.</documentation>
+    </annotation>
+  </element>
+  <complexType name="HILUCSPresenceType">
+    <choice>
+      <element maxOccurs="unbounded" name="orderedList" type="gml:ReferenceType">
+        <annotation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element maxOccurs="unbounded" name="percentageList" type="lunom:HILUCSPercentagePropertyType"/>
+    </choice>
+  </complexType>
+  <complexType name="HILUCSPresencePropertyType">
+    <sequence>
+      <element ref="lunom:HILUCSPresence"/>
+    </sequence>
+  </complexType>
+  <element name="SpecificPercentage" substitutionGroup="gml:AbstractObject" type="lunom:SpecificPercentageType">
+    <annotation>
+      <documentation>-- Name --
+specific percentage
+-- Definition --
+Percentage of land use object that is covered by this specific presence.</documentation>
+    </annotation>
+  </element>
+  <complexType name="SpecificPercentageType">
+    <sequence>
+      <element name="specificValue" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Definition --
+specific value category for this specific percentage.</documentation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element name="percentage" type="integer">
+        <annotation>
+          <documentation>-- Definition --
+Percentage of land use object that is covered by a specific presence.
+-- Description --
+NOTE The percentage is according to the socio-economic importance of the use. In section 5.2.1.1.2. examples of the use of percentages are given.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="SpecificPercentagePropertyType">
+    <sequence>
+      <element ref="lunom:SpecificPercentage"/>
+    </sequence>
+  </complexType>
+  <element name="SpecificPresence" substitutionGroup="gml:AbstractObject" type="lunom:SpecificPresenceType">
+    <annotation>
+      <documentation>-- Name --
+specific presence
+
+-- Definition --
+Presence of one or several land use classification values in an area according to the code list
+provided by the data provider, indicated either as the percentage covered for each value or as
+the values listed in their order of importance.
+
+-- Description --
+NOTE 1: The order of land use value presence without percentages enable providing  an order of dominance/importance of each land use present in the land use object
+NOTE 2: The sum of the percentages can be  below 100%, or above. The order is provided according to the respective importance when the percentages are not known.</documentation>
+    </annotation>
+  </element>
+  <complexType name="SpecificPresenceType">
+    <choice>
+      <element maxOccurs="unbounded" name="orderedList" type="gml:ReferenceType">
+        <annotation>
+          <appinfo>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">implementingRule</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element maxOccurs="unbounded" name="percentageList" type="lunom:SpecificPercentagePropertyType"/>
+    </choice>
+  </complexType>
+  <complexType name="SpecificPresencePropertyType">
+    <sequence>
+      <element ref="lunom:SpecificPresence"/>
+    </sequence>
+  </complexType>
+</schema>

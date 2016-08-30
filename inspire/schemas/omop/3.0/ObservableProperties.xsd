@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8"?><schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:omop="http://inspire.ec.europa.eu/schemas/omop/3.0" elementFormDefault="qualified" targetNamespace="http://inspire.ec.europa.eu/schemas/omop/3.0" version="3.0">
+  <annotation>
+    <documentation>-- Definition --
+Application Schema for Observable Properties</documentation>
+  </annotation>
+  <import namespace="http://www.opengis.net/gml/3.2" schemaLocation="../../schemas/ogc/gml/3.2.1/gml.xsd"/>
+  <!--XML Schema document created by ShapeChange-->
+  <element abstract="true" name="AbstractObservableProperty" substitutionGroup="gml:AbstractGML" type="omop:AbstractObservablePropertyType">
+    <annotation>
+      <documentation>-- Name --
+Abstract Observable Property
+-- Definition --
+An abstract class that represents an observable property (or phenomenon).
+-- Description --
+An abstract class that represents an observable property (or phenomenon). This class is intended to be used in the context of ISO 19156 'observedProperty' role but may be used in other contexts.</documentation>
+    </annotation>
+  </element>
+  <complexType abstract="true" name="AbstractObservablePropertyType">
+    <complexContent>
+      <extension base="gml:AbstractGMLType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="label" type="string">
+            <annotation>
+              <documentation>-- Name --
+label
+
+-- Definition --
+A human readable title for the observable property</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="AbstractObservablePropertyPropertyType">
+    <sequence minOccurs="0">
+      <element ref="omop:AbstractObservableProperty"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="CategoryConstraint" substitutionGroup="omop:Constraint" type="omop:CategoryConstraintType">
+    <annotation>
+      <documentation>-- Name --
+Category Constraint
+
+-- Definition --
+A constraint based on some qualifying category.  e..g  colour = 'Red'.
+
+-- Description --
+A constraint based on some qualifying category.  e..g  colour = 'Red'.
+The value ('Red') of the constraint ('colour') can be any string, although it may be desirable to constrain this in particular application domains.</documentation>
+    </annotation>
+  </element>
+  <complexType name="CategoryConstraintType">
+    <complexContent>
+      <extension base="omop:ConstraintType">
+        <sequence>
+          <element name="comparison" type="omop:ComparisonOperatorValueType">
+            <annotation>
+              <documentation>-- Name --
+comparison
+
+-- Definition --
+A comparison operator. In the case of a category constraint it should be 'equalTo' or 'notEqualTo'.</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" name="value" type="string">
+            <annotation>
+              <documentation>-- Name --
+value
+
+-- Definition --
+The value of the property that is constrained e.g. 'blue' (if the constrained property is colour)</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="CategoryConstraintPropertyType">
+    <sequence>
+      <element ref="omop:CategoryConstraint"/>
+    </sequence>
+  </complexType>
+  <simpleType name="ComparisonOperatorValueType">
+    <annotation>
+      <documentation>-- Name --
+ComparisonOperatorValue
+-- Definition --
+An enumeration of  comparison operators (e.g. greater than)</documentation>
+    </annotation>
+    <restriction base="string">
+      <enumeration value="equalTo">
+        <annotation>
+          <documentation>-- Name --
+equalTo
+
+-- Definition --
+Exactly equal to</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="notEqualTo">
+        <annotation>
+          <documentation>-- Name --
+notEqualTo
+
+-- Definition --
+Not exactly equal to</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="lessThan">
+        <annotation>
+          <documentation>-- Name --
+lessThan
+
+-- Definition --
+Less than</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="greaterThan">
+        <annotation>
+          <documentation>-- Name --
+greaterThan
+
+-- Definition --
+Greater Than</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="lessThanOrEqualTo">
+        <annotation>
+          <documentation>-- Name --
+lessThanOrEqualTo
+
+-- Definition --
+Less than or exactly equal to</documentation>
+        </annotation>
+      </enumeration>
+      <enumeration value="greaterThanOrEqualTo">
+        <annotation>
+          <documentation>-- Name --
+greaterThanOrEqualTo
+
+-- Definition --
+Greater than or exactly equal to</documentation>
+        </annotation>
+      </enumeration>
+    </restriction>
+  </simpleType>
+  <element name="CompositeObservableProperty" substitutionGroup="omop:AbstractObservableProperty" type="omop:CompositeObservablePropertyType">
+    <annotation>
+      <documentation>-- Name --
+Composite Observable Property
+
+-- Definition --
+A composite of mulitple Observable Properties.
+
+-- Description --
+A composite of multiple Observable Properties, for example U,V winds.
+There is no requirement that the observable properties in the composite are related to each other. 
+A composite observable property  may have components which are observabel properties or other composite observable properties.</documentation>
+    </annotation>
+  </element>
+  <complexType name="CompositeObservablePropertyType">
+    <complexContent>
+      <extension base="omop:AbstractObservablePropertyType">
+        <sequence>
+          <element name="count" type="integer">
+            <annotation>
+              <documentation>-- Name --
+count 
+
+-- Definition --
+Number of components  in this composite</documentation>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="2" name="component" type="omop:AbstractObservablePropertyPropertyType"/>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="CompositeObservablePropertyPropertyType">
+    <sequence minOccurs="0">
+      <element ref="omop:CompositeObservableProperty"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="Constraint" substitutionGroup="gml:AbstractObject" type="omop:ConstraintType">
+    <annotation>
+      <documentation>-- Name --
+Constraint
+-- Definition --
+A constraint on some property e.g. wavelength = 200nm.
+-- Description --
+A constraint on some property e.g. wavelength = 200nm. This property is  typically not the same property as the base phenomenon of the observed property. e.g. 
+the observed property has a base phenomenon 'radiance'. 
+a constraint is added to say 'wavelength = 200nm'
+So the overall ObservableProperty which is represented is 'radiance where wavelength = 200nm'
+The Constraint class is specialised into several specific classes covering Scalar, Range and Categorical constraints</documentation>
+    </annotation>
+  </element>
+  <complexType name="ConstraintType">
+    <sequence>
+      <element minOccurs="0" name="constrainedProperty" type="gml:ReferenceType">
+        <annotation>
+          <documentation>-- Name --
+constrainedProperty
+
+-- Definition --
+The property being constrained. e.g. 'colour' if the constraint is 'colour = blue'</documentation>
+          <appinfo>
+            <targetElement xmlns="http://www.opengis.net/gml/3.2">omop:PhenomenonTypeValue</targetElement>
+            <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+          </appinfo>
+        </annotation>
+      </element>
+      <element minOccurs="0" name="label" type="string">
+        <annotation>
+          <documentation>-- Name --
+description
+
+-- Definition --
+A human readable title for the constraint as a whole</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="ConstraintPropertyType">
+    <sequence>
+      <element ref="omop:Constraint"/>
+    </sequence>
+  </complexType>
+  <element name="ObservableProperty" substitutionGroup="omop:AbstractObservableProperty" type="omop:ObservablePropertyType">
+    <annotation>
+      <documentation>-- Name --
+Observable Property
+
+-- Definition --
+Represents a single observable property e.g. 'temperature'.
+
+-- Description --
+The Observable Property represents a single observable property e.g. 'temperature'. It may have associations to additional constraints or measures that make it more complex e.g. 'daily mean temperature'.</documentation>
+    </annotation>
+  </element>
+  <complexType name="ObservablePropertyType">
+    <complexContent>
+      <extension base="omop:AbstractObservablePropertyType">
+        <sequence>
+          <element maxOccurs="unbounded" minOccurs="0" name="restriction" type="omop:ConstraintPropertyType"/>
+          <element name="basePhenomenon" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+basePhenomenon
+
+-- Definition --
+The phenomenon that the Observable Property description builds upon.
+
+
+-- Description --
+The phenomenon that the Observable Property description builds upon. e.g. if the Observable property describes 'monthly minimum temperature' then the basePhenomenon should reference the vocabulary term 'temperature'.</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">omop:PhenomenonTypeValue</targetElement>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="uom" type="gml:UnitOfMeasureType">
+            <annotation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">gml:UnitOfMeasure</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+          <element maxOccurs="unbounded" minOccurs="0" name="statisticalMeasure">
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="omop:StatisticalMeasure"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ObservablePropertyPropertyType">
+    <sequence minOccurs="0">
+      <element ref="omop:ObservableProperty"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+  <element name="OtherConstraint" substitutionGroup="omop:Constraint" type="omop:OtherConstraintType">
+    <annotation>
+      <documentation>-- Name -- 
+Other Constraint
+
+-- Definition --
+A constraint, not modelled in a structured way, but may be described using the freetext 'description' attribute.</documentation>
+    </annotation>
+  </element>
+  <complexType name="OtherConstraintType">
+    <complexContent>
+      <extension base="omop:ConstraintType">
+        <sequence>
+          <element name="description" type="string">
+            <annotation>
+              <documentation>-- Name -- 
+description
+
+-- Definition --
+A description of the constraint.</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="OtherConstraintPropertyType">
+    <sequence>
+      <element ref="omop:OtherConstraint"/>
+    </sequence>
+  </complexType>
+  <element name="RangeBounds" substitutionGroup="gml:AbstractObject" type="omop:RangeBoundsType">
+    <annotation>
+      <documentation>-- Name --
+Range Bounds
+
+-- Definition --
+The start and end bounding values of a numerical range (e.g. start &gt;=50, end &lt;=99)</documentation>
+    </annotation>
+  </element>
+  <complexType name="RangeBoundsType">
+    <sequence>
+      <element name="startComparison" type="omop:ComparisonOperatorValueType">
+        <annotation>
+          <documentation>-- Name --
+startComparison
+
+-- Definition --
+The comparator used for the lower range limit (e.g. greaterThanOrEqualTo)</documentation>
+        </annotation>
+      </element>
+      <element name="rangeStart" type="double">
+        <annotation>
+          <documentation>-- Name --
+rangeStart
+
+-- Definition --
+The lower limit of the range.</documentation>
+        </annotation>
+      </element>
+      <element name="endComparison" type="omop:ComparisonOperatorValueType">
+        <annotation>
+          <documentation>-- Name --
+endComparison
+
+-- Definition --
+The comparator used for the upper range limit (e.g. lessThan)</documentation>
+        </annotation>
+      </element>
+      <element name="rangeEnd" type="double">
+        <annotation>
+          <documentation>-- Name --
+rangeEnd
+
+-- Definition --
+The upper limit of the range.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+  </complexType>
+  <complexType name="RangeBoundsPropertyType">
+    <sequence>
+      <element ref="omop:RangeBounds"/>
+    </sequence>
+  </complexType>
+  <element name="RangeConstraint" substitutionGroup="omop:Constraint" type="omop:RangeConstraintType">
+    <annotation>
+      <documentation>-- Name --
+Range Constraint
+
+-- Definition --
+A numerical range constraint on some property e.g.  wavelength &gt;=300nm and wavelength &lt;=600nm
+
+-- Description --
+A numerical range constraint on some property e.g. wavelength &gt;=300nm and wavelength &lt;=600nm
+e.g. To be used when data is observed in particular bands or groupings based on a numerical quantity.</documentation>
+    </annotation>
+  </element>
+  <complexType name="RangeConstraintType">
+    <complexContent>
+      <extension base="omop:ConstraintType">
+        <sequence>
+          <element maxOccurs="unbounded" name="value" type="omop:RangeBoundsPropertyType">
+            <annotation>
+              <documentation>-- Name --
+value
+
+-- Definition --
+The numerical value range of the property that is constrained</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="uom" type="gml:UnitOfMeasureType">
+            <annotation>
+              <documentation>-- Name --
+uom
+
+-- Definition --
+Units of measure used in the constraint</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">gml:UnitOfMeasure</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="RangeConstraintPropertyType">
+    <sequence>
+      <element ref="omop:RangeConstraint"/>
+    </sequence>
+  </complexType>
+  <element name="ScalarConstraint" substitutionGroup="omop:Constraint" type="omop:ScalarConstraintType">
+    <annotation>
+      <documentation>-- Name --
+Scalar Constraint
+-- Definition --
+A numerical scalar constraint on some property e.g. length &gt;= 1m
+-- Description --
+A scalar constraint on some property e.g. length &gt;= 1m</documentation>
+    </annotation>
+  </element>
+  <complexType name="ScalarConstraintType">
+    <complexContent>
+      <extension base="omop:ConstraintType">
+        <sequence>
+          <element maxOccurs="unbounded" name="value" type="double">
+            <annotation>
+              <documentation>-- Name --
+value
+
+-- Definition --
+The numerical value of the property that is constrained</documentation>
+            </annotation>
+          </element>
+          <element name="comparison" type="omop:ComparisonOperatorValueType">
+            <annotation>
+              <documentation>-- Name --
+comparison
+
+-- Definition --
+The comparator to be used in the constraint e.g. greaterThan</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="uom" type="gml:UnitOfMeasureType">
+            <annotation>
+              <documentation>-- Name --
+uom
+
+-- Definition --
+Units of measure used in the constraint</documentation>
+              <appinfo>
+                <targetElement xmlns="http://www.opengis.net/gml/3.2">gml:UnitOfMeasure</targetElement>
+              </appinfo>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="ScalarConstraintPropertyType">
+    <sequence>
+      <element ref="omop:ScalarConstraint"/>
+    </sequence>
+  </complexType>
+  <element name="StatisticalMeasure" substitutionGroup="gml:AbstractGML" type="omop:StatisticalMeasureType">
+    <annotation>
+      <documentation>-- Name --
+Statistical Measure
+
+-- Definition --
+A descripton of some statistical measure e.g. "daily maximum"
+
+-- Description --
+A descripton of some statistical measure e.g. "daily maximum"
+The measure is usually some function over some time (e.g. an hour, a day)  or space (e.g. a length, area or volume)
+Other aggregation types can be supported via the 'otherAggregation' extension point.</documentation>
+    </annotation>
+  </element>
+  <complexType name="StatisticalMeasureType">
+    <complexContent>
+      <extension base="gml:AbstractGMLType">
+        <sequence>
+          <element minOccurs="0" name="derivedFrom" type="omop:StatisticalMeasurePropertyType">
+            <annotation>
+              <documentation>-- Name --
+derived from
+
+-- Definition --
+One statistical measure may be derived from another. e.g. Monthly Maximum temperatures may be derived from Daily Mean temperatures.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="statisticalFunction" type="gml:ReferenceType">
+            <annotation>
+              <documentation>-- Name --
+statisticalFunction
+
+-- Definition --
+A statistical function e.g. (mean)</documentation>
+              <appinfo>
+                <taggedValue xmlns="http://www.interactive-instruments.de/ShapeChange/AppInfo" tag="obligation">technicalGuidance</taggedValue>
+              </appinfo>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="aggregationTimePeriod" type="duration">
+            <annotation>
+              <documentation>-- Name --
+aggregationTimePeriod
+-- Definition --
+A temporal range over which a statistic is calculated. e.g. A day, An hour.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="aggregationLength" type="gml:LengthType">
+            <annotation>
+              <documentation>-- Name --
+aggregationLength
+-- Definition --
+A one dimensional spatial range over which a statistic is calculated for example 1 metre.</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="aggregationArea" type="gml:AreaType">
+            <annotation>
+              <documentation>-- Name --
+aggregationArea
+-- Definition --
+A two dimensional spatial range over which a statistic is calculated for example 1 square metre</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="aggregationVolume" type="gml:VolumeType">
+            <annotation>
+              <documentation>-- Name --
+aggregationVolume
+-- Definition --
+A three dimensional spatial range over which a statistic is calculated for example 1 cubic metre</documentation>
+            </annotation>
+          </element>
+          <element minOccurs="0" name="otherAggregation">
+            <annotation>
+              <documentation>-- Name --
+otherAggregation
+-- Definition --
+Any other type of aggregation.</documentation>
+            </annotation>
+            <complexType>
+              <complexContent>
+                <extension base="gml:AbstractMemberType">
+                  <sequence minOccurs="0">
+                    <element ref="gml:AbstractObject"/>
+                  </sequence>
+                  <attributeGroup ref="gml:AssociationAttributeGroup"/>
+                </extension>
+              </complexContent>
+            </complexType>
+          </element>
+          <element minOccurs="0" name="label" type="string">
+            <annotation>
+              <documentation>-- Name --
+label
+
+-- Definition --
+A human readable title for the statistical measure</documentation>
+            </annotation>
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="StatisticalMeasurePropertyType">
+    <sequence minOccurs="0">
+      <element ref="omop:StatisticalMeasure"/>
+    </sequence>
+    <attributeGroup ref="gml:AssociationAttributeGroup"/>
+    <attributeGroup ref="gml:OwnershipAttributeGroup"/>
+  </complexType>
+</schema>
