@@ -82,7 +82,7 @@ declare function local:passed($id as xs:string) as xs:boolean
 
 declare function local:error-statistics($template as xs:string, $count as xs:integer) as element()*
 {
-	(if ($count>=$limitErrors) then local:addMessage('TR.tooManyErrors', map { 'count': string($count) }) else (),
+	(if ($count>=$limitErrors) then local:addMessage('TR.tooManyErrors', map { 'count': string($limitErrors) }) else (),
 	 if ($count>0) then local:addMessage($template, map { 'count': string($count) }) else ())
 };
 
