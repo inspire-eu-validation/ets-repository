@@ -1,0 +1,23 @@
+<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/2.0" id="EID242272e0-3f0a-4e9c-9643-657c4d6d304a" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 schema/model/report.xsd">
+	<label>Metadata Record Statistics</label>
+	<description>The number of records per record type.</description>
+	<version>0.1.0</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-30T00:00:00Z</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-30T00:00:00Z</lastUpdateDate>
+	<columnHeaderLabels>
+		<label>Record Type</label>
+		<label>Record Count</label>
+	</columnHeaderLabels>
+	<rowExpressions>
+		<expression>'all; ' || count($records)</expression>
+		<expression>
+for $record in $records 
+let $rt := $record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue
+group by $rt 
+order by $rt
+return '' || $rt || '; ' || count($records)
+		</expression>
+	</rowExpressions>
+</StatisticalReportTableType>

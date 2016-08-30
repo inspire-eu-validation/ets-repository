@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDec7323d5-d8f0-4cfe-b23a-b826df86d58c" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/metadata/iso</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: INSPIRE Profile based on EN ISO 19115 and EN ISO 19119</label>
+	<description><![CDATA[This test suite examines metadata records against the requirements for metadata in INSPIRE.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119" target="_blank">Conformance Class 'INSPIRE Profile based on EN ISO 19115 and EN ISO 19119'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a></li></ul>]]></description>
+	<reference>../../inspire-md-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-30T00:00:00Z</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-30T00:00:00Z</lastUpdateDate>
+	<!--tags>
+		TODO: not yet supported
+		<tag ref="EID27dc9b72-0084-4f4a-981b-afc16e8d6e5e"/>
+	</tags-->
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for metadata XML test objects">
+		<parameter name="encoding" required="false">
+			<defaultValue>CSW ISO AP 1.0.0</defaultValue>
+			<description ref="TR.metadata-encoding"/>
+			<allowedValues>^(CSW ISO AP 1\.0\.0|ISO/TS 19139)$</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EIDe3500038-e37c-4dcf-806c-6bc82d585b3b"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID4c5d8006-3ac6-43d9-a1a3-1e19bf163ff3">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDec7323d5-d8f0-4cfe-b23a-b826df86d58c"/>
+			<testCases>
+				<TestCase id="EID31c568d6-1073-4ff5-a5b2-f0e6b9683177">
+					<label>Basic tests</label>
+					<description>Verify that each metadata record has a resource type. This is a pre-condition for many other tests.</description>
+					<parent ref="EID4c5d8006-3ac6-43d9-a1a3-1e19bf163ff3"/>
+					<testSteps>
+						<TestStep id="EID95a1a8a8-3132-453f-921a-c0334781e8bb">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID31c568d6-1073-4ff5-a5b2-f0e6b9683177"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDcacf6ca7-b5df-49e3-8577-dbc76cd6d72a">
+									<label>md-iso.a.1: Hierarchy</label>
+									<description><![CDATA[Checks that a resource type is provided and is taken from the list of valid values, i.e. 'dataset', 'series' or 'service'.<br/><br/>
+This test is a pre-condition to process INSPIRE metadata records in the test object.<br/><br/>
+Relevant requirements:
+<ul>
+<li>TG Requirement 1: The hierarchyLevel property is not mandated by ISO 19115 but is mandated for conformance to the INSPIRE Metadata Regulation 1205/2008/EC.</li>
+<li>TG Requirement 2: The values of MD_ScopeCode in the scope of the INSPIRE Directive are: 'dataset' for spatial datasets; 'series' for spatial dataset series; 'service' for spatial data services.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/hierarchy" target="_blank">Abstract Test Case 'Hierarchy'</a>]]></description>
+									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series', 'service')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count($recordsWithErrors)),
+ for $record in $recordsWithErrors
+   let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+   order by $rid
+   let $levels := $record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevel': fn:string-join($levels,', ') }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EIDb5b5b5c0-c021-4b90-9c76-9603bf17ed4c">
+					<label>Dataset (series) tests</label>
+					<description>Verify that each metadata record has a resource type. This is a pre-condition for many other tests.</description>
+					<parent ref="EID4c5d8006-3ac6-43d9-a1a3-1e19bf163ff3"/>
+					<dependencies>
+						<testCase ref="EID31c568d6-1073-4ff5-a5b2-f0e6b9683177"/>
+					</dependencies>
+					<testSteps>
+						<TestStep id="EID0422a7f2-4ec7-4a75-9667-38f265ea4545">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDb5b5b5c0-c021-4b90-9c76-9603bf17ed4c"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDbab97b1b-4ffe-4ac7-be22-16d10e3ed3dd">
+									<label>md-iso.b.1: Dataset linkage</label>
+									<description><![CDATA[This test checks each resource locator URL to see if it is syntactically correct and if the resource it references can be accessed, in order to determine its type. If the referenced resource is recognized as a Network Service, it checks whether the linkage to the dataset is declared and implemented.<br/><br/>
+This test case only applies to records with a hierarchyLevel value 'dataset' or 'series'.<br/><br/>
+The test checks if a linkage is provided. If none is given, the test will complete successfully. If one or more are provided, for each linkage the test checks:
+<ul>
+<li>if the linkage element contains an element of type gmd:URL.</li>
+<li>if the element content is a syntactically correct URL.</li>
+<li>if the referenced resource is accessible.</li>
+<li>if the response identifies the linkage as a known Harmonised Spatial Data Service type or a Network Service type, the test checks if appropriate linkage to dataset is available. The linkage is established via the Metadata URL for WMS, WFS and Atom based services. Otherwise a final manual test is suggested to the tester (to test if any of the linkages points to a webpage with further instructions or a client application that directly accesses the service).</li>
+</ul>
+Relevant requirements:
+<ul>
+<li>TG Requirement 3: If a linkage for data is available, the Resource Locator shall be a valid URL providing one of the following: a link to a web with further instructions, a link to a service capabilities document, a link to the service WSDL document (SOAP Binding), a link to a client application that directly accesses the service.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/ds-linkage" target="_blank">Abstract Test Case 'Dataset linkage'</a>]]></description>
+									<parent ref="EID0422a7f2-4ec7-4a75-9667-38f265ea4545"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series')
+let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels and gmd:distributionInfo//gmd:transferOptions//gmd:onLine//gmd:linkage]
+let $messages := (for $record in $recordsToInspect
+  let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+  let $urls := $record/gmd:distributionInfo//gmd:transferOptions//gmd:onLine//gmd:linkage/gmd:URL/text()
+  return
+  if (not($urls)) then
+    local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
+  else
+  for $url in $urls
+    let $doc := if (fn:doc-available($url)) then fn:doc($url) else ()
+    return
+    if (not($doc)) then
+      if (local:check-resource-uri($url)) then
+	      local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+      else
+	      local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+    else
+      let $root := $doc/element()
+      return
+      if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::atom:feed]) then ()
+      else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) }))[position() le $limitErrors]
+return
+	(if ($messages//@ref = ('TR.linkageWithoutURL','TR.resourceNotAccessible')) then 'FAILED' else if ($messages) then 'PASSED_MANUAL' else 'PASSED',
+	 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+	 $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.linkageWithoutURL"/>
+										<translationTemplate ref="TR.resourceNotAccessible"/>
+										<translationTemplate ref="TR.unknownXMLResource"/>
+										<translationTemplate ref="TR.unknownResourceType"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID0422a7f2-4ec7-4a75-9667-38f265ea4545">
+									<label>md-iso.b.2: Dataset identification</label>
+									<description><![CDATA[Unique resource identifier. If the type of the resource was dataset or series, a unique identifier identifying the resource must be given.<br/><br/>
+This test case only applies to records with a hierarchyLevel value 'dataset' or 'series'.<br/><br/>
+The test first checks if a unique identifier is given and if it is of type MD_Identifier or RS_Identifier. The contained code element may not be empty.<br/><br/>
+Relevant requirements:
+<ul>
+<li>TG Requirement 5: The code property is required (see B.2.7.3 of ISO 19115).</li>
+<li>TG Requirement 6: If a value for codeSpace is provided, then the data type for the identifier shall be RS_Identifier, which is substitutable for the usual MD_Identifier.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/ds-identification" target="_blank">Abstract Test Case 'Dataset identification'</a>]]></description>
+									<parent ref="EID0422a7f2-4ec7-4a75-9667-38f265ea4545"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series')
+let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
+let $messages := (for $record in $recordsToInspect
+  let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+  let $identifiers := $record/gmd:identificationInfo[1]//gmd:citation//gmd:identifier/*/gmd:code/gco:CharacterString/text()
+  return
+  if (not($identifiers)) then
+    local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+  else
+  for $identifier in $identifiers
+    return
+    if (string-length(normalize-space($identifier)) = 0) then
+	   local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+	 else if (count($records[gmd:identificationInfo[1]//gmd:citation//gmd:identifier/*/gmd:code/gco:CharacterString/text()=$identifier])>1) then
+	   local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': $identifier })
+	 else ())[position() le $limitErrors]
+return
+	(if ($messages) then 'FAILED' else 'PASSED',
+	 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+	 $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noIdentifier"/>
+										<translationTemplate ref="TR.emptyIdentifier"/>
+										<translationTemplate ref="TR.duplicateIdentifier"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
