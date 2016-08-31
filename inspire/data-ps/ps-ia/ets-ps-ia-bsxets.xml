@@ -80,17 +80,18 @@ let $uris :=
 	fn:distinct-values( 
 		for $clv in $featuresToInspect/ps:siteDesignation/*/*[self::ps:designationScheme or self::ps:designation]
 			return $clv/@xlink:href) (: $clv/@codeSpace || '/' || $clv/text() :)
-let $urimap := local:check-resource-uris( $uris )
+let $urimap := local:check-resource-uris($uris, 30)
+let $errorregex := '(notHTTP|TIMEOUT|\d{3})'
 let $featuresWithErrors := if (count($uris)=0) then () else
-	$featuresToInspect[*:siteDesignation/*/*:designationScheme[map:get($urimap,@xlink:href)=false()] or
-		*:siteDesignation/*/*:designation[map:get($urimap,@xlink:href)=false()]][position() le $limitErrors]
+	$featuresToInspect[*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] or
+		*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else if ($features[self::ps3:ProtectedSite]) then 'PASSED_MANUAL' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $values := $feature/*:siteDesignation/*/*:designationScheme[map:get($urimap,@xlink:href)=false()] |
-		$feature/*:siteDesignation/*/*:designation[map:get($urimap,@xlink:href)=false()]
+   let $values := $feature/*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] |
+		$feature/*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]
    return
    	for $value in $values
    		let $uri := $value/@xlink:href

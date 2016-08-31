@@ -68,14 +68,15 @@ Source: <a href="" target="_blank">Abstract Test Case 'Version consistency'</a>]
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $uris := distinct-values(($features//@srsName,$features//@frame))
-let $urimap := local:check-resource-uris( $uris )
-let $featuresWithErrors := $features[.//@srsName[map:get($urimap,.)=false()] or .//@frame[map:get($urimap,.)=false()]][position() le $limitErrors]
+let $urimap := local:check-resource-uris($uris, 30)
+let $errorregex := '(notHTTP|TIMEOUT|\d{3})'
+let $featuresWithErrors := $features[.//@srsName[matches(map:get($urimap,.),$errorregex)] or .//@frame[matches(map:get($urimap,.),$errorregex)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $featureuris := ($feature//@srsName[map:get($urimap,.)=false()]|$feature//@frame[map:get($urimap,.)=false()])
+   let $featureuris := ($feature//@srsName[matches(map:get($urimap,.),$errorregex)]|$feature//@frame[matches(map:get($urimap,.),$errorregex)])
    return
      for $uri in $featureuris return local:addMessage('TR.brokenLinkCRS', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'rsid': string($uri) }))
 									</expression>
