@@ -87,17 +87,31 @@ declare function local:status($stati as xs:string*) as xs:string
 	if ($stati='FAILED') then 'FAILED' else if ($stati='SKIPPED') then 'SKIPPED' else if ($stati='WARNING') then 'WARNING' else if ($stati='INFO') then 'INFO' else if ($stati='PASSED_MANUAL') then 'PASSED_MANUAL' else if ($stati='PASSED') then 'PASSED' else if ($stati='NOT_APPLICABLE') then 'NOT_APPLICABLE' else 'UNDEFINED'
 };
 
-declare function local:check-resource-uri($uri as xs:string) as xs:boolean
+(: 'notHTTP' = not a HTTP(S) URL
+   'TIMEOUT' = not accessible within timeout limits 
+   HTTP status code = resource not available, the status code may point to the reason
+   media type = accessible :)
+declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:integer) as xs:string
 {
 	if (starts-with($uri,'http://') or starts-with($uri,'https://')) then
-		(http:send-request(<http:request method='head' status-only='true'/>, $uri)/@status=('200','204'))
+		try { 
+			let $response := http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true'/>, $uri) 
+			return
+			if ($response/@status=('200','204')) then
+		  		$response/http:body/@media-type
+			else
+				$response/@status
+		} catch * 
+		{ 
+			'TIMEOUT' 
+		}
 	else
-		false()
+		'notHTTP'
 };
 
-declare function local:check-resource-uris($uris as xs:string*) as map(*)
+declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer) as map(*)
 {
-	map:merge( for $uri in $uris return map { $uri : local:check-resource-uri($uri) } )
+	map:merge( for $uri in $uris return map { $uri : local:check-resource-uri($uri, $timeoutInS) } )
 };
 
 (: Start logging :)

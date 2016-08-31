@@ -143,20 +143,25 @@ let $messages := (for $record in $recordsToInspect
     local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
   else
   for $url in $urls
-    let $doc := try { if (fn:doc-available($url)) then fn:doc($url) else () } catch * { () }
+    let $validuri := try { local:check-resource-uri($url, 30) } catch * { false() }
     return
-    if (not($doc)) then
-      let $validuri := try { local:check-resource-uri($url) } catch * { false() }
-      return
-      if ($validuri) then
-	      local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
-      else
-	      local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+    if ($validuri = 'notHTTP') then
+	   local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+    else if ($validuri = 'TIMEOUT') then
+		local:addMessage('TR.resourceNotAccessibleTimeout', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+    else if (matches($validuri,'\d{3}')) then
+		local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
+    else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
+      try { 
+      	let $root := fn:doc($url)/element()
+        	return
+        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::atom:feed]) then ()
+			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
+		} catch * { 
+			local:addMessage('TR.resourceNotAccessibleTimeout', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+      }
     else
-      let $root := $doc/element()
-      return
-      if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::atom:feed]) then ()
-      else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) }))[position() le $limitErrors]
+       local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri }))[position() le $limitErrors]
 return
 	(if ($messages//@ref = ('TR.linkageWithoutURL','TR.resourceNotAccessible')) then 'FAILED' else if ($messages) then 'PASSED_MANUAL' else 'PASSED',
 	 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
