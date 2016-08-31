@@ -98,7 +98,7 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 			let $response := http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true'/>, $uri) 
 			return
 			if ($response/@status=('200','204')) then
-		  		$response/http:body/@media-type
+		  		$response/http:header[@name='Content-Type']/@value
 			else
 				$response/@status
 		} catch * 
