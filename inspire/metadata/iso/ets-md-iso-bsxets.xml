@@ -95,10 +95,88 @@ return
 										<translationTemplate ref="TR.hierarchyLevel"/>
 									</translationTemplates>
 								</TestAssertion>
+							 <TestAssertion id="EIDe2459219-e13e-43ac-9cea-99d98225dd31">
+							  <label>md-iso: Keywords</label>
+							  <description><![CDATA[Checks if at least one keyword element is provided and it is not an empty CharacterString.<br/><br/>
+This test is a pre-condition to process INSPIRE metadata records in the test object.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/keyword" target="_blank">Abstract Test Case 'Keyword'</a>]]></description>
+							  <parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
+							  <expectedResult>NOT_APPLICABLE</expectedResult>
+							  <expression>
+							   let $messages := (for $record in $records
+							   let $rid := $record/gmd:fileIdentifier/*/text()
+							   let $keywords := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:keyword/*
+							   return
+							   if (not($keywords)) then
+							   local:addMessage('TR.noKeywords', map { 'filename': local:filename($record), 'id': $rid })
+							   else if ($keywords[string-length(normalize-space(text())) > 0]) then
+							   ()
+							   else local:addMessage('TR.emptyKeywords', map { 'filename': local:filename($record), 'id': $rid }))[position() le $limitErrors]
+							   return
+							   (if ($messages) then 'FAILED' else 'PASSED',
+							   local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+							   $messages)
+							  </expression>
+							  <testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+							  <translationTemplates>
+							   <translationTemplate ref="TR.recordsWithErrors"/>
+							   <translationTemplate ref="TR.noKeywords"/>
+							   <translationTemplate ref="TR.emptyKeywords"/>
+							  </translationTemplates>
+							 </TestAssertion>
 							</testAssertions>
 						</TestStep>
 					</testSteps>
 				</TestCase>
+			 <TestCase id="EID455b0d39-ee9f-4f5a-a15e-2b264e57bb62">
+			  <label>Common tests</label>
+			  <description>Execute tests that apply for all metadata records.</description>
+			  <parent ref="EID4c5d8006-3ac6-43d9-a1a3-1e19bf163ff3"/>
+			  <dependencies>
+			   <testCase ref="EID31c568d6-1073-4ff5-a5b2-f0e6b9683177"/>
+			  </dependencies>
+			  <testSteps>
+			   <TestStep id="EID96ea0d7d-3115-4dd2-af86-82c788085239">
+			    <label>IGNORE</label>
+			    <description>IGNORE</description>
+			    <parent ref="EID455b0d39-ee9f-4f5a-a15e-2b264e57bb62"/>
+			    <statementForExecution>not applicable</statementForExecution>
+			    <testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+			    <testAssertions>
+			     <TestAssertion id="EIDb0de8830-67ee-4bc5-b122-136060ea6103">
+			      <label>md-iso.c.1: Abstract</label>
+			      <description><![CDATA[Checks if an abstract is present and not an empty characterstring.<br/><br/>
+			       The abstract is a brief narrative summary of the content of the resource and provides a clear and concise statement that enables the reader to understand the content of the data or service.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/abstract" target="_blank">Abstract Test Case 'Abstract'</a>]]></description>
+			      <parent ref="EID96ea0d7d-3115-4dd2-af86-82c788085239"/>
+			      <expectedResult>NOT_APPLICABLE</expectedResult>
+			      <expression>
+			       let $messages := (for $record in $records
+			       let $rid := $record/gmd:fileIdentifier/*/text()
+			       let $abstract := $record/gmd:identificationInfo[1]/*/gmd:abstract/*
+			       return
+			       if (not($abstract)) then
+			       local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
+			       else 
+			       if (string-length(normalize-space($abstract/text())) = 0) then
+			       local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($record), 'id': $rid })
+			       else ())[position() le $limitErrors]
+			       return
+			       (if ($messages) then 'FAILED' else 'PASSED',
+			       local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+			       $messages)
+			      </expression>
+			      <testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+			      <translationTemplates>
+			       <translationTemplate ref="TR.recordsWithErrors"/>
+			       <translationTemplate ref="TR.noAbstract"/>
+			       <translationTemplate ref="TR.emptyAbstract"/>
+			      </translationTemplates>
+			     </TestAssertion>
+			    </testAssertions>
+			   </TestStep>
+			  </testSteps>
+			 </TestCase>
 				<TestCase id="EIDb5b5b5c0-c021-4b90-9c76-9603bf17ed4c">
 					<label>Dataset (series) tests</label>
 					<description>Execute tests that apply for all dataset / dataset series metadata records.</description>
@@ -176,7 +254,7 @@ return
 										<translationTemplate ref="TR.unknownResourceType"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID0422a7f2-4ec7-4a75-9667-38f265ea4545">
+							 <TestAssertion id="EIDdf3b3ecb-d429-450a-abd8-895b6c1d8e79">
 									<label>md-iso.b.2: Dataset identification</label>
 									<description><![CDATA[Unique resource identifier. If the type of the resource was dataset or series, a unique identifier identifying the resource must be given.<br/><br/>
 This test case only applies to records with a hierarchyLevel value 'dataset' or 'series'.<br/><br/>
@@ -223,6 +301,78 @@ return
 						</TestStep>
 					</testSteps>
 				</TestCase>
+			 <TestCase id="EID32301fad-c617-47a7-b07c-3c5f45802349">
+			  <label>Service tests</label>
+			  <description>Execute tests that apply for all service metadata records.</description>
+			  <parent ref="EID4c5d8006-3ac6-43d9-a1a3-1e19bf163ff3"/>
+			  <dependencies>
+			   <testCase ref="EID31c568d6-1073-4ff5-a5b2-f0e6b9683177"/>
+			  </dependencies>
+			  <testSteps>
+			   <TestStep id="EID1c897122-b9cc-4d27-806e-e527630a23b1">
+			    <label>IGNORE</label>
+			    <description>IGNORE</description>
+			    <parent ref="EID32301fad-c617-47a7-b07c-3c5f45802349"/>
+			    <statementForExecution>not applicable</statementForExecution>
+			    <testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+			    <testAssertions>
+			     <TestAssertion id="EID6ae07702-e063-43a4-bf3f-c0d29696bcd2">
+			      <label>md-iso.srv.1: Coupled resource</label>
+			      <description><![CDATA[If the resource is a spatial data service, this metadata element refers to the target spatial data set(s) of the service. It is implemented by reference, i.e. through a URL that points to the metadata record of the data on which the service operates.<br/><br/>
+This test case only applies to records with a hierarchyLevel value 'service'.<br/><br/>
+The operatesOn element in the SV_ServiceIdentification element should be a HTTP URI that when retrieved using HTTP GET should return the metadata document describing the dataset exposed by this service (i.e. the resource must be a metadata record with a hierarchyLevel 'dataset' or 'series').<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/coupled-resource" target="_blank">Abstract Test Case 'Coupled resource'</a>]]></description>
+			      <parent ref="EID1c897122-b9cc-4d27-806e-e527630a23b1"/>
+			      <expectedResult>NOT_APPLICABLE</expectedResult>
+			      <expression>
+			       let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service' and gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn]
+			       let $messages := (for $record in $recordsToInspect
+			       let $rid := $record/gmd:fileIdentifier/*/text()
+			       let $urls := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
+			       return  
+			       if (not($urls)) then
+			       local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
+			       else
+			       for $url in $urls
+			       let $validuri := try { local:check-resource-uri($url, 30) } catch * { false() }
+			       return
+			       if ($validuri = 'notHTTP') then
+			       local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+			       else if ($validuri = 'TIMEOUT') then
+			       local:addMessage('TR.resourceNotAccessibleTimeout', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+			       else if (matches($validuri,'\d{3}')) then
+			       local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
+			       else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
+			       try { 
+			       let $root := fn:doc($url)/element()
+			       return
+			       if ($root[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]) then ()
+			       else local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url }) 
+			       } catch * { 
+			       local:addMessage('TR.resourceNotAccessibleTimeout', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+			       }
+			       else
+			       local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri }))[position() le $limitErrors]
+			       return
+			       (if ($messages//@ref = ('TR.operatesOnWithoutXlink','TR.resourceNotAccessible','TR.resourceNotAccessibleTimeout','TR.urlNotHttp','TR.operatesOnWithoutDatasetOrSeriesRecord','TR.unknownResourceType')) then 'FAILED' else 'PASSED',
+			       local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+			       $messages)
+			      </expression>
+			      <testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+			      <translationTemplates>
+			       <translationTemplate ref="TR.operatesOnWithoutXlink"/>			       
+			       <translationTemplate ref="TR.urlNotHttp"/>
+			       <translationTemplate ref="TR.resourceNotAccessibleTimeout"/>
+			       <translationTemplate ref="TR.resourceNotAccessible"/>			       
+			       <translationTemplate ref="TR.operatesOnWithoutDatasetOrSeriesRecord"/>
+			       <translationTemplate ref="TR.unknownResourceType"/>
+			       <translationTemplate ref="TR.recordsWithErrors"/>
+			      </translationTemplates>
+			     </TestAssertion>			     
+			    </testAssertions>
+			   </TestStep>
+			  </testSteps>
+			 </TestCase>
 			</testCases>
 		</TestModule>
 	</testModules>
