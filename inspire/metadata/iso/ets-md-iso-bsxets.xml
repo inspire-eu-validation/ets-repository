@@ -226,7 +226,7 @@ let $messages := (for $record in $recordsToInspect
     if ($validuri = 'notHTTP') then
 	   local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
     else if ($validuri = 'TIMEOUT') then
-		local:addMessage('TR.resourceNotAccessibleTimeout', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+		local:addMessage('TR.resourceNotAccessibleTimeout', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'timeout': '30' })
     else if (matches($validuri,'\d{3}')) then
 		local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
     else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
@@ -236,7 +236,7 @@ let $messages := (for $record in $recordsToInspect
         	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::atom:feed]) then ()
 			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
 		} catch * { 
-			local:addMessage('TR.resourceNotAccessibleTimeout', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+			local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
       }
     else
        local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri }))[position() le $limitErrors]
@@ -249,6 +249,8 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.linkageWithoutURL"/>
+										<translationTemplate ref="TR.urlNotHttp"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout"/>
 										<translationTemplate ref="TR.resourceNotAccessible"/>
 										<translationTemplate ref="TR.unknownXMLResource"/>
 										<translationTemplate ref="TR.unknownResourceType"/>
