@@ -114,6 +114,103 @@ declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as x
 	map:merge( for $uri in $uris return map { $uri : local:check-resource-uri($uri, $timeoutInS) } )
 };
 
+
+(:
+@throws: an error that explains why the code list could not be accessed
+:)
+declare function local:get-code-list-values($url as xs:string) as xs:string*
+{
+let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata-)?codelist/)?')
+let $clurl := $url || '/' || $clname || '.en.atom'
+let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
+return
+  if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
+     error((),'Code list ' || $url || ' cannot be accessed.')
+  else if ($valid_clurl = 'TIMEOUT') then
+    error((),'Access to code list ' || $url || ' timed out.')
+  else if (not(starts-with($valid_clurl,'text/xml') or starts-with($valid_clurl,'application/xml') or starts-with($valid_clurl,'application/atom+xml'))) then
+    error((),'Unknown resource type encountered when accessing the atom representation of code list ' || $url || ' at URL ' || $clurl || '.')
+  else
+      try { 
+        let $clfeed := fn:doc($clurl)
+        let $codeUris := $clfeed//atom:entry/atom:id/text()
+        let $codes := for $codeUri in $codeUris return fn:substring-after($codeUri, $url || '/')
+        return
+          $codes
+    		} catch * { 
+    			error((),'Code list ' || $url || ' cannot be accessed.')
+      }
+};
+
+
+(:
+@throws: an error that explains why the code list could not be accessed
+:)
+declare function local:get-codes-in-atom-format($url as xs:string, $langId as xs:string) as element()*
+{
+let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata-)?codelist/)?')
+let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
+let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
+return
+  if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
+     error((),'Code list ' || $url || ' cannot be accessed.')
+  else if ($valid_clurl = 'TIMEOUT') then
+    error((),'Access to code list ' || $url || ' timed out.')
+  else if (not(starts-with($valid_clurl,'text/xml') or starts-with($valid_clurl,'application/xml') or starts-with($valid_clurl,'application/atom+xml'))) then
+    error((),'Unknown resource type encountered when accessing the atom representation of code list ' || $url || ' at URL ' || $clurl || '.')
+  else
+      try { 
+        let $root := fn:doc($clurl)/element()
+        return
+          $root//atom:entry
+		} catch * { 
+			error((),'Code list ' || $url || ' cannot be accessed.')
+    }
+};
+
+
+(:
+@throws: an error that explains why the invocation failed
+:)
+declare function local:get-code-titles($url as xs:string, $langIds as xs:string*) as xs:string*
+{
+  let $codesAsAtomEntries := (
+    for $lang in $langIds
+    return
+      local:get-codes-in-atom-format($url,$lang)
+  )
+  return $codesAsAtomEntries/atom:title/text()
+};
+
+
+declare function local:is-valid-date-or-dateTime($dateString as xs:string) as xs:boolean
+{
+	let $date := 
+    try {
+      let $tmp := xs:date($dateString)
+      return
+        (: NOTE: apparently, the value of the xs:date must be evaluated to be parsed by BaseX :)
+       'DATE ' || $tmp
+    } catch * {
+      'INVALID'
+    }
+  let $dateTime :=
+    try {
+      let $tmp := xs:dateTime($dateString)
+      return 
+       (: NOTE: apparently, the value of the xs:date must be evaluated to be parsed by BaseX :)
+       'DATETIME ' || $tmp
+    } catch * {
+      'INVALID'
+    }
+  return
+    if(starts-with($date,'DATE') or starts-with($dateTime,'DATETIME')) then
+      true()
+    else
+      false()
+};
+
+
 (: Start logging :)
 let $logentry := local:log('Testing ' || count($records) || ' records')
 
