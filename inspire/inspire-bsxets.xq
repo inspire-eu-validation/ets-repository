@@ -52,7 +52,7 @@ try { " || $assertion/etf:expression || " } catch * {
 let $status_returned := $result[1]
 let $messages := $result[position()>1]
 let $status := if ($status_returned = ('PASSED','FAILED','WARNING','PASSED_MANUAL','INFO','SKIPPED')) then $status_returned else 'UNDEFINED'
-let $duration := prof:current-ms()-$start
+let $duration := xs:integer(prof:current-ms()-$start)
 let $endmessage := prof:void(local:end('" || $assertion/@id || "',$status))
 let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': ' || $status || ' - ' ||$duration || ' ms')
 return 
@@ -90,7 +90,7 @@ return
 <parent ref='" || $caseresultid || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampStep}</startTimestamp>
-<duration>{sum($assertionresults/duration)}</duration>
+<duration>{xs:integer(sum($assertionresults/duration))}</duration>
 <resultedFrom ref='" || $step/@id || "'/>
 <testAssertionResults>{$assertionresults}</testAssertionResults>
 </TestStepResult>"
@@ -109,7 +109,7 @@ return
 <parent ref='" || $moduleresultid || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampCase}</startTimestamp>
-<duration>{sum($teststepresults/duration)}</duration>
+<duration>{xs:integer(sum($teststepresults/duration))}</duration>
 <resultedFrom ref='" || $case/@id || "'/>
 <testStepResults>{$teststepresults}</testStepResults>
 </TestCaseResult>"
@@ -125,7 +125,7 @@ return
 <parent ref='" || $testTaskResultId || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampModule}</startTimestamp>
-<duration>{sum($testcaseresults/duration)}</duration>
+<duration>{xs:integer(sum($testcaseresults/duration))}</duration>
 <resultedFrom ref='" || $module/@id || "'/>
 <testCaseResults>{$testcaseresults}</testCaseResults>
 </TestModuleResult>"
@@ -142,7 +142,7 @@ return
 <TestTaskResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $testTaskResultId || "'>
 <status>{$status}</status>
 <startTimestamp>{$timestampSuite}</startTimestamp>
-<duration>{sum($testmoduleresults/duration)}</duration>
+<duration>{xs:integer(sum($testmoduleresults/duration))}</duration>
 <resultedFrom ref='" || $ets/@id || "'/>
 <testObject ref='{$testObjectId}'/>
 <attachments>
@@ -364,7 +364,7 @@ let $statTable :=
 </entries>
 </StatisticalReportTable>
 let $statWrite := file:write($statFile, $statTable, map { 'method': 'xml', 'media-type': 'application/xml' })
-let $duration := prof:current-ms()-$start
+let $duration := xs:integer(prof:current-ms()-$start)
 let $logentry := local:log('Statistics table: ' || $duration || ' ms')
 
 "

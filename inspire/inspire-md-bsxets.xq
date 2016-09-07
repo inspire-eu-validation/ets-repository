@@ -61,7 +61,7 @@ try { " || $assertion/etf:expression || " } catch * {
 let $status_returned := $result[1]
 let $messages := $result[position()>1]
 let $status := if ($status_returned = ('PASSED','FAILED','WARNING','PASSED_MANUAL','INFO','SKIPPED')) then $status_returned else 'UNDEFINED'
-let $duration := prof:current-ms()-$start
+let $duration := xs:integer(prof:current-ms()-$start)
 let $endmessage := prof:void(local:end('" || $assertion/@id || "',$status))
 let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': ' || $status || ' - ' ||$duration || ' ms')
 return 
@@ -99,7 +99,7 @@ return
 <parent ref='" || $caseresultid || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampStep}</startTimestamp>
-<duration>{sum($assertionresults/duration)}</duration>
+<duration>{xs:integer(sum($assertionresults/duration))}</duration>
 <resultedFrom ref='" || $step/@id || "'/>
 <testAssertionResults>{$assertionresults}</testAssertionResults>
 </TestStepResult>"
@@ -118,7 +118,7 @@ return
 <parent ref='" || $moduleresultid || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampCase}</startTimestamp>
-<duration>{sum($teststepresults/duration)}</duration>
+<duration>{xs:integer(sum($teststepresults/duration))}</duration>
 <resultedFrom ref='" || $case/@id || "'/>
 <testStepResults>{$teststepresults}</testStepResults>
 </TestCaseResult>"
@@ -134,7 +134,7 @@ return
 <parent ref='" || $testTaskResultId || "'/>
 <status>{$status}</status>
 <startTimestamp>{$timestampModule}</startTimestamp>
-<duration>{sum($testcaseresults/duration)}</duration>
+<duration>{xs:integer(sum($testcaseresults/duration))}</duration>
 <resultedFrom ref='" || $module/@id || "'/>
 <testCaseResults>{$testcaseresults}</testCaseResults>
 </TestModuleResult>"
@@ -151,7 +151,7 @@ return
 <TestTaskResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $testTaskResultId || "'>
 <status>{$status}</status>
 <startTimestamp>{$timestampSuite}</startTimestamp>
-<duration>{sum($testmoduleresults/duration)}</duration>
+<duration>{xs:integer(sum($testmoduleresults/duration))}</duration>
 <resultedFrom ref='" || $ets/@id || "'/>
 <testObject ref='{$testObjectId}'/>
 <attachments>
@@ -186,7 +186,7 @@ else ()}
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
 
 return try {
-  xquery:eval($query, map {'records': $records, 'validationErrors': $validationErrors, 'db': $db, 'encoding': $encoding, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile, 'schemaisoap': $schemaisoap, 'schema19139': $schema19139 })
+  xquery:eval($query, map {'records': $records, 'validationErrors': $validationErrors, 'db': $db, 'encoding': $encoding, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile, 'schemapath': $schemapath })
 } catch * {
 let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
@@ -282,7 +282,7 @@ else ()}
 declare variable $encoding external := "CSW ISO AP 1.0.0";
 declare variable $files_to_test external := ".*";
 declare variable $tests_to_execute external := ".*";
-declare variable $schema_file external;
+declare variable $Schema_file external := 'apiso.xsd';
 
 (: ETF test driver parameters :)
 (: For local testing set $projDir, $dbBaseName in local DB without "-0" suffix and $etsFile :)
@@ -294,7 +294,7 @@ declare variable $executableTestSuiteId external;
 declare variable $testTaskId external := 'EID' || uuid:randomUUID();
 declare variable $testTaskResultId external := 'EID' || uuid:randomUUID();
 declare variable $translationTemplateBundleId external := "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" ;
-declare variable $projDir external := "C:\REPOSITORIES\ii\intern\ETF\ets-repository\inspire";
+declare variable $projDir external := "/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire";
 declare variable $tmpDir external := $projDir || file:dir-separator() || "tmp";
 declare variable $outputFile external := $tmpDir || file:dir-separator() || $testTaskResultId || "-result.xml";
 declare variable $logFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-log.txt";
@@ -302,8 +302,7 @@ declare variable $statFile external :=  $tmpDir || file:dir-separator() || $test
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "StatisticalReportTableType-EID242272e0-3f0a-4e9c-9643-657c4d6d304a-esrtt.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52-ettb.xml";
-declare variable $schemaisoap := $projDir || file:dir-separator() || "schemas" || file:dir-separator() || "ogc" || file:dir-separator() || "apiso" || file:dir-separator() || "1.0.0" || file:dir-separator() || "apiso.xsd";
-declare variable $schema19139 := $projDir || file:dir-separator() || "schemas" || file:dir-separator() || "iso" || file:dir-separator() || "19139" || file:dir-separator() || "20070417" || file:dir-separator() || "gmd" || file:dir-separator() || "gmd.xsd";
+declare variable $schemapath := $projDir || file:dir-separator() || "schemas" || file:dir-separator();
 declare variable $dbDir external;
 declare variable $dbBaseName external := "md";
 declare variable $dbCount external := 1;
@@ -376,7 +375,7 @@ let $statTable :=
 </entries>
 </StatisticalReportTable>
 let $statWrite := file:write($statFile, $statTable, map { 'method': 'xml', 'media-type': 'application/xml' })
-let $duration := prof:current-ms()-$start
+let $duration := xs:integer(prof:current-ms()-$start)
 let $logentry := local:log('Statistics table: ' || $duration || ' ms')
 
 "

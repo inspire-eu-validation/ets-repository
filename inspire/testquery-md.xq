@@ -28,8 +28,7 @@ declare variable $testObjectId external;
 declare variable $logFile external;
 declare variable $statFile external;
 declare variable $encoding external;
-declare variable $schemaisoap external;
-declare variable $schema19139 external;
+declare variable $schemapath external;
 
 declare function local:strippath($path as xs:string) as xs:string
 {
@@ -148,14 +147,14 @@ return
 :)
 declare function local:get-codes-in-atom-format($url as xs:string, $langId as xs:string) as element()*
 {
-let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata-)?codelist/)?')
+let $clname := if ($url = 'http://inspire.ec.europa.eu/theme') then 'theme' else functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata\-)?codelist/)?')
 let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
   if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
-     error((),'Code list ' || $url || ' cannot be accessed.')
+     error((),'Code list ' || $clurl || ' cannot be accessed.')
   else if ($valid_clurl = 'TIMEOUT') then
-    error((),'Access to code list ' || $url || ' timed out.')
+    error((),'Access to code list ' || $clurl || ' timed out.')
   else if (not(starts-with($valid_clurl,'text/xml') or starts-with($valid_clurl,'application/xml') or starts-with($valid_clurl,'application/atom+xml'))) then
     error((),'Unknown resource type encountered when accessing the atom representation of code list ' || $url || ' at URL ' || $clurl || '.')
   else
@@ -164,10 +163,9 @@ return
         return
           $root//atom:entry
 		} catch * { 
-			error((),'Code list ' || $url || ' cannot be accessed.')
+			error((),'Code list ' || $clurl || ' cannot be accessed.')
     }
 };
-
 
 (:
 @throws: an error that explains why the invocation failed
@@ -181,7 +179,6 @@ declare function local:get-code-titles($url as xs:string, $langIds as xs:string*
   )
   return $codesAsAtomEntries/atom:title/text()
 };
-
 
 declare function local:is-valid-date-or-dateTime($dateString as xs:string) as xs:boolean
 {
@@ -209,7 +206,6 @@ declare function local:is-valid-date-or-dateTime($dateString as xs:string) as xs
     else
       false()
 };
-
 
 (: Start logging :)
 let $logentry := local:log('Testing ' || count($records) || ' records')

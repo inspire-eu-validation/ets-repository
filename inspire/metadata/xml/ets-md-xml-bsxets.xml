@@ -4,7 +4,8 @@
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/metadata/xml</remoteResource>
 	<localPath>/auto</localPath>
 	<label>Conformance class: XML encoding of ISO 19115/19119 metadata</label>
-	<description><![CDATA[This test suite examines GMD documents against basic requirements for the encoding for metadata in INSPIRE.<br/><br/>
+	<description><![CDATA[This test suite examines XML documents containing gmd:MD_Metadata records against basic requirements for the encoding for metadata in INSPIRE.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a>]]></description>
 	<reference>../../inspire-md-bsxets.xq</reference>
 	<version>0.1.0</version>
@@ -12,19 +13,26 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" t
 	<creationDate>2016-08-30T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
 	<lastUpdateDate>2016-08-30T00:00:00Z</lastUpdateDate>
-	<!--tags>
-		TODO: not yet supported
-		<tag ref="EID27dc9b72-0084-4f4a-981b-afc16e8d6e5e"/>
-	</tags-->
+	<tags>
+		<tag ref="EID3b9846c7-3940-4795-ae1d-0b5d82375c76"/>
+	</tags>
 	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
 	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
 	<ParameterList name="ETF Standard Parameters for metadata XML test objects">
+		<!-- TODO clean up, currently disabled due to open issues with schema validation
 		<parameter name="encoding" required="false">
 			<defaultValue>CSW ISO AP 1.0.0</defaultValue>
-			<description ref="TR.metadata-encoding"/>
+			<description ref="TR.metadataEncoding"/>
 			<allowedValues>^(CSW ISO AP 1\.0\.0|ISO/TS 19139)$</allowedValues>
 			<type>string</type>
 		</parameter>
+		<parameter name="Schema_file" required="false">
+			<defaultValue></defaultValue>
+			<description ref="TR.metadataSchema"/>
+			<allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)$</allowedValues>
+			<type>string</type>
+		</parameter>
+		-->
 		<parameter name="files_to_test" required="true">
 			<defaultValue>.*</defaultValue>
 			<description ref="TR.filesToTest"/>
@@ -41,10 +49,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" t
 	<supportedTestObjectTypes>
 		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
 	</supportedTestObjectTypes>
-	<!--dependencies>
-		No dependencies in this ETS
-		<executableTestSuite ref="EIDxxx"/>
-	</dependencies-->
 	<testModules>
 		<TestModule id="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e">
 			<label>IGNORE</label>
@@ -53,7 +57,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" t
 			<testCases>
 				<TestCase id="EID242272e0-3f0a-4e9c-9643-657c4d6d304a">
 					<label>Schema validation</label>
-					<description>Performs a schema validation of the document.</description>
+					<description>Validation of the XML documents under test against the ISO/OGC metadata schemas.</description>
 					<parent ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
 					<testSteps>
 						<TestStep id="EID27dc9b72-0084-4f4a-981b-afc16e8d6e5e">
@@ -63,52 +67,60 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" t
 							<statementForExecution>not applicable</statementForExecution>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
-								<TestAssertion id="EIDe3500038-e37c-4dcf-806c-6bc82d585b3b">
-									<label>md-xml.a.1: validate XML documents</label>
-									<description><![CDATA[Validate each document against the schema(s) specified in the xsi:schemaLocation attribute using strict XML schema validation.<br/><br/>
-Official ISO schemas (ISO AP or ISO 19139) are currently found in two separate locations:
+								<TestAssertion id="EID04c71089-1d8c-4e67-897c-11908e78e2d4">
+									<label>md-xml.a.1: Validate XML documents</label>
+									<description><![CDATA[<p>Validate each document against the schema(s) specified in the xsi:schemaLocation attribute using strict XML schema validation.</p>
+<p>Official XML schemas are currently found in two separate locations:</p>
 <ul>
 <li>ISO repository for public available standards. The ISO 19139 schemas can be found at <a href="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/">http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/</a>.</li>
 <li>OGC Schema repository. The ISO 19139 schemas are located at <a href="http://schemas.opengis.net/iso/19139/20070417/">http://schemas.opengis.net/iso/19139/20070417/</a> and <a href="http://schemas.opengis.net/iso/19139/20060504/">http://schemas.opengis.net/iso/19139/20060504/</a>. The difference in the schemas is the GML version. The version dated "2007-04-17" uses GML 3.2.1, the version dated "2006-06-04" use GML 3.2.0, which was never approved or published by OGC. The major difference is that GML 3.2.0 schemas are defined in the namespace http://www.opengis.net/gml whereas GML 3.2.1 schemas are defined in the namespace http://www.opengis.net/gml/3.2.<br/>
 The ISO AP schemas are located at <a href="http://schemas.opengis.net/csw/2.0.2/profiles/apiso/">http://schemas.opengis.net/csw/2.0.2/profiles/apiso/</a>. The ISO AP schemas are bound to the ISO 19139 schemas dated "2006-06-04".<br/>
 The schemas located in the ISO repository for public available standards are the same as the ISO 19139 schemas dated "2007-04-17".</li>
 </ul>
-I.e., each document is validated using the following XML schema definitions:
+I.e., each document is validated using the following XML schema definition:
 <ul>
-<li>encoding = "CSW ISO AP 1.0.0": http://schemas.opengis.net/csw/2.0.2/profiles/apiso/1.0.0/apiso.xsd</li>
-<li>encoding = "ISO/TS 19139": http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd</li>
-<li>If no encoding information is provided with the test, the encoding is determined by inspecting the schemaLocation based on the schema documents used for the "http://www.isotc211.org/2005/gmd" namespace. If this information cannot be determined, assume "CSW ISO AP 1.0.0".</li>
+<li>If the parameter 'encoding' is 'CSW ISO AP 1.0.0': <a href="http://schemas.opengis.net/csw/2.0.2/profiles/apiso/1.0.0/apiso.xsd" target="_blank">http://schemas.opengis.net/csw/2.0.2/profiles/apiso/1.0.0/apiso.xsd</a></li>
+<li>If the parameter 'encoding' is 'ISO/TS 19139': <a href="http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd" target="_blank">http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd</a></li>
+<li>If no encoding information is provided with the test, the encoding is determined by inspecting the schemaLocation based on the schema documents used for the 'http://www.isotc211.org/2005/gmd' namespace. If this information cannot be determined, assume 'CSW ISO AP 1.0.0'.</li>
 </ul>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding/schema-validation" target="_blank">Abstract Test Case 'Schema validation'</a>]]></description>
+<p><b>Known limitations:</b></p>
+<ul>
+<li>Only schema validation against the schemas provided in the xsi:schemaLocation attribute is currently supported. The built-in validator used for validating XML documents against a pre-selected schema, e.g. apiso.xsd, has issues that need to be resolved first.</li>
+<li>Note that validation is done on a file-by-file basis and access to many remote schema files is time consuming. I.e. it will be <em>much</em> faster to validate a single document with many metadata records than many files with a single record each.</li>
+</ul>
+<p>Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding/schema-validation" target="_blank">Abstract Test Case 'Schema validation'</a></p>]]></description>
 									<parent ref="EID27dc9b72-0084-4f4a-981b-afc16e8d6e5e"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO BaseX validation is incomplete and needs to be replaced by a custom validation module :)
-let $sisoap := if (fn:doc-available($schemaisoap)) then fn:doc($schemaisoap) else ()
-let $s19139 := if (fn:doc-available($schema19139)) then fn:doc($schema19139) else ()
-let $errors := (for $file in $db
-  return 
-    if ($encoding != ('CSW ISO AP 1.0.0', 'ISO/TS 19139') and $file/@xsi:schemaLocation) then 
-      let $start := prof:current-ms()
-      let $infos := validate:xsd-info($file)
-      let $duration := prof:current-ms()-$start
-      let $logentry := local:log('Validating file ' || local:filename($file) || ', encoding=''' || $encoding || ''': ' || $duration || ' ms')
-      let $errors := count($infos)
-      return
-        if ($errors&gt;0) then
-          (local:addMessage('TR.invalidSchema', map { 'filename': local:filename($file), 'count': string($errors) }),
-           for $info in $infos return local:addMessage('TR.xmlSchemaError', map { 'filename': local:filename($file), 'error': $info }))
-        else ()
-    else
-      for $record in $records[db:path(.)=db:path($file/element())]
-        let $id := $record/gmd:fileIdentifier/gco:CharacterString/text()
-        let $infos := if ($encoding eq 'ISO/TS 19139' and $s19139) then validate:xsd-info($record,$s19139) else if ($sisoap) then validate:xsd-info($record,$sisoap) else validate:xsd-info($record)
-        let $errors := count($infos)
-        return
-          if ($errors&gt;0) then
-            (local:addMessage('TR.invalidSchemaRecord', map { 'filename': local:filename($record), 'id': $id, 'count': string($errors) }),
-            for $info in $infos return local:addMessage('TR.xmlSchemaErrorRecord', map { 'filename': local:filename($record), 'id': $id, 'error': $info }))
-          else ())[position() le $limitErrors]
+(: TODO BaseX validation is incomplete and needs to be replaced by a custom validation module, see 'known limitations' :)
+let $errors := (
+	if ($validationErrors) then
+		for $error in $validationErrors
+		return local:addMessage('TR.validationError', map { 'text': $error })
+	else
+		for $file in $db
+		  return 
+			 if ($file/element()/@xsi:schemaLocation) then 
+				let $start := prof:current-ms()
+				let $infos := validate:xsd-info($file)
+				let $duration := prof:current-ms()-$start
+				let $logentry := local:log('Validating file ' || local:filename($file) || ': ' || $duration || ' ms')
+				let $errors := count($infos)
+				return
+				  if ($errors&gt;0) then
+					 (local:addMessage('TR.invalidSchema', map { 'filename': local:filename($file), 'count': string($errors) }),
+					  for $info in $infos return local:addMessage('TR.xmlSchemaError', map { 'filename': local:filename($file), 'error': $info }))
+				  else ()
+			 else
+				for $record in $records[db:path(.)=db:path($file/element())]
+				  let $id := $record/gmd:fileIdentifier/gco:CharacterString/text()
+				  let $infos := validate:xsd-info($record)
+				  let $errors := count($infos)
+				  return
+					 if ($errors&gt;0) then
+						(local:addMessage('TR.invalidSchemaRecord', map { 'filename': local:filename($record), 'id': $id, 'count': string($errors) }),
+						for $info in $infos return local:addMessage('TR.xmlSchemaErrorRecord', map { 'filename': local:filename($record), 'id': $id, 'error': $info }))
+					 else ())[position() le $limitErrors]
 return
 (if ($errors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.filesWithErrors', count($errors[@ref eq 'TR.invalidSchema'])),
