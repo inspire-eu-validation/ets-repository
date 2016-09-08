@@ -1,0 +1,23 @@
+<StatisticalReportTableType xmlns="http://www.interactive-instruments.de/etf/2.0" id="EID1a19c3a8-9e76-41d9-bac8-14490162561c">
+	<label>Feature Type Statistics</label>
+	<description>The number of features per feature type and file in the dataset.</description>
+	<version>1.0.0</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-15T00:00:00Z</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
+	<columnHeaderLabels>
+		<label>Feature Type</label>
+		<label>Feature Count</label>
+	</columnHeaderLabels>
+	<rowExpressions>
+		<expression>'all; ' || count($features)</expression>
+		<expression>
+for $feature in $features 
+let $ft := $feature/local-name()
+group by $ft 
+order by $ft
+return '' || $ft || '; ' || count($feature)
+		</expression>
+	</rowExpressions>
+</StatisticalReportTableType>

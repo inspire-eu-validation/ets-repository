@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not forget to change all UUID values -->
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" id="EID627f1774-8dd4-4e4f-af64-41701b304f4c">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://example.com/</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Name of a test suite</label>
+	<description>Description of the test suite</description>
+	<reference>ets-generic-bsxets.xq</reference>
+	<version>0.0.1</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-15T00:00:00Z</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID1a19c3a8-9e76-41d9-bac8-14490162561c"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe5821168-0dd9-4809-b071-429b06d57ba5"/>
+	</supportedTestObjectTypes>
+	<testModules>
+		<TestModule id="EID5489bb1e-1be1-47ce-a8a1-11276aef791e">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID627f1774-8dd4-4e4f-af64-41701b304f4c"/>
+			<testCases>
+				<TestCase id="EID5841a461-b735-4e37-a9e7-9ee20eb62e09">
+					<label>Name of a test case</label>
+					<description>Description of the test case.</description>
+					<parent ref="EID5489bb1e-1be1-47ce-a8a1-11276aef791e"/>
+					<testSteps>
+						<TestStep id="EID9688fe09-53ad-4f8b-9021-ddb02578936d">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5841a461-b735-4e37-a9e7-9ee20eb62e09"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDbb5bb2ef-734b-49a3-869e-576149868407">
+									<label>Label of an assertion</label>
+									<description>Description of the assertion.</description>
+									<parent ref="EID9688fe09-53ad-4f8b-9021-ddb02578936d"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+if (not($validationErrors)) then 
+	'PASSED' 
+else 
+	('FAILED', 
+	 for $error in $validationErrors return (local:addMessage('TR.valdiationError', map { 'text': $error }))
+	)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.valdiationError"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID8793a08b-a4b4-4ba7-957d-f88f0bac1d61">
+									<label>Label of another assertion</label>
+									<description>Description of the assertion.</description>
+									<parent ref="EID9688fe09-53ad-4f8b-9021-ddb02578936d"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $filesWithErrors := $db[not(wfs:FeatureCollection or gml:FeatureCollection or wfs11:FeatureCollection or gml31:FeatureCollection)][position() le $limitErrors]
+return 
+(if ($filesWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.filesWithErrors', count($filesWithErrors)),
+ for $file in $filesWithErrors
+    order by local:filename($file)
+    let $root := $file/element()
+    return
+   	local:addMessage('TR.incorrectRoot', map { 'filename': local:filename($root), 'elementName': local-name($root), 'namespace': namespace-uri($root) }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.incorrectRoot"/>
+										<translationTemplate ref="TR.filesWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
