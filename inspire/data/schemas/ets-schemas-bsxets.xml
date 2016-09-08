@@ -262,13 +262,13 @@ Source: <a href="" target="_blank">Abstract Test Case 'GML model'</a>]]></descri
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $values := ( 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Unknown', 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Unpopulated', 'http://inspire.ec.europa.eu/codelist/VoidReasonValue/Withheld', 'unknown', 'other:unpopulated', 'withheld' )
-let $featuresWithErrors := $features[*[@xsi:nil eq 'true' and not(@nilReason =  $values)]][position() le $limitErrors]
+let $featuresWithErrors := $features[*[@xsi:nil eq 'true' and @nilReason and not(@nilReason =  $values)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $properties := $feature/*[@xsi:nil eq 'true' and not(@nilReason =  $values)]
+   let $properties := $feature/*[@xsi:nil eq 'true' and @nilReason and not(@nilReason =  $values)]
    let $values := distinct-values($properties/@nilReason)
    return
      local:addMessage('TR.incorrectReason', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'propertyNames': fn:string-join($properties/local-name(),', '), 'values': fn:string-join($values, ', ') }))
