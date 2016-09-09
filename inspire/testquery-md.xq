@@ -180,8 +180,11 @@ declare function local:get-code-titles($url as xs:string, $langIds as xs:string*
   return $codesAsAtomEntries/atom:title/text()
 };
 
-declare function local:is-valid-date-or-dateTime($dateString as xs:string) as xs:boolean
+declare function local:is-valid-date-or-dateTime($dateString as xs:string?) as xs:boolean
 {
+   if (not($dateString)) then
+   	false()
+   else
 	let $date := 
     try {
       let $tmp := xs:date($dateString)

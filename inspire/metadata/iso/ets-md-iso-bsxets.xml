@@ -30,9 +30,8 @@ Pre-requisite conformance classes:
 			<type>string</type>
 		</parameter>
 		<parameter name="Schema_file" required="false">
-			<defaultValue></defaultValue>
 			<description ref="TR.metadataSchema"/>
-			<allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)$</allowedValues>
+			<allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)?$</allowedValues>
 			<type>string</type>
 		</parameter>
 		-->
@@ -1075,8 +1074,8 @@ let $messages :=
 			try { 
 				let $root := fn:doc($url)/element()
 				return
-				if ($root[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]) then ()
-				else local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': fn:string-join($root/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue, ', ') }) 
+				if ($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]) then ()
+				else local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': $root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue }) 
 			} catch * { 
 				local:addMessage('TR.resourceNotAccessibleTimeout', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
 			}
