@@ -6,7 +6,7 @@
 	<label>Conformance class: INSPIRE Profile based on EN ISO 19115 and EN ISO 19119</label>
 	<description><![CDATA[This test suite examines metadata records against the requirements for metadata in INSPIRE.<br/><br/>
 <b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
-Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/README#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5. However, the current Abstract Test Suite does not support either polymorphism nor references (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is there unclear, if this is really a limitation or if the sections in the technical guidance are outdated.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion.<p/>There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/README#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119" target="_blank">Conformance Class 'INSPIRE Profile based on EN ISO 19115 and EN ISO 19119'</a><br/><br/>
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a></li></ul>]]></description>
@@ -597,10 +597,15 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
+let $distinctRecordIdentifiers := 
+  for $rec in $records
+  return
+    distinct-values($rec/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:identifier/*/gmd:code/*/text())
+let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($distinctRecordIdentifiers,.)[2]]
 let $messages := 
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
-	 let $identifiers := $record/gmd:identificationInfo[1]//gmd:citation//gmd:identifier/*/gmd:code/gco:CharacterString/text()
+	 let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:identifier/*/gmd:code/*/text()
 	 return
 	 if (not($identifiers)) then
 		local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
@@ -609,7 +614,7 @@ let $messages :=
 		return
 		if (string-length(normalize-space($identifier)) = 0) then
 			local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-		else if (count($records[gmd:identificationInfo[1]//gmd:citation//gmd:identifier/*/gmd:code/gco:CharacterString/text()=$identifier])&gt;1) then
+		else if ($identifier = $duplicateDistinctRecordIdentifiers) then
 			local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': $identifier })
 		else ()
 	)[position() le $limitErrors]
@@ -641,13 +646,13 @@ This test case only applies to records with a hierarchyLevel value 'dataset' or 
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]
+let $codes := ('bul','hrv','cze','dan','dut','eng','est','fin','fre','ger','gre','hun','gle','ita','lav','lit','mlt','pol','por','rum','slo','slv','spa','swe')
 let $messages :=    
 	if (not($recordsToInspect)) then ()
 	else
 	(for $record in $recordsToInspect    
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode
-	 let $codes := ('bul','hrv','cze','dan','dut','eng','est','fin','fre','ger','gre','hun','gle','ita','lav','lit','mlt','pol','por','rum','slo','slv','spa','swe')
+	 let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode	 
 	 return
 	 if (not($languageCodes)) then
 		local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
@@ -655,7 +660,7 @@ let $messages :=
 		let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
 		return
 		if ($wrongCodeValues) then
-			local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues) })
+		local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
 		else ()     
 	)[position() le $limitErrors]
 return
@@ -683,7 +688,7 @@ return
 </ul>
 <p>Relevant requirements:</p>
 <ul>
-<li>TG Requirement 3: If a linkage for data is available, the Resource Locator shall be a valid URL providing one of the following: a link to a web with further instructions, a link to a service capabilities document, a link to the service WSDL document (SOAP Binding), a link to a client application that directly accesses the service.</li>
+<li>TG Requirement 3: If a linkage for data is available, the Resource Locator shall be a valid URL providing one of the following: a link to a web page with further instructions, a link to a service capabilities document, a link to the service WSDL document (SOAP Binding), a link to a client application that directly accesses the service.</li>
 </ul>
 <p>Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/ds-linkage" target="_blank">Abstract Test Case 'Dataset linkage'</a></p>]]></description>
 									<parent ref="EID0422a7f2-4ec7-4a75-9667-38f265ea4545"/>
@@ -813,7 +818,7 @@ return
 								</TestAssertion>
 								<TestAssertion id="EIDdd254a75-cd7a-4e59-9e9d-b38e251376b1">
 									<label>md-iso.c.6: Dataset geographic Bounding box</label>
-									<description><![CDATA[<p>This test checks, if the metadata record has a valid geographic extent, expressed as a geographic bounding box with four coordinates (westBoundLongitude, eastBoundLongitude, southBoundLatitude and northBoundLatitude). In addition, the bounding box shall be as small as possible. This requires a manual check.</p>
+									<description><![CDATA[<p>This test checks if the metadata record has a valid geographic extent, expressed as a geographic bounding box with four coordinates (westBoundLongitude, eastBoundLongitude, southBoundLatitude, and northBoundLatitude). In addition, the bounding box shall be as small as possible. This requires a manual check.</p>
 <p>This test case only applies to records with a hierarchyLevel value 'dataset' or 'series'.</p>
 <p>The test checks if:</p>
 <ul>
