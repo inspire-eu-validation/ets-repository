@@ -34,10 +34,10 @@ if ($disabled) then "
   return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
     <parent ref='" || $stepresultid || "'/>
-    <resultedFrom ref='" || $assertion/@id || "'/>
+    <status>" || $disabled || "</status>
     <startTimestamp>" || fn:current-dateTime() || "</startTimestamp>
     <duration>0</duration>
-    <status>" || $disabled || "</status>
+    <resultedFrom ref='" || $assertion/@id || "'/>
   </TestAssertionResult>" 
 else "
 if ($dependencyResult) then
@@ -58,11 +58,11 @@ let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': '
 return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
     <parent ref='" || $stepresultid || "'/>
-    { if (empty($messages)) then () else <messages>{$messages}</messages> }
-    <resultedFrom ref='" || $assertion/@id || "'/>
+    <status>{$status}</status>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>{$duration}</duration>
-    <status>{$status}</status>
+    <resultedFrom ref='" || $assertion/@id || "'/>
+    { if (empty($messages)) then () else <messages>{$messages}</messages> }
   </TestAssertionResult>
 else
 let $startmessage := prof:void(local:start('" || $assertion/@id || "')) 
@@ -73,10 +73,10 @@ let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': '
 return
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
     <parent ref='" || $stepresultid || "'/>
-    <resultedFrom ref='" || $assertion/@id || "'/>
+    <status>{$status}</status>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>0</duration>
-    <status>{$status}</status>
+    <resultedFrom ref='" || $assertion/@id || "'/>
   </TestAssertionResult>"
 
       return "
@@ -88,11 +88,11 @@ let $endmessage := prof:void(local:end('" || $step/@id || "',$status))
 return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $stepresultid || "'>
 <parent ref='" || $caseresultid || "'/>
-<testAssertionResults>{$assertionresults}</testAssertionResults>
-<resultedFrom ref='" || $step/@id || "'/>
+<status>{$status}</status>
 <startTimestamp>{$timestampStep}</startTimestamp>
 <duration>{xs:integer(sum($assertionresults/duration))}</duration>
-<status>{$status}</status>
+<resultedFrom ref='" || $step/@id || "'/>
+<testAssertionResults>{$assertionresults}</testAssertionResults>
 </TestStepResult>"
 
     return "
@@ -107,11 +107,11 @@ let $logentry := local:log('Test Case ''" || $case/etf:label || "'' finished: ' 
 return 
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $caseresultid || "'>
 <parent ref='" || $moduleresultid || "'/>
-<testStepResults>{$teststepresults}</testStepResults>
-<resultedFrom ref='" || $case/@id || "'/>
+<status>{$status}</status>
 <startTimestamp>{$timestampCase}</startTimestamp>
 <duration>{xs:integer(sum($teststepresults/duration))}</duration>
-<status>{$status}</status>
+<resultedFrom ref='" || $case/@id || "'/>
+<testStepResults>{$teststepresults}</testStepResults>
 </TestCaseResult>"
 
 return "
@@ -123,11 +123,11 @@ let $endmessage := prof:void(local:end('" || $module/@id || "',$status))
 return
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $moduleresultid || "'>
 <parent ref='" || $testTaskResultId || "'/>
-<testCaseResults>{$testcaseresults}</testCaseResults>
-<resultedFrom ref='" || $module/@id || "'/>
+<status>{$status}</status>
 <startTimestamp>{$timestampModule}</startTimestamp>
 <duration>{xs:integer(sum($testcaseresults/duration))}</duration>
-<status>{$status}</status>
+<resultedFrom ref='" || $module/@id || "'/>
+<testCaseResults>{$testcaseresults}</testCaseResults>
 </TestModuleResult>"
 
 return "
@@ -140,8 +140,11 @@ let $endmessage := prof:void(local:end('" || $ets/@id || "',$status))
 let $logentry := local:log('Test Suite ''" || $ets/etf:label || "'' finished: ' || $status)
 return
 <TestTaskResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $testTaskResultId || "'>
+<status>{$status}</status>
+<startTimestamp>{$timestampSuite}</startTimestamp>
+<duration>{xs:integer(sum($testmoduleresults/duration))}</duration>
+<resultedFrom ref='" || $ets/@id || "'/>
 <testObject ref='{$testObjectId}'/>
-<testModuleResults>{$testmoduleresults}</testModuleResults>
 <attachments>
 { if (file:exists('" || $logFile || "')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='LogFile' id='EID{uuid:randomUUID()}'>
@@ -168,10 +171,7 @@ else ()}
 </Attachment>
 else ()}
 </attachments>
-<resultedFrom ref='" || $ets/@id || "'/>
-<startTimestamp>{$timestampSuite}</startTimestamp>
-<duration>{xs:integer(sum($testmoduleresults/duration))}</duration>
-<status>{$status}</status>
+<testModuleResults>{$testmoduleresults}</testModuleResults>
 </TestTaskResult>")
 
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
@@ -193,40 +193,40 @@ let $caseresultid := 'EID' || uuid:randomUUID()
           return            
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
     <parent ref='{$stepresultid}'/>
-    <resultedFrom ref='{$assertion/@id}'/>
+    <status>SKIPPED</status>
     <startTimestamp>{fn:current-dateTime()}</startTimestamp>
     <duration>0</duration>
-    <status>SKIPPED</status>
+    <resultedFrom ref='{$assertion/@id}'/>
   </TestAssertionResult>
 
       return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$stepresultid}'>
 <parent ref='{$caseresultid}'/>
-<testAssertionResults>{$assertion-results}</testAssertionResults>
-<resultedFrom ref='{$step/@id}'/>
+<status>SKIPPED</status>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<resultedFrom ref='{$step/@id}'/>
+<testAssertionResults>{$assertion-results}</testAssertionResults>
 </TestStepResult>
 
     return
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$caseresultid}'>
 <parent ref='{$moduleresultid}'/>
-<testStepResults>{$test-step-results}</testStepResults>
-<resultedFrom ref='{$case/@id}'/>
+<status>SKIPPED</status>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<resultedFrom ref='{$case/@id}'/>
+<testStepResults>{$test-step-results}</testStepResults>
 </TestCaseResult>
 
 return 
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$moduleresultid}'>
 <parent ref='{$testTaskResultId}'/>
-<testCaseResults>{$test-case-results}</testCaseResults>
-<resultedFrom ref='{$module/@id}'/>
+<status>SKIPPED</status>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<resultedFrom ref='{$module/@id}'/>
+<testCaseResults>{$test-case-results}</testCaseResults>
 </TestModuleResult>
 
 let $text := 'System error in the Executable Test Suite. Please contact a system administrator. Error information:
@@ -236,8 +236,11 @@ let $logentry := file:append($logFile, $text || file:line-separator(), map { 'me
 let $logout := prof:dump($text)
 return
 <TestTaskResult xmlns="http://www.interactive-instruments.de/etf/2.0" id='{$testTaskResultId}'>
+<status>FAILED</status>
+<startTimestamp>{fn:current-dateTime()}</startTimestamp>
+<duration>0</duration>
+<resultedFrom ref='{$ets/@id}'/>
 <testObject ref='{$testObjectId}'/>
-<testModuleResults>{$test-module-results}</testModuleResults>
 <attachments>
 <Attachment xmlns="http://www.interactive-instruments.de/etf/2.0" type="LogFile" id="EID{uuid:randomUUID()}">
 <label>Log file</label>
@@ -262,10 +265,7 @@ else ()}
 </Attachment>
 else ()}
 </attachments>
-<resultedFrom ref='{$ets/@id}'/>
-<startTimestamp>{fn:current-dateTime()}</startTimestamp>
-<duration>0</duration>
-<status>FAILED</status>
+<testModuleResults>{$test-module-results}</testModuleResults>
 </TestTaskResult> }
 };
 
