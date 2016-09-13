@@ -589,20 +589,25 @@ Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></
 									<expression>
 (: TODO: add other feature types to exclude; extend with subtypes :)
 let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
-let $featuresWithErrors := for $feature in $featuresToInspect
+let $messages := for $feature in $featuresToInspect
   return
-	try { 
-	   if (contains(ggeo:validate($feature,'110'),'F')) then $feature else ()
+	try {
+		let $vr := ggeo:validateAndReport($feature,'110')
+		return
+	   if (xs:boolean($vr/ggeo:isValid)) then ()
+	   else
+	   	for $message in $vr/ggeo:message[@type='ERROR']
+			return
+				local:addMessage('TR.invalidGeometry', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'text': $message/text() })
 	} catch * { 
+		let $dummy := local:log($err:code || ' - ' || $err:description || ' - ' || $err:module || ' - ' || $err:line-number || ' - ' || $err:column-number || ' - ' || $err:additional)
+		return
 		(: parsing exceptions already covered by gmlas.d.11 :) ()
 	}
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   return
-     local:addMessage('TR.invalidGeometry', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
