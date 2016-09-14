@@ -48,6 +48,142 @@ Pre-requisite conformance classes:
 			<description>IGNORE</description>
 			<parent ref="EID4c53a8c7-7cac-4531-982b-d03eb48ffa77"/>
 			<testCases>
+			<TestCase id="EID7d448a71-4c0a-4ea9-a5b1-d28eb8d825d4">
+			  <label>Code list values</label>
+			  <description>Verify whether all attributes whose value type is a code list take the values set out therein.</description>
+			  <parent ref="EID0437f9fb-62ec-48dc-b88a-37e058282c5e"/>
+			<testSteps>
+				<TestStep id="EID04e8c34a-09d2-4d98-a951-3d9ae99201d7">
+					<label>IGNORE</label>
+					<description>IGNORE</description>
+					<parent ref="EID7d448a71-4c0a-4ea9-a5b1-d28eb8d825d4"/>
+					<statementForExecution>not applicable</statementForExecution>
+					<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+					<testAssertions>
+					  <TestAssertion id="EID47e32330-93d0-446c-9f88-0cfd7e1c8b3e">
+						 <label>ps-as.a.1: extensions to code lists in property ''ps:designation''</label>
+						 <description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, any values are allowed as long as they do not conflict with the pre-defined values in code list <a href='http://inspire.ec.europa.eu/codelist/DesignationValue'>DesignationValue</a> or any of its subtypes.<br/><br/>
+If a value is not one of the values listed in the data specification, it will be reported. Please review the code list definition to check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule.<br/><br/>						
+For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects. For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 6 (1): Code Lists and Enumerations. Codelists shall be of one of the following types, as specified in the Annexes:
+<ol>
+<li>code lists whose allowed values comprise only the values specified in this Regulation;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+narrower values defined by data providers;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+additional values at any level defined by data providers;</li>
+<li>code lists, whose allowed values comprise any values defined by data providers.</li>
+</ol>
+For the purposes of points 2, 3 and 4, in addition to the allowed values, data providers may use the values specified in the relevant INSPIRE Technical Guidance document available on the INSPIRE web site of the Joint Research Centre.</li>
+<li>IR Requirement Article 6 (2): Code Lists and Enumerations. Code lists may be hierarchical. Values of hierarchical code lists may have a more generic parent value. Where the valid values of a hierarchical code list are specified in a table in this Regulation, the parent values are listed in the last column.</li>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points 2, 3 or 4 of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+<li>IR Requirement Article 6 (4): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ps/3.2/ps-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>]]></description>
+						 <parent ref="EID04e8c34a-09d2-4d98-a951-3d9ae99201d7"/>
+						 <expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $features3 := $features[self::ps3:ProtectedSite]
+let $features4 := $features[self::ps:ProtectedSite]
+let $designationURIs :=
+	(for $codelist in ('IUCNDesignationValue', 'NationalMonumentsRecordDesignationValue', 'Natura2000DesignationValue', 'RamsarDesignationValue', 'UNESCOManAndBiosphereProgrammeDesignationValue', 'UNESCOWorldHeritageDesignationValue')
+    let $allowedValuesURI := local:getAllowedValuesURI( 'http://inspire.ec.europa.eu/codelist/' || $codelist )
+    return $allowedValuesURI)
+let $designationCodes := 
+	for $uri in $designationURIs
+	return functx:substring-after-last($uri, '/')
+let $valuesURI := fn:distinct-values($features4/ps:siteDesignation/*/ps:designation/@xlink:href)
+let $valuesCode := fn:distinct-values($features3/ps3:siteDesignation/*/ps3:designation/text())
+let $newvaluesURI := functx:value-except($valuesURI,$designationURIs)
+let $newvaluesCode := functx:value-except($valuesCode,$designationCodes)
+let $messages :=
+	(if (empty($newvaluesURI)) then () else
+	for $value in $newvaluesURI
+	return
+		local:addMessage('TR.reviewCodeListValue', map { 'featureType': 'ps:ProtectedSite', 'property': 'ps:designation', 'value': $value }),
+	if (empty($newvaluesCode)) then () else
+	for $value in $newvaluesCode
+	return
+		local:addMessage('TR.reviewCodeListValue', map { 'featureType': 'ps:ProtectedSite', 'property': 'ps:designation', 'value': $value }))
+return
+	(if ($messages) then 'PASSED_MANUAL' else 'PASSED',
+	 $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="TR.reviewCodeListValue"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					  <TestAssertion id="EID9027d178-b37c-472b-a0b3-b5717772375a">
+						 <label>ps-as.a.1: extensions to code lists in property ''ps:designationScheme''</label>
+						 <description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, any values are allowed as long as they do not conflict with the pre-defined values in code list <a href='http://inspire.ec.europa.eu/codelist/DesignationSchemeValue'>DesignationSchemeValue</a>.<br/><br/>
+If a value is not one of the values listed in the data specification, it will be reported. Please review the code list definition to check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule.<br/><br/>						
+For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects. For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 6 (1): Code Lists and Enumerations. Codelists shall be of one of the following types, as specified in the Annexes:
+<ol>
+<li>code lists whose allowed values comprise only the values specified in this Regulation;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+narrower values defined by data providers;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+additional values at any level defined by data providers;</li>
+<li>code lists, whose allowed values comprise any values defined by data providers.</li>
+</ol>
+For the purposes of points 2, 3 and 4, in addition to the allowed values, data providers may use the values specified in the relevant INSPIRE Technical Guidance document available on the INSPIRE web site of the Joint Research Centre.</li>
+<li>IR Requirement Article 6 (2): Code Lists and Enumerations. Code lists may be hierarchical. Values of hierarchical code lists may have a more generic parent value. Where the valid values of a hierarchical code list are specified in a table in this Regulation, the parent values are listed in the last column.</li>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points 2, 3 or 4 of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+<li>IR Requirement Article 6 (4): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ps/3.2/ps-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>]]></description>
+						 <parent ref="EID04e8c34a-09d2-4d98-a951-3d9ae99201d7"/>
+						 <expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $features3 := $features[self::ps3:ProtectedSite]
+let $features4 := $features[self::ps:ProtectedSite]
+let $designationURIs :=
+	(for $codelist in ('DesignationSchemeValue')
+    let $allowedValuesURI := local:getAllowedValuesURI( 'http://inspire.ec.europa.eu/codelist/' || $codelist )
+    return $allowedValuesURI)
+let $designationCodes := 
+	for $uri in $designationURIs
+	return functx:substring-after-last($uri, '/')
+let $valuesURI := fn:distinct-values($features4/ps:siteDesignation/*/ps:designationScheme/@xlink:href)
+let $valuesCode := fn:distinct-values($features3/ps3:siteDesignation/*/ps3:designationScheme/text())
+let $newvaluesURI := functx:value-except($valuesURI,$designationURIs)
+let $newvaluesCode := functx:value-except($valuesCode,$designationCodes)
+let $messages :=
+	(if (empty($newvaluesURI)) then () else
+	for $value in $newvaluesURI
+	return
+		local:addMessage('TR.reviewCodeListValue', map { 'featureType': 'ps:ProtectedSite', 'property': 'ps:designationScheme', 'value': $value }),
+	if (empty($newvaluesCode)) then () else
+	for $value in $newvaluesCode
+	return
+		local:addMessage('TR.reviewCodeListValue', map { 'featureType': 'ps:ProtectedSite', 'property': 'ps:designationScheme', 'value': $value }))
+return
+	(if ($messages) then 'PASSED_MANUAL' else 'PASSED',
+	 $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="TR.reviewCodeListValue"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
+						 </translationTemplates>
+					  </TestAssertion>
+					</testAssertions>
+				 </TestStep>
+			  </testSteps>
+			</TestCase>
 				<TestCase id="EID98ce975c-c2ab-4e7e-a6d4-c9da101a054d">
 					<label>Constraints</label>
 					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
@@ -61,7 +197,7 @@ Pre-requisite conformance classes:
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID2ddab1fa-817a-47a4-82c4-731cc0f50dbf">
-									<label>ps-as.a.1: Sites must use designations from an appropriate designation scheme</label>
+									<label>ps-as.b.1: Sites must use designations from an appropriate designation scheme</label>
 									<description><![CDATA[Sites must use designations from an appropriate designation scheme, and the designation code value must agree with the designation scheme.<br/><br/>
 OCL: "inv: self.designationScheme = DesignationSchemeValue::natura2000 implies self.designation.oclIsKindOf(DesignationValueNatura2000) and
 self.designationScheme = DesignationSchemeValue::emeraldNetwork implies self.designation.oclIsKindOf(DesignationValueEmeraldNetwork) and
