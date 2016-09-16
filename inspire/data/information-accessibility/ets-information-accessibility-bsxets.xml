@@ -70,7 +70,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Version consistency'</a>]
 									<expression>
 let $uris := distinct-values(($features//@srsName,$features//@frame))
 let $urimap := local:check-resource-uris($uris, 30)
-let $errorregex := '(notHTTP|TIMEOUT|\d{3})'
+let $errorregex := '(notHTTP|idNotFound|TIMEOUT|\d{3})'
 let $featuresWithErrors := $features[.//@srsName[matches(map:get($urimap,.),$errorregex)] or .//@frame[matches(map:get($urimap,.),$errorregex)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',

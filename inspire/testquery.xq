@@ -110,6 +110,13 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 		{ 
 			'TIMEOUT' 
 		}
+	else if (starts-with($uri,'#')) then
+		let $response := $features[@gml:id=substring($uri,2)] 
+		return
+		if ($response) then
+			'application/gml+xml'
+		else
+			'idNotFound'
 	else
 		'notHTTP'
 };
@@ -117,6 +124,43 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer) as map(*)
 {
 	map:merge( for $uri in $uris return map { $uri : local:check-resource-uri($uri, $timeoutInS) } )
+};
+
+declare function local:check-feature-references($hrefs as node()*, $targets as xs:string*, $expected as xs:string) as element()*
+{
+let $dummy := if (count($hrefs)>10) then local:log("Checking " || count($hrefs) || " relatedHydroObject references - this may take awhile...") else ()
+let $messages := 
+	(for $href in $hrefs
+	 let $feature := $href/../..
+	 let $fid := string($feature/@gml:id)
+	 let $url := string($href)
+	 let $validuri := local:check-resource-uri($url, 30)
+	 return
+	 if ($validuri = 'notHTTP') then
+		local:addMessage('TR.urlNotHttp2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
+	else if ($validuri = 'idNotFound') then
+		local:addMessage('TR.idNotFound2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
+	else if ($validuri = 'TIMEOUT') then
+		local:addMessage('TR.resourceNotAccessibleTimeout2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'timeout': '30' })
+	else if (matches($validuri,'\d{3}')) then
+		local:addMessage('TR.resourceNotAccessible2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'status' : $validuri })
+	else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/gml+xml') or starts-with($validuri,'application/xml')) then
+		try { 
+			let $root := 
+				if (starts-with($url,'#')) then $features[@gml:id=substring($url,2)]
+				else fn:doc($url)/element()
+			return
+			if (local-name($root)=$targets) then ()
+			else local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'elementNameExpected': $expected, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
+		} catch * { 
+			local:addMessage('TR.resourceNotAccessibleException2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'message': $err:description })
+		}
+	else
+		local:addMessage('TR.unknownResourceType2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'mediaType': $validuri })
+	)[position() le $limitErrors]
+return
+(local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)									
 };
 
 declare function local:check-code-list-values($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
@@ -150,7 +194,7 @@ let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa
 let $clurl := $url || '/' || $clname || '.en.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
-  if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
+  if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
      error((),'Code list ' || $url || ' cannot be accessed.')
   else if ($valid_clurl = 'TIMEOUT') then
     error((),'Access to code list ' || $url || ' timed out.')
@@ -178,7 +222,7 @@ let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa
 let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
-  if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
+  if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
      error((),'Code list ' || $url || ' cannot be accessed.')
   else if ($valid_clurl = 'TIMEOUT') then
     error((),'Access to code list ' || $url || ' timed out.')
