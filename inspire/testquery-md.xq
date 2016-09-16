@@ -87,6 +87,7 @@ declare function local:status($stati as xs:string*) as xs:string
 };
 
 (: 'notHTTP' = not a HTTP(S) URL
+   'idNotFound' = a bare name Xpointer was provided, but not found
    'TIMEOUT' = not accessible within timeout limits 
    HTTP status code = resource not available, the status code may point to the reason
    media type = accessible :)
@@ -104,6 +105,13 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 		{ 
 			'TIMEOUT' 
 		}
+	else if (starts-with($uri,'#')) then
+		let $response := $records[@id=substring($uri,2)] 
+		return
+		if ($response) then
+			'application/xml'
+		else
+			'idNotFound'
 	else
 		'notHTTP'
 };
@@ -123,7 +131,7 @@ let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa
 let $clurl := $url || '/' || $clname || '.en.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
-  if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
+  if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
      error((),'Code list ' || $url || ' cannot be accessed.')
   else if ($valid_clurl = 'TIMEOUT') then
     error((),'Access to code list ' || $url || ' timed out.')
@@ -151,7 +159,7 @@ let $clname := if ($url = 'http://inspire.ec.europa.eu/theme') then 'theme' else
 let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
-  if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
+  if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
      error((),'Code list ' || $clurl || ' cannot be accessed.')
   else if ($valid_clurl = 'TIMEOUT') then
     error((),'Access to code list ' || $clurl || ' timed out.')

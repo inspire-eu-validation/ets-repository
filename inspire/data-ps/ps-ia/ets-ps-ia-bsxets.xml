@@ -82,7 +82,7 @@ let $uris :=
 		for $clv in $featuresToInspect/ps:siteDesignation/*/*[self::ps:designationScheme or self::ps:designation]
 			return $clv/@xlink:href) (: $clv/@codeSpace || '/' || $clv/text() :)
 let $urimap := local:check-resource-uris($uris, 30)
-let $errorregex := '(notHTTP|TIMEOUT|\d{3})'
+let $errorregex := '(notHTTP|idNotFound|TIMEOUT|\d{3})'
 let $featuresWithErrors := if (count($uris)=0) then () else
 	$featuresToInspect[*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] or
 		*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]][position() le $limitErrors]
