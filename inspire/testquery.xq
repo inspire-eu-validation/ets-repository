@@ -5,6 +5,7 @@ declare namespace net3='urn:x-inspire:specification:gmlas:Network:3.2';
 declare namespace gn3='urn:x-inspire:specification:gmlas:GeographicalNames:3.0'; 
 declare namespace cp3='urn:x-inspire:specification:gmlas:CadastralParcels:3.0'; 
 declare namespace ps3='urn:x-inspire:specification:gmlas:ProtectedSites:3.0'; 
+declare namespace au3='urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0'; 
 declare namespace base32='urn:x-inspire:specification:gmlas:BaseTypes:3.2'; 
 declare namespace hy='http://inspire.ec.europa.eu/schemas/hy/4.0'; 
 declare namespace hy-n='http://inspire.ec.europa.eu/schemas/hy-n/4.0'; 
@@ -12,7 +13,8 @@ declare namespace hy-p='http://inspire.ec.europa.eu/schemas/hy-p/4.0';
 declare namespace net='http://inspire.ec.europa.eu/schemas/net/4.0'; 
 declare namespace gn='http://inspire.ec.europa.eu/schemas/gn/4.0'; 
 declare namespace cp='http://inspire.ec.europa.eu/schemas/cp/4.0'; 
-declare namespace ps='http://inspire.ec.europa.eu/schemas/cp/4.0'; 
+declare namespace ps='http://inspire.ec.europa.eu/schemas/ps/4.0'; 
+declare namespace au='http://inspire.ec.europa.eu/schemas/au/4.0'; 
 declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3'; 
 declare namespace gml='http://www.opengis.net/gml/3.2'; 
 declare namespace wfs='http://www.opengis.net/wfs/2.0'; 
@@ -169,7 +171,7 @@ let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
 let $cluri := $uri || '/' || $clname || '.en.atom'
 let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
 return
-if (not($clfeed)) then ('FAILED', local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' }))
+if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' })
 else
 let $valuesURI := $clfeed//atom:entry/atom:id/text()
 let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
