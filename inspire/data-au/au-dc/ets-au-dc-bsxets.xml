@@ -71,36 +71,32 @@ Source: <a href="" target="_blank">Abstract Test Case 'Higher Hierarchy'</a>]]><
 									<parent ref="EIDbead9324-b7b6-405e-bbe8-c59683bfcea1"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- (: TODO extend with subtypes :)
-let $surfacewaters := $features[self::*:Watercourse|self::*:StandingWater]
-let $networkelements := $features[self::*:WatercourseLink|self::*:HydroNode]
-return
-if (count($surfacewaters) = 0 or count($networkelements) = 0)
-then 'PASSED'
-else
+let $administrativeUnits := $features[self::*:AdministrativeUnit]
+
 let $featuresWithErrors :=
-(for $candidate in $networkelements
-let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centerlineGeometry or self::*:geometry]/*[1])
-let $env := ggeo:envelope($candidate_geometry)
-let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
-let $isWithin :=
-for $feature in $other_features[self::*:Watercourse|self::*:StandingWater]
-let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
-return if (ggeo:isWithin($candidate_geometry,$other_geometry)) then $feature else ()
-return if (not($isWithin)) then $candidate else ())[position() le $limitErrors]
+	(for $candidate in $administrativeUnits
+		let $country := boolean($candidate/au3:nationalLevel[1]/text()='1stOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder') 
+		let $administeredBy := $candidate[self::*:administeredBy/@xlink:href]
+		let $upperLevel := $candidate[self::*:upperLevelUnit/@xlink:href]
+
+		return
+		if (not($country)) then 
+			if (count($administeredBy) = 0) then
+				if (count($upperLevel) != 1) then $candidate
+				else ()
+			else ()
+		else ()
+	)[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   return
-     local:addMessage('TR.notWithin', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) })) -->
-
-     return 'PASSED'
+	let $level := $feature/au3:nationalLevel[1]/text() | $feature/au:nationalLevel[1]/@xlink:href
+   return local:addMessage('TR.noUpperLevelArea', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'level': substring-after(data($level),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/') })) 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.notWithin"/>   <!-- list possibly invoked messages -->
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -108,7 +104,6 @@ return
 						</TestStep>
 					</testSteps>
 				</TestCase>
-
 			</testCases>
 		</TestModule>
 	</testModules>
