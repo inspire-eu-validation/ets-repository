@@ -96,7 +96,7 @@ let $status := if ($dependencyResult) then local:status($assertionresults/etf:st
 let $endmessage := prof:void(local:end('" || $step/@id || "',$status))
 return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $stepresultid || "'>
-<testAssertionResults>{$assertionresults}</testAssertionResults
+<testAssertionResults>{$assertionresults}</testAssertionResults>
 <parent ref='" || $caseresultid || "'/>
 <resultedFrom ref='" || $step/@id || "'/>
 <startTimestamp>{$timestampStep}</startTimestamp>
