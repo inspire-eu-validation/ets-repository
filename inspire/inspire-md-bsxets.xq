@@ -162,7 +162,7 @@ return
 else ()}
 { if (file:exists('" || $statFile || "')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='StatisticalReport' id='EID{uuid:randomUUID()}'>
-<label>Feature statistics</label>
+<label>Metadata record statistics</label>
 <encoding>UTF-8</encoding>
 <mimeType>application/xml</mimeType>
 <referencedData href='" || file:path-to-uri($statFile) || "'/>
