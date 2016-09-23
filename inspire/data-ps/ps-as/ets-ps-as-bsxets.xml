@@ -104,12 +104,16 @@ let $newvaluesCode := functx:value-except($valuesCode,$designationCodes)
 let $messages :=
 	(if (empty($newvaluesURI)) then () else
 	for $value in $newvaluesURI
-	return
-		local:addMessage('TR.reviewCodeListValue', map { 'featureType': 'ps:ProtectedSite', 'property': 'ps:designation', 'value': $value }),
+		let $featuresWithValue := $features4[ps:siteDesignation/*/ps:designation/@xlink:href=$value]
+		let $feature := $featuresWithValue[1]
+		return
+		local:addMessage('TR.reviewCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'designation', 'value': $value, 'count': count($featuresWithValue)-1 }),
 	if (empty($newvaluesCode)) then () else
 	for $value in $newvaluesCode
-	return
-		local:addMessage('TR.reviewCodeListValue', map { 'featureType': 'ps:ProtectedSite', 'property': 'ps:designation', 'value': $value }))
+		let $featuresWithValue := $features3[ps3:siteDesignation/*/ps3:designation=$value]
+		let $feature := $featuresWithValue[1]
+		return
+		local:addMessage('TR.reviewCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'designation', 'value': $value, 'count': count($featuresWithValue)-1 }))
 return
 	(if ($messages) then 'PASSED_MANUAL' else 'PASSED',
 	 $messages)
@@ -121,7 +125,7 @@ return
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EID9027d178-b37c-472b-a0b3-b5717772375a">
-						 <label>ps-as.a.1: extensions to code lists in property ''ps:designationScheme''</label>
+						 <label>ps-as.a.2: extensions to code lists in property ''ps:designationScheme''</label>
 						 <description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, any values are allowed as long as they do not conflict with the pre-defined values in code list <a href='http://inspire.ec.europa.eu/codelist/DesignationSchemeValue'>DesignationSchemeValue</a>.<br/><br/>
 If a value is not one of the values listed in the data specification, it will be reported. Please review the code list definition to check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule.<br/><br/>						
 For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
@@ -164,12 +168,16 @@ let $newvaluesCode := functx:value-except($valuesCode,$designationCodes)
 let $messages :=
 	(if (empty($newvaluesURI)) then () else
 	for $value in $newvaluesURI
-	return
-		local:addMessage('TR.reviewCodeListValue', map { 'featureType': 'ps:ProtectedSite', 'property': 'ps:designationScheme', 'value': $value }),
+		let $featuresWithValue := $features4[ps:siteDesignation/*/ps:designationScheme/@xlink:href=$value]
+		let $feature := $featuresWithValue[1]
+		return
+		local:addMessage('TR.reviewCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'designationScheme', 'value': $value, 'count': count($featuresWithValue)-1 }),
 	if (empty($newvaluesCode)) then () else
 	for $value in $newvaluesCode
-	return
-		local:addMessage('TR.reviewCodeListValue', map { 'featureType': 'ps:ProtectedSite', 'property': 'ps:designationScheme', 'value': $value }))
+		let $featuresWithValue := $features3[ps3:siteDesignation/*/ps3:designationScheme=$value]
+		let $feature := $featuresWithValue[1]
+		return
+		local:addMessage('TR.reviewCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'designationScheme', 'value': $value, 'count': count($featuresWithValue)-1 }))
 return
 	(if ($messages) then 'PASSED_MANUAL' else 'PASSED',
 	 $messages)

@@ -70,19 +70,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m', 'mm', 'cm', 'dm', 'km')
-let $featuresWithErrors := $features[self::*:WatercourseLink and *:length and not(*:length/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:WatercourseLink and *:length and not(*:length/@uom and *:length/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:length/@uom[not(. = $units)])
+   let $missing := $feature[not(*:length/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -97,19 +100,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m2', 'mm2', 'cm2', 'dm2', 'km2')
-let $featuresWithErrors := $features[self::*:DrainageBasin and *:area and not(*:area/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:DrainageBasin and *:area and not(*:area/@uom and *:area/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:area/@uom[not(. = $units)])
+   let $missing := $feature[not(*:area/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'area', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'area', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'area' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -124,19 +130,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m', 'mm', 'cm', 'dm', 'km')
-let $featuresWithErrors := $features[self::*:Falls and *:length and not(*:length/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:Falls and *:length and not(*:length/@uom and *:length/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:length/@uom[not(. = $units)])
+   let $missing := $feature[not(*:length/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -151,19 +160,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m', 'mm', 'cm', 'dm', 'km')
-let $featuresWithErrors := $features[self::*:StandingWater and *:elevation and not(*:elevation/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:StandingWater and *:elevation and not(*:elevation/@uom and *:elevation/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:elevation/@uom[not(. = $units)])
+   let $missing := $feature[not(*:elevation/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'elevation', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'elevation', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'elevation' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -178,19 +190,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m', 'mm', 'cm', 'dm', 'km')
-let $featuresWithErrors := $features[self::*:StandingWater and *:meanDepth and not(*:meanDepth/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:StandingWater and *:meanDepth and not(*:meanDepth/@uom and *:meanDepth/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:meanDepth/@uom[not(. = $units)])
+   let $missing := $feature[not(*:meanDepth/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'meanDepth', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'meanDepth', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'meanDepth' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -205,19 +220,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m2', 'mm2', 'cm2', 'dm2', 'km2')
-let $featuresWithErrors := $features[self::*:StandingWater and *:surfaceArea and not(*:surfaceArea/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:StandingWater and *:surfaceArea and not(*:surfaceArea/@uom and *:surfaceArea/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:surfaceArea/@uom[not(. = $units)])
+   let $missing := $feature[not(*:surfaceArea/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'surfaceArea', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'surfaceArea', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'surfaceArea' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -232,19 +250,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m', 'mm', 'cm', 'dm', 'km')
-let $featuresWithErrors := $features[self::*:Watercourse and *:length and not(*:length/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:Watercourse and *:length and not(*:length/@uom and *:length/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:length/@uom[not(. = $units)])
+   let $missing := $feature[not(*:length/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'length' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -259,19 +280,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m', 'mm', 'cm', 'dm', 'km')
-let $featuresWithErrors := $features[self::*:Watercourse and *:width/*/*:lower and not(*:width/*/*:lower/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:Watercourse and *:width/*/*:lower and not(*:width/*/*:lower/@uom and *:width/*/*:lower/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:width/*/*:lower/@uom[not(. = $units)])
+   let $missing := $feature[not(*:width/*/*:lower/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'width.lower', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'width.upper', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'width.lower' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -286,19 +310,22 @@ Source: <a href="" target="_blank">Abstract Test Case 'Spatial reference systems
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := ('m', 'mm', 'cm', 'dm', 'km')
-let $featuresWithErrors := $features[self::*:Watercourse and *:width/*/*:upper and not(*:width/*/*:upper/@uom = $units)][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:Watercourse and *:width/*/*:upper and not(*:width/*/*:upper/@uom and *:width/*/*:upper/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    let $uoms := fn:distinct-values($feature/*:width/*/*:upper/@uom[not(. = $units)])
+   let $missing := $feature[not(*:width/*/*:upper/@uom)]
    return
-     for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'width.upper', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }))
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'width.upper', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'width.upper' }) else ()))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
