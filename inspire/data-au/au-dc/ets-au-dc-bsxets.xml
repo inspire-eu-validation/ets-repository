@@ -48,7 +48,7 @@ Pre-requisite conformance classes:
 			<description>IGNORE</description>
 			<parent ref="EIDacc5931c-4ff0-499f-b916-3cda1603456b"/>
 			<testCases>
- 				<TestCase id="EID89897f44-87d9-4f8e-be29-19e62b0380be">
+<!-- 				<TestCase id="EID89897f44-87d9-4f8e-be29-19e62b0380be">
 					<label>Higher Hierarchy Consistency</label>
 					<description>Verify that administrative units, except those corresponding to the country level unit representing a Member State or being a co-administered unit, refer to exactly one administrative unit at a higher level of administrative hierarchy.</description>
 					<parent ref="EID8944a9ef-bf4e-49c4-9a93-4be27b71a77b"/>
@@ -289,6 +289,64 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 										<translationTemplate ref="TR.incorrectCoAdministered"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase> -->
+   				<TestCase id="EID430577bd-bcb1-4f94-8ec0-8aed8795d1c5">
+					<label>condominium administration</label>
+					<description>VVerify whether each condominium is only administered by administrative units at country level.</description>
+					<parent ref="EID8944a9ef-bf4e-49c4-9a93-4be27b71a77b"/>
+					<testSteps>
+						<TestStep id="EIDccc9f79a-f082-4164-8beb-cfab6e34254d">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID430577bd-bcb1-4f94-8ec0-8aed8795d1c5"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID87e1aeaf-5c2f-4c53-bfd7-410bfaace32b">
+									<label>au-dc.d.1: Each condominium is only administered by administrative units at country level.</label>
+									<description><![CDATA[Verify that each condominium only refers to administrative units at country level (each of them representing a Member State) through using the admUnit association role of the condominium spatial object type.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 4.4 (7)): Theme-specific Requirements. Condominiums can only be administered by administrative units at country level.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Condominium administration'</a>]]></description>
+									<parent ref="EIDccc9f79a-f082-4164-8beb-cfab6e34254d"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $condominiums := $features[self::*:Condominium]
+let $administrativeUnits := $features[self::*:AdministrativeUnit]
+
+let $featuresWithErrors :=
+	(for $candidate in $condominiums
+		let $admUnits := $candidate/au:admUnit/@xlink:href
+
+		let $admUnitCheck :=
+		(for $admUnit in $admUnits
+			let $admUnitVal := string($admUnit)
+			let $countryLevelUnit := $administrativeUnits[concat('#', string(@gml:id)) = $admUnitVal]
+			return
+				if ( boolean($countryLevelUnit/au3:nationalLevel[1]/text()='1stOrder' or $countryLevelUnit/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder')) then ()
+				else $admUnit
+		)
+	return
+		if ($admUnitCheck) then $candidate else ()
+	)
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return local:addMessage('TR.incorrectCondominiumAdministration', map { 'filename': local:filename($feature), 'featureType' : local-name($feature), 'gmlid': string($feature/@gml:id)}))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.incorrectCondominiumAdministration"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
