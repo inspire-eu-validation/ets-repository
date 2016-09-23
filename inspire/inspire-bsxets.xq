@@ -293,7 +293,7 @@ declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $tes
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8-esrtt.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52-ettb.xml";
 declare variable $dbDir external;
-declare variable $dbBaseName external := "au_coAdm";
+declare variable $dbBaseName external := "au_upperlower";
 declare variable $dbCount external := 1;
 declare variable $etsFile external := $projDir || file:dir-separator() || "data-au" || file:dir-separator() || "au-dc" || file:dir-separator() || "ets-au-dc-bsxets.xml";
 (: Project internals :)

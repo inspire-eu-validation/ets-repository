@@ -105,7 +105,7 @@ return
 						</TestStep>
 					</testSteps>
 				</TestCase>
-<!--  				<TestCase id="EID9a78ce54-e8b5-4484-b73c-ce11f822391a">
+  				<TestCase id="EID9a78ce54-e8b5-4484-b73c-ce11f822391a">
 					<label>Lower Hierarchy Consistency</label>
 					<description>Verify that administrative units, except those corresponding to the lowest level, refer to its respective lower level units in the administrative hierarchy.</description>
 					<parent ref="EID8944a9ef-bf4e-49c4-9a93-4be27b71a77b"/>
@@ -127,103 +127,8 @@ Relevant requirements:
 Source: <a href="" target="_blank">Abstract Test Case 'Lower Hierarchy'</a>]]></description>
 									<parent ref="EIDd7a07c8f-02ec-4477-891b-e9fad70a06e7"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression> -->
-<!-- try 1 -->
-<!-- let $administrativeUnits := $features[self::*:AdministrativeUnit]
-
-let $sixthLevel :=
-	(for $candidate in $administrativeUnits
-		return
-			if ( boolean($candidate/au3:nationalLevel[1]/text()='6thOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/6thOrder')) then $candidate
-			else ()
-	)
-
-let $fifthLevel :=
-	(for $candidate in $administrativeUnits
-		return
-			if ($sixthLevel) then ()
-			else (
-				if ( boolean($candidate/au3:nationalLevel[1]/text()='5thOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder')) then $candidate
-				else ()
-			)
-)
-
-let $fourthLevel :=
-	(for $candidate in $administrativeUnits
-		return
-			if ($sixthLevel or $fifthLevel) then ()
-			else (
-				if ( boolean($candidate/au3:nationalLevel[1]/text()='4thOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder')) then $candidate
-				else ()
-			)
-)
-
-let $thirdLevel :=
-	(for $candidate in $administrativeUnits
-		return
-			if ($sixthLevel or $ fifthLevel or $fourthLevel) then ()
-			else (
-				if ( boolean($candidate/au3:nationalLevel[1]/text()='3rdOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder')) then $candidate
-				else ()
-			)
-)
-
-let $secondLevel :=
-	(for $candidate in $administrativeUnits
-		return
-			if ($sixthLevel or $fifthLevel or $fourthLevel or $thirdLevel) then ()
-			else (
-				if ( boolean($candidate/au3:nationalLevel[1]/text()='2ndOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder')) then $candidate
-				else ()
-			)
-)
-
-let $firstLevel :=
-	(for $candidate in $administrativeUnits
-		return
-			if ($sixthLevel or $fifthLevel or $fourthLevel or $thirdLevel or $secondLevel) then ()
-			else (
-				if ( boolean($candidate/au3:nationalLevel[1]/text()='1stOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder')) then $candidate
-				else ()
-			)
-)
-
-let $lowestLevel :=
-	if ($sixthLevel) then $sixthLevel
-	else ( if ($fifthLevel) then $fifthLevel
-       	else ( if ($fourthLevel) then $fourthLevel
-           	else (if ($thirdLevel) then $thirdLevel
-               	else (if ($secondLevel) then $secondLevel
-                 	else (if ($firstLevel) then $firstLevel
-          	          else ()
-                    )
-                )
-            )          	   
-	    )
-	)
-
-let $featuresWithErrors :=
-	(for $unit in $administrativeUnits
-		let $lowerLevel := $unit/au:lowerLevelUnit/@xlink:href
-
-		return
-			if ($lowestLevel = $secondLevel) then $unit
-			else()
-	)
-	
- return
-    (if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
-    local:error-statistics('TR.featuresWithErrors', count($lowestLevel)),
-    for $feature in $lowestLevel
-    order by $feature/@gml:id
-    let $level := $feature/au3:nationalLevel[1]/text() | $feature/au:nationalLevel[1]/@xlink:href
-    return
-    	local:addMessage('TR.LevelFound', map { 'gmlid' : string($feature/@gml:id), 'level': substring-after(data($level),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/')})
-    )  -->
-
-
-<!-- try 2 -->
-<!-- let $administrativeUnits := $features[self::*:AdministrativeUnit]
+									<expression>
+let $administrativeUnits := $features[self::*:AdministrativeUnit]
 
 let $featuresWithErrors :=
 	(for $candidate in $administrativeUnits
@@ -234,7 +139,10 @@ let $featuresWithErrors :=
 				let $unitFiveWithError :=
 				(for $unitFindSix in $administrativeUnits
 					return
-					if ( boolean($unitFindSix/au3:nationalLevel[1]/text()='6thOrder' or $unitFindSix/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/6thOrder')) then $unitFindSix
+					if ( boolean($unitFindSix/au3:nationalLevel[1]/text()='6thOrder' or $unitFindSix/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/6thOrder')) then
+						let $LevelSixUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindSix/@gml:id))]/@xlink:href
+						return
+							if (string($LevelSixUnitFound) = concat('#', string($unitFindSix/@gml:id))) then () else $unitFindSix
 					else ()
 				)
 				return
@@ -245,7 +153,10 @@ let $featuresWithErrors :=
 					let $unitFourWithError :=
 					(for $unitFindFive in $administrativeUnits
 						return
-						if ( boolean($unitFindFive/au3:nationalLevel[1]/text()='5thOrder' or $unitFindFive/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder')) then $unitFindFive
+						if ( boolean($unitFindFive/au3:nationalLevel[1]/text()='5thOrder' or $unitFindFive/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder')) then
+							let $LevelFiveUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindFive/@gml:id))]/@xlink:href
+							return
+								if (string($LevelFiveUnitFound) = concat('#', string($unitFindFive/@gml:id))) then () else $unitFindFive
 						else ()
 					)
 					return
@@ -256,7 +167,10 @@ let $featuresWithErrors :=
 						let $unitThreeWithError :=
 						(for $unitFindFour in $administrativeUnits
 							return
-							if ( boolean($unitFindFour/au3:nationalLevel[1]/text()='4thOrder' or $unitFindFour/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder')) then $unitFindFour
+							if ( boolean($unitFindFour/au3:nationalLevel[1]/text()='4thOrder' or $unitFindFour/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder')) then 
+									let $LevelFourUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindFour/@gml:id))]/@xlink:href
+									return
+										if (string($LevelFourUnitFound) = concat('#', string($unitFindFour/@gml:id))) then () else $unitFindFour
 							else ()
 						)
 						return
@@ -267,7 +181,10 @@ let $featuresWithErrors :=
 							let $unitTwoWithError :=
 							(for $unitFindThree in $administrativeUnits
 								return
-								if ( boolean($unitFindThree/au3:nationalLevel[1]/text()='3rdOrder' or $unitFindThree/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder')) then $unitFindThree
+								if ( boolean($unitFindThree/au3:nationalLevel[1]/text()='3rdOrder' or $unitFindThree/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder')) then 
+									let $LevelThreeUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindThree/@gml:id))]/@xlink:href
+									return
+										if (string($LevelThreeUnitFound) = concat('#', string($unitFindThree/@gml:id))) then () else $unitFindThree
 								else ()
 							)
 							return
@@ -278,7 +195,10 @@ let $featuresWithErrors :=
 								let $unitOneWithError :=
 								(for $unitFindTwo in $administrativeUnits
 									return
-									if ( boolean($unitFindTwo/au3:nationalLevel[1]/text()='2ndOrder' or $unitFindTwo/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder')) then $unitFindTwo
+									if ( boolean($unitFindTwo/au3:nationalLevel[1]/text()='2ndOrder' or $unitFindTwo/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder')) then
+										let $LevelTwoUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindTwo/@gml:id))]/@xlink:href
+										return
+											if (string($LevelTwoUnitFound) = concat('#', string($unitFindTwo/@gml:id))) then () else $unitFindTwo
 									else ()
 								)
 								return
@@ -298,18 +218,19 @@ return
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
 	let $level := $feature/au3:nationalLevel[1]/text() | $feature/au:nationalLevel[1]/@xlink:href
-   return local:addMessage('TR.noUpperLevelArea', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'level': substring-after(data($level),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/') })) 
+   return local:addMessage('TR.incorrectLowerLevelArea', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'level': substring-after(data($level),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/') })) 
 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.incorrectLowerLevelArea"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>
 					</testSteps>
-				</TestCase> -->
+				</TestCase>
    				<TestCase id="EID8575dc23-994f-439b-b896-1e298845ea87">
 					<label>co-administered</label>
 					<description>Verify whether the adminsteredBy association role is used for administrative units co-administered by two or more administrative units, and the units co-administering this unit apply the inverse role coAdminister.</description>
