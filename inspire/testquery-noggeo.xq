@@ -99,6 +99,7 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 {
 	if (starts-with($uri,'http://') or starts-with($uri,'https://')) then
 		try { 
+		   let $loginfo := local:log('Checking URL: ''' || $uri || '''')
 		   let $query := "import module namespace http = 'http://expath.org/ns/http-client'; declare variable $timeoutInS external; declare variable $uri external; http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true'/>, $uri)"
 			let $response := xquery:eval($query, map{ 'timeoutInS' : $timeoutInS, 'uri': $uri }, map{ 'timeout': $timeoutInS })
 			return
@@ -117,7 +118,7 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 
 declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer) as map(*)
 {
-	map:merge( for $uri in $uris return map { $uri : local:check-resource-uri($uri, $timeoutInS) } )
+	map:merge( for $uri in fn:distinct-values($uris) return map { string($uri) : local:check-resource-uri(string($uri), $timeoutInS) } )
 };
 
 declare function local:check-code-list-values($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*

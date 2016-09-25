@@ -161,7 +161,7 @@ let $messages :=
 		local:addMessage('TR.emptyUseLimitation', map { 'filename': local:filename($record), 'id': $rid })
 	)[position() le $limitErrors]
 return
-(if ($messages) then 'FAILED' else 'PASSED_MAUNAL',
+(if ($messages) then 'FAILED' else 'PASSED_MANUAL',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 							  </expression>
@@ -697,6 +697,8 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels and gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage]
+let $urls := $recordsToInspect/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
+let $map := local:check-resource-uris($urls, 30)
 let $messages := (for $record in $recordsToInspect
   let $rid := $record/gmd:fileIdentifier/*/text()
   let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
@@ -705,8 +707,7 @@ let $messages := (for $record in $recordsToInspect
     local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
   else
   for $url in $urls
-    let $dummy := local:log('Checking URL: ''' || $url || '''')
-    let $validuri := local:check-resource-uri($url, 30)
+    let $validuri := map:get($map, $url)
     return
     if ($validuri = 'notHTTP') then
 	   local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
@@ -1010,6 +1011,8 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service' and gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage]
+let $urls := $recordsToInspect/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
+let $map := local:check-resource-uris($urls, 30)
 let $messages := (for $record in $recordsToInspect
   let $rid := $record/gmd:fileIdentifier/*/text()
   let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
@@ -1018,8 +1021,7 @@ let $messages := (for $record in $recordsToInspect
     local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
   else
   for $url in $urls
-    let $dummy := local:log('Checking URL: ''' || $url || '''')
-    let $validuri := local:check-resource-uri($url, 30)
+    let $validuri := map:get($map, $url)
     return
     if ($validuri = 'notHTTP') then
 	   local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
@@ -1066,6 +1068,8 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service' and gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn]
+let $urls := $recordsToInspect/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
+let $map := local:check-resource-uris($urls, 30)
 let $messages := 
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
@@ -1076,7 +1080,7 @@ let $messages :=
 	 else
 		for $href in $urls
 		let $url := string($href)
-		let $validuri := local:check-resource-uri($url, 30)
+		let $validuri := map:get($map, $url)
 		return
 		if ($validuri = 'notHTTP') then
 			local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
