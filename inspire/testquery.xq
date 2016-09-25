@@ -136,19 +136,20 @@ declare function local:check-feature-references($hrefs as node()*, $targets as x
 let $dummy := if (count($hrefs)>10) then local:log("Checking " || count($hrefs) || " relatedHydroObject references - this may take awhile...") else ()
 let $messages := 
 	(for $href in $hrefs
+	 let $property := $href/..
 	 let $feature := $href/../..
 	 let $fid := string($feature/@gml:id)
 	 let $url := string($href)
 	 let $validuri := local:check-resource-uri($url, 30)
 	 return
 	 if ($validuri = 'notHTTP') then
-		local:addMessage('TR.urlNotHttp2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
+		local:addMessage('TR.urlNotHttp2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'property': local-name($property), 'url': $url })
 	else if ($validuri = 'idNotFound') then
-		local:addMessage('TR.idNotFound2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
+		local:addMessage('TR.idNotFound2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'property': local-name($property), 'url': $url })
 	else if ($validuri = 'TIMEOUT') then
-		local:addMessage('TR.resourceNotAccessibleTimeout2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'timeout': '30' })
+		local:addMessage('TR.resourceNotAccessibleTimeout2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'property': local-name($property), 'url': $url, 'timeout': '30' })
 	else if (matches($validuri,'\d{3}')) then
-		local:addMessage('TR.resourceNotAccessible2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'status' : $validuri })
+		local:addMessage('TR.resourceNotAccessible2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'property': local-name($property), 'url': $url, 'status' : $validuri })
 	else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/gml+xml') or starts-with($validuri,'application/xml')) then
 		try { 
 			let $root := 
@@ -156,12 +157,12 @@ let $messages :=
 				else fn:doc($url)/element()
 			return
 			if (local-name($root)=$targets) then ()
-			else local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'elementNameExpected': $expected, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
+			else local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'property': local-name($property), 'url': $url, 'elementNameExpected': $expected, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
 		} catch * { 
-			local:addMessage('TR.resourceNotAccessibleException2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'message': $err:description })
+			local:addMessage('TR.resourceNotAccessibleException2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'property': local-name($property), 'url': $url, 'message': $err:description })
 		}
 	else
-		local:addMessage('TR.unknownResourceType2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'mediaType': $validuri })
+		local:addMessage('TR.unknownResourceType2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'property': local-name($property), 'url': $url, 'mediaType': $validuri })
 	)[position() le $limitErrors]
 return
 (local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
