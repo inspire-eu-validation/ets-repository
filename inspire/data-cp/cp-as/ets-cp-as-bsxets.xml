@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID1f9bc92a-5879-4e9b-bcbe-1d2d0cab0aab" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
 	<itemHash>bQ==</itemHash>
-	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-au/au-dc</remoteResource>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-cp/cp-as</remoteResource>
 	<localPath>/auto</localPath>
-	<label>Conformance class: Data consistency, Administrative Units</label>
+	<label>Conformance class: Application Schema, Cadastral parcel</label>
 	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
 <b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
 Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are not fully supported.<br/><br/>
-Source: <a href="https://github.com/inspire-eu-validation/data-cp/tree/master/cp-as" target="_blank">Conformance Class 'Application schema, >Cadastral Parcels'</a><br/><br/>]]></description>
+Source: <a href="https://github.com/inspire-eu-validation/data-cp/tree/master/cp-as" target="_blank">Conformance Class 'Application schema, Cadastral Parcels'</a><br/><br/>]]></description>
 	<reference>../../inspire-bsxets.xq</reference>
 	<version>0.1.0</version>
 	<author>PwC</author>
 	<creationDate>2016-09-27T00:00:00Z</creationDate>
 	<lastEditor>PwC</lastEditor>
-	<lastUpdateDate>2016-09-27T00:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2016-09-28T00:00:00Z</lastUpdateDate>
  	<tags>
 		<tag ref="EID94000e12-3021-4ba6-827e-a59eefd7a3c8"/>
 	</tags>
@@ -67,7 +67,21 @@ Source: <a href="" target="_blank">Abstract Test Case 'Modelling of object refer
 									<parent ref="EIDbbccbf96-6daa-46f7-8bad-8563c0209295"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $cadastralParcels := $features[self::*:CadastralParcel]
 
+let $featuresWithErrors :=
+(for $candidate in $cadastralParcels
+	let $nationalCadastralReference := $candidate/cp:nationalCadastralReference/text()
+
+	return
+		if ($nationalCadastralReference) then () else $candidate
+)
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return local:addMessage('TR.emptyAttribute', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'attribute' : 'nationalCadastralReference' }))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -76,7 +90,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Modelling of object refer
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDf76ab80a-9cd0-4b9a-ac2b-99f296f0f56d">
-									<label>cp-as.a.2: Manual review</label>
+									<label>cp-as.a.2: Manual review - Verify that the value of the attribute nationalCadastralReference enables the users to make the link with rights, owners and other cadastral information in national cadastral registers or equivalent.</label>
 									<description><![CDATA[Verify that the value of the attribute nationalCadastralReference enables the users to make the link with rights, owners and other cadastral information in national cadastral registers or equivalent.<br/><br/>
 Relevant requirements:
 <ul>
