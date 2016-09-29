@@ -56,7 +56,7 @@ Source: <a href="https://github.com/inspire-eu-validation/data-cp/tree/master/cp
 							<statementForExecution>not applicable</statementForExecution>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
-								<TestAssertion id="EIDe2f93bf1-ae15-4b33-a20d-fdd53bd7d78e">
+ 								<TestAssertion id="EIDe2f93bf1-ae15-4b33-a20d-fdd53bd7d78e">
 									<label>cp-rs.a.1: Verify that data related to the spatial data theme Cadastral Parcels made available in plane coordinates using the Lambert Conformal Conic projection are also available in at least one other of the coordinate reference systems specified in sections 1.3.1, 1.3.2 and 1.3.3</label>
 									<description><![CDATA[Verify that data related to the spatial data theme Cadastral Parcels made available in plane coordinates using the Lambert Conformal Conic projection, i.e. the reference to the coordinate reference system in the features uses the Lambert Conformal Conic projection crsuri, are also available in at least one other of the coordinate reference systems specified in sections 1.3.1, 1.3.2 and 1.3.3, i.e. one of the crsuris listed in TG requirement 2<br/><br/>
 Relevant requirements:
@@ -183,24 +183,28 @@ Source: <a href="" target="_blank">Abstract Test Case 'Lambert Conformal Conic P
 									<parent ref="EID634b0715-07c5-4361-bdbe-89ac1fcca709"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- let $crsuriLCC := ('http://www.opengis.net/def/crs/EPSG/0/3034')
-let $crsuris := ('http://www.opengis.net/def/crs/EPSG/0/4936', 'http://www.opengis.net/def/crs/EPSG/0/4937', 'http://www.opengis.net/def/crs/EPSG/0/4258', 'http://www.opengis.net/def/crs/EPSG/0/3035', 'http://www.opengis.net/def/crs/EPSG/0/3038', 'http://www.opengis.net/def/crs/EPSG/0/3039', 'http://www.opengis.net/def/crs/EPSG/0/3040', 'http://www.opengis.net/def/crs/EPSG/0/3041', 'http://www.opengis.net/def/crs/EPSG/0/3042', 'http://www.opengis.net/def/crs/EPSG/0/3043', 'http://www.opengis.net/def/crs/EPSG/0/3044', 'http://www.opengis.net/def/crs/EPSG/0/3045', 'http://www.opengis.net/def/crs/EPSG/0/3046', 'http://www.opengis.net/def/crs/EPSG/0/3047', 'http://www.opengis.net/def/crs/EPSG/0/3048', 'http://www.opengis.net/def/crs/EPSG/0/3049', 'http://www.opengis.net/def/crs/EPSG/0/3050', 'http://www.opengis.net/def/crs/EPSG/0/3051', 'http://www.opengis.net/def/crs/EPSG/0/5730', 'http://www.opengis.net/def/crs/EPSG/0/7409') -->
+let $crsuriLCC := ('http://www.opengis.net/def/crs/EPSG/0/3034')
+let $crsuris := ('http://www.opengis.net/def/crs/EPSG/0/4936', 'http://www.opengis.net/def/crs/EPSG/0/4937', 'http://www.opengis.net/def/crs/EPSG/0/4258', 'http://www.opengis.net/def/crs/EPSG/0/3035', 'http://www.opengis.net/def/crs/EPSG/0/3038', 'http://www.opengis.net/def/crs/EPSG/0/3039', 'http://www.opengis.net/def/crs/EPSG/0/3040', 'http://www.opengis.net/def/crs/EPSG/0/3041', 'http://www.opengis.net/def/crs/EPSG/0/3042', 'http://www.opengis.net/def/crs/EPSG/0/3043', 'http://www.opengis.net/def/crs/EPSG/0/3044', 'http://www.opengis.net/def/crs/EPSG/0/3045', 'http://www.opengis.net/def/crs/EPSG/0/3046', 'http://www.opengis.net/def/crs/EPSG/0/3047', 'http://www.opengis.net/def/crs/EPSG/0/3048', 'http://www.opengis.net/def/crs/EPSG/0/3049', 'http://www.opengis.net/def/crs/EPSG/0/3050', 'http://www.opengis.net/def/crs/EPSG/0/3051', 'http://www.opengis.net/def/crs/EPSG/0/5730', 'http://www.opengis.net/def/crs/EPSG/0/7409')
 
+let $filesWithErrors :=
+(for $file in $db
+	let $LCCfound := $file[*/wfs:boundedBy/*/@srsName[(. = $crsuriLCC)] or */gml:boundedBy/*/@srsName[(. = $crsuriLCC)]]
+	let $otherfound := $file[*/wfs:boundedBy/*/@srsName[(. = $crsuris)] or */gml:boundedBy/*/@srsName[(. = $crsuris)]]
 
-
-<!-- let $crsuris := (
-'http://www.opengis.net/def/crs/EPSG/0/4936', 'http://www.opengis.net/def/crs/EPSG/0/4937', 'http://www.opengis.net/def/crs/EPSG/0/4258', 'http://www.opengis.net/def/crs/EPSG/0/3035', 'http://www.opengis.net/def/crs/EPSG/0/3034', 'http://www.opengis.net/def/crs/EPSG/0/3038', 'http://www.opengis.net/def/crs/EPSG/0/3039', 'http://www.opengis.net/def/crs/EPSG/0/3040', 'http://www.opengis.net/def/crs/EPSG/0/3041', 'http://www.opengis.net/def/crs/EPSG/0/3042', 'http://www.opengis.net/def/crs/EPSG/0/3043', 'http://www.opengis.net/def/crs/EPSG/0/3044', 'http://www.opengis.net/def/crs/EPSG/0/3045', 'http://www.opengis.net/def/crs/EPSG/0/3046', 'http://www.opengis.net/def/crs/EPSG/0/3047', 'http://www.opengis.net/def/crs/EPSG/0/3048', 'http://www.opengis.net/def/crs/EPSG/0/3049', 'http://www.opengis.net/def/crs/EPSG/0/3050', 'http://www.opengis.net/def/crs/EPSG/0/3051', 'http://www.opengis.net/def/crs/EPSG/0/5730', 'http://www.opengis.net/def/crs/EPSG/0/7409')
-let $filesWithErrors := $db[*/wfs:boundedBy/*/@srsName[not(. = $crsuris)] or */gml:boundedBy/*/@srsName[not(. = $crsuris)]][position() le $limitErrors] 
+	return
+		if ($LCCfound) then
+			if ($otherfound) then ()
+			else $file
+		else ()	
+)[position() le $limitErrors]
 return
 (if ($filesWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.filesWithErrors', count($filesWithErrors)),
  for $file in $filesWithErrors
     order by local:filename($file)
     let $root := $file/element()
-    let $srsnames := $file/*/*[local-name() = 'boundedBy']/*/@srsName[not(. = $crsuris)]
-   return
-     for $srsname in $srsnames return local:addMessage('TR.unknownCRS2', map { 'filename': local:filename($root), 'crs': string($srsname) })) 
--->
+    return
+    local:addMessage('TR.missingCRS2BesidesLCC', map { 'filename': local:filename($root) })) 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
