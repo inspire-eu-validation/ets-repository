@@ -113,20 +113,20 @@ let $crsuris := ('http://www.opengis.net/def/crs/EPSG/0/4936', 'http://www.openg
 let $featuresWithErrors:=
 	(for $candidate in $cadastralParcels
 		let $LCCfound := $candidate[.//@srsName[(. = $crsuriLCC)]]
-		let $otherfound := $candidate[.//@srsName[not(. = $crsuris)]]
+		let $otherfound := $candidate[.//@srsName[(. = $crsuris)]]
 
 	return
 		if ($LCCfound) then
 			if ($otherfound) then ()
 			else $candidate
-		else ()
+		else ()	
 	)[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   return local:addMessage('TR.missingCRS1BesidesLCC', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'feature' : $feature })) 
+   return local:addMessage('TR.missingCRS1BesidesLCC', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) })) 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
