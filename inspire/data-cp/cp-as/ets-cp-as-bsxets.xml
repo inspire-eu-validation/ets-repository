@@ -129,7 +129,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Cadastral Boundaries'</a>
 									<parent ref="EID487e2252-6777-4f61-9e1f-7b97865ffeb2"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-NOT APPLICABLE <!--to do -->
+<!--to do -->
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -164,7 +164,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Geometry Representation'<
 									<parent ref="EID487e2252-6777-4f61-9e1f-7b97865ffeb2"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-NOT APPLICABLE <!--to do -->
+<!--to do -->
 <!-- There is a conflict between the ATS description in annex A and the IR requirement as stated in the document. The ETS can not be implemented until this is resolved. -->
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -175,7 +175,60 @@ NOT APPLICABLE <!--to do -->
 							</testAssertions>
 						</TestStep>
 					</testSteps>
-				</TestCase>			
+				</TestCase>
+				<TestCase id="EIDbf3c38ae-92d1-409e-8550-2680de04bfa1">
+					<label>Code list values</label>
+					<description>Verify whether all attributes whose value type is a code list take the values set out therein.</description>
+					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
+					<testSteps>
+						<TestStep id="EID1c04b5b9-e980-4722-8fed-ea7b0fdd26b2">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDbf3c38ae-92d1-409e-8550-2680de04bfa1"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID3b54e278-c15c-44b4-8314-ffba1225b32c">
+									<label>au-as.a.1: CadastralZoningLevel attributes</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue'>http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects.  For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 6 (1): Code Lists and Enumerations. Codelists shall be of one of the following types, as specified in the Annexes:
+<ol>
+<li>code lists whose allowed values comprise only the values specified in this Regulation;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+narrower values defined by data providers;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+additional values at any level defined by data providers;</li>
+<li>code lists, whose allowed values comprise any values defined by data providers.</li>
+</ol>
+For the purposes of points 2, 3 and 4, in addition to the allowed values, data providers may use the values specified in the relevant INSPIRE Technical Guidance document available on the INSPIRE web site of the Joint Research Centre.</li>
+<li>IR Requirement Article 6 (2): Code Lists and Enumerations. Code lists may be hierarchical. Values of hierarchical code lists may have a more generic parent value. Where the valid values of a hierarchical code list are specified in a table in this Regulation, the parent values are listed in the last column.</li>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points 2, 3 or 4 of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+<li>IR Requirement Article 6 (4): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]></description>
+									<parent ref="EID1c04b5b9-e980-4722-8fed-ea7b0fdd26b2"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $features3 := $features[self::cp3:CadastralZoning]
+let $features4 := $features[self::cp:CadastralZoning]
+let $messages := local:check-code-list-values($features3, $features4, 'level', 'http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue')
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>							
 			</testCases>
 		</TestModule>
 	</testModules>
