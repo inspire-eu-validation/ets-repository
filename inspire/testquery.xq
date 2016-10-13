@@ -186,6 +186,26 @@ return
      local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': $property, 'value': string($value), 'codelist' : $uri }))  
 };
 
+declare function local:check-code-list-values-attribute($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
+{
+let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
+let $cluri := $uri || '/' || $clname || '.en.atom'
+let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
+return
+if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' }) else
+let $valuesURI := $clfeed//atom:entry/atom:id/text()
+let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
+let $featuresWithErrors := ($features3[@*[local-name(.) = $property and not(. = $valuesCode)]] | $features4[@*[local-name(.) = $property and not(. = $valuesURI)]])
+[position() le $limitErrors]
+return
+(local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $value := $feature[@*[local-name(.) = $property]]
+   return
+     local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': $property, 'value': string($value), 'codelist' : $uri }))  
+};
+
 
 (:
 @throws: an error that explains why the code list could not be accessed
