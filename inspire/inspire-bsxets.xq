@@ -57,8 +57,8 @@ let $endmessage := prof:void(local:end('" || $assertion/@id || "',$status))
 let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': ' || $status || ' - ' ||$duration || ' ms')
 return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
-    { if (empty($messages)) then () else <messages>{$messages}</messages> }
     <parent ref='" || $stepresultid || "'/>
+    { if (empty($messages)) then () else <messages>{$messages}</messages> }
     <resultedFrom ref='" || $assertion/@id || "'/>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>{$duration}</duration>
@@ -87,8 +87,8 @@ let $status := if ($dependencyResult) then local:status($assertionresults/etf:st
 let $endmessage := prof:void(local:end('" || $step/@id || "',$status))
 return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $stepresultid || "'>
-<testAssertionResults>{$assertionresults}</testAssertionResults>
 <parent ref='" || $caseresultid || "'/>
+<testAssertionResults>{$assertionresults}</testAssertionResults>
 <resultedFrom ref='" || $step/@id || "'/>
 <startTimestamp>{$timestampStep}</startTimestamp>
 <duration>{xs:integer(sum($assertionresults/duration))}</duration>
@@ -106,8 +106,8 @@ let $endmessage := prof:void(local:end('" || $case/@id || "',$status))
 let $logentry := local:log('Test Case ''" || $case/etf:label || "'' finished: ' || $status)
 return 
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $caseresultid || "'>
-<testStepResults>{$teststepresults}</testStepResults>
 <parent ref='" || $moduleresultid || "'/>
+<testStepResults>{$teststepresults}</testStepResults>
 <resultedFrom ref='" || $case/@id || "'/>
 <startTimestamp>{$timestampCase}</startTimestamp>
 <duration>{xs:integer(sum($teststepresults/duration))}</duration>
@@ -122,8 +122,8 @@ let $status := local:status($testcaseresults/etf:status)
 let $endmessage := prof:void(local:end('" || $module/@id || "',$status))
 return
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $moduleresultid || "'>
-<testCaseResults>{$testcaseresults}</testCaseResults>
 <parent ref='" || $testTaskResultId || "'/>
+<testCaseResults>{$testcaseresults}</testCaseResults>
 <resultedFrom ref='" || $module/@id || "'/>
 <startTimestamp>{$timestampModule}</startTimestamp>
 <duration>{xs:integer(sum($testcaseresults/duration))}</duration>
@@ -201,8 +201,8 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 
       return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$stepresultid}'>
-<testAssertionResults>{$assertion-results}</testAssertionResults>
 <parent ref='{$caseresultid}'/>
+<testAssertionResults>{$assertion-results}</testAssertionResults>
 <resultedFrom ref='{$step/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
@@ -211,8 +211,8 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 
     return
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$caseresultid}'>
-<testStepResults>{$test-step-results}</testStepResults>
 <parent ref='{$moduleresultid}'/>
+<testStepResults>{$test-step-results}</testStepResults>
 <resultedFrom ref='{$case/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
@@ -221,8 +221,8 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 
 return 
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$moduleresultid}'>
-<testCaseResults>{$test-case-results}</testCaseResults>
 <parent ref='{$testTaskResultId}'/>
+<testCaseResults>{$test-case-results}</testCaseResults>
 <resultedFrom ref='{$module/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
@@ -293,11 +293,11 @@ declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $tes
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
 declare variable $dbDir external;
-declare variable $dbBaseName external := "errors";
+declare variable $dbBaseName external := "au";
 declare variable $dbCount external := 1;
-declare variable $etsFile external := $projDir || file:dir-separator() || "data-encoding" || file:dir-separator() || "inspire-gml" || file:dir-separator() || "ets-inspire-gml-bsxets.xml";
+declare variable $etsFile external := $projDir || file:dir-separator() || "data-au" || file:dir-separator() || "au-dc" || file:dir-separator() || "ets-au-dc-bsxets.xml";
 (: Project internals :)
-declare variable $testQueryFile := "testquery.xq";
+declare variable $testQueryFile := "testquery-noggeo.xq";
 
 declare variable $limitErrors := 1000;
 declare variable $paramerror := xs:QName("etf:ParameterError");
