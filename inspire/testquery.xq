@@ -6,6 +6,7 @@ declare namespace gn3='urn:x-inspire:specification:gmlas:GeographicalNames:3.0';
 declare namespace cp3='urn:x-inspire:specification:gmlas:CadastralParcels:3.0'; 
 declare namespace ps3='urn:x-inspire:specification:gmlas:ProtectedSites:3.0'; 
 declare namespace au3='urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0';
+declare namespace mu='urn:x-inspire:specification:gmlas:MaritimeUnits:3.0';
 declare namespace base32='urn:x-inspire:specification:gmlas:BaseTypes:3.2'; 
 declare namespace hy='http://inspire.ec.europa.eu/schemas/hy/4.0'; 
 declare namespace hy-n='http://inspire.ec.europa.eu/schemas/hy-n/4.0'; 
