@@ -284,7 +284,7 @@ declare variable $executableTestSuiteId external;
 declare variable $testTaskId external := 'EID' || uuid:randomUUID();
 declare variable $testTaskResultId external := 'EID' || uuid:randomUUID();
 declare variable $translationTemplateBundleId external := "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" ;
-declare variable $projDir external := "/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire";
+declare variable $projDir external := "\Users\vandeloc\Documents\Documents\ARE3NA\WP4\GitHub\ETS-repository\inspire";
 declare variable $tmpDir external := $projDir || file:dir-separator() || "tmp";
 declare variable $outputFile external := $tmpDir || file:dir-separator() || $testTaskResultId || "-result.xml";
 declare variable $logFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-log.txt";
@@ -293,9 +293,9 @@ declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $tes
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
 declare variable $dbDir external;
-declare variable $dbBaseName external := "au";
+declare variable $dbBaseName external := "002-au-errors";
 declare variable $dbCount external := 1;
-declare variable $etsFile external := $projDir || file:dir-separator() || "data-au" || file:dir-separator() || "au-dc" || file:dir-separator() || "ets-au-dc-bsxets.xml";
+declare variable $etsFile external := $projDir || file:dir-separator() || "data-au" || file:dir-separator() || "au-as" || file:dir-separator() || "ets-au-as-bsxets.xml";
 (: Project internals :)
 declare variable $testQueryFile := "testquery-noggeo.xq";
 
