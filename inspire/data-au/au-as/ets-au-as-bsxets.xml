@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>PwC</author>
 	<creationDate>2016-10-12T00:00:00Z</creationDate>
 	<lastEditor>PwC</lastEditor>
-	<lastUpdateDate>2016-10-24T00:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2016-10-25T00:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDfe1f3796-0ebf-4960-a6f7-f935e087fa4b"/>
 	</tags>
@@ -93,6 +93,109 @@ return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID5cc339a4-c007-4538-a816-e3d5d074ad19">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID07e06fe2-84ad-42d7-9f00-ef66c046c90c"/>
+					<testSteps>
+						<TestStep id="EIDc1645b47-344a-456c-a2a2-6808047e0e37">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5cc339a4-c007-4538-a816-e3d5d074ad19"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDde605406-7883-458f-8ae1-59f9b64928e4">
+									<label>au-as.b.1: No unit at highest level can associate units at a higher level</label>
+									<description><![CDATA[No unit at highest level can associate units at a higher level.<br/><br/>
+OCL: "inv: self.nationalLevel = '1stOrder' implies self.upperLevelUnit->isEmpty() and self.loweLevelUnit->notEmpty()".<br/><br/>
+Verify that units of nationalLevel 1stOrder do not reference a unit in upperLevelUnit.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/3.1/au-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EIDc1645b47-344a-456c-a2a2-6808047e0e37"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+<!--to do -->
+<!-- NOTE: OCL constraint "inv: self.nationalLevel = '1stOrder' implies self.upperLevelUnit->isEmpty() and self.lowerLevelUnit->notEmpty()" implies that a dataset with only units at nationalLevel is not valid. -->
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+<TestAssertion id="EID44c654af-5131-4d16-b51d-30ba80311053">
+									<label>au-as.b.2: No unit at lowest level can associate units at lower level</label>
+									<description><![CDATA[No unit at lowest level can associate units at lower level.<br/><br/>
+OCL: "inv: self.nationalLevel = '6thOrder' implies self.lowerLevelUnit->isEmpty and self.upperLevelUnit->notEmpty".<br/><br/>
+Verify that units of nationalLevel 6thOrder do not reference a unit in lowerLevelUnit<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/3.1/au-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EIDc1645b47-344a-456c-a2a2-6808047e0e37"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+<!--to do -->
+<!-- NOTE: OCL constraint "inv: self.nationalLevel = '6thOrder' implies self.lowerLevelUnit->isEmpty and self.upperLevelUnit->notEmpty" implies that the lowest level in the dataset is always of 6thOrder. -->
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+<TestAssertion id="EID1dd27b97-3672-47ab-aaf3-046b778287a9">
+									<label>au-as.b.3: Association role condominium applies only for administrative units which nationalLevel='1st order' (country level)</label>
+									<description><![CDATA[Association role condominium applies only for administrative units which nationalLevel='1st order' (country level).<br/><br/>
+OCL: "inv: self.condominium->notEmpty implies self.nationalLevel = '1stOrder'".<br/><br/>
+Verify that condominium is only set, if the nationalLevel is 1stOrder.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/3.1/au-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EIDc1645b47-344a-456c-a2a2-6808047e0e37"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $administrativeUnits := $features[self::*:AdministrativeUnit]
+
+let $featuresWithErrors :=
+	(for $candidate in $administrativeUnits
+		let $country := boolean($candidate/au3:nationalLevel[1]/text()='1stOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder')
+		let $condominium :=$candidate/au:condominium/@xlink:href
+
+		return
+		if (not($country)) then
+			if ($condominium) then $candidate
+			else ()
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+	let $level := $feature/au3:nationalLevel[1]/text() | $feature/au:nationalLevel[1]/@xlink:href
+	for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Association role condominium applies only for administrative units which nationalLevel='1st order' (country level)', 'additionalInfo': 'Found: ''' || substring-after(data($level),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/') || '''.' }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolation"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
