@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>PwC</author>
 	<creationDate>2016-10-12T00:00:00Z</creationDate>
 	<lastEditor>PwC</lastEditor>
-	<lastUpdateDate>2016-10-12T00:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2016-10-25T00:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID589db923-b4c4-4979-b618-a84ea3228df4"/>
 	</tags>
@@ -244,6 +244,60 @@ return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>																
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID72dd801d-cd5f-409b-b07a-f161106c5ec2">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID016647ff-8d0d-4f8c-a814-0dcd6bcfcb1a"/>
+					<testSteps>
+						<TestStep id="EID81c7e523-72fc-4981-9d59-5b20cef911f6">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID72dd801d-cd5f-409b-b07a-f161106c5ec2"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID719af9fc-ad3d-4c89-85ed-6507712f634a">
+									<label>gn-as.b.1: At least one of the two attributes pronunciationSoundLink and pronunciationIPA shall not be void</label>
+									<description><![CDATA[At least one of the two attributes pronunciationSoundLink and pronunciationIPA shall not be void<br/><br/>
+OCL: "inv: self.pronounciationIPA -> notEmpty() or self.pronounciationSoundLink -> notEmpty()"<br/><br/>
+Verify that for all features either or both pronunciationSoundLink or pronunciationIPA is not void.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-gn/3.1/gn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EID81c7e523-72fc-4981-9d59-5b20cef911f6"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $namedPlaces := $features[self::*:NamedPlace]
+
+let $featuresWithErrors :=
+	(for $candidate in $namedPlaces
+		let $pronunciationSoundLink := $candidate/gn:PronunciationOfName/gn:pronunciationSoundLink
+		let $pronunciationIPA := $candidate/gn:PronunciationOfName/gn:pronunciationIPA
+
+	return 
+		if (not($pronunciationSoundLink or $pronunciationIPA)) then $candidate
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one of the two attributes pronunciationSoundLink and pronunciationIPA shall not be void.'}))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
 							</testAssertions>
 						</TestStep>
 					</testSteps>
