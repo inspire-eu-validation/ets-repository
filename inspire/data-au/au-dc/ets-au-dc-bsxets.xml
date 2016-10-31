@@ -48,7 +48,7 @@ Pre-requisite conformance classes:
 			<description>IGNORE</description>
 			<parent ref="EIDacc5931c-4ff0-499f-b916-3cda1603456b"/>
 			<testCases>
- 				<TestCase id="EID89897f44-87d9-4f8e-be29-19e62b0380be">
+  				<TestCase id="EID89897f44-87d9-4f8e-be29-19e62b0380be">
 					<label>Higher Hierarchy Consistency</label>
 					<description>Verify that administrative units, except those corresponding to the country level unit representing a Member State or being a co-administered unit, refer to exactly one administrative unit at a higher level of administrative hierarchy.</description>
 					<parent ref="EID8944a9ef-bf4e-49c4-9a93-4be27b71a77b"/>
@@ -335,7 +335,7 @@ let $featuresWithErrors :=
 		)
 	return
 		if ($admUnitCheck) then $candidate else ()
-	)
+	)[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -352,7 +352,7 @@ return
 							</testAssertions>
 						</TestStep>
 					</testSteps>
-				</TestCase>
+				</TestCase> 
 				<TestCase id="EID26ea8352-0519-4b9c-9454-89bfc4d13f51">
 					<label>area</label>
 					<description>Verify whether administrative units having the same level of administrative hierarchy do not conceptually share common areas.</description>
@@ -376,11 +376,35 @@ Source: <a href="" target="_blank">Abstract Test Case 'Area'</a>]]></description
 									<parent ref="EIDdb19eabc-cb96-4fa7-bcf0-aea9385423f0"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
- <!--to do-->
+let $administrativeUnits := $features[self::*:AdministrativeUnit]
+
+let $featuresWithErrors :=
+(for $candidate in $administrativeUnits
+		let $featuresToCheck := $administrativeUnits[au:nationalLevel/@xlink:href = $candidate/au:nationalLevel/@xlink:href and not (@gml:id = $candidate/@gml:id)]
+
+		let $checked :=
+		(for $featureToCheck in $featuresToCheck
+			let $candidateGeometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:geometry]/*[1])
+			let $checkGeometry := ggeo:getGeometry($featureToCheck/@gml:id,$featureToCheck/*[self::*:geometry]/*[1])
+			let $check := ggeo:isDisjoint($candidateGeometry, $checkGeometry) 
+			return
+				if ($check = true() ) then () else $candidate
+		)
+		return
+		if ($checked) then $candidate else ()
+)[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $level := $feature/au3:nationalLevel[1]/text() | $feature/au:nationalLevel[1]/@xlink:href
+   return local:addMessage('TR.incorrectGeometry', map { 'filename': local:filename($feature), 'featureType' : local-name($feature), 'gmlid': string($feature/@gml:id), 'level': substring-after(data($level),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/')}))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.AdministrativeUnitArea"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -444,17 +468,39 @@ Source: <a href="" target="_blank">Abstract Test Case 'Condominium Spatial Exten
 									<parent ref="EID92ac87b5-cd0e-4e40-a990-ffe39328d633"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!--to do-->
+ let $condominiums := $features[self::*:Condominium]
+let $administrativeUnits := $features[self::*:AdministrativeUnit]
+
+let $featuresWithErrors :=
+(for $candidate in $condominiums
+		let $checked :=
+		(for $administrativeUnit in $administrativeUnits
+			let $candidateGeometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:geometry]/*[1])
+			let $administrativeUnitGeometry := ggeo:getGeometry($administrativeUnit/@gml:id,$administrativeUnit/*[self::*:geometry]/*[1])
+			let $check := ggeo:overlaps($candidateGeometry, $administrativeUnitGeometry) 
+			return
+				if ($check = true() ) then $candidate else ()
+		)
+		return
+		if ($checked) then $candidate else ()
+)[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return local:addMessage('TR.incorrectCondominiumAdministration', map { 'filename': local:filename($feature), 'featureType' : local-name($feature), 'gmlid': string($feature/@gml:id)}))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.wrongSpatialCondominiumExtent"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>
 					</testSteps>
-				</TestCase>								
+				</TestCase>					
 			</testCases>
 		</TestModule>
 	</testModules>
