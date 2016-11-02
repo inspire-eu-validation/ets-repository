@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDb529e8fa-b9f8-4758-acea-1d2af744599f" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-ps/ps-ia</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Information accessibility, Protected Sites</label>
+	<description><![CDATA[This test suite examines a data set against the themespecific requirements related to the accessibility of resources referenced by the data.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are not fully supported.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ps/3.1/ps-ia" target="_blank">Conformance Class 'Information accessibility, Protected Sites'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
+</ul>]]></description>
+  <reference>../../inspire-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-15T00:00:00Z</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDb1b53238-efe4-4975-8e2d-a194c20a2e74"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID37f4e9b2-d3ae-4c88-bdb5-109a40c07752">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDb529e8fa-b9f8-4758-acea-1d2af744599f"/>
+			<testCases>
+				<TestCase id="EID87c69409-c382-471f-95bd-77615581e930">
+					<label>Code lists</label>
+					<description>Verify that code lists extensions can be accessed.</description>
+					<parent ref="EID37f4e9b2-d3ae-4c88-bdb5-109a40c07752"/>
+					<testSteps>
+						<TestStep id="EID0a59a45d-e834-40c0-9017-e7936d799c83">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID87c69409-c382-471f-95bd-77615581e930"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDea09c016-0187-42e5-9056-d7bd7fa76004">
+									<label>ps-ia.a.1: Code list extensions accessible</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+This data theme currently has two extensible code lists:
+<ul>
+<li><a href='http://inspire.ec.europa.eu/codelist/DesignationSchemeValue'>DesignationSchemeValue</a></li>
+<li><a href='http://inspire.ec.europa.eu/codelist/DesignationValue'>DesignationValue</a></li>
+</ul>
+Note that this test is only executed automatically on GML documents using the v4.0 GML application schema as starting with this version, HTTP URIs are used as code list values. For version 3.0 schemas this test is executed manually.<br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Version consistency'</a>]]></description>
+									<parent ref="EID0a59a45d-e834-40c0-9017-e7936d799c83"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $featuresToInspect := $features[self::*:ProtectedSite]
+let $uris := 
+	fn:distinct-values( 
+		for $clv in $featuresToInspect/ps:siteDesignation/*/*[self::ps:designationScheme or self::ps:designation]
+			return $clv/@xlink:href) (: $clv/@codeSpace || '/' || $clv/text() :)
+let $urimap := local:check-resource-uris($uris, 30)
+let $errorregex := '(notHTTP|idNotFound|TIMEOUT|\d{3})'
+let $featuresWithErrors := if (count($uris)=0) then () else
+	$featuresToInspect[*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] or
+		*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else if ($features[self::ps3:ProtectedSite]) then 'PASSED_MANUAL' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $values := $feature/*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] |
+		$feature/*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]
+   return
+   	for $value in $values
+   		let $uri := $value/@xlink:href
+     		return local:addMessage('TR.brokenLink', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': local-name($value), 'value': string($value/@xlink:href), 'uri': string($uri) }))
+						 </expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLink"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
