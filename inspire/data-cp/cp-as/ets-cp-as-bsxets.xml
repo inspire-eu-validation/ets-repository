@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID1f9bc92a-5879-4e9b-bcbe-1d2d0cab0aab" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-cp/cp-as</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Application Schema, Cadastral parcel</label>
+	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are not fully supported.<br/><br/>
+Source: <a href="https://github.com/inspire-eu-validation/data-cp/tree/master/cp-as" target="_blank">Conformance Class 'Application schema, Cadastral Parcels'</a><br/><br/>]]></description>
+	<reference>../../inspire-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>PwC</author>
+	<creationDate>2016-09-27T00:00:00Z</creationDate>
+	<lastEditor>PwC</lastEditor>
+	<lastUpdateDate>2016-09-28T00:00:00Z</lastUpdateDate>
+ 	<tags>
+		<tag ref="EID94000e12-3021-4ba6-827e-a59eefd7a3c8"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+ 	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID052df133-b598-4f1c-957f-8354751fc3c3">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID1f9bc92a-5879-4e9b-bcbe-1d2d0cab0aab"/>
+			<testCases>
+ 				<TestCase id="EID67cce5c3-336e-4a5b-b6be-4cc4a6daba61">
+					<label>Modelling of object references</label>
+					<description>Verify whether all instances of the spatial object type CadastralParcel carry as a thematic identifier the attribute nationalCadastralReference. This attribute must enable users to make the link with rights, owners and other cadastral information in national cadastral registers or equivalent.</description>
+					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
+					<testSteps>
+						<TestStep id="EIDbbccbf96-6daa-46f7-8bad-8563c0209295">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID67cce5c3-336e-4a5b-b6be-4cc4a6daba61"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDf9e38ad9-f997-4e26-8a4c-f5f7d82f48c4">
+									<label>cp-as.a.1: Verify whether all instances of the spatial object type CadastralParcel carry as a thematic identifier the attribute nationalCadastralReference.</label>
+									<description><![CDATA[Verify that all instances of the spatial object type CadastralParcel have as a thematic identifier the attribute nationalCadastralReference.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 6.3.2: Theme-specific Requirements. All instances of the spatial object type CadastralParcel shall carry as a thematic identifier the attribute nationalCadastralReference. This attribute must enable users to make the link with rights, owners and other cadastral information in national cadastral registers or equivalent.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Modelling of object references'</a>]]></description>
+									<parent ref="EIDbbccbf96-6daa-46f7-8bad-8563c0209295"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $cadastralParcels := $features[self::*:CadastralParcel]
+
+let $featuresWithErrors :=
+(for $candidate in $cadastralParcels
+	let $nationalCadastralReference := $candidate/cp:nationalCadastralReference/text()
+
+	return
+		if ($nationalCadastralReference) then () else $candidate
+)
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return local:addMessage('TR.emptyAttribute', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'attribute' : 'nationalCadastralReference' }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.noUpperLevelArea"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDf76ab80a-9cd0-4b9a-ac2b-99f296f0f56d">
+									<label>cp-as.a.2: Manual review - Verify that the value of the attribute nationalCadastralReference enables the users to make the link with rights, owners and other cadastral information in national cadastral registers or equivalent.</label>
+									<description><![CDATA[Verify that the value of the attribute nationalCadastralReference enables the users to make the link with rights, owners and other cadastral information in national cadastral registers or equivalent.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 6.3.2: Theme-specific Requirements. All instances of the spatial object type CadastralParcel shall carry as a thematic identifier the attribute nationalCadastralReference. This attribute must enable users to make the link with rights, owners and other cadastral information in national cadastral registers or equivalent.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Modelling of object references'</a>]]></description>
+									<parent ref="EIDbbccbf96-6daa-46f7-8bad-8563c0209295"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>NOT_APPLICABLE</expression>
+									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID36322003-1c28-432b-8fcc-dceaa3ce8395">
+					<label>Cadastral Boundaries</label>
+					<description>Verify whether, if cadastral boundaries are provided, the cadastral boundaries corresponding to the outline of a cadastral parcel form closed ring(s).</description>
+					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
+					<testSteps>
+						<TestStep id="EID487e2252-6777-4f61-9e1f-7b97865ffeb2">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID36322003-1c28-432b-8fcc-dceaa3ce8395"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDbe281220-e6b9-47ab-925e-a41015b6337e">
+									<label>cp-as.b.1: Cadastral boundaries corresponding to the outline of a cadastral parcel form closed ring(s).</label>
+									<description><![CDATA[Check that cadastral boundaries corresponding to the outline of a cadastral parcel form closed ring(s).<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 6.3.2 (2): Theme-specific Requirements. If cadastral boundaries are provided, the cadastral boundaries corresponding to the outline of a cadastral parcel shall form closed ring(s).</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Cadastral Boundaries'</a>]]></description>
+									<parent ref="EID487e2252-6777-4f61-9e1f-7b97865ffeb2"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+<!--to do -->
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>	
+				<TestCase id="EID36322003-1c28-432b-8fcc-dceaa3ce8395">
+					<label>geometry Representation</label>
+					<description>Verification whether the value domain of spatial properties is not restricted to the Simple Feature spatial schema as defined by EN ISO 19125-1.</description>
+					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
+					<testSteps>
+						<TestStep id="EID487e2252-6777-4f61-9e1f-7b97865ffeb2">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID36322003-1c28-432b-8fcc-dceaa3ce8395"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDbe281220-e6b9-47ab-925e-a41015b6337e">
+									<label>cp-as.c.1: The value domain of spatial properties is not restricted to the Simple Feature spatial schema as defined by EN ISO 19125-1.</label>
+									<description><![CDATA[Check whether all spatial properties only use 0, 1 and 2-dimensional geometric objects that exist in the right 2-, 3- or 4-dimensional coordinate space, and where all curve interpolations respect the rules specified in the reference documents.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section x: Theme-specific Requirements. By way of derogation from article 12(1), the value domain of spatial properties used in the xxx package shall not be restricted.</li>
+<li>IR Requirement Annex II Section 6.3.2: Theme-specific Requirements. By way of derogation from article 12(1), the value domain of spatial properties used in the Cadastral Parcels package shall be restricted to the Simple Feature spatial schema as defined by EN ISO 19125-1:2006.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Geometry Representation'</a>]]></description>
+									<parent ref="EID487e2252-6777-4f61-9e1f-7b97865ffeb2"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+<!--to do -->
+<!-- There is a conflict between the ATS description in annex A and the IR requirement as stated in the document. The ETS can not be implemented until this is resolved. -->
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EIDbf3c38ae-92d1-409e-8550-2680de04bfa1">
+					<label>Code list values</label>
+					<description>Verify whether all attributes whose value type is a code list take the values set out therein.</description>
+					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
+					<testSteps>
+						<TestStep id="EID1c04b5b9-e980-4722-8fed-ea7b0fdd26b2">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDbf3c38ae-92d1-409e-8550-2680de04bfa1"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID3b54e278-c15c-44b4-8314-ffba1225b32c">
+									<label>cp-as.c.1: CadastralZoningLevel attributes</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue'>http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects.  For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 6 (1): Code Lists and Enumerations. Codelists shall be of one of the following types, as specified in the Annexes:
+<ol>
+<li>code lists whose allowed values comprise only the values specified in this Regulation;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+narrower values defined by data providers;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+additional values at any level defined by data providers;</li>
+<li>code lists, whose allowed values comprise any values defined by data providers.</li>
+</ol>
+For the purposes of points 2, 3 and 4, in addition to the allowed values, data providers may use the values specified in the relevant INSPIRE Technical Guidance document available on the INSPIRE web site of the Joint Research Centre.</li>
+<li>IR Requirement Article 6 (2): Code Lists and Enumerations. Code lists may be hierarchical. Values of hierarchical code lists may have a more generic parent value. Where the valid values of a hierarchical code list are specified in a table in this Regulation, the parent values are listed in the last column.</li>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points 2, 3 or 4 of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+<li>IR Requirement Article 6 (4): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]></description>
+									<parent ref="EID1c04b5b9-e980-4722-8fed-ea7b0fdd26b2"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $features3 := $features[self::cp3:CadastralZoning]
+let $features4 := $features[self::cp:CadastralZoning]
+let $messages := local:check-code-list-values($features3, $features4, 'level', 'http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue')
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>							
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>

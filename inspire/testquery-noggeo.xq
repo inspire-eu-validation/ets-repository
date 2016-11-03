@@ -5,6 +5,7 @@ declare namespace net3='urn:x-inspire:specification:gmlas:Network:3.2';
 declare namespace gn3='urn:x-inspire:specification:gmlas:GeographicalNames:3.0'; 
 declare namespace cp3='urn:x-inspire:specification:gmlas:CadastralParcels:3.0'; 
 declare namespace ps3='urn:x-inspire:specification:gmlas:ProtectedSites:3.0'; 
+declare namespace au3='urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0';
 declare namespace base32='urn:x-inspire:specification:gmlas:BaseTypes:3.2'; 
 declare namespace hy='http://inspire.ec.europa.eu/schemas/hy/4.0'; 
 declare namespace hy-n='http://inspire.ec.europa.eu/schemas/hy-n/4.0'; 
@@ -12,7 +13,8 @@ declare namespace hy-p='http://inspire.ec.europa.eu/schemas/hy-p/4.0';
 declare namespace net='http://inspire.ec.europa.eu/schemas/net/4.0'; 
 declare namespace gn='http://inspire.ec.europa.eu/schemas/gn/4.0'; 
 declare namespace cp='http://inspire.ec.europa.eu/schemas/cp/4.0'; 
-declare namespace ps='http://inspire.ec.europa.eu/schemas/cp/4.0'; 
+declare namespace ps='http://inspire.ec.europa.eu/schemas/ps/4.0'; 
+declare namespace au='http://inspire.ec.europa.eu/schemas/au/4.0'; 
 declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3'; 
 declare namespace gml='http://www.opengis.net/gml/3.2'; 
 declare namespace wfs='http://www.opengis.net/wfs/2.0'; 
@@ -76,18 +78,18 @@ declare function local:addMessage($templateId as xs:string, $map as map(*)) as e
 
 declare function local:passed($id as xs:string) as xs:boolean
 {
-	true() (: TODO :)
+  true() (: TODO :)
 };
 
 declare function local:error-statistics($template as xs:string, $count as xs:integer) as element()*
 {
-	(if ($count>=$limitErrors) then local:addMessage('TR.tooManyErrors', map { 'count': string($limitErrors) }) else (),
-	 if ($count>0) then local:addMessage($template, map { 'count': string($count) }) else ())
+  (if ($count>=$limitErrors) then local:addMessage('TR.tooManyErrors', map { 'count': string($limitErrors) }) else (),
+   if ($count>0) then local:addMessage($template, map { 'count': string($count) }) else ())
 };
 
 declare function local:status($stati as xs:string*) as xs:string 
 {
-	if ($stati='FAILED') then 'FAILED' else if ($stati='SKIPPED') then 'SKIPPED' else if ($stati='WARNING') then 'WARNING' else if ($stati='INFO') then 'INFO' else if ($stati='PASSED_MANUAL') then 'PASSED_MANUAL' else if ($stati='PASSED') then 'PASSED' else if ($stati='NOT_APPLICABLE') then 'NOT_APPLICABLE' else 'UNDEFINED'
+  if ($stati='FAILED') then 'FAILED' else if ($stati='SKIPPED') then 'SKIPPED' else if ($stati='WARNING') then 'WARNING' else if ($stati='INFO') then 'INFO' else if ($stati='PASSED_MANUAL') then 'PASSED_MANUAL' else if ($stati='PASSED') then 'PASSED' else if ($stati='NOT_APPLICABLE') then 'NOT_APPLICABLE' else 'UNDEFINED'
 };
 
 (: 'notHTTP' = not a HTTP(S) URL
@@ -97,28 +99,69 @@ declare function local:status($stati as xs:string*) as xs:string
 
 declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:integer) as xs:string
 {
-	if (starts-with($uri,'http://') or starts-with($uri,'https://')) then
-		try { 
-		   let $loginfo := local:log('Checking URL: ''' || $uri || '''')
-		   let $query := "import module namespace http = 'http://expath.org/ns/http-client'; declare variable $timeoutInS external; declare variable $uri external; http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true'/>, $uri)"
-			let $response := xquery:eval($query, map{ 'timeoutInS' : $timeoutInS, 'uri': $uri }, map{ 'timeout': $timeoutInS })
-			return
-			if ($response/@status=('200','204')) then
-		  		$response/http:header[lower-case(@name)='content-type']/@value
-			else
-				$response/@status
-		} catch * 
-		{ 
-			let $logerror := local:log($err:description || ' URL: ' || $uri)
-			return 'TIMEOUT' 
-		}
-	else
-		'notHTTP'
+  if (starts-with($uri,'http://') or starts-with($uri,'https://')) then
+    try { 
+      let $response := http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true'/>, $uri) 
+      return
+      if ($response/@status=('200','204')) then
+          $response/http:header[lower-case(@name)='content-type']/@value
+      else
+        $response/@status
+    } catch * 
+    { 
+      'TIMEOUT' 
+    }
+  else if (starts-with($uri,'#')) then
+    let $response := $features[@gml:id=substring($uri,2)] 
+    return
+    if ($response) then
+      'application/gml+xml'
+    else
+      'idNotFound'
+  else
+    'notHTTP'
 };
 
 declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer) as map(*)
 {
-	map:merge( for $uri in fn:distinct-values($uris) return map { string($uri) : local:check-resource-uri(string($uri), $timeoutInS) } )
+  map:merge( for $uri in $uris return map { $uri : local:check-resource-uri($uri, $timeoutInS) } )
+};
+
+declare function local:check-feature-references($hrefs as node()*, $targets as xs:string*, $expected as xs:string) as element()*
+{
+let $dummy := if (count($hrefs)>10) then local:log("Checking " || count($hrefs) || " relatedHydroObject references - this may take awhile...") else ()
+let $messages := 
+  (for $href in $hrefs
+   let $feature := $href/../..
+   let $fid := string($feature/@gml:id)
+   let $url := string($href)
+   let $validuri := local:check-resource-uri($url, 30)
+   return
+   if ($validuri = 'notHTTP') then
+    local:addMessage('TR.urlNotHttp2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
+  else if ($validuri = 'idNotFound') then
+    local:addMessage('TR.idNotFound2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
+  else if ($validuri = 'TIMEOUT') then
+    local:addMessage('TR.resourceNotAccessibleTimeout2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'timeout': '30' })
+  else if (matches($validuri,'\d{3}')) then
+    local:addMessage('TR.resourceNotAccessible2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'status' : $validuri })
+  else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/gml+xml') or starts-with($validuri,'application/xml')) then
+    try { 
+      let $root := 
+        if (starts-with($url,'#')) then $features[@gml:id=substring($url,2)]
+        else fn:doc($url)/element()
+      return
+      if (local-name($root)=$targets) then ()
+      else local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'elementNameExpected': $expected, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
+    } catch * { 
+      local:addMessage('TR.resourceNotAccessibleException2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'message': $err:description })
+    }
+  else
+    local:addMessage('TR.unknownResourceType2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'mediaType': $validuri })
+  )[position() le $limitErrors]
+return
+(local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)
 };
 
 declare function local:check-code-list-values($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
@@ -127,7 +170,7 @@ let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
 let $cluri := $uri || '/' || $clname || '.en.atom'
 let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
 return
-if (not($clfeed)) then ('FAILED', local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' }))
+if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' })
 else
 let $valuesURI := $clfeed//atom:entry/atom:id/text()
 let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
@@ -142,6 +185,25 @@ return
      local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': $property, 'value': string($value), 'codelist' : $uri }))  
 };
 
+declare function local:check-code-list-values-attribute($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
+{
+let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
+let $cluri := $uri || '/' || $clname || '.en.atom'
+let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
+return
+if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' }) else
+let $valuesURI := $clfeed//atom:entry/atom:id/text()
+let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
+let $featuresWithErrors := ($features3[@*[local-name(.) = $property and not(. = $valuesCode)]] | $features4[@*[local-name(.) = $property and not(. = $valuesURI)]])
+[position() le $limitErrors]
+return
+(local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $value := $feature[@*[local-name(.) = $property]]
+   return
+     local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': $property, 'value': string($value), 'codelist' : $uri }))  
+};
 
 (:
 @throws: an error that explains why the code list could not be accessed
@@ -152,7 +214,7 @@ let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa
 let $clurl := $url || '/' || $clname || '.en.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
-  if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
+  if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
      error((),'Code list ' || $url || ' cannot be accessed.')
   else if ($valid_clurl = 'TIMEOUT') then
     error((),'Access to code list ' || $url || ' timed out.')
@@ -165,8 +227,8 @@ return
         let $codes := for $codeUri in $codeUris return fn:substring-after($codeUri, $url || '/')
         return
           $codes
-    		} catch * { 
-    			error((),'Code list ' || $url || ' cannot be accessed.')
+        } catch * { 
+          error((),'Code list ' || $url || ' cannot be accessed.')
       }
 };
 
@@ -180,7 +242,7 @@ let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa
 let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
-  if ($valid_clurl = 'notHTTP' or matches($valid_clurl,'\d{3}')) then
+  if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
      error((),'Code list ' || $url || ' cannot be accessed.')
   else if ($valid_clurl = 'TIMEOUT') then
     error((),'Access to code list ' || $url || ' timed out.')
@@ -191,8 +253,8 @@ return
         let $root := fn:doc($clurl)/element()
         return
           $root//atom:entry
-		} catch * { 
-			error((),'Code list ' || $url || ' cannot be accessed.')
+    } catch * { 
+      error((),'Code list ' || $url || ' cannot be accessed.')
     }
 };
 
@@ -213,7 +275,7 @@ declare function local:get-code-titles($url as xs:string, $langIds as xs:string*
 
 declare function local:is-valid-date-or-dateTime($dateString as xs:string) as xs:boolean
 {
-	let $date := 
+  let $date := 
     try {
       let $tmp := xs:date($dateString)
       return
@@ -264,22 +326,22 @@ return
 
 declare function local:getAllowedValuesURI( $uri as xs:string ) as xs:string*
 {
-	let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
-	let $cluri := $uri || '/' || $clname || '.en.atom'
-	let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
-	return
-		if (not($clfeed)) then 
-			let $dummy := local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' })
-			return ()
-		else
-			let $valuesURI := $clfeed//atom:entry/atom:id/text()
-			return $valuesURI
+  let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
+  let $cluri := $uri || '/' || $clname || '.en.atom'
+  let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
+  return
+    if (not($clfeed)) then 
+      let $dummy := local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' })
+      return ()
+    else
+      let $valuesURI := $clfeed//atom:entry/atom:id/text()
+      return $valuesURI
 };
 
 declare function local:getAllowedValuesCode( $valuesURI as xs:string*, $uri as xs:string ) as xs:string*
 {
-	let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
-	return $valuesCode
+  let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
+  return $valuesCode
 };
 
 (: Start logging :)
