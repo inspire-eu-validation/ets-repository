@@ -7,13 +7,15 @@
 	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
 <b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
 Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are not fully supported.<br/><br/>
-Source: <a href="https://github.com/inspire-eu-validation/data-cp/tree/master/cp-as" target="_blank">Conformance Class 'Application schema, Cadastral Parcels'</a><br/><br/>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as" target="_blank">Conformance Class 'Application schema, Cadastral Parcels'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-gml" target="_blank">Conformance Class 'GML application schemas, Cadastral Parcels'</a></li></ul>]]></description>
 	<reference>../../inspire-bsxets.xq</reference>
 	<version>0.1.0</version>
 	<author>PwC</author>
 	<creationDate>2016-09-27T00:00:00Z</creationDate>
-	<lastEditor>PwC</lastEditor>
-	<lastUpdateDate>2016-09-28T00:00:00Z</lastUpdateDate>
+	<lastEditor>interactive instruments</lastEditor>
+	<lastUpdateDate>2016-11-04T00:00:00Z</lastUpdateDate>
  	<tags>
 		<tag ref="EID94000e12-3021-4ba6-827e-a59eefd7a3c8"/>
 	</tags>
@@ -37,14 +39,15 @@ Source: <a href="https://github.com/inspire-eu-validation/data-cp/tree/master/cp
 		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
 	</supportedTestObjectTypes>
 	<dependencies>
-	</dependencies>
+		<executableTestSuite ref="EID18b742d0-15eb-421f-bbec-7c8c5cf7ee1a"/>
+	</dependencies>	
 	<testModules>
 		<TestModule id="EID052df133-b598-4f1c-957f-8354751fc3c3">
 			<label>IGNORE</label>
 			<description>IGNORE</description>
 			<parent ref="EID1f9bc92a-5879-4e9b-bcbe-1d2d0cab0aab"/>
 			<testCases>
- 				<TestCase id="EID67cce5c3-336e-4a5b-b6be-4cc4a6daba61">
+  				<TestCase id="EID67cce5c3-336e-4a5b-b6be-4cc4a6daba61">
 					<label>Modelling of object references</label>
 					<description>Verify whether all instances of the spatial object type CadastralParcel carry as a thematic identifier the attribute nationalCadastralReference. This attribute must enable users to make the link with rights, owners and other cadastral information in national cadastral registers or equivalent.</description>
 					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
@@ -67,15 +70,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Modelling of object refer
 									<parent ref="EIDbbccbf96-6daa-46f7-8bad-8563c0209295"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $cadastralParcels := $features[self::*:CadastralParcel]
-
-let $featuresWithErrors :=
-(for $candidate in $cadastralParcels
-	let $nationalCadastralReference := $candidate/cp:nationalCadastralReference/text()
-
-	return
-		if ($nationalCadastralReference) then () else $candidate
-)
+let $featuresWithErrors := $features[self::*:CadastralParcel and not(*:nationalCadastralReference)]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -106,7 +101,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Modelling of object refer
 						</TestStep>
 					</testSteps>
 				</TestCase>
-				<TestCase id="EID36322003-1c28-432b-8fcc-dceaa3ce8395">
+ 				<TestCase id="EID36322003-1c28-432b-8fcc-dceaa3ce8395">
 					<label>Cadastral Boundaries</label>
 					<description>Verify whether, if cadastral boundaries are provided, the cadastral boundaries corresponding to the outline of a cadastral parcel form closed ring(s).</description>
 					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
@@ -129,54 +124,42 @@ Source: <a href="" target="_blank">Abstract Test Case 'Cadastral Boundaries'</a>
 									<parent ref="EID487e2252-6777-4f61-9e1f-7b97865ffeb2"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!--to do -->
+let $messages :=
+(for $candidate in $features[self::*:CadastralParcel]
+  return
+  try {
+  let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
+  let $env := ggeo:envelope($candidate_geometry)
+  let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+  let $onBoundary :=
+  for $feature in $other_features[self::*:CadastralBoundary]
+   let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+   let $check := ggeo:relate($other_geometry, $candidate_geometry, 'FTFF*FT*T') 
+	return if ($check) then $feature else ()
+  return 
+  if (not($onBoundary)) then () 
+  else
+    let $union := ggeo:union($onBoundary)
+    (: TODO reduce to line strings that are not closed, requires a new isClosed() function in GmlGeoX :)
+    let $linestrings := functx:get-matches($union,'LINESTRING\s?\([\d,\.\s]+\)')[fn:string-length(.)>0]
+    return local:addMessage('TR.openBoundary', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'featureType2' : local-name($onBoundary[1]), 'gmlids': string-join($onBoundary/@gml:id, ''', '''), 'openBoundaries': fn:string-join($linestrings, ', ') })
+   } catch * { 
+   })[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)
 									</expression>
+									<testItemType ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
+									<!-- disabled for now, see TODO
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-									<translationTemplates>
-										<translationTemplate ref="TR.featuresWithErrors"/>
-									</translationTemplates>
-								</TestAssertion>
-							</testAssertions>
-						</TestStep>
-					</testSteps>
-				</TestCase>	
-				<TestCase id="EID36322003-1c28-432b-8fcc-dceaa3ce8395">
-					<label>geometry Representation</label>
-					<description>Verification whether the value domain of spatial properties is not restricted to the Simple Feature spatial schema as defined by EN ISO 19125-1.</description>
-					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
-					<testSteps>
-						<TestStep id="EID487e2252-6777-4f61-9e1f-7b97865ffeb2">
-							<label>IGNORE</label>
-							<description>IGNORE</description>
-							<parent ref="EID36322003-1c28-432b-8fcc-dceaa3ce8395"/>
-							<statementForExecution>not applicable</statementForExecution>
-							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
-							<testAssertions>
-								<TestAssertion id="EIDbe281220-e6b9-47ab-925e-a41015b6337e">
-									<label>cp-as.c.1: The value domain of spatial properties is not restricted to the Simple Feature spatial schema as defined by EN ISO 19125-1.</label>
-									<description><![CDATA[Check whether all spatial properties only use 0, 1 and 2-dimensional geometric objects that exist in the right 2-, 3- or 4-dimensional coordinate space, and where all curve interpolations respect the rules specified in the reference documents.<br/><br/>
-Relevant requirements:
-<ul>
-<li>IR Requirement Annex II Section x: Theme-specific Requirements. By way of derogation from article 12(1), the value domain of spatial properties used in the xxx package shall not be restricted.</li>
-<li>IR Requirement Annex II Section 6.3.2: Theme-specific Requirements. By way of derogation from article 12(1), the value domain of spatial properties used in the Cadastral Parcels package shall be restricted to the Simple Feature spatial schema as defined by EN ISO 19125-1:2006.</li>
-</ul>
-Source: <a href="" target="_blank">Abstract Test Case 'Geometry Representation'</a>]]></description>
-									<parent ref="EID487e2252-6777-4f61-9e1f-7b97865ffeb2"/>
-									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>
-<!--to do -->
-<!-- There is a conflict between the ATS description in annex A and the IR requirement as stated in the document. The ETS can not be implemented until this is resolved. -->
-									</expression>
-									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-									<translationTemplates>
-										<translationTemplate ref="TR.featuresWithErrors"/>
-									</translationTemplates>
+									-->
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>
 					</testSteps>
 				</TestCase>
-				<TestCase id="EIDbf3c38ae-92d1-409e-8550-2680de04bfa1">
+ 				<TestCase id="EIDbf3c38ae-92d1-409e-8550-2680de04bfa1">
 					<label>Code list values</label>
 					<description>Verify whether all attributes whose value type is a code list take the values set out therein.</description>
 					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
@@ -224,6 +207,160 @@ return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 										<translationTemplate ref="TR.disallowedCodeListValue"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID43f3aaa7-ea02-4435-9d05-78f5e48c463b">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID052df133-b598-4f1c-957f-8354751fc3c3"/>
+					<testSteps>
+						<TestStep id="EID856a5b01-bfbf-45e0-9f01-7252eff56354">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID43f3aaa7-ea02-4435-9d05-78f5e48c463b"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+							<TestAssertion id="EID2be9a647-eee6-4a6e-b9cc-ec0220d0c6a7">
+									<label>cp-as.d.1: Value of areaValue shall be given in square meters</label>
+									<description><![CDATA[Value of areaValue shall be given in square meters<br/><br/>
+OCL: "inv: self.areaValue.uom.uomSymbol='m2'".<br/><br/>
+Verify that BasicPropertyUnit.areaValue.uom and CadastralParcel.areaValue.uom are given in 'm2'.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EID856a5b01-bfbf-45e0-9f01-7252eff56354"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $units := 'm2'
+let $featuresWithErrors := $features[self::*:BasicPropertyUnit or self::*:CadastralParcel and *:areaValue and not (*:areaValue/@uom and *:areaValue/@uom=$units)][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $uoms := fn:distinct-values($feature/*:areaValue/@uom[not(. = $units)])
+   let $missing := $feature[not(*:areaValue/@uom)]
+   return
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'areaValue', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'areaValue' }) else ()))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates> 
+								</TestAssertion>
+								<TestAssertion id="EID2c800fcb-3e82-4385-be9c-1fc6a761dc9b">
+									<label>cp-as.d.2: Value of estimatedAccuracy shall be given in meters</label>
+									<description><![CDATA[Value of estimatedAccuracy shall be given in meters<br/><br/>
+OCL: "inv: self.estimatedAccuracy.uom.uomSymbol='m'".<br/><br/>
+Verify that CadastralBoundary.estimatedAccuracy.uom and CadastralZoning.estimatedAccuracy.uom are given in 'm'.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EID856a5b01-bfbf-45e0-9f01-7252eff56354"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $units := 'm'
+let $featuresWithErrors := $features[self::*:CadastralBoundary or self::*:CadastralZoning and *:estimatedAccuracy and not (*:estimatedAccuracy/@uom and *:estimatedAccuracy/@uom=$units)][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $uoms := fn:distinct-values($feature/*:estimatedAccuracy/@uom[not(. = $units)])
+   let $missing := $feature[not(*:estimatedAccuracy/@uom)]
+   return
+     (for $uom in $uoms return local:addMessage('TR.unknownUoM', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'estimatedAccuracy', 'uom': string($uom), 'allowedUoM' : string-join($units, ', ') }),
+      if ($missing) then local:addMessage('TR.uomMissing', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'estimatedAccuracy' }) else ()))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.unknownUoM"/>
+										<translationTemplate ref="TR.uomMissing"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates> 
+								</TestAssertion>
+								<TestAssertion id="EID1e7f2289-f7be-4db4-8673-e84d05a091bd">
+									<label>cp-as.d.3: Type of geometry shall be GM_Surface or GM_MultiSurface</label>
+									<description><![CDATA[Type of geometry shall be GM_Surface or GM_MultiSurface<br/><br/>
+OCL "inv: geometry.oclIsKindOf(GM_Surface) or geometry.oclIsKindOf(GM_MultiSurface)".<br/><br/>
+Verify that CadastralParcel.geometryType is a gml:Surface or gml:MutiSurface.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EID856a5b01-bfbf-45e0-9f01-7252eff56354"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $featuresToInspect := $features[self::*:CadastralParcel]
+let $featuresWithErrors := $featuresToInspect[*:geometry/*[not(self::gml:Polygon or self::gml:Surface or self::gml:MultiSurface)]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Type of geometry shall be GM_Surface or GM_MultiSurface.', 'additionalInfo': 'Found: ''' || local-name($feature/*:geometry/*) || '''.' }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates> 
+								</TestAssertion>
+								<TestAssertion id="EID7c7de013-84bf-4e14-8831-912f1b328646">
+									<label>cp-as.d.4: A lower level cadastral zoning shall be part of an upper level zoning.</label>
+									<description><![CDATA[A lower level cadastral zoning shall be part of an upper level zoning.<br/><br/>
+OCL: "inv: self.nationalLevel <> '1stOrder' implies self.level < self.upperLevelUnit.level".<br/><br/>
+Verify that for a CadastralZoning not of the nationalLevel 1st Order, its own level is lower than the level of the CadastralZoning referenced in upperLevelUnit.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EID856a5b01-bfbf-45e0-9f01-7252eff56354"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('2ndOrder', '3rdOrder')
+let $candidates := $features[self::*:CadastralZoning and (cp3:level[1]/text()=$levels or substring-after(cp:level[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/')=$levels)]
+let $refcount := count($candidates/*:upperLevelUnit[not(@xsi:nil='true')]/@xlink:href)
+let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
+let $messages := 
+  (for $candidate in $candidates
+   order by $candidate/@gml:id
+   let $level := if ($candidate[cp3:level[1]/text()='3rdOrder' or cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/3rdOrder']) then '2ndOrder'
+                else if ($candidate[cp3:level[1]/text()='2ndOrder' or cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/2ndOrder']) then '1stOrder'
+                else ()
+   let $href := $candidate/*:upperLevelUnit[not(@xsi:nil='true')]/@xlink:href 
+   let $element := local:return-reference($href)
+   return
+    if (not($element)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+    else if (not($element[self::*:CadastralZoning])) then local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id), 'url': string($href), 'elementNameExpected': 'CadastralZoning', 'elementName': local-name($element), 'namespace': namespace-uri($element) })
+    else if (not($element/cp3:level[1]/text()=$level or substring-after($element/cp:level[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/')=$level)) then local:addMessage('TR.constraintViolation', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id), 'constraint': 'A lower level cadastral zoning shall be part of an upper level zoning.', 'additionalInfo': 'The level of the reference zone should be ''' || $level || ''', but the level is ''' || substring-after($element/cp3:level[1]/text() | $element/cp:level[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/') || '''.' })
+    else ())[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)										
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates> 
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>

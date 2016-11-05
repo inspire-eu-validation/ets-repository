@@ -15,6 +15,7 @@ declare namespace gn='http://inspire.ec.europa.eu/schemas/gn/4.0';
 declare namespace cp='http://inspire.ec.europa.eu/schemas/cp/4.0'; 
 declare namespace ps='http://inspire.ec.europa.eu/schemas/ps/4.0'; 
 declare namespace au='http://inspire.ec.europa.eu/schemas/au/4.0'; 
+declare namespace mu='http://inspire.ec.europa.eu/schemas/mu/3.0'; 
 declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3'; 
 declare namespace gml='http://www.opengis.net/gml/3.2'; 
 declare namespace wfs='http://www.opengis.net/wfs/2.0'; 
@@ -130,7 +131,7 @@ declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as x
 
 declare function local:check-feature-references($hrefs as node()*, $targets as xs:string*, $expected as xs:string) as element()*
 {
-let $dummy := if (count($hrefs)>10) then local:log("Checking " || count($hrefs) || " relatedHydroObject references - this may take awhile...") else ()
+let $dummy := if (count($hrefs)>10) then local:log("Checking " || count($hrefs) || " feature references - this may take awhile...") else ()
 let $messages := 
   (for $href in $hrefs
    let $feature := $href/../..
@@ -165,6 +166,19 @@ return
  $messages)
 };
 
+declare function local:return-reference($href as node()) as element()?
+{
+   try { 
+     let $url := string($href)
+     let $validuri := local:check-resource-uri($url, 30)
+     let $root := 
+       if (starts-with($url,'#')) then $features[@gml:id=substring($url,2)]
+       else fn:doc($url)/element()
+     return $root
+   } catch * { 
+   }
+};
+
 declare function local:check-code-list-values($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
 {
 let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
@@ -175,7 +189,7 @@ if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code li
 else
 let $valuesURI := $clfeed//atom:entry/atom:id/text()
 let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
-let $featuresWithErrors := ($features3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $features4[*[local-name()=$property and not(@xsi:nil='true') and @xlink:href and not(@xlink:href=$valuesURI)]])[position() le $limitErrors]
+let $featuresWithErrors := ($features3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $features4[*[local-name()=$property and not(@xsi:nil='true') and not(@xlink:href=$valuesURI)]])[position() le $limitErrors]
 return
 (local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
@@ -186,22 +200,23 @@ return
      local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': $property, 'value': string($value), 'codelist' : $uri }))  
 };
 
-declare function local:check-code-list-values-attribute($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
+declare function local:check-code-list-values-gn($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
 {
 let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
 let $cluri := $uri || '/' || $clname || '.en.atom'
 let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
 return
-if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' }) else
+if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' })
+else
 let $valuesURI := $clfeed//atom:entry/atom:id/text()
 let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
-let $featuresWithErrors := ($features3[@*[local-name(.) = $property and not(. = $valuesCode)]] | $features4[@*[local-name(.) = $property and not(. = $valuesURI)]])
-[position() le $limitErrors]
+let $featuresWithErrors := ($features3[*/gn3:GeographicalName/*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $features4[*/gn:GeographicalName/*[local-name()=$property and not(@xsi:nil='true') and not(@xlink:href=$valuesURI)]])[position() le $limitErrors]
 return
 (local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $value := $feature[@*[local-name(.) = $property]]
+   let $v4 := fn:starts-with(namespace-uri($feature/*/*:GeographicalName/*[local-name()=$property]),'http://inspire.ec.europa.eu/schemas/')
+   let $value := if ($v4) then $feature/*/gn:GeographicalName/*[local-name()=$property]/@xlink:href else $feature/*/gn3:GeographicalName/*[local-name()=$property]/text()
    return
      local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': $property, 'value': string($value), 'codelist' : $uri }))  
 };
@@ -352,7 +367,7 @@ let $logentry := local:log('Testing ' || count($features) || ' features')
 let $start := prof:current-ms()
 let $geometryParsingErrors :=
   map:merge(for $feature in $features
-    let $geom := $feature//*[self::gml:Point or self::gml:LineString or self::gml:Curve or self::gml:Polygon or self::gml:PolyhedralSurface or self::gml:Surface or self::gml:MultiPoint or self::gml:MultiCurve or self::gml:MultiLineString or self::gml:MultiSurface or self::gml:MultiPolygon or self::gml:MultiGeometry][1]
+    let $geom := ($feature//*[self::gml:Point or self::gml:LineString or self::gml:Curve or self::gml:Polygon or self::gml:PolyhedralSurface or self::gml:Surface or self::gml:MultiPoint or self::gml:MultiCurve or self::gml:MultiLineString or self::gml:MultiSurface or self::gml:MultiPolygon or self::gml:MultiGeometry])[1]
     return 
     if ($geom) then 
       try { 

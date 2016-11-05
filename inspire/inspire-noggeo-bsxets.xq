@@ -1,22 +1,13 @@
 declare namespace base32='http://inspire.ec.europa.eu/schemas/base/3.2';
 declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3';
-declare namespace csw='http://www.opengis.net/cat/csw/2.0.2';
-declare namespace gsr='http://www.isotc211.org/2005/gsr';
-declare namespace gss='http://www.isotc211.org/2005/gss';
-declare namespace gts='http://www.isotc211.org/2005/gts';
-declare namespace gmx='http://www.isotc211.org/2005/gmx'; 
-declare namespace srv='http://www.isotc211.org/2005/srv';
-declare namespace gco='http://www.isotc211.org/2005/gco';
-declare namespace gmd='http://www.isotc211.org/2005/gmd';
 declare namespace gml='http://www.opengis.net/gml/3.2';
-declare namespace gml31='http://www.opengis.net/gml';
 declare namespace wfs='http://www.opengis.net/wfs/2.0';
 declare namespace xsi='http://www.w3.org/2001/XMLSchema-instance';
 declare namespace xlink='http://www.w3.org/1999/xlink';
 declare namespace etf='http://www.interactive-instruments.de/etf/2.0';
 declare namespace uuid='java.util.UUID';
 
-declare function local:test($db as document-node()*, $records as element()*, $ets as element()*, $testQuery as xs:string) as element()
+declare function local:test($db as document-node()*, $features as element()*, $ets as element()*, $testQuery as xs:string) as element()
 {
 let $query := $testQuery || 
 (let $test-module-results :=
@@ -162,7 +153,7 @@ return
 else ()}
 { if (file:exists('" || $statFile || "')) then 
 <Attachment xmlns='http://www.interactive-instruments.de/etf/2.0' type='StatisticalReport' id='EID{uuid:randomUUID()}'>
-<label>Metadata record statistics</label>
+<label>Feature statistics</label>
 <encoding>UTF-8</encoding>
 <mimeType>application/xml</mimeType>
 <referencedData href='" || file:path-to-uri($statFile) || "'/>
@@ -186,7 +177,7 @@ else ()}
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
 
 return try {
-  xquery:eval($query, map {'records': $records, 'validationErrors': $validationErrors, 'db': $db, 'encoding': $encoding, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile, 'schemapath': $schemapath })
+  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(gml:identifier), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile })
 } catch * {
 let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
@@ -256,7 +247,7 @@ return
 </Attachment>
 { if (file:exists($statFile)) then 
 <Attachment xmlns="http://www.interactive-instruments.de/etf/2.0" type="StatisticalReport" id="EID{uuid:randomUUID()}">
-<label>Metadata record statistics</label>
+<label>Feature statistics</label>
 <encoding>UTF-8</encoding>
 <mimeType>application/xml</mimeType>
 <referencedData href='{file:path-to-uri($statFile)}'/>
@@ -279,10 +270,9 @@ else ()}
 };
 
 (: Parameters as strings :)
-declare variable $encoding external := "CSW ISO AP 1.0.0";
 declare variable $files_to_test external := ".*";
 declare variable $tests_to_execute external := ".*";
-declare variable $Schema_file external := 'apiso.xsd';
+declare variable $schema_file external;
 
 (: ETF test driver parameters :)
 (: For local testing set $projDir, $dbBaseName in local DB without "-0" suffix and $etsFile :)
@@ -300,15 +290,14 @@ declare variable $outputFile external := $tmpDir || file:dir-separator() || $tes
 declare variable $logFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-log.txt";
 declare variable $statFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-stat.xml";
 declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-query.xq";
-declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "StatisticalReportTableType-EID242272e0-3f0a-4e9c-9643-657c4d6d304a.xml";
+declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
-declare variable $schemapath := $projDir || file:dir-separator() || "schemas" || file:dir-separator();
 declare variable $dbDir external;
-declare variable $dbBaseName external := "md";
+declare variable $dbBaseName external := "e-cp";
 declare variable $dbCount external := 1;
-declare variable $etsFile external := $projDir || file:dir-separator() || "metadata" || file:dir-separator() || "iso" || file:dir-separator() || "ets-md-iso-bsxets.xml";
+declare variable $etsFile external := $projDir || file:dir-separator() || "data-cp" || file:dir-separator() || "cp-ia" || file:dir-separator() || "ets-cp-ia-bsxets.xml";
 (: Project internals :)
-declare variable $testQueryFile := "testquery-md.xq";
+declare variable $testQueryFile := "testquery-noggeo.xq";
 
 declare variable $limitErrors := 1000;
 declare variable $paramerror := xs:QName("etf:ParameterError");
@@ -361,7 +350,7 @@ try{
 
 let $db := for $i in 0 to $count return db:open($dbBaseName || '-' || $i)[matches(db:path(.),$files_to_test)]
 
-let $records := $db//gmd:MD_Metadata
+let $features := $db/wfs:FeatureCollection/wfs:member/* | $db/gml:FeatureCollection/gml:featureMember/* | $db/gml:FeatureCollection/gml:featureMembers/* | $db/base:SpatialDataSet/base:member/* | $db/base32:SpatialDataSet/base32:member/*
 
 let $stattmpl := if (not($statisticalReportTableType) or not(fn:doc-available($statisticalReportTableType))) then () else doc($statisticalReportTableType)
 let $stat := if (not($stattmpl)) then "let $logentry := local:log('Statistics table: " || string($statisticalReportTableType) || "')" else "
@@ -380,6 +369,6 @@ let $logentry := local:log('Statistics table: ' || $duration || ' ms')
 
 "
 
-let $res := local:test($db, $records, $ets, $testQuery || $startlog || $stat)
+let $res := local:test($db, $features, $ets, $testQuery || $startlog || $stat)
 let $dummy := file:write($outputFile,$res)
 return ($res)

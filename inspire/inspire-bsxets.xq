@@ -293,11 +293,11 @@ declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $tes
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
 declare variable $dbDir external;
-declare variable $dbBaseName external := "au";
+declare variable $dbBaseName external := "012-gn";
 declare variable $dbCount external := 1;
-declare variable $etsFile external := $projDir || file:dir-separator() || "data-au" || file:dir-separator() || "au-dc" || file:dir-separator() || "ets-au-dc-bsxets.xml";
+declare variable $etsFile external := $projDir || file:dir-separator() || "data-gn" || file:dir-separator() || "gn-as" || file:dir-separator() || "ets-gn-as-bsxets.xml";
 (: Project internals :)
-declare variable $testQueryFile := "testquery-noggeo.xq";
+declare variable $testQueryFile := "testquery.xq";
 
 declare variable $limitErrors := 1000;
 declare variable $paramerror := xs:QName("etf:ParameterError");
