@@ -1,6 +1,6 @@
 # ets-repository
 
-Repository for Executable Test Suites of the INSPIRE validator using [ETF](https://github.com/interactive-instruments/etf-webapp) as the test framework software tool.
+Repository for Executable Test Suites of the INSPIRE validator (under development) using [ETF](https://github.com/interactive-instruments/etf-webapp) as the test framework software tool.
 
 ## Testing the executable test suites
 
