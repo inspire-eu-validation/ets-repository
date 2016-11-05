@@ -71,22 +71,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Higher Hierarchy'</a>]]><
 									<parent ref="EIDbead9324-b7b6-405e-bbe8-c59683bfcea1"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $administrativeUnits := $features[self::*:AdministrativeUnit]
-
-let $featuresWithErrors :=
-	(for $candidate in $administrativeUnits
-		let $country := boolean($candidate/au3:nationalLevel[1]/text()='1stOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder') 
-		let $administeredBy := $candidate/au:administeredBy/@xlink:href
-		let $upperLevel := $candidate/au:upperLevelUnit/@xlink:href
-
-		return
-		if (not($country)) then 
-			if (count($administeredBy) lt 2) then
-				if (count($upperLevel) != 1) then $candidate
-				else ()
-			else ()
-		else ()
-	)[position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:AdministrativeUnit and not(au3:nationalLevel[1]/text()='1stOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder' or *:administeredBy/@xlink:href) and count(*:upperLevelUnit[@xlink:href or @xsi:nil='true']) ne 1][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -118,8 +103,8 @@ return
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EIDca5200cc-d6e1-47d6-837d-8b1dc40d30fd">
-									<label>au-dc.b.1: Each administrative unit refers to all its respective lower level administrative units, except those corresponding to the lowest level of the administrative hierarchy.</label>
-									<description><![CDATA[Verify for each administrative unit, expect those corresponding to the lowest level of the administrative hierarchy, that it refers to all its respective lower level administrative units using the lowerLevelUnit association role.<br/><br/>
+									<label>au-dc.b.1: Each administrative unit refers to a lower level administrative units, except those corresponding to the lowest level of the administrative hierarchy.</label>
+									<description><![CDATA[Verify for each administrative unit, expect those corresponding to the lowest level of the administrative hierarchy, that it refers to a lower level administrative unit using the lowerLevelUnit association role.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 4.4 (2)): Theme-specific Requirements. Each instance of spatial object type AdministrativeUnit, except for those at the lowest level, shall refer to their respective lower level units. This correspondence shall be expressed by the lowerLevelUnit association role of AdministrativeUnit spatial object type.</li>
@@ -128,90 +113,16 @@ Source: <a href="" target="_blank">Abstract Test Case 'Lower Hierarchy'</a>]]></
 									<parent ref="EIDd7a07c8f-02ec-4477-891b-e9fad70a06e7"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $administrativeUnits := $features[self::*:AdministrativeUnit]
-
-let $featuresWithErrors :=
-	(for $candidate in $administrativeUnits
-		return
-		if ( boolean($candidate/au3:nationalLevel[1]/text()='6thOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/6thOrder')) then ()
-		else ( 
-			if ( boolean($candidate/au3:nationalLevel[1]/text()='5thOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder')) then (
-				let $unitFiveWithError :=
-				(for $unitFindSix in $administrativeUnits
-					return
-					if ( boolean($unitFindSix/au3:nationalLevel[1]/text()='6thOrder' or $unitFindSix/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/6thOrder')) then
-						let $LevelSixUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindSix/@gml:id))]/@xlink:href
-						return
-							if (string($LevelSixUnitFound) = concat('#', string($unitFindSix/@gml:id))) then () else $unitFindSix
-					else ()
-				)
-				return
-					if ($unitFiveWithError) then $candidate else ()
-				)
-			else (
-				if ( boolean($candidate/au3:nationalLevel[1]/text()='4thOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder')) then (
-					let $unitFourWithError :=
-					(for $unitFindFive in $administrativeUnits
-						return
-						if ( boolean($unitFindFive/au3:nationalLevel[1]/text()='5thOrder' or $unitFindFive/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder')) then
-							let $LevelFiveUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindFive/@gml:id))]/@xlink:href
-							return
-								if (string($LevelFiveUnitFound) = concat('#', string($unitFindFive/@gml:id))) then () else $unitFindFive
-						else ()
-					)
-					return
-						if ($unitFourWithError) then $candidate else ()
-					)
-				else(
-					if ( boolean($candidate/au3:nationalLevel[1]/text()='3rdOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder')) then (
-						let $unitThreeWithError :=
-						(for $unitFindFour in $administrativeUnits
-							return
-							if ( boolean($unitFindFour/au3:nationalLevel[1]/text()='4thOrder' or $unitFindFour/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder')) then 
-									let $LevelFourUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindFour/@gml:id))]/@xlink:href
-									return
-										if (string($LevelFourUnitFound) = concat('#', string($unitFindFour/@gml:id))) then () else $unitFindFour
-							else ()
-						)
-						return
-							if ($unitThreeWithError) then $candidate else ()
-					)
-					else(
-						if ( boolean($candidate/au3:nationalLevel[1]/text()='2ndOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder')) then (
-							let $unitTwoWithError :=
-							(for $unitFindThree in $administrativeUnits
-								return
-								if ( boolean($unitFindThree/au3:nationalLevel[1]/text()='3rdOrder' or $unitFindThree/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder')) then 
-									let $LevelThreeUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindThree/@gml:id))]/@xlink:href
-									return
-										if (string($LevelThreeUnitFound) = concat('#', string($unitFindThree/@gml:id))) then () else $unitFindThree
-								else ()
-							)
-							return
-								if ($unitTwoWithError) then $candidate else ()
-						)
-						else(
-							if ( boolean($candidate/au3:nationalLevel[1]/text()='1stOrder' or $candidate/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder')) then (
-								let $unitOneWithError :=
-								(for $unitFindTwo in $administrativeUnits
-									return
-									if ( boolean($unitFindTwo/au3:nationalLevel[1]/text()='2ndOrder' or $unitFindTwo/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder')) then
-										let $LevelTwoUnitFound := $candidate/au:lowerLevelUnit[string(@xlink:href) = concat('#', string($unitFindTwo/@gml:id))]/@xlink:href
-										return
-											if (string($LevelTwoUnitFound) = concat('#', string($unitFindTwo/@gml:id))) then () else $unitFindTwo
-									else ()
-								)
-								return
-									if ($unitOneWithError) then $candidate else ()
-							)
-							else()
-						)
-					)
-				)
-			)
-		)
-	)
-
+let $levels := if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='6thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/6thOrder')]) then ('1stOrder','2ndOrder','3rdOrder','4thOrder','5thOrder')
+                    else if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='5thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder')]) then ('1stOrder','2ndOrder','3rdOrder','4thOrder')
+                    else if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='4thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder')]) then ('1stOrder','2ndOrder','3rdOrder')
+                    else if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='3rdOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder')]) then ('1stOrder','2ndOrder')
+                    else if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='2ndOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder')]) then '1stOrder'
+                    else ()
+return                    
+if (count($levels)=0) then 'PASSED'
+else
+let $featuresWithErrors := $features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()=$levels or substring-after(au:nationalLevel[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/')=$levels) and not(*:lowerLevelUnit[@xlink:href or @xsi:nil='true'])][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -219,12 +130,69 @@ return
    order by $feature/@gml:id
 	let $level := $feature/au3:nationalLevel[1]/text() | $feature/au:nationalLevel[1]/@xlink:href
    return local:addMessage('TR.incorrectLowerLevelArea', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'level': substring-after(data($level),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/') })) 
-
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 										<translationTemplate ref="TR.incorrectLowerLevelArea"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID13980d13-1916-4c1b-a8ad-2ab4c804c477">
+									<label>au-dc.b.2: Each administrative unit refers to lower level administrative units on the next level, except those corresponding to the lowest level of the administrative hierarchy.</label>
+									<description><![CDATA[Verify for each administrative unit, expect those corresponding to the lowest level of the administrative hierarchy, that it refers to administrative units on the next level using the lowerLevelUnit association role.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 4.4 (2)): Theme-specific Requirements. Each instance of spatial object type AdministrativeUnit, except for those at the lowest level, shall refer to their respective lower level units. This correspondence shall be expressed by the lowerLevelUnit association role of AdministrativeUnit spatial object type.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Lower Hierarchy'</a>]]></description>
+									<parent ref="EIDd7a07c8f-02ec-4477-891b-e9fad70a06e7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='6thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/6thOrder')]) then ('1stOrder','2ndOrder','3rdOrder','4thOrder','5thOrder')
+                    else if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='5thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder')]) then ('1stOrder','2ndOrder','3rdOrder','4thOrder')
+                    else if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='4thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder')]) then ('1stOrder','2ndOrder','3rdOrder')
+                    else if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='3rdOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder')]) then ('1stOrder','2ndOrder')
+                    else if ($features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()='2ndOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder')]) then '1stOrder'
+                    else ()
+return                    
+if (count($levels)=0) then 'PASSED'
+else
+let $candidates := $features[self::*:AdministrativeUnit and (au3:nationalLevel[1]/text()=$levels or substring-after(au:nationalLevel[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/')=$levels)]
+let $refcount := count($candidates/*:lowerLevelUnit[not(@xsi:nil='true')]/@xlink:href)
+let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
+let $messages := 
+  (for $candidate in $candidates
+   order by $candidate/@gml:id
+  let $level := if ($candidate[au3:nationalLevel[1]/text()='5thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder']) then '6thOrder'
+                else if ($candidate[au3:nationalLevel[1]/text()='4thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder']) then '5thOrder'
+                else if ($candidate[au3:nationalLevel[1]/text()='3rdOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder']) then '4thOrder'
+                else if ($candidate[au3:nationalLevel[1]/text()='2ndOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder']) then '3rdOrder'
+                else if ($candidate[au3:nationalLevel[1]/text()='1stOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder']) then '2ndOrder'
+                else ()
+  return
+  for $href in $candidate/*:lowerLevelUnit[not(@xsi:nil='true')]/@xlink:href 
+    let $element := local:return-reference($href)
+    return
+    if (not($element)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+    else if (not($element[self::*:AdministrativeUnit])) then local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id), 'url': string($href), 'elementNameExpected': 'AdministrativeUnit', 'elementName': local-name($element), 'namespace': namespace-uri($element) })
+    else if (not($element/au3:nationalLevel[1]/text()=$level or substring-after($element/au:nationalLevel[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/')=$level)) then local:addMessage('TR.notAnAdminUnitAtNextLevel', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id), 'url': string($href), 'expectedLevel': $level, 'level': substring-after($element/au3:nationalLevel[1]/text() | $element/au:nationalLevel[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/') })
+    else ())[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)									
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.notAnAdminUnitAtNextLevel"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -256,34 +224,32 @@ Source: <a href="" target="_blank">Abstract Test Case 'Co-administered'</a>]]></
 									<parent ref="EIDe60579bd-1e10-4957-b27c-d45fe0cd8c43"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $administrativeUnits := $features[self::*:AdministrativeUnit]
-
-let $featuresWithErrors :=
-	(for $candidate in $administrativeUnits
-		let $administeredBy := $candidate/au:administeredBy/@xlink:href
-		let $candidateVal := concat('#', string($candidate/@gml:id))
-
+let $candidates := $features[self::*:AdministrativeUnit and count(*:administeredBy[not(@xsi:nil='true') and @xlink:href]) ge 2]
+let $refcount := count($candidates/*:administeredBy[not(@xsi:nil='true')]/@xlink:href)
+let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
+let $messages :=
+  (for $href in $candidates/*:administeredBy[not(@xsi:nil='true')]/@xlink:href 
+    let $candidate := $href/../..
+    let $element := local:return-reference($href)
+    order by $candidate/@gml:id
     return
-		if (count($administeredBy) >= 2) then (
-			let $coAdminCheck :=
-				(for $administer in $administeredBy
-					let $administerVal := string($administer)
-					let $coAdminVal := $administrativeUnits[concat('#', string(@gml:id)) = $administerVal]/au:coAdminister/@xlink:href
-							return
-								if ($coAdminVal = string($candidateVal)) then () else $administer
-		 				)
-			return
-			if ($coAdminCheck) then $coAdminCheck else ()
-		)		
-		else ()
-
-	)[position() le $limitErrors]
+    if (not($element)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+    else if (not($element[self::*:AdministrativeUnit])) then local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id), 'url': string($href), 'elementNameExpected': 'AdministrativeUnit', 'elementName': local-name($element), 'namespace': namespace-uri($element) })
+    else 
+      let $backref :=
+      for $href2 in $element/*:coAdminister[not(@xsi:nil='true')]/@xlink:href
+        let $element2 := local:return-reference($href2)
+        return
+        if (not($element2)) then $href2 (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+        else if ($candidate/@gml:id ne $element2/@gml:id) then ()
+        else $href2
+      return
+      if ($backref) then ()
+      else local:addMessage('TR.incorrectCoAdministered', map { 'filename': local:filename($candidate), 'featureType' : 'AdministrativeUnit', 'gmlid': string($candidate/@gml:id), 'url': string($href) }))[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   return local:addMessage('TR.incorrectCoAdministered', map { 'filename': local:filename($feature), 'featureType' : 'AdministrativeUnit', 'gmlid': string($feature)}))
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -318,30 +284,23 @@ Source: <a href="" target="_blank">Abstract Test Case 'Condominium administratio
 									<parent ref="EIDccc9f79a-f082-4164-8beb-cfab6e34254d"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $condominiums := $features[self::*:Condominium]
-let $administrativeUnits := $features[self::*:AdministrativeUnit]
-
-let $featuresWithErrors :=
-	(for $candidate in $condominiums
-		let $admUnits := $candidate/au:admUnit/@xlink:href
-
-		let $admUnitCheck :=
-		(for $admUnit in $admUnits
-			let $admUnitVal := string($admUnit)
-			let $countryLevelUnit := $administrativeUnits[concat('#', string(@gml:id)) = $admUnitVal]
-			return
-				if ( boolean($countryLevelUnit/au3:nationalLevel[1]/text()='1stOrder' or $countryLevelUnit/au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder')) then ()
-				else $admUnit
-		)
-	return
-		if ($admUnitCheck) then $candidate else ()
-	)[position() le $limitErrors]
+let $candidates := $features[self::*:Condominium]
+let $refcount := count($candidates/*:admUnit[not(@xsi:nil='true')]/@xlink:href)
+let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
+let $messages :=
+  (for $href in $candidates/*:admUnit[not(@xsi:nil='true')]/@xlink:href 
+    let $candidate := $href/../..
+    let $element := local:return-reference($href)
+    order by $candidate/@gml:id
+    return
+    if (not($element)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+    else if (not($element[self::*:AdministrativeUnit])) then local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id), 'url': string($href), 'elementNameExpected': 'AdministrativeUnit', 'elementName': local-name($element), 'namespace': namespace-uri($element) })
+    else if ($element[au3:nationalLevel[1]/text()='1stOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder']) then ()
+    else local:addMessage('TR.incorrectCondominiumAdministration', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'url' : string($href), 'level': substring-after($element/au3:nationalLevel[1]/text() | $element/au:nationalLevel[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/') }))[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   return local:addMessage('TR.incorrectCondominiumAdministration', map { 'filename': local:filename($feature), 'featureType' : local-name($feature), 'gmlid': string($feature/@gml:id)}))
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)									
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -376,30 +335,26 @@ Source: <a href="" target="_blank">Abstract Test Case 'Area'</a>]]></description
 									<parent ref="EIDdb19eabc-cb96-4fa7-bcf0-aea9385423f0"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $administrativeUnits := $features[self::*:AdministrativeUnit]
-
-let $featuresWithErrors :=
-(for $candidate in $administrativeUnits
-		let $featuresToCheck := $administrativeUnits[au:nationalLevel/@xlink:href = $candidate/au:nationalLevel/@xlink:href and not (@gml:id = $candidate/@gml:id)]
-
-		let $checked :=
-		(for $featureToCheck in $featuresToCheck
-			let $candidateGeometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:geometry]/*[1])
-			let $checkGeometry := ggeo:getGeometry($featureToCheck/@gml:id,$featureToCheck/*[self::*:geometry]/*[1])
-			let $check := ggeo:isDisjoint($candidateGeometry, $checkGeometry) 
-			return
-				if ($check = true() ) then () else $candidate
-		)
-		return
-		if ($checked) then $candidate else ()
-)[position() le $limitErrors]
+let $messages :=
+(for $candidate in $features[self::*:AdministrativeUnit]
+  let $level := substring-after(data($candidate/au3:nationalLevel[1]/text() | $candidate/au:nationalLevel[1]/@xlink:href),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/')
+  let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
+  let $env := ggeo:envelope($candidate_geometry)
+  let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+  for $feature in $other_features[self::*:AdministrativeUnit and (au:nationalLevel/@xlink:href = $candidate/au:nationalLevel/@xlink:href or au3:nationalLevel/text() = $candidate/au3:nationalLevel/text()) and not (@gml:id = $candidate/@gml:id)]
+   order by $candidate/@gml:id, $feature/@gml:id
+   let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+   let $check := ggeo:relate($candidate_geometry, $other_geometry, 'F********') 
+	return 
+	if ($check) then () 
+	else 
+	let $intersection := string(ggeo:intersection($candidate_geometry, $other_geometry))
+	let $polygons := functx:get-matches($intersection,'POLYGON\s?\(\s?\([\d,\.\s]+\)\s?\)')[fn:string-length(.)>0]
+	return local:addMessage('TR.AdministrativeUnitArea', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'gmlid2': string($feature/@gml:id), 'level': $level, 'sharedArea': fn:string-join($polygons, ', ') }))[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   let $level := $feature/au3:nationalLevel[1]/text() | $feature/au:nationalLevel[1]/@xlink:href
-   return local:addMessage('TR.AdministrativeUnitArea', map { 'filename': local:filename($feature), 'featureType' : local-name($feature), 'gmlid': string($feature/@gml:id), 'level': substring-after(data($level),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/')}))
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)									
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -434,7 +389,23 @@ Source: <a href="" target="_blank">Abstract Test Case 'Boundary'</a>]]></descrip
 									<parent ref="EIDeea3c33d-0bbe-4de6-ad29-ad677b930609"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
- <!--to do-->
+let $messages :=
+(for $candidate in $features[self::*:AdministrativeBoundary]
+  let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
+  let $env := ggeo:envelope($candidate_geometry)
+  let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+  let $onBoundary :=
+  for $feature in $other_features[self::*:AdministrativeUnit]
+   let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+   let $check := ggeo:relate($candidate_geometry, $other_geometry, 'FTFF*FT*T') 
+	return if ($check) then $feature else ()
+  return 
+  if ($onBoundary) then () 
+  else local:addMessage('TR.AdministrativeUnitArea', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id) }))[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)									
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -468,28 +439,25 @@ Source: <a href="" target="_blank">Abstract Test Case 'Condominium Spatial Exten
 									<parent ref="EID92ac87b5-cd0e-4e40-a990-ffe39328d633"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
- let $condominiums := $features[self::*:Condominium]
-let $administrativeUnits := $features[self::*:AdministrativeUnit]
-
-let $featuresWithErrors :=
-(for $candidate in $condominiums
-		let $checked :=
-		(for $administrativeUnit in $administrativeUnits
-			let $candidateGeometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:geometry]/*[1])
-			let $administrativeUnitGeometry := ggeo:getGeometry($administrativeUnit/@gml:id,$administrativeUnit/*[self::*:geometry]/*[1])
-			let $check := ggeo:overlaps($candidateGeometry, $administrativeUnitGeometry) 
-			return
-				if ($check = true() ) then $candidate else ()
-		)
-		return
-		if ($checked) then $candidate else ()
-)[position() le $limitErrors]
+let $messages :=
+(for $candidate in $features[self::*:Condominium]
+  let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
+  let $env := ggeo:envelope($candidate_geometry)
+  let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+  for $feature in $other_features[self::*:AdministrativeUnit]
+   order by $candidate/@gml:id, $feature/@gml:id
+   let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+   let $check := ggeo:relate($candidate_geometry, $other_geometry, 'F********') 
+	return 
+	if ($check) then () 
+	else 
+	let $intersection := string(ggeo:intersection($candidate_geometry, $other_geometry))
+   let $polygons := functx:get-matches($intersection,'POLYGON\s?\(\s?\([\d,\.\s]+\)\s?\)')[fn:string-length(.)>0]
+   return local:addMessage('TR.wrongSpatialCondominiumExtent', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'gmlid2': string($feature/@gml:id), 'sharedArea': fn:string-join($polygons, ', ') }))[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   return local:addMessage('TR.wrongSpatialCondominiumExtent', map { 'filename': local:filename($feature), 'featureType' : local-name($feature), 'gmlid': string($feature/@gml:id)}))
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)									
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>

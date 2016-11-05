@@ -14,8 +14,8 @@ Pre-requisite conformance classes:
 	<version>0.1.0</version>
 	<author>PwC</author>
 	<creationDate>2016-09-27T00:00:00Z</creationDate>
-	<lastEditor>PwC</lastEditor>
-	<lastUpdateDate>2016-10-25T00:00:00Z</lastUpdateDate>
+	<lastEditor>interactive instruments</lastEditor>
+	<lastUpdateDate>2016-11-04T00:00:00Z</lastUpdateDate>
  	<tags>
 		<tag ref="EID94000e12-3021-4ba6-827e-a59eefd7a3c8"/>
 	</tags>
@@ -70,15 +70,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Modelling of object refer
 									<parent ref="EIDbbccbf96-6daa-46f7-8bad-8563c0209295"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $cadastralParcels := $features[self::*:CadastralParcel]
-
-let $featuresWithErrors :=
-(for $candidate in $cadastralParcels
-	let $nationalCadastralReference := $candidate/cp:nationalCadastralReference/text()
-
-	return
-		if ($nationalCadastralReference) then () else $candidate
-)
+let $featuresWithErrors := $features[self::*:CadastralParcel and not(*:nationalCadastralReference)]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -131,8 +123,37 @@ Relevant requirements:
 Source: <a href="" target="_blank">Abstract Test Case 'Cadastral Boundaries'</a>]]></description>
 									<parent ref="EID487e2252-6777-4f61-9e1f-7b97865ffeb2"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>NOT_APPLICABLE</expression>
+									<expression>
+let $messages :=
+(for $candidate in $features[self::*:CadastralParcel]
+  return
+  try {
+  let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
+  let $env := ggeo:envelope($candidate_geometry)
+  let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+  let $onBoundary :=
+  for $feature in $other_features[self::*:CadastralBoundary]
+   let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+   let $check := ggeo:relate($other_geometry, $candidate_geometry, 'FTFF*FT*T') 
+	return if ($check) then $feature else ()
+  return 
+  if (not($onBoundary)) then () 
+  else
+    let $union := ggeo:union($onBoundary)
+    (: TODO reduce to line strings that are not closed, requires a new isClosed() function in GmlGeoX :)
+    let $linestrings := functx:get-matches($union,'LINESTRING\s?\([\d,\.\s]+\)')[fn:string-length(.)>0]
+    return local:addMessage('TR.openBoundary', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'featureType2' : local-name($onBoundary[1]), 'gmlids': string-join($onBoundary/@gml:id, ''', '''), 'openBoundaries': fn:string-join($linestrings, ', ') })
+   } catch * { 
+   })[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)
+									</expression>
+									<testItemType ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
+									<!-- disabled for now, see TODO
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									-->
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>
@@ -271,7 +292,7 @@ return
 								</TestAssertion>
 								<TestAssertion id="EID1e7f2289-f7be-4db4-8673-e84d05a091bd">
 									<label>cp-as.d.3: Type of geometry shall be GM_Surface or GM_MultiSurface</label>
-									<description><![CDATA[Value of areaValue shall be given in square meters<br/><br/>
+									<description><![CDATA[Type of geometry shall be GM_Surface or GM_MultiSurface<br/><br/>
 OCL "inv: geometry.oclIsKindOf(GM_Surface) or geometry.oclIsKindOf(GM_MultiSurface)".<br/><br/>
 Verify that CadastralParcel.geometryType is a gml:Surface or gml:MutiSurface.<br/><br/>
 Relevant requirements:
@@ -284,14 +305,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/constraint
 									<expression>
 (: TODO: extend with subtypes :)
 let $featuresToInspect := $features[self::*:CadastralParcel]
-let $featuresWithErrors := $featuresToInspect[*:geometry/*[not(self::gml:Surface or self::MultiSurface)]][position() le $limitErrors]
+let $featuresWithErrors := $featuresToInspect[*:geometry/*[not(self::gml:Polygon or self::gml:Surface or self::gml:MultiSurface)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    return
-     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'A watercourse geometry may be a curve or surface.', 'additionalInfo': 'Found: ''' || local-name($feature/*:geometry/*) || '''.' }))
+     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Type of geometry shall be GM_Surface or GM_MultiSurface.', 'additionalInfo': 'Found: ''' || local-name($feature/*:geometry/*) || '''.' }))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -312,45 +333,32 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/constraint
 									<parent ref="EID856a5b01-bfbf-45e0-9f01-7252eff56354"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $CadastralZonings := $features[self::*:CadastralZoning]
-
-let $featuresWithErrors :=
-	(for $candidate in $CadastralZonings
-		let $upperLevelUnits := $candidate/cp:upperLevelUnit/@xlink:href
-
-		let $upperLevelUnitCheck :=
-		(for $ulu in $upperLevelUnits
-			let $uluVal := string($ulu)
-			let $uluElement := $CadastralZonings[concat('#', string(@gml:id)) = $uluVal]
-			return
-				if (boolean($candidate/cp3:level[1]/text()='1stOrder' or $candidate/cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/1stOrder')) then ()
-					else (
-						if (boolean($candidate/cp3:level[1]/text()='2ndOrder' or $candidate/cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/2ndOrder')) then
-							if (boolean($uluElement/cp3:level[1]/text()='1stOrder' or $uluElement/cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/1stOrder')) then ()
-							else ($uluElement)
-						else (
-							if (boolean($candidate/cp3:level[1]/text()='3thOrder' or $candidate/cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/3thOrder')) then 
-								if (boolean($uluElement/cp3:level[1]/text()='1stOrder' or $uluElement/cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/1stOrder') or $uluElement/cp3:level[1]/text()='2ndOrder' or $uluElement/cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/2ndOrder') then ()
-								else ($uluElement)
-							else ()	
-						)		
-					)
-			)
-	return
-		if ($upperLevelUnitCheck) then $upperLevelUnitCheck
-		else ()
-	)[position() le $limitErrors]
+let $levels := ('2ndOrder', '3rdOrder')
+let $candidates := $features[self::*:CadastralZoning and (cp3:level[1]/text()=$levels or substring-after(cp:level[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/')=$levels)]
+let $refcount := count($candidates/*:upperLevelUnit[not(@xsi:nil='true')]/@xlink:href)
+let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
+let $messages := 
+  (for $candidate in $candidates
+   order by $candidate/@gml:id
+   let $level := if ($candidate[cp3:level[1]/text()='3rdOrder' or cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/3rdOrder']) then '2ndOrder'
+                else if ($candidate[cp3:level[1]/text()='2ndOrder' or cp:level[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/2ndOrder']) then '1stOrder'
+                else ()
+   let $href := $candidate/*:upperLevelUnit[not(@xsi:nil='true')]/@xlink:href 
+   let $element := local:return-reference($href)
+   return
+    if (not($element)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+    else if (not($element[self::*:CadastralZoning])) then local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id), 'url': string($href), 'elementNameExpected': 'CadastralZoning', 'elementName': local-name($element), 'namespace': namespace-uri($element) })
+    else if (not($element/cp3:level[1]/text()=$level or substring-after($element/cp:level[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/')=$level)) then local:addMessage('TR.constraintViolation', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id), 'constraint': 'A lower level cadastral zoning shall be part of an upper level zoning.', 'additionalInfo': 'The level of the reference zone should be ''' || $level || ''', but the level is ''' || substring-after($element/cp3:level[1]/text() | $element/cp:level[1]/@xlink:href,'http://inspire.ec.europa.eu/codelist/CadastralZoningLevelValue/') || '''.' })
+    else ())[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-	let $level := $feature/cp3:level[1]/text() | $feature/cp:level[1]/@xlink:href
-   return local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'A lower level cadastral zoning shall be part of an upper level zoning.'}))
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
+ $messages)										
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates> 
 								</TestAssertion>

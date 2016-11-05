@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2016-08-15T00:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2016-11-05T00:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDaeed5629-2c33-4fa6-aa66-f59418abaa70"/>
 	</tags>
@@ -309,7 +309,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 (: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:*)]  
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:Node|self::gml:Edge|self::gml:Face|self::gml:TopoSolid|self::gml:TopoPoint|self::gml:TopoCurve|self::gml:TopoSurface|self::gml:TopoVolume|self::gml:TopoComplex]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -633,6 +633,214 @@ if (map:size($geometryParsingErrors)=0) then 'PASSED' else
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.invalidGmlGeometry"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID2bb450fc-b68f-468e-85b6-56ee9741b731">
+					<label>Code list values in basic data types</label>
+					<description>Verify whether all attributes whose value type is a code list take the values set out therein. This is usually part of the tests of the corresponding application schema. However, for data types that are used across the INSPIRE application schemas, this is best done in this test suite to avoid duplicating the same test in many test suites. The relevant data types for the Annex I data themes with code list values are: GeographicalName.</description>
+					<parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+					<testSteps>
+						<TestStep id="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID2bb450fc-b68f-468e-85b6-56ee9741b731"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID12abc9dc-27ff-406f-8cdd-f55db5523c97">
+									<label>gmlas.e.1: GrammaticalNumber attributes</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/GrammaticalNumberValue'>http://inspire.ec.europa.eu/codelist/GrammaticalNumberValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects.  For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 6 (1): Code Lists and Enumerations. Codelists shall be of one of the following types, as specified in the Annexes:
+<ol>
+<li>code lists whose allowed values comprise only the values specified in this Regulation;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+narrower values defined by data providers;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+additional values at any level defined by data providers;</li>
+<li>code lists, whose allowed values comprise any values defined by data providers.</li>
+</ol>
+For the purposes of points 2, 3 and 4, in addition to the allowed values, data providers may use the values specified in the relevant INSPIRE Technical Guidance document available on the INSPIRE web site of the Joint Research Centre.</li>
+<li>IR Requirement Article 6 (2): Code Lists and Enumerations. Code lists may be hierarchical. Values of hierarchical code lists may have a more generic parent value. Where the valid values of a hierarchical code list are specified in a table in this Regulation, the parent values are listed in the last column.</li>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points 2, 3 or 4 of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+<li>IR Requirement Article 6 (4): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]></description>
+									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $features3 := $features[*/gn3:GeographicalName]
+let $features4 := $features[*/gn:GeographicalName]
+let $messages := local:check-code-list-values-gn($features3, $features4, 'grammaticalNumber', 'http://inspire.ec.europa.eu/codelist/GrammaticalNumberValue')
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID74abd92b-9225-4d73-a03f-db7bd3471bd6">
+									<label>gmlas.e.2: GrammaticalGender attributes</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/GrammaticalGenderValue'>http://inspire.ec.europa.eu/codelist/GrammaticalGenderValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects.  For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 6 (1): Code Lists and Enumerations. Codelists shall be of one of the following types, as specified in the Annexes:
+<ol>
+<li>code lists whose allowed values comprise only the values specified in this Regulation;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+narrower values defined by data providers;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+additional values at any level defined by data providers;</li>
+<li>code lists, whose allowed values comprise any values defined by data providers.</li>
+</ol>
+For the purposes of points 2, 3 and 4, in addition to the allowed values, data providers may use the values specified in the relevant INSPIRE Technical Guidance document available on the INSPIRE web site of the Joint Research Centre.</li>
+<li>IR Requirement Article 6 (2): Code Lists and Enumerations. Code lists may be hierarchical. Values of hierarchical code lists may have a more generic parent value. Where the valid values of a hierarchical code list are specified in a table in this Regulation, the parent values are listed in the last column.</li>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points 2, 3 or 4 of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+<li>IR Requirement Article 6 (4): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]></description>
+									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $features3 := $features[*/gn3:GeographicalName]
+let $features4 := $features[*/gn:GeographicalName]
+let $messages := local:check-code-list-values-gn($features3, $features4, 'grammaticalGender', 'http://inspire.ec.europa.eu/codelist/GrammaticalGenderValue')
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDa81c147e-72b2-4054-9d3d-26b1091b641f">
+									<label>gmlas.e.3: NameStatus attributes</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/NameStatusValue'>http://inspire.ec.europa.eu/codelist/NameStatusValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects.  For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 6 (1): Code Lists and Enumerations. Codelists shall be of one of the following types, as specified in the Annexes:
+<ol>
+<li>code lists whose allowed values comprise only the values specified in this Regulation;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+narrower values defined by data providers;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+additional values at any level defined by data providers;</li>
+<li>code lists, whose allowed values comprise any values defined by data providers.</li>
+</ol>
+For the purposes of points 2, 3 and 4, in addition to the allowed values, data providers may use the values specified in the relevant INSPIRE Technical Guidance document available on the INSPIRE web site of the Joint Research Centre.</li>
+<li>IR Requirement Article 6 (2): Code Lists and Enumerations. Code lists may be hierarchical. Values of hierarchical code lists may have a more generic parent value. Where the valid values of a hierarchical code list are specified in a table in this Regulation, the parent values are listed in the last column.</li>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points 2, 3 or 4 of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+<li>IR Requirement Article 6 (4): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]></description>
+									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $features3 := $features[*/gn3:GeographicalName]
+let $features4 := $features[*/gn:GeographicalName]
+let $messages := local:check-code-list-values-gn($features3, $features4, 'nameStatus', 'http://inspire.ec.europa.eu/codelist/NameStatusValue')
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID5f5466b9-1f77-4577-aef8-2fdee94f7ad2">
+									<label>gmlas.e.4: Nativeness attributes</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/NativenessValue'>http://inspire.ec.europa.eu/codelist/NativenessValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (1): Types for the Exchange and Classification of Spatial Objects.  For the exchange and classification of spatial objects from data sets meeting the conditions laid down in Article 4 of Directive 2007/2/EC, Member States shall use the spatial object types and associated data types, enumerations and code lists that are defined in Annexes II, III and IV for the themes the data sets relate to.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 6 (1): Code Lists and Enumerations. Codelists shall be of one of the following types, as specified in the Annexes:
+<ol>
+<li>code lists whose allowed values comprise only the values specified in this Regulation;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+narrower values defined by data providers;</li>
+<li>code lists whose allowed values comprise the values specified in this Regulation and
+additional values at any level defined by data providers;</li>
+<li>code lists, whose allowed values comprise any values defined by data providers.</li>
+</ol>
+For the purposes of points 2, 3 and 4, in addition to the allowed values, data providers may use the values specified in the relevant INSPIRE Technical Guidance document available on the INSPIRE web site of the Joint Research Centre.</li>
+<li>IR Requirement Article 6 (2): Code Lists and Enumerations. Code lists may be hierarchical. Values of hierarchical code lists may have a more generic parent value. Where the valid values of a hierarchical code list are specified in a table in this Regulation, the parent values are listed in the last column.</li>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points 2, 3 or 4 of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+<li>IR Requirement Article 6 (4): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
+</ul>
+Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]></description>
+									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $features3 := $features[*/gn3:GeographicalName]
+let $features4 := $features[*/gn:GeographicalName]
+let $messages := local:check-code-list-values-gn($features3, $features4, 'nativeness', 'http://inspire.ec.europa.eu/codelist/NativenessValue')
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID72dd801d-cd5f-409b-b07a-f161106c5ec2">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema. This is usually part of the tests of the corresponding application schema. However, for data types that are used across the INSPIRE application schemas, this is best done in this test suite to avoid duplicating the same test in many test suites. The relevant data types for the Annex I data themes with constraints are: GeographicalName.</description>
+					<parent ref="EID073b8871-8ce0-4ba8-9b53-f1aec2019d3b"/>
+					<testSteps>
+						<TestStep id="EID81c7e523-72fc-4981-9d59-5b20cef911f6">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID72dd801d-cd5f-409b-b07a-f161106c5ec2"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID719af9fc-ad3d-4c89-85ed-6507712f634a">
+									<label>gmlas.f.1: At least one of the two attributes pronunciationSoundLink and pronunciationIPA shall not be void</label>
+									<description><![CDATA[At least one of the two attributes pronunciationSoundLink and pronunciationIPA shall not be void<br/><br/>
+OCL: "inv: self.pronounciationIPA -> notEmpty() or self.pronounciationSoundLink -> notEmpty()"<br/><br/>
+Verify that for all features either or both pronunciationSoundLink or pronunciationIPA is not void.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-gn/3.1/gn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
+									<parent ref="EID81c7e523-72fc-4981-9d59-5b20cef911f6"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $featuresWithErrors := $features[*/*:GeographicalName/*:pronunciation[not(@xsi:nil='true') and not(*:pronunciationSoundLink[not(@xsi:nil='true')] or *:pronunciationIPA[not(@xsi:nil='true')])]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one of the two attributes pronunciationSoundLink and pronunciationIPA shall not be void.'}))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolation"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
