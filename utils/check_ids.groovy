@@ -24,9 +24,15 @@ new File('../').eachFileRecurse(FILES) { file ->
             println "Checking $id"
             def duplicateCheck = idFileMap[id]
             if(duplicateCheck!=null) {
-                def errMesg = "Non-unique ID ${id} found in ${file} which is also used in ${duplicateCheck}"
-                println errMesg
-                errMsgBuilder <<= errMesg + lineSep
+                if(duplicateCheck==file) {
+                  def errMesg = "Non-unique ID ${id} found multiple times in ${file}"
+                  println errMesg
+                  errMsgBuilder <<= errMesg + lineSep
+                }else{
+                  def errMesg = "Non-unique ID ${id} found in ${file} which is also used in ${duplicateCheck}"
+                  println errMesg
+                  errMsgBuilder <<= errMesg + lineSep
+                }
             }else{
                 idFileMap.put(id,file)
             }
