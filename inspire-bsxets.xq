@@ -57,8 +57,8 @@ let $endmessage := prof:void(local:end('" || $assertion/@id || "',$status))
 let $logentry := local:log('Test Assertion ''" || $assertion/etf:label || "'': ' || $status || ' - ' ||$duration || ' ms')
 return 
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
-    <parent ref='" || $stepresultid || "'/>
     { if (empty($messages)) then () else <messages>{$messages}</messages> }
+    <parent ref='" || $stepresultid || "'/>
     <resultedFrom ref='" || $assertion/@id || "'/>
     <startTimestamp>{$timestampAssertion}</startTimestamp>
     <duration>{$duration}</duration>
@@ -87,8 +87,8 @@ let $status := if ($dependencyResult) then local:status($assertionresults/etf:st
 let $endmessage := prof:void(local:end('" || $step/@id || "',$status))
 return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $stepresultid || "'>
-<parent ref='" || $caseresultid || "'/>
 <testAssertionResults>{$assertionresults}</testAssertionResults>
+<parent ref='" || $caseresultid || "'/>
 <resultedFrom ref='" || $step/@id || "'/>
 <startTimestamp>{$timestampStep}</startTimestamp>
 <duration>{xs:integer(sum($assertionresults/duration))}</duration>
@@ -106,8 +106,8 @@ let $endmessage := prof:void(local:end('" || $case/@id || "',$status))
 let $logentry := local:log('Test Case ''" || $case/etf:label || "'' finished: ' || $status)
 return 
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $caseresultid || "'>
-<parent ref='" || $moduleresultid || "'/>
 <testStepResults>{$teststepresults}</testStepResults>
+<parent ref='" || $moduleresultid || "'/>
 <resultedFrom ref='" || $case/@id || "'/>
 <startTimestamp>{$timestampCase}</startTimestamp>
 <duration>{xs:integer(sum($teststepresults/duration))}</duration>
@@ -122,8 +122,8 @@ let $status := local:status($testcaseresults/etf:status)
 let $endmessage := prof:void(local:end('" || $module/@id || "',$status))
 return
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='" || $moduleresultid || "'>
-<parent ref='" || $testTaskResultId || "'/>
 <testCaseResults>{$testcaseresults}</testCaseResults>
+<parent ref='" || $testTaskResultId || "'/>
 <resultedFrom ref='" || $module/@id || "'/>
 <startTimestamp>{$timestampModule}</startTimestamp>
 <duration>{xs:integer(sum($testcaseresults/duration))}</duration>
@@ -201,8 +201,8 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 
       return 
 <TestStepResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$stepresultid}'>
-<parent ref='{$caseresultid}'/>
 <testAssertionResults>{$assertion-results}</testAssertionResults>
+<parent ref='{$caseresultid}'/>
 <resultedFrom ref='{$step/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
@@ -211,8 +211,8 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 
     return
 <TestCaseResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$caseresultid}'>
-<parent ref='{$moduleresultid}'/>
 <testStepResults>{$test-step-results}</testStepResults>
+<parent ref='{$moduleresultid}'/>
 <resultedFrom ref='{$case/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
@@ -221,8 +221,8 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 
 return 
 <TestModuleResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='{$moduleresultid}'>
-<parent ref='{$testTaskResultId}'/>
 <testCaseResults>{$test-case-results}</testCaseResults>
+<parent ref='{$testTaskResultId}'/>
 <resultedFrom ref='{$module/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
