@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDb529e8fa-b9f8-4758-acea-1d2af744599f" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID334bbd38-378d-4a44-8a19-5d00df919ec0" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
 	<itemHash>bQ==</itemHash>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-ad/ad-ia</remoteResource>
 	<localPath>/auto</localPath>
@@ -43,65 +43,353 @@ Pre-requisite conformance classes:
 		<executableTestSuite ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
 	</dependencies>
 	<testModules>
-		<TestModule id="EID37f4e9b2-d3ae-4c88-bdb5-109a40c07752">
+		<TestModule id="EIDb0d37e73-cf64-4cbf-ab80-f6ea39572d0f">
 			<label>IGNORE</label>
 			<description>IGNORE</description>
-			<parent ref="EIDb529e8fa-b9f8-4758-acea-1d2af744599f"/>
+			<parent ref="EID334bbd38-378d-4a44-8a19-5d00df919ec0"/>
 			<testCases>
-				<TestCase id="EID87c69409-c382-471f-95bd-77615581e930">
+				<TestCase id="EID8884e96f-f4d3-4ddb-a19a-caf4bd1a6ce3">
 					<label>Code lists</label>
 					<description>Verify that code lists extensions can be accessed.</description>
-					<parent ref="EID37f4e9b2-d3ae-4c88-bdb5-109a40c07752"/>
+					<parent ref="EIDb0d37e73-cf64-4cbf-ab80-f6ea39572d0f"/>
 					<testSteps>
-						<TestStep id="EID0a59a45d-e834-40c0-9017-e7936d799c83">
+						<TestStep id="EID7118218a-c220-42f7-8f4d-47996e340f21">
 							<label>IGNORE</label>
 							<description>IGNORE</description>
-							<parent ref="EID87c69409-c382-471f-95bd-77615581e930"/>
+							<parent ref="EID8884e96f-f4d3-4ddb-a19a-caf4bd1a6ce3"/>
 							<statementForExecution>not applicable</statementForExecution>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
-								<TestAssertion id="EIDea09c016-0187-42e5-9056-d7bd7fa76004">
+								<TestAssertion id="EID8b6190f2-8286-40c7-86d1-e49ff2646d80">
 									<label>ad-ia.a.1: Code list extensions accessible</label>
 									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
-This data theme currently has two extensible code lists:
-<ul>
-<li><a href='http://inspire.ec.europa.eu/codelist/DesignationSchemeValue'>DesignationSchemeValue</a></li>
-<li><a href='http://inspire.ec.europa.eu/codelist/DesignationValue'>DesignationValue</a></li>
-</ul>
-Note that this test is only executed automatically on GML documents using the v4.0 GML application schema as starting with this version, HTTP URIs are used as code list values. For version 3.0 schemas this test is executed manually.<br/><br/>
+This data theme currently does not specify any extensible code lists. The test always passes.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
-Source: <a href="" target="_blank">Abstract Test Case 'Version consistency'</a>]]></description>
-									<parent ref="EID0a59a45d-e834-40c0-9017-e7936d799c83"/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EID0cd2569f-d0cb-4d07-bfc6-bfbe8df1b69e"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>
-(: TODO: extend with subtypes :)
-let $featuresToInspect := $features[self::*:ProtectedSite]
-let $uris := 
-	fn:distinct-values( 
-		for $clv in $featuresToInspect/ps:siteDesignation/*/*[self::ps:designationScheme or self::ps:designation]
-			return $clv/@xlink:href) (: $clv/@codeSpace || '/' || $clv/text() :)
-let $urimap := local:check-resource-uris($uris, 30)
-let $errorregex := '(notHTTP|idNotFound|TIMEOUT|\d{3})'
-let $featuresWithErrors := if (count($uris)=0) then () else
-	$featuresToInspect[*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] or
-		*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]][position() le $limitErrors]
-return
-(if ($featuresWithErrors) then 'FAILED' else if ($features[self::ps3:ProtectedSite]) then 'PASSED_MANUAL' else 'PASSED',
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   let $values := $feature/*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] |
-		$feature/*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]
-   return
-   	for $value in $values
-   		let $uri := $value/@xlink:href
-     		return local:addMessage('TR.brokenLink', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': local-name($value), 'value': string($value/@xlink:href), 'uri': string($uri) }))
-						 </expression>
+									<expression>'PASSED'</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.brokenLink"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID1b1d01ce-a8b7-494c-9104-48916c925c8f">
+					<label>Feature references</label>
+					<description>Verify that referenced features can be retrieved.</description>
+					<parent ref="EIDb0d37e73-cf64-4cbf-ab80-f6ea39572d0f"/>
+					<testSteps>
+						<TestStep id="EIDee715d8b-e282-40d9-9392-8699db3bf7d7">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID1b1d01ce-a8b7-494c-9104-48916c925c8f"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID003874fa-0aa7-48c3-a2a1-a9df8ec2a434">
+									<label>ad-ia.b.1: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDd82614a6-8496-4e4f-aef0-68c7c6fa7831">
+									<label>ad-ia.b.2: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID29f50239-c892-41dc-ac90-5eb5ca54623f">
+									<label>ad-ia.b.3: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDb666e017-4ee3-42f5-b8f8-5d932facf462">
+									<label>ad-ia.b.4: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDa6b0a310-e326-4192-9239-89010247f3b9">
+									<label>ad-ia.b.5: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDe7eacf58-3132-4df8-b62b-87e7ca61d8a7">
+									<label>ad-ia.b.6: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID0abac29c-a839-4fd5-8218-170190f73ae4">
+									<label>ad-ia.b.7: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDeb441189-1b35-420a-b443-d32594cc171a">
+									<label>ad-ia.b.8: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDbf269ddb-61e8-4991-b850-3e42878ef386">
+									<label>ad-ia.b.9: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID8db8c4ee-1953-4600-87d3-7084b81269ed">
+									<label>ad-ia.b.10: AdministrativeUnit.NUTS</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $target := 'NUTSRegion'
+let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, $target)
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ $messages)	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
