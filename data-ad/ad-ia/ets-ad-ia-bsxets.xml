@@ -103,9 +103,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" 
 									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'AddressComponent'
+let $target := ('ThoroughfareName', 'AddressAreaName', 'PostalDescriptor', 'AdminUnitName') 
 let $hrefs := $features[self::*:Address]/*:component/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target)
+let $messages := local:check-feature-references($hrefs, $target, 'AddressComponent')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)	
@@ -195,7 +195,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" 
 									<expression>
 let $target := ('Building', 'AbstractConstruction')
 let $hrefs := $features[self::*:Address]/*:building/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target)
+let $messages := local:check-feature-references($hrefs, $target, 'Building or AbstractConstruction')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)	
