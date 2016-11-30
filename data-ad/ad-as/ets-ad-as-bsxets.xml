@@ -362,7 +362,7 @@ let $featuresWithErrors :=
 	    else 
 	    	if (not($element[self::*:AdminUnitName])) then () (: ignore non AdminUnitName components :)
 	    	else 
-	    		if ($element/au3:level/text()='1stOrder' or $element/au:level/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder') then
+	    		if ($element/ad3:level/text()='1stOrder' or $element/ad:level/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder') then
 	    			$element
 	    		else ()
 	)
@@ -397,7 +397,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-as/constraint
 									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[self::*:Address and count(*:position/*:GeographicPosition/*:default/text()='true') ne 1][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:Address and (count(*:position/*:GeographicPosition/*:default[text()="true"]) ne 1)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),

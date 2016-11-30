@@ -254,7 +254,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" 
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $target := ('ThoroughfareName', 'AddressAreaName', 'PostalDescriptor', 'AdminUnitName')
-let $hrefs := $features[self::*:AddressComponent]/*:situatedWithin/@xlink:href
+let $hrefs := $features[(self::*:ThoroughfareName or self::*:AddressAreaName or self::*:PostalDescriptor or self::*:AdminUnitName)]/*:situatedWithin/@xlink:href
 let $messages := local:check-feature-references($hrefs, $target, 'AddressComponent')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -344,7 +344,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" 
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $target := ('ThoroughfareName', 'AddressAreaName', 'PostalDescriptor', 'AdminUnitName')
-let $hrefs := $features[self::*:AdministrativeUnit]/*:Locator/*:AddressLocator/*:withinScopeOf/@xlink:href
+let $hrefs := $features[self::*:Address]/*:locator/*:AddressLocator/*:withinScopeOf/@xlink:href
 let $messages := local:check-feature-references($hrefs, $target, 'AddressComponent')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
