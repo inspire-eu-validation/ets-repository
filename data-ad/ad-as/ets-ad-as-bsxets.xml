@@ -425,7 +425,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-as/constraint
 									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[self::*:PostalDescriptor/*:position/*:PostalDescriptor[not(@xsi:nil='true') and *:postCode[(@xsi:nil='true')] and not(*:postName[not(@xsi:nil='true')])]][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:PostalDescriptor[not(@xsi:nil='true') and *:postCode[(@xsi:nil='true')] and not(*:postName[not(@xsi:nil='true')])]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -453,7 +453,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-as/constraint
 									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[self::*:PostalDescriptor/*:position/*:PostalDescriptor[not(@xsi:nil='true') and *:postName[(@xsi:nil='true')] and not(*:postCode[not(@xsi:nil='true')])]][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:PostalDescriptor[not(@xsi:nil='true') and *:postName[(@xsi:nil='true')] and not(*:postCode[not(@xsi:nil='true')])]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -551,7 +551,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-as/address-mu
 									<parent ref="EIDf6550361-1a7d-4faf-91c8-c17de64cc584"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[self::*:Address[not(@xsi:nil='true') and count(*:position[(@xsi:nil='true')] gt 1) and (au3:position/text() = following-sibling::au3:position/text()) or (au:position/@xlink:href = following-sibling::au:position/@xlink:href))]][position() le $limitErrors]
+let $featuresWithErrors := $features[self::*:Address[not(@xsi:nil='true') and (count(*:position[not(@xsi:nil='true')]) gt 1) and ((ad3:position[ad3:GeographicPosition/ad3:specification/text() = following-sibling::ad3:position/ad3:GeographicPosition/ad3:specification/text()]) or (ad:position[ad:GeographicPosition/ad:specification/@xlink:href = following-sibling::ad:position/ad:GeographicPosition/ad:specification/@xlink:href]))]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -560,7 +560,11 @@ return
    return
      local:addMessage('TR.incorrectAddressMultiplePosition', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id)}))
 									</expression>
-									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.incorrectAddressMultiplePosition"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>
