@@ -612,8 +612,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-as/address-po
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID037e000b-9195-42be-8137-db95958de62f">
-									<label>ad-as.e.1: Manual review - Verify that an address has associations to the address components necessary to the unambiguous identification and location of the address instance.</label>
-									<description><![CDATA[Verify that an address has associations to the address components necessary to the unambiguous identification and location of the address instance.<br/><br/>
+									<label>ad-as.e.1: Verify that an address has associations to the address components necessary to the unambiguous identification and location of the address instance.</label>
+									<description><![CDATA[Verify that an address has associations to the address components necessary to the unambiguous identification and location of the address instance. Check that no combination of Address components with LocatorDesignator and/or LocatorName appears for different Addresses.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 5.5.2 (3): Theme-specific Requirements – Association Roles. An address shall have an association to the name of the country in which it is located. Furthermore, an address must have associations to the additional address components necessary to the unambiguous identification and location of the address instance.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-as/country-address-components" target="_blank">Abstract Test Case 'Country and Addrezss Components'</a>]]></description>
+									<parent ref="EIDbd3df0e3-f6ce-404c-8a92-6a1658a982de"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $Addresses := $features[self::*:Address[not(@xsi:nil='true')]]
+
+let $featuresWithErrors :=
+(for $Address in $Addresses
+	let $CountAddresses := count($Addresses)
+
+	let $AddressWithError :=
+	(for $i in (1 to $CountAddresses)
+		let $DuplicateFound := $Address[concat(string-join(*:component/@xlink:href), *:locator/*:AddressLocator/*:designator/*:LocatorDesignator/*:designator, *:locator/*:AddressLocator/*:name/*:LocatorName/*:name/text()) 
+		= 
+		concat(string-join(following::*:Address[$i]/*:component/@xlink:href), following::*:Address[$i]/*:locator/*:AddressLocator/*:designator/*:LocatorDesignator/*:designator, following::*:Address[$i]/*:locator/*:AddressLocator/*:name/*:LocatorName/*:name/text())]
+		
+		return $DuplicateFound
+	)
+return $AddressWithError
+)[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.AmbiguousAddressComponents', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'AddressCombination': concat(string-join($feature/*:component/@xlink:href), $feature/*:locator/*:AddressLocator/*:designator/*:LocatorDesignator/*:designator, $feature/*:locator/*:AddressLocator/*:name/*:LocatorName/*:name/text()) }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.AmbiguousAddressComponents"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID9959487b-f87f-4889-818a-921f4ab20e66">
+									<label>ad-as.e.2: Manual review</label>
+									<description><![CDATA[Verify that an address has associations to the address components necessary to the unambiguous identification and location of the address instance. Review the presence of the needed address components.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 5.5.2 (3): Theme-specific Requirements – Association Roles. An address shall have an association to the name of the country in which it is located. Furthermore, an address must have associations to the additional address components necessary to the unambiguous identification and location of the address instance.</li>
