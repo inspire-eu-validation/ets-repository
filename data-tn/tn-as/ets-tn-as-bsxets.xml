@@ -163,12 +163,23 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-
+let $target := ('RoadLink', 'RailwayLink', 'CablewayLink', 'WaterwayLink', 'AirRouteLink', ' ProcedureLink', 'StandardInstrumentDeparture', 'InstrumentApproachProcedure', 'StandardInstrumentArrival', 'RoadLinkSequence', 'RailwayLinkSequence', 'CablewayLinkSequence', 'WaterLinkSequence', 'AirLinkSequence') 
+let $hrefs := $features[(self::*:TrafficFlowDirection or self::*:WaterTrafficFlowDirection)]/*:networkRef/*/*:element/@xlink:href
+let $messages := local:check-feature-references($hrefs, $target, 'Link or LinkSequence') 
+return 
+(if ($messages) then 'FAILED' else 'PASSED', 
+ $messages) 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.constraintViolation"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.urlNotHttp2"/>
+										<translationTemplate ref="TR.idNotFound2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleTimeout2"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException2"/>
+										<translationTemplate ref="TR.resourceNotAccessible2"/>
+										<translationTemplate ref="TR.unknownXMLResource2"/>
+										<translationTemplate ref="TR.unknownResourceType2"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDb7daf317-fad9-4d41-818f-1b43b52cb76a">
@@ -371,7 +382,7 @@ return
 									<label>tn-as.b.9: A transport link sequence must be composed of transport links that all belong to the same transport network.</label>
 									<description><![CDATA[A transport link sequence must be composed of transport links that all belong to the same transport network.<br/><br/>
 OCL: "inv: link->forAll(l | l.link.inNetwork = self.inNetwork)".<br/><br/>
-Verify that all TransportLinkSequence are composed of all link that have the same value for the inNetwork association role.<br/><br/>
+Verify that all TransportLinkSequence are composed of all link that have the same value for the inNetwork association role as the TransportLinkSequence.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
@@ -380,6 +391,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $featuresWithErrors := $features[(self:*:RoadLinkSequence or self:*:RailwayLinkSequence or self:*:CablewayLinkSequence or self:*:WaterLinkSequence or self:*:AirLinkSequence) and *:link[*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'A transport link sequence must be composed of transport links that all belong to the same transport network.'}))
 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -392,7 +411,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<label>tn-as.b.10: A transport link set must be composed of transport links and or transport link sequences that all belong to the same transport network.</label>
 									<description><![CDATA[A transport link set must be composed of transport links and or transport link sequences that all belong to the same transport network.<br/><br/>
 OCL: "inv: link->forAll(l | l.inNetwork = self.inNetwork)".<br/><br/>
-Verify that all TransportLinkSet are composed of all link that have the same value for the inNetwork association role.<br/><br/>
+Verify that all TransportLinkSet are composed of all link that have the same value for the inNetwork association role as the TransportLinkSet.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
@@ -401,7 +420,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-
+let $featuresWithErrors := $features[(self::*:Road or self::*:ERoad or self::*:RailwayLine or self::*:CablewayLinkSet or self::*:FerryCrossing or self::*:MarineWaterway or self::*:InlandWaterway or self::*:AirRoute) and *:link[*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'A transport link set must be composed of transport links and or transport link sequences that all belong to the same transport network.'}))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
