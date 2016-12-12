@@ -16,7 +16,7 @@ Pre-requisite conformance classes:
 	<author>PwC</author>
 	<creationDate>2016-12-09T00:00:00Z</creationDate>
 	<lastEditor>PwC</lastEditor>
-	<lastUpdateDate>2016-12-09T00:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2016-12-12T00:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID169dad4a-2b71-4077-9e85-e686b7373b05"/>
 	</tags>
@@ -97,8 +97,8 @@ return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 										<translationTemplate ref="TR.featuresWithErrors"/>
 							 		</translationTemplates>
 					  			</TestAssertion>
-					  			<TestAssertion id="EID28a341d3-c1cb-47fd-a2f4-1148cdffcde4">
-							 		<label>tn-as.a.1: RestrictionTypeValue attributes</label>
+					  			<TestAssertion id="EID1a33615b-0723-4d4f-9bc3-69f0bac3572a">
+							 		<label>tn-as.a.2: RestrictionTypeValue attributes</label>
 									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II of the regulation. For this attribute, the allowed values are specified in code list <a href='http://inspire.ec.europa.eu/codelist/RestrictionTypeValue'>http://inspire.ec.europa.eu/codelist/RestrictionTypeValue</a>.<br/>For datasets using version 3 of the GML application schema, the value is the last path element of the code list value URI and it is in the child text node. For datasets using version 4 of the GML application schema, the value is in the xlink:href XML attribute and is the HTTP URI of the code list value.<br/><br/>
 Relevant requirements:
 <ul>
@@ -124,7 +124,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/features" 
 									<expression>
 (: TODO: extend with subtypes :)
 let $features3 := $features[(self::tn3:RestrictionForVehicles or self::tn3:RestrictionForWaterVehicles)]
-let $features4 := $features[self::tn:RestrictionForVehicles or self::tn:RestrictionForWaterVehicles)]
+let $features4 := $features[(self::tn:RestrictionForVehicles or self::tn:RestrictionForWaterVehicles)]
 let $messages := local:check-code-list-values($features3, $features4, 'restrictionType', 'http://inspire.ec.europa.eu/codelist/RestrictionTypeValue')
 return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 									</expression>
@@ -138,29 +138,29 @@ return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 				 		</TestStep>
 			  	  	</testSteps>
 				</TestCase>
-				<TestCase id="EID5c153f10-63a1-4c94-9e2d-ab4dc9c6da4b">
+				<TestCase id="EIDaf5b50fc-96a3-49e9-b015-d1400736687b">
 				<label>Constraints</label>
 				<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
-				<parent ref="EID56df4fc5-92f0-40ed-837d-f5bfb1ef9463"/>
+				<parent ref="EIDe11a7179-a5d8-4556-a94a-90fcfb7e6ffd"/>
 					<testSteps>
-						<TestStep id="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3">
+						<TestStep id="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb">
 						  <label>IGNORE</label>
 						  <description>IGNORE</description>
-						  <parent ref="EID5c153f10-63a1-4c94-9e2d-ab4dc9c6da4b"/>
+						  <parent ref="EIDaf5b50fc-96a3-49e9-b015-d1400736687b"/>
 						  <statementForExecution>not applicable</statementForExecution>
 						  <testItemType ref="EIDf483e8e8-06b9-4900-ab36-tnad0d7f22f0"/>
 							<testAssertions>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EIDfb2ed162-a2ef-4881-bb05-e261c2e316ae">
+									<label>tn-as.b.1: TrafficFlowDirection can only be associated with a spatial object of the type Link or LinkSequence.</label>
+									<description><![CDATA[TrafficFlowDirection can only be associated with a spatial object of the type Link or LinkSequence.<br/><br/>
+OCL: "inv: networkRef.element.oclIsKindOf(LinkReference)".<br/><br/>
+Verify that an TrafficFlowDirection only has a Network element association with a spatial object TransportLink or TransportLinkSequence.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -171,17 +171,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EIDb7daf317-fad9-4d41-818f-1b43b52cb76a">
+									<label>tn-as.b.2: All transport areas have an external object identifier.</label>
+									<description><![CDATA[All transport areas have an external object identifier<br/><br/>
+OCL: "inv:inspireId->notEmpty()".<br/><br/>
+Verify that all TransportArea have an inspireID.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -192,17 +192,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EID2164f7e3-ca11-4958-a11e-c9482c0541d9">
+									<label>tn-as.b.3: All transport links have an external object identifier.</label>
+									<description><![CDATA[All transport links have an external object identifier.<br/><br/>
+OCL: "inv:inspireId->notEmpty()".<br/><br/>
+Verify that all TransportLink have an inspireID.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -213,17 +213,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EIDe31f1598-98ec-4d1c-9ad8-7abca5a21214">
+									<label>tn-as.b.4: All transport link sequences have an external object identifier.</label>
+									<description><![CDATA[All transport link sequences have an external object identifier.<br/><br/>
+OCL: "inv:inspireId->notEmpty()".<br/><br/>
+Verify that all TransportLinkSequence have an inspireID.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -234,17 +234,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EID8a716b73-cfef-4bc7-b2a0-496059c55136">
+									<label>tn-as.b.5: All transport link sets have an external object identifier.</label>
+									<description><![CDATA[All transport link sets have an external object identifier.<br/><br/>
+OCL: "inv:inspireId->notEmpty()".<br/><br/>
+Verify that all TransportLinkSet have an inspireID.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -255,17 +255,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EID6071c2b7-d4d3-4dcc-a3df-5d24e7739816">
+									<label>tn-as.b.6: All transport nodes have an external object identifier.</label>
+									<description><![CDATA[All transport nodes have an external object identifier.<br/><br/>
+OCL: "inv:inspireId->notEmpty()".<br/><br/>
+Verify that all TransportNode have an inspireID.<<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -276,17 +276,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EID89792a2f-f3b7-4008-a1c6-eedfc6909bfc">
+									<label>tn-as.b.7: All transport points have an external object identifier.</label>
+									<description><![CDATA[All transport points have an external object identifier.<br/><br/>
+OCL: "inv:inspireId->notEmpty()".<br/><br/>
+Verify that all TransportPoint have an inspireID.<<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -297,17 +297,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EIDe4cb76d6-b8a6-4d90-ae4f-f2bed0ae26ad">
+									<label>tn-as.b.8: All transport properties have an external object identifier</label>
+									<description><![CDATA[All transport properties have an external object identifier<br/><br/>
+OCL: "inv:inspireId->notEmpty()".<br/><br/>
+Verify that all TransportProperty have an inspireID.<<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -318,17 +318,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EID8e5faabd-a733-4600-b519-18e53af211f4">
+									<label>tn-as.b.9: A transport link sequence must be composed of transport links that all belong to the same transport network.</label>
+									<description><![CDATA[A transport link sequence must be composed of transport links that all belong to the same transport network.<br/><br/>
+OCL: "inv: link->forAll(l | l.link.inNetwork = self.inNetwork)".<br/><br/>
+Verify that all TransportLinkSequence are composed of all link that have the same value for the inNetwork association role.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
@@ -339,17 +339,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID110786b3-71a8-4926-a6ca-bf9b98ba0925">
-									<label>tn-as.b.1: An address shall have an admin unit address component spatial object whose level is 1 (Country).</label>
-									<description><![CDATA[An address shall have an admin unit address component spatial object whose level is 1 (Country).<br/><br/>
-OCL: "inv: self.component -> forAll (a1 | exists(a1.parent.oclIsTypeOf(AdminUnitName) and a1.parent.level=1))".<br/><br/>
-Verify that for each address, an AdminUnitName is referenced in component and that it is of level 1.<br/><br/>
+								<TestAssertion id="EIDf56cfea3-56e6-4afd-b136-2fe78faacec1">
+									<label>tn-as.b.10: A transport link set must be composed of transport links and or transport link sequences that all belong to the same transport network.</label>
+									<description><![CDATA[A transport link set must be composed of transport links and or transport link sequences that all belong to the same transport network.<br/><br/>
+OCL: "inv: link->forAll(l | l.inNetwork = self.inNetwork)".<br/><br/>
+Verify that all TransportLinkSet are composed of all link that have the same value for the inNetwork association role.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>]]></description>
-									<parent ref="EID6ad87ad2-ef11-4541-a9dd-c0b40cf047e3"/>
+									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
