@@ -439,6 +439,76 @@ return
 						</TestStep>
 					</testSteps>
 				</TestCase>
+				<TestCase id="EIDc1219880-f263-4459-9c87-c6b9377458c0">
+					<label>Geometry</label>
+					<description>Verify that geometries are consistent with the geometries of other features in the data set.</description>
+					<parent ref="EIDe11a7179-a5d8-4556-a94a-90fcfb7e6ffd"/>
+					<testSteps>
+						<TestStep id="EIDa0ccae1d-2917-417e-b29c-6553854c5d78">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDc1219880-f263-4459-9c87-c6b9377458c0"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDd6fa7b64-9a2a-490e-aebe-7411a4610407">
+									<label>tn-as.b.1: No free transport nodes</label>
+									<description><![CDATA[verify for each TransportNode that the geometry (a gml:Point) is located a position that touches a TransportLink.centerlineGeometry (a gml:LineString or gml:Curve), i.e. that the node is at the start or end of a transport link. Otherwise report freeNode.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 7.9.3 (2): Theme-specific Requirements – Geometry representation. In a Transport Networks data set which contains nodes, these nodes shall only be present where Transport Links connect or end.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/geometry" target="_blank">Abstract Test Case 'Geometry'</a>]]></description>
+									<parent ref="EIDa0ccae1d-2917-417e-b29c-6553854c5d78"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO: extend with subtypes :)
+let $nodes := $features[(self::*:RoadNode or self::*:RailwayNode or self::*:RailwayYardNode or self::*:RailwayStationNode or self::*:CablewayNode or self::*:WaterwayNode or self::*:PortNode or self::*:tn-a:Navaid or self::*:tn-a:DesignatedPoint or self::*:tn-a:RunwayCentrelinePoint or self::*:tn-a:TouchDownLiftOff or self::*:tn-a:AerodromeNode)]
+return
+if (count($nodes) = 0)
+then 'PASSED'
+else
+let $featuresWithErrors :=
+(for $candidate in $nodes
+let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
+let $env := ggeo:envelope($candidate_geometry)
+let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+let $touches :=
+for $feature in $other_features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*: ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)]
+let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centerlineGeometry/*[1])
+return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
+return if (not($touches)) then $candidate else ())[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.freeNode', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.freeNode"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID4e0e2598-8103-4b18-a98a-673910214c91">
+									<label>tn-as.b.2: Intersections only at crossings</label>
+									<description><![CDATA[Verify that transport link connections are consistent with the real world, i.e. check that TransportLink features ends are connected wherever a connection exists between the real world phenomena they represent. No connections must be created at connecting network elements when it is not possible for water to pass from one element to another.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IIR Requirement Annex II Section 7.9.3 (1): Theme-specific Requirements – Geometry representation. Transport link ends shall be connected wherever an intersection exists between the real world phenomena they represent. No connections shall be created at crossing network elements when it is not possible to pass from one element to another.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/geometry" target="_blank">Abstract Test Case 'Geometry'</a>]]></description>
+									<parent ref="EIDa0ccae1d-2917-417e-b29c-6553854c5d78"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>NOT_APPLICABLE</expression>
+									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
 			</testCases>
 		</TestModule>
 	</testModules>
