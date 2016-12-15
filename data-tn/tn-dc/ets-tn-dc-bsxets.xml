@@ -60,11 +60,40 @@ Pre-requisite conformance classes:
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID9fb4a73a-8e08-4bc8-a608-b353dcb99d53">
-									<label>tn-dc.a.1: xxxx</label>
-									<description></description>
+									<label>hy-dc.a.1: Each Tansport Network Link or Node geometry is within a Network Area geometry</label>
+									<description><![CDATA[Verify that Transport Networks centreline representations and nodes are located within the extent of the area representation of the same object.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 7.9.1 (1): Theme-specific Requirements – Consistency between spatial data sets. Transport Networks centreline representations and nodes shall always be located within the extent of the area representation of the same object.</li>
+</ul>
+Source: <a href="https://github.com/inspire-eu-validation/data-tn/blob/3.2/tn-dc/spatial.md" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
 									<parent ref="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression></expression>
+									<expression>
+(: TODO extend with subtypes :)
+let $TransportLinkNode := $features[self::*:tn-ro:RoadLink|self::*:tn-ra:RailwayLink|self::*:tn-ca:CablewayLink|self::*:tn-w:WaterwayLink|self::*:tn-a:AirRouteLink|self::*:tn-a: ProcedureLink|self::*:tn-a:StandardInstrumentDeparture|self::*:tn-a:InstrumentApproachProcedure|self::*:tn-a:StandardInstrumentArrival|self::*:tn-ro:RoadNode|self::*:tn-ra:RailwayNode|self::*:tn-ra:RailwayYardNode|self::*:tn-ra:RailwayStationNode|self::*:tn-ca:CablewayNode|self::*:tn-w:WaterwayNode|self::*:tn-w:PortNode|self::*:tn-a:Navaid|self::*:tn-a:DesignatedPoint|self::*:tn-a:RunwayCentrelinePoint|self::*:tn-a:TouchDownLiftOff|self::*:tn-a:AerodromeNode]
+return
+if (count($TransportLinkNode) = 0)
+then 'PASSED'
+else
+let $featuresWithErrors :=
+(for $candidate in $TransportLinkNode
+let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centrelineGeometry or self::*:geometry]/*[1])
+let $env := ggeo:envelope($candidate_geometry)
+let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+let $isWithin :=
+for $feature in $other_features[$features[self::*:tn-ro:RoadServiceArea|self::*:tn-ro:RoadArea|self::*:tn-ro:VehicleTrafficArea|self::*:tn-ra:RailwayArea|self::*:tn-ra:RailwayStationArea|self::*:tn-ra:RailwayYardArea|self::*:tn-w:FairwayArea|self::*:tn-w:PortArea|self::*:tn-w:TrafficSeparationSchemeCrossing|self::*:tn-w:TrafficSeparationSchemeLane|self::*:tn-w:TrafficSeparationSchemeRoundabout|self::*:tn-w:TrafficSeparationSchemeSeperator|self::*:tn-a:AerodromeArea|self::*:tn-a:AirspaceArea|self::*:tn-a:ApronArea|self::*:tn-a:RunwayArea|self::*:tn-a:TaxiwayArea]
+let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+return if (ggeo:isWithin($candidate_geometry,$other_geometry)) then $feature else ()
+return if (not($isWithin)) then $candidate else ())[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.notWithin', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.notWithin"/>
@@ -79,7 +108,7 @@ Relevant requirements:
 <li>IR Requirement Annex II Section 7.9.1 (2): Theme-specific Requirements – Consistency between spatial data sets. Connectivity between transport networks across state borders and – where applicable – also across regional borders (and data sets) within Member States shall be established and maintained by the respective authorities, using the cross-border connectivity mechanisms provided by the NetworkConnection type.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
-									<parent ref="EID871889b6-5664-4498-8762-849fb77a084f"/>
+									<parent ref="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>NOT_APPLICABLE</expression>
 									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
