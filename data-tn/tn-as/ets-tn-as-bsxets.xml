@@ -577,7 +577,7 @@ Source: <a href="" target="_blank">Abstract Test Case 'Network connectivity'</a>
 							<statementForExecution>not applicable</statementForExecution>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
-								<TestAssertion id="EID8353f727-60ce-4893-9a33-5b93013ff6d8">
+<!-- 								<TestAssertion id="EID8353f727-60ce-4893-9a33-5b93013ff6d8">
 									<label>tn-as.e.1: Linear references</label>
 									<description><![CDATA[For each NetworkProperty feature that links to a TransportLink or a TransportLinkSequence, verify that any linear references are consistent with the length of the geometry of the network feature.<br/><br/>
 Relevant requirements:
@@ -588,12 +588,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/object-ref
 									<parent ref="EID5330a6e0-8ddc-483e-86e2-1460b4c1ecc0"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+( : TODO : )
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
-								</TestAssertion>
+								</TestAssertion> -->
 								<TestAssertion id="EID8353f727-60ce-4893-9a33-5b93013ff6d8">
 									<label>tn-as.e.2: Inter-modal connections</label>
 									<description><![CDATA[For each NetworkConnection with as value 'intermodal' for the type attribute, verify that the two elements referenced in the element association role belong to different networks, i.e. they reference different networks in their inNetwork association role.<br/><br/>
@@ -606,10 +607,34 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/object-ref
 									<parent ref="EID5330a6e0-8ddc-483e-86e2-1460b4c1ecc0"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $interModalConnections := $features[self::*:NetworkConnection[not(xsi:nil="true") and (net:type/text() eq "intermodal") or (net3:type/@xlink:href eq 'http://inspire.ec.europa.eu/codelist/ConnectionTypeValue/intermodal')]]
+
+let $refcount := count($interModalConnections/*:element[not(@xsi:nil='true')]/@xlink:href)
+let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
+
+let $featuresWithErrors :=
+(for $interModalConnection in $interModalConnections
+	let $element1 := local:return-reference($interModalConnection/*:element[1][not(@xsi:nil='true')]/@xlink:href)
+	let $element2 := local:return-reference($interModalConnection/*:element[2][not(@xsi:nil='true')]/@xlink:href)
+		return
+		if (not($element1 or $element2)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+	    else
+	    	if ($element1/*:inNetwork/@xlink:href eq $element2/*:inNetwork/@xlink:href) then
+	    		$interModalConnection
+	    	else ()
+)[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.wrongIntermodalConnection', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id)}))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.featuresWithErrors"/>
+										<translationTemplate ref="TR.wrongIntermodalConnection"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
