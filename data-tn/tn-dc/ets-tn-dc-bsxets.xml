@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>PwC</author>
 	<creationDate>2016-12-09T00:00:00Z</creationDate>
 	<lastEditor>PwC</lastEditor>
-	<lastUpdateDate>2016-12-09T00:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2016-12-16T00:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID169dad4a-2b71-4077-9e85-e686b7373b05"/>
 	</tags>
@@ -71,9 +71,10 @@ Source: <a href="https://github.com/inspire-eu-validation/data-tn/blob/3.2/tn-dc
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 (: TODO extend with subtypes :)
-let $TransportLinkNode := $features[self::*:tn-ro:RoadLink|self::*:tn-ra:RailwayLink|self::*:tn-ca:CablewayLink|self::*:tn-w:WaterwayLink|self::*:tn-a:AirRouteLink|self::*:tn-a: ProcedureLink|self::*:tn-a:StandardInstrumentDeparture|self::*:tn-a:InstrumentApproachProcedure|self::*:tn-a:StandardInstrumentArrival|self::*:tn-ro:RoadNode|self::*:tn-ra:RailwayNode|self::*:tn-ra:RailwayYardNode|self::*:tn-ra:RailwayStationNode|self::*:tn-ca:CablewayNode|self::*:tn-w:WaterwayNode|self::*:tn-w:PortNode|self::*:tn-a:Navaid|self::*:tn-a:DesignatedPoint|self::*:tn-a:RunwayCentrelinePoint|self::*:tn-a:TouchDownLiftOff|self::*:tn-a:AerodromeNode]
+let $TransportLinkNode := $features[self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*: ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival|self::*:RoadNode|self::*:RailwayNode|self::*:RailwayYardNode|self::*:RailwayStationNode|self::*:CablewayNode|self::*:WaterwayNode|self::*:PortNode|self::*:Navaid|self::*:DesignatedPoint|self::*:RunwayCentrelinePoint|self::*:TouchDownLiftOff|self::*:AerodromeNode]
+let $NetworkArea := $features[self::*:RoadServiceArea|self::*:RoadArea|self::*:VehicleTrafficArea|self::*:RailwayArea|self::*:RailwayStationArea|self::*:RailwayYardArea|self::*:FairwayArea|self::*:PortArea|self::*:TrafficSeparationSchemeCrossing|self::*:TrafficSeparationSchemeLane|self::*:TrafficSeparationSchemeRoundabout|self::*:TrafficSeparationSchemeSeperator|self::*:AerodromeArea|self::*:AirspaceArea|self::*:ApronArea|self::*:RunwayArea|self::*:TaxiwayArea]
 return
-if (count($TransportLinkNode) = 0)
+if (count($TransportLinkNode) = 0 or count($NetworkArea) = 0)
 then 'PASSED'
 else
 let $featuresWithErrors :=
@@ -82,7 +83,7 @@ let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self
 let $env := ggeo:envelope($candidate_geometry)
 let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
 let $isWithin :=
-for $feature in $other_features[$features[self::*:tn-ro:RoadServiceArea|self::*:tn-ro:RoadArea|self::*:tn-ro:VehicleTrafficArea|self::*:tn-ra:RailwayArea|self::*:tn-ra:RailwayStationArea|self::*:tn-ra:RailwayYardArea|self::*:tn-w:FairwayArea|self::*:tn-w:PortArea|self::*:tn-w:TrafficSeparationSchemeCrossing|self::*:tn-w:TrafficSeparationSchemeLane|self::*:tn-w:TrafficSeparationSchemeRoundabout|self::*:tn-w:TrafficSeparationSchemeSeperator|self::*:tn-a:AerodromeArea|self::*:tn-a:AirspaceArea|self::*:tn-a:ApronArea|self::*:tn-a:RunwayArea|self::*:tn-a:TaxiwayArea]
+for $feature in $other_features[self::*:RoadServiceArea|self::*:RoadArea|self::*:VehicleTrafficArea|self::*:RailwayArea|self::*:RailwayStationArea|self::*:RailwayYardArea|self::*:FairwayArea|self::*:PortArea|self::*:TrafficSeparationSchemeCrossing|self::*:TrafficSeparationSchemeLane|self::*:TrafficSeparationSchemeRoundabout|self::*:TrafficSeparationSchemeSeperator|self::*:AerodromeArea|self::*:AirspaceArea|self::*:ApronArea|self::*:RunwayArea|self::*:TaxiwayArea]
 let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
 return if (ggeo:isWithin($candidate_geometry,$other_geometry)) then $feature else ()
 return if (not($isWithin)) then $candidate else ())[position() le $limitErrors]
