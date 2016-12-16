@@ -48,7 +48,7 @@ Pre-requisite conformance classes:
 			<description>IGNORE</description>
 			<parent ref="EID4441cbde-371f-4899-90b3-145f4fd08ebc"/>
 			<testCases>
- 				<TestCase id="EID14b1c9d9-59fe-4983-9e91-b5ec14d743a6">
+  				<TestCase id="EID14b1c9d9-59fe-4983-9e91-b5ec14d743a6">
 				  <label>Code list values</label>
 				  <description>Verify whether all attributes whose value type is a code list take the values set out therein.</description>
 				  <parent ref="EIDe11a7179-a5d8-4556-a94a-90fcfb7e6ffd"/>
@@ -223,7 +223,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*: ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*:ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -391,7 +391,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self:*:RoadLinkSequence or self:*:RailwayLinkSequence or self:*:CablewayLinkSequence or self:*:WaterLinkSequence or self:*:AirLinkSequence)[not(@xsi:nil='true') and *:link[*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:RoadLinkSequence or self::*:RailwayLinkSequence or self::*:CablewayLinkSequence or self::*:WaterLinkSequence or self::*:AirLinkSequence)[not(@xsi:nil='true') and *:link/*/*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -438,7 +438,7 @@ return
 							</testAssertions>
 						</TestStep>
 					</testSteps>
-				</TestCase>
+				</TestCase> 
 				<TestCase id="EIDc1219880-f263-4459-9c87-c6b9377458c0">
 					<label>Geometry</label>
 					<description>Verify that geometries are consistent with the geometries of other features in the data set.</description>
@@ -453,7 +453,7 @@ return
 							<testAssertions>
 								<TestAssertion id="EIDd6fa7b64-9a2a-490e-aebe-7411a4610407">
 									<label>tn-as.c.1: No free transport nodes</label>
-									<description><![CDATA[verify for each TransportNode that the geometry (a gml:Point) is located a position that touches a TransportLink.centerlineGeometry (a gml:LineString or gml:Curve), i.e. that the node is at the start or end of a transport link. Otherwise report freeNode.<br/><br/>
+									<description><![CDATA[verify for each TransportNode that the geometry (a gml:Point) is located at a position that touches a TransportLink.centerlineGeometry (a gml:LineString or gml:Curve), i.e. that the node is at the start or end of a transport link. Otherwise report freeNode.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 7.9.3 (2): Theme-specific Requirements – Geometry representation. In a Transport Networks data set which contains nodes, these nodes shall only be present where Transport Links connect or end.</li>
@@ -463,7 +463,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/geometry" 
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 (: TODO: extend with subtypes :)
-let $nodes := $features[(self::*:RoadNode or self::*:RailwayNode or self::*:RailwayYardNode or self::*:RailwayStationNode or self::*:CablewayNode or self::*:WaterwayNode or self::*:PortNode or self::*:*:Navaid or self::*:DesignatedPoint or self::*:RunwayCentrelinePoint or self::*:TouchDownLiftOff or self::*:AerodromeNode)]
+let $nodes := $features[(self::*:RoadNode or self::*:RailwayNode or self::*:RailwayYardNode or self::*:RailwayStationNode or self::*:CablewayNode or self::*:WaterwayNode or self::*:PortNode or self::*:Navaid or self::*:DesignatedPoint or self::*:RunwayCentrelinePoint or self::*:TouchDownLiftOff or self::*:AerodromeNode)]
 return
 if (count($nodes) = 0)
 then 'PASSED'
@@ -472,12 +472,12 @@ else
 	(for $candidate in $nodes
 		let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
 		let $env := ggeo:envelope($candidate_geometry)
-		let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
-		let $touches :=
-		(for $feature in $other_features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*: ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)]
-			let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centerlineGeometry/*[1])
+ 		let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+		let $touches := 
+		(for $feature in $other_features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*:ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)]
+			let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centrelineGeometry/*[1])
 			return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
-		)
+		) 
 		return if (not($touches)) then $candidate else ()
 	)[position() le $limitErrors]
 return
@@ -511,7 +511,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/geometry" 
 						</TestStep>
 					</testSteps>
 				</TestCase>
-				<TestCase id="EIDa85e3c90-3e4f-4c7a-a6a2-8e38671d6556">
+ 				<TestCase id="EIDa85e3c90-3e4f-4c7a-a6a2-8e38671d6556">
 					<label>Network connectivity</label>
 					<description>Verify the connectivity of the transport network.</description>
 					<parent ref="EIDe11a7179-a5d8-4556-a94a-90fcfb7e6ffd"/>
@@ -566,8 +566,8 @@ Source: <a href="" target="_blank">Abstract Test Case 'Network connectivity'</a>
 							</testAssertions>
 						</TestStep>
 					</testSteps>
-				</TestCase>
-				<TestCase id="EIDf271ab9f-796b-4644-b27f-cf5dbb919cdc">
+				</TestCase> 
+ 				<TestCase id="EIDf271ab9f-796b-4644-b27f-cf5dbb919cdc">
 					<label>Object References</label>
 					<description>Verify the consistent use of references to other features.</description>
 					<parent ref="EIDe11a7179-a5d8-4556-a94a-90fcfb7e6ffd"/>
@@ -578,8 +578,8 @@ Source: <a href="" target="_blank">Abstract Test Case 'Network connectivity'</a>
 							<parent ref="EIDf271ab9f-796b-4644-b27f-cf5dbb919cdc"/>
 							<statementForExecution>not applicable</statementForExecution>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
-							<testAssertions>
-<!-- 								<TestAssertion id="EID8353f727-60ce-4893-9a33-5b93013ff6d8">
+							<testAssertions> 
+<!--  								<TestAssertion id="EID8353f727-60ce-4893-9a33-5b93013ff6d8">
 									<label>tn-as.e.1: Linear references</label>
 									<description><![CDATA[For each NetworkProperty feature that links to a TransportLink or a TransportLinkSequence, verify that any linear references are consistent with the length of the geometry of the network feature.<br/><br/>
 Relevant requirements:
@@ -596,8 +596,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/object-ref
 									<translationTemplates>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
-								</TestAssertion> -->
-								<TestAssertion id="EID8353f727-60ce-4893-9a33-5b93013ff6d8">
+								</TestAssertion>  -->
+ 								<TestAssertion id="EID8353f727-60ce-4893-9a33-5b93013ff6d8">
 									<label>tn-as.e.2: Inter-modal connections</label>
 									<description><![CDATA[For each NetworkConnection with as value 'intermodal' for the type attribute, verify that the two elements referenced in the element association role belong to different networks, i.e. they reference different networks in their inNetwork association role.<br/><br/>
 Relevant requirements:
@@ -645,7 +645,7 @@ return
 							</testAssertions>
 						</TestStep>
 					</testSteps>
-				</TestCase>
+				</TestCase> 
 			</testCases>
 		</TestModule>
 	</testModules>
