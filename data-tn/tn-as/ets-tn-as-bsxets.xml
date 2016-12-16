@@ -468,16 +468,18 @@ return
 if (count($nodes) = 0)
 then 'PASSED'
 else
-let $featuresWithErrors :=
-(for $candidate in $nodes
-let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
-let $env := ggeo:envelope($candidate_geometry)
-let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
-let $touches :=
-for $feature in $other_features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*: ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)]
-let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centerlineGeometry/*[1])
-return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
-return if (not($touches)) then $candidate else ())[position() le $limitErrors]
+	let $featuresWithErrors :=
+	(for $candidate in $nodes
+		let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
+		let $env := ggeo:envelope($candidate_geometry)
+		let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+		let $touches :=
+		(for $feature in $other_features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*: ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)]
+			let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centerlineGeometry/*[1])
+			return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
+		)
+		return if (not($touches)) then $candidate else ()
+	)[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -608,21 +610,24 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/object-ref
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $interModalConnections := $features[self::*:NetworkConnection[not(xsi:nil="true") and (net:type/text() eq "intermodal") or (net3:type/@xlink:href eq 'http://inspire.ec.europa.eu/codelist/ConnectionTypeValue/intermodal')]]
+return
+if (count($interModalConnections) = 0)
+then 'PASSED'
+else
+	let $refcount := count($interModalConnections/*:element[not(@xsi:nil='true')]/@xlink:href)
+	let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
 
-let $refcount := count($interModalConnections/*:element[not(@xsi:nil='true')]/@xlink:href)
-let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
-
-let $featuresWithErrors :=
-(for $interModalConnection in $interModalConnections
-	let $element1 := local:return-reference($interModalConnection/*:element[1][not(@xsi:nil='true')]/@xlink:href)
-	let $element2 := local:return-reference($interModalConnection/*:element[2][not(@xsi:nil='true')]/@xlink:href)
-		return
-		if (not($element1 or $element2)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
-	    else
-	    	if ($element1/*:inNetwork/@xlink:href eq $element2/*:inNetwork/@xlink:href) then
-	    		$interModalConnection
-	    	else ()
-)[position() le $limitErrors]
+	let $featuresWithErrors :=
+	(for $interModalConnection in $interModalConnections
+		let $element1 := local:return-reference($interModalConnection/*:element[1][not(@xsi:nil='true')]/@xlink:href)
+		let $element2 := local:return-reference($interModalConnection/*:element[2][not(@xsi:nil='true')]/@xlink:href)
+			return
+			if (not($element1 or $element2)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+		    else
+		    	if ($element1/*:inNetwork/@xlink:href eq $element2/*:inNetwork/@xlink:href) then
+		    		$interModalConnection
+		    	else ()
+	)[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
