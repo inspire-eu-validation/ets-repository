@@ -123,8 +123,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/features" 
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 (: TODO: extend with subtypes :)
-let $features3 := $features[(self::tn3:RestrictionForVehicles or self::tn-w3:RestrictionForWaterVehicles)]
-let $features4 := $features[(self::tn:RestrictionForVehicles or self::tn-w:RestrictionForWaterVehicles)]
+let $features3 := $features[(self::tn3:RestrictionForVehicles|self::tn-w3:RestrictionForWaterVehicles)]
+let $features4 := $features[(self::tn:RestrictionForVehicles|self::tn-w:RestrictionForWaterVehicles)]
 let $messages := local:check-code-list-values($features3, $features4, 'restrictionType', 'http://inspire.ec.europa.eu/codelist/RestrictionTypeValue')
 return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 									</expression>
@@ -164,7 +164,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $target := ('RoadLink', 'RailwayLink', 'CablewayLink', 'WaterwayLink', 'AirRouteLink', ' ProcedureLink', 'StandardInstrumentDeparture', 'InstrumentApproachProcedure', 'StandardInstrumentArrival', 'RoadLinkSequence', 'RailwayLinkSequence', 'CablewayLinkSequence', 'WaterLinkSequence', 'AirLinkSequence') 
-let $hrefs := $features[(self::*:TrafficFlowDirection or self::*:WaterTrafficFlowDirection)]/*:networkRef/*/*:element/@xlink:href
+let $hrefs := $features[(self::*:TrafficFlowDirection|self::*:WaterTrafficFlowDirection)]/*:networkRef/*/*:element/@xlink:href
 let $messages := local:check-feature-references($hrefs, $target, 'Link or LinkSequence') 
 return 
 (if ($messages) then 'FAILED' else 'PASSED', 
@@ -195,7 +195,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:RoadServiceArea or self::*:RoadArea or self::*:VehicleTrafficArea or self::*:RailwayArea or self::*:RailwayStationArea or self::*:RailwayYardArea or self::*:FairwayArea or self::*:PortArea or self::*:TrafficSeparationSchemeCrossing or self::*:TrafficSeparationSchemeLane or self::*:TrafficSeparationSchemeRoundabout or self::*:TrafficSeparationSchemeSeperator or self::*:AerodromeArea or self::*:AirspaceArea or self::*:ApronArea or self::*:RunwayArea or self::*:TaxiwayArea)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:RoadServiceArea|self::*:RoadArea|self::*:VehicleTrafficArea|self::*:RailwayArea|self::*:RailwayStationArea|self::*:RailwayYardArea|self::*:FairwayArea|self::*:PortArea|self::*:TrafficSeparationSchemeCrossing|self::*:TrafficSeparationSchemeLane|self::*:TrafficSeparationSchemeRoundabout|self::*:TrafficSeparationSchemeSeperator|self::*:AerodromeArea|self::*:AirspaceArea|self::*:ApronArea|self::*:RunwayArea|self::*:TaxiwayArea)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -223,7 +223,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*:ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -251,7 +251,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:RoadLinkSequence or self::*:RailwayLinkSequence or self::*:CablewayLinkSequence or self::*:WaterLinkSequence or self::*:AirLinkSequence)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:RoadLinkSequence|self::*:RailwayLinkSequence|self::*:CablewayLinkSequence|self::*:WaterLinkSequence|self::*:AirLinkSequence)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -279,7 +279,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:Road or self::*:ERoad or self::*:RailwayLine or self::*:CablewayLinkSet or self::*:FerryCrossing or self::*:MarineWaterway or self::*:InlandWaterway or self::*:AirRoute)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:Road|self::*:ERoad|self::*:RailwayLine|self::*:CablewayLinkSet|self::*:FerryCrossing|self::*:MarineWaterway|self::*:InlandWaterway|self::*:AirRoute)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -307,7 +307,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:RoadNode or self::*:RailwayNode or self::*:RailwayYardNode or self::*:RailwayStationNode or self::*:CablewayNode or self::*:WaterwayNode or self::*:PortNode or self::*:Navaid or self::*:DesignatedPoint or self::*:RunwayCentrelinePoint or self::*:TouchDownLiftOff or self::*:AerodromeNode)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:RoadNode|self::*:RailwayNode|self::*:RailwayYardNode|self::*:RailwayStationNode|self::*:CablewayNode|self::*:WaterwayNode|self::*:PortNode|self::*:Navaid|self::*:DesignatedPoint|self::*:RunwayCentrelinePoint|self::*:TouchDownLiftOff|self::*:AerodromeNode)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -335,7 +335,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:MarkerPost or self::*:Buoy or self::*:Beacon)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:MarkerPost|self::*:Buoy|self::*:Beacon)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -363,7 +363,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:MaintenanceAuthority or self::*:OwnerAuthority or self::*:VerticalPosition or self::*:TrafficFlowDirection or self::*:ConditionOfFacility or self::*:RestrictionForVehicles or self::*:AccessRestriction or self::*:FunctionalRoadClass or self::*:RoadSurfaceCategory or self::*:RoadServiceType or self::*:RoadName or self::*:NumberOfLanes or self::*:SpeedLimit or self::*:RoadWidth or self::*:FormOfWay or self::*:NominalTrackGauge or self::*:RailwayElectrification or self::*:RailwayType or self::*:NumberOfTracks or self::*:DesignSpeed or self::*:RailwayUse or self::*:RailwayStationCode or self::*:FerryUse or self::*:CEMTClass or self::*:RestrictionForWaterVehicles or self::*:WaterTrafficFlowDirection or self::*:ConditionOfWaterFacility or self::*:UpperAltitudeLimit or self::*:FieldElevation or self::*:LowerAltitudeLimit or self::*:AerodromeType or self::*:SurfaceComposition or self::*:useRestriction or self::*:ElementLength or self::*:ElementWidth or self::*:AerodromeCategory or self::*:ConditionOfAirFacility)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:MaintenanceAuthority|self::*:OwnerAuthority|self::*:VerticalPosition|self::*:TrafficFlowDirection|self::*:ConditionOfFacility|self::*:RestrictionForVehicles|self::*:AccessRestriction|self::*:FunctionalRoadClass|self::*:RoadSurfaceCategory|self::*:RoadServiceType|self::*:RoadName|self::*:NumberOfLanes|self::*:SpeedLimit|self::*:RoadWidth|self::*:FormOfWay|self::*:NominalTrackGauge|self::*:RailwayElectrification|self::*:RailwayType|self::*:NumberOfTracks|self::*:DesignSpeed|self::*:RailwayUse|self::*:RailwayStationCode|self::*:FerryUse|self::*:CEMTClass|self::*:RestrictionForWaterVehicles|self::*:WaterTrafficFlowDirection|self::*:ConditionOfWaterFacility|self::*:UpperAltitudeLimit|self::*:FieldElevation|self::*:LowerAltitudeLimit|self::*:AerodromeType|self::*:SurfaceComposition|self::*:useRestriction|self::*:ElementLength|self::*:ElementWidth|self::*:AerodromeCategory|self::*:ConditionOfAirFacility)[not(@xsi:nil='true') and *:inspireID[(@xsi:nil='true')]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -391,7 +391,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:RoadLinkSequence or self::*:RailwayLinkSequence or self::*:CablewayLinkSequence or self::*:WaterLinkSequence or self::*:AirLinkSequence)[not(@xsi:nil='true') and *:link/*/*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:RoadLinkSequence|self::*:RailwayLinkSequence|self::*:CablewayLinkSequence|self::*:WaterLinkSequence|self::*:AirLinkSequence)[not(@xsi:nil='true') and *:link/*/*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -420,7 +420,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:Road or self::*:ERoad or self::*:RailwayLine or self::*:CablewayLinkSet or self::*:FerryCrossing or self::*:MarineWaterway or self::*:InlandWaterway or self::*:AirRoute)[not(@xsi:nil='true') and *:link[*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]]][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:Road|self::*:ERoad|self::*:RailwayLine|self::*:CablewayLinkSet|self::*:FerryCrossing|self::*:MarineWaterway|self::*:InlandWaterway|self::*:AirRoute)[not(@xsi:nil='true') and *:link[*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -463,7 +463,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/geometry" 
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 (: TODO: extend with subtypes :)
-let $nodes := $features[(self::*:RoadNode or self::*:RailwayNode or self::*:RailwayYardNode or self::*:RailwayStationNode or self::*:CablewayNode or self::*:WaterwayNode or self::*:PortNode or self::*:Navaid or self::*:DesignatedPoint or self::*:RunwayCentrelinePoint or self::*:TouchDownLiftOff or self::*:AerodromeNode)]
+let $nodes := $features[(self::*:RoadNode|self::*:RailwayNode|self::*:RailwayYardNode|self::*:RailwayStationNode|self::*:CablewayNode|self::*:WaterwayNode|self::*:PortNode|self::*:Navaid|self::*:DesignatedPoint|self::*:RunwayCentrelinePoint|self::*:TouchDownLiftOff|self::*:AerodromeNode)]
 return
 if (count($nodes) = 0)
 then 'PASSED'
@@ -474,7 +474,7 @@ else
 		let $env := ggeo:envelope($candidate_geometry)
  		let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
 		let $touches := 
-		(for $feature in $other_features[(self::*:RoadLink or self::*:RailwayLink or self::*:CablewayLink or self::*:WaterwayLink or self::*:AirRouteLink or self::*:ProcedureLink or self::*:StandardInstrumentDeparture or self::*:InstrumentApproachProcedure or self::*:StandardInstrumentArrival)]
+		(for $feature in $other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]
 			let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centrelineGeometry/*[1])
 			return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
 		) 
