@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ExecutableTestSuite id="EID733af9a0-312b-4f71-9aa2-977cd2134d23" xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
 	<itemHash>bQ==</itemHash>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-tn/tn-dc</remoteResource>
@@ -70,8 +71,7 @@ Source: <a href="https://github.com/inspire-eu-validation/data-tn/blob/3.2/tn-dc
 									<parent ref="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO extend with subtypes :)
-let $TransportLinkNode := $features[self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*: ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival|self::*:RoadNode|self::*:RailwayNode|self::*:RailwayYardNode|self::*:RailwayStationNode|self::*:CablewayNode|self::*:WaterwayNode|self::*:PortNode|self::*:Navaid|self::*:DesignatedPoint|self::*:RunwayCentrelinePoint|self::*:TouchDownLiftOff|self::*:AerodromeNode]
+let $TransportLinkNode := $features[self::*:RoadLink|self::*:RoadNode|self::*:RailwayNode|self::*:RailwayYardNode|self::*:RailwayStationNode|self::*:CablewayNode|self::*:WaterwayNode|self::*:PortNode|self::*:Navaid|self::*:DesignatedPoint|self::*:RunwayCentrelinePoint|self::*:TouchDownLiftOff|self::*:AerodromeNode]
 let $NetworkArea := $features[self::*:RoadServiceArea|self::*:RoadArea|self::*:VehicleTrafficArea|self::*:RailwayArea|self::*:RailwayStationArea|self::*:RailwayYardArea|self::*:FairwayArea|self::*:PortArea|self::*:TrafficSeparationSchemeCrossing|self::*:TrafficSeparationSchemeLane|self::*:TrafficSeparationSchemeRoundabout|self::*:TrafficSeparationSchemeSeperator|self::*:AerodromeArea|self::*:AirspaceArea|self::*:ApronArea|self::*:RunwayArea|self::*:TaxiwayArea]
 return
 if (count($TransportLinkNode) = 0 or count($NetworkArea) = 0)
@@ -85,7 +85,7 @@ let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
 let $isWithin :=
 for $feature in $other_features[self::*:RoadServiceArea|self::*:RoadArea|self::*:VehicleTrafficArea|self::*:RailwayArea|self::*:RailwayStationArea|self::*:RailwayYardArea|self::*:FairwayArea|self::*:PortArea|self::*:TrafficSeparationSchemeCrossing|self::*:TrafficSeparationSchemeLane|self::*:TrafficSeparationSchemeRoundabout|self::*:TrafficSeparationSchemeSeperator|self::*:AerodromeArea|self::*:AirspaceArea|self::*:ApronArea|self::*:RunwayArea|self::*:TaxiwayArea]
 let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
-return if (ggeo:isWithin($candidate_geometry,$other_geometry)) then $feature else ()
+return if (ggeo:isWithin($candidate_geometry, $other_geometry)) then $feature else ()
 return if (not($isWithin)) then $candidate else ())[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
