@@ -438,9 +438,28 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-as/constraint
 									<parent ref="EID6bb73535-1e46-4a58-9cb1-f9d4acc653eb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresWithErrors := $features[(self::*:Road|self::*:ERoad|self::*:RailwayLine|self::*:CablewayLinkSet|self::*:FerryCrossing|self::*:MarineWaterway|self::*:InlandWaterway|self::*:AirRoute)[not(@xsi:nil='true') and *:link[*:inNetwork/@xlink:href != *:inNetwork/@xlink:href]]][position() le $limitErrors]
+let $candidates := $features[(self::*:Road|self::*:ERoad|self::*:RailwayLine|self::*:CablewayLinkSet|self::*:FerryCrossing|self::*:MarineWaterway|self::*:InlandWaterway|self::*:AirRoute)[not(@xsi:nil='true')]]
+
+let $refcount := count($candidates/*:link[not(@xsi:nil='true')]/*/*:link/@xlink:href)
+let $dummy := if ($refcount>100) then local:log("Checking " || $refcount || " feature references - this may take awhile...") else ()
+let $featuresWithErrors :=
+(for $candidate in $candidates
+	let $sameNetworkFound :=
+	(for $href in $candidate/*:link[not(@xsi:nil='true')]/*/*:link/@xlink:href
+	    let $element := local:return-reference($href)
+	    return
+	    if (not($element)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
+	    else 
+    		if ($element/*:inNetwork = $candidate/*:inNetwork) then
+    			$element
+    		else ()
+	)
+	return
+	if ($sameNetworkFound) then ()
+	else $candidate
+)[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
