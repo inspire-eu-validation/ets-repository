@@ -186,7 +186,7 @@ else ()}
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
 
 return try {
-  xquery:eval($query, map {'records': $records, 'validationErrors': $validationErrors, 'db': $db, 'encoding': $encoding, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile, 'schemapath': $schemapath })
+  xquery:eval($query, map {'records': $records, 'idMap': map:merge($records ! map:entry(fn:string(gmd:fileIdentifier/*/text()), .)), 'validationErrors': $validationErrors, 'db': $db, 'encoding': $encoding, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile, 'schemapath': $schemapath })
 } catch * {
 let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
@@ -294,7 +294,7 @@ declare variable $executableTestSuiteId external;
 declare variable $testTaskId external := 'EID' || uuid:randomUUID();
 declare variable $testTaskResultId external := 'EID' || uuid:randomUUID();
 declare variable $translationTemplateBundleId external := "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" ;
-declare variable $projDir external := "/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire";
+declare variable $projDir external := "/Users/portele/Documents/Dropbox/EC JRC/Are3na Reference Platform 2/WP4/D4.3.3/github/ets-repository";
 declare variable $tmpDir external := $projDir || file:dir-separator() || "tmp";
 declare variable $outputFile external := $tmpDir || file:dir-separator() || $testTaskResultId || "-result.xml";
 declare variable $logFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-log.txt";

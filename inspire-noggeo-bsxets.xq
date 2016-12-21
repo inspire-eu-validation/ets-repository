@@ -177,7 +177,7 @@ else ()}
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
 
 return try {
-  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(gml:identifier), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile })
+  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(@gml:id), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile })
 } catch * {
 let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
@@ -284,7 +284,7 @@ declare variable $executableTestSuiteId external;
 declare variable $testTaskId external := 'EID' || uuid:randomUUID();
 declare variable $testTaskResultId external := 'EID' || uuid:randomUUID();
 declare variable $translationTemplateBundleId external := "EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52" ;
-declare variable $projDir external := "/Users/portele/Documents/Dropbox/ETF/ets-repository/inspire";
+declare variable $projDir external := "/Users/portele/Documents/Dropbox/EC JRC/Are3na Reference Platform 2/WP4/D4.3.3/github/ets-repository";
 declare variable $tmpDir external := $projDir || file:dir-separator() || "tmp";
 declare variable $outputFile external := $tmpDir || file:dir-separator() || $testTaskResultId || "-result.xml";
 declare variable $logFile external :=  $tmpDir || file:dir-separator() || $testTaskResultId || "-log.txt";
@@ -293,9 +293,9 @@ declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $tes
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
 declare variable $dbDir external;
-declare variable $dbBaseName external := "e-cp";
+declare variable $dbBaseName external := "ad";
 declare variable $dbCount external := 1;
-declare variable $etsFile external := $projDir || file:dir-separator() || "data-cp" || file:dir-separator() || "cp-ia" || file:dir-separator() || "ets-cp-ia-bsxets.xml";
+declare variable $etsFile external := $projDir || file:dir-separator() || "data-ad" || file:dir-separator() || "ad-as" || file:dir-separator() || "ets-ad-as-bsxets.xml";
 (: Project internals :)
 declare variable $testQueryFile := "testquery-noggeo.xq";
 
