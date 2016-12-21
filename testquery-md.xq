@@ -24,6 +24,7 @@ declare variable $limitErrors external := 1000;
 declare variable $validationErrors external := ''; 
 declare variable $db external; 
 declare variable $records external; 
+declare variable $idMap external;
 declare variable $testObjectId external;
 declare variable $logFile external;
 declare variable $statFile external;
@@ -72,18 +73,18 @@ declare function local:addMessage($templateId as xs:string, $map as map(*)) as e
 
 declare function local:passed($id as xs:string) as xs:boolean
 {
-	true() (: TODO :)
+  true() (: TODO :)
 };
 
 declare function local:error-statistics($template as xs:string, $count as xs:integer) as element()*
 {
-	(if ($count>=$limitErrors) then local:addMessage('TR.tooManyErrors', map { 'count': string($limitErrors) }) else (),
-	 if ($count>0) then local:addMessage($template, map { 'count': string($count) }) else ())
+  (if ($count>=$limitErrors) then local:addMessage('TR.tooManyErrors', map { 'count': string($limitErrors) }) else (),
+   if ($count>0) then local:addMessage($template, map { 'count': string($count) }) else ())
 };
 
 declare function local:status($stati as xs:string*) as xs:string 
 {
-	if ($stati='FAILED') then 'FAILED' else if ($stati='SKIPPED') then 'SKIPPED' else if ($stati='WARNING') then 'WARNING' else if ($stati='INFO') then 'INFO' else if ($stati='PASSED_MANUAL') then 'PASSED_MANUAL' else if ($stati='PASSED') then 'PASSED' else if ($stati='NOT_APPLICABLE') then 'NOT_APPLICABLE' else 'UNDEFINED'
+  if ($stati='FAILED') then 'FAILED' else if ($stati='SKIPPED') then 'SKIPPED' else if ($stati='WARNING') then 'WARNING' else if ($stati='INFO') then 'INFO' else if ($stati='PASSED_MANUAL') then 'PASSED_MANUAL' else if ($stati='PASSED') then 'PASSED' else if ($stati='NOT_APPLICABLE') then 'NOT_APPLICABLE' else 'UNDEFINED'
 };
 
 (: 'notHTTP' = not a HTTP(S) URL
@@ -121,7 +122,17 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 
 declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer) as map(*)
 {
-	map:merge( for $uri in fn:distinct-values($uris) return map { string($uri) : local:check-resource-uri(string($uri), $timeoutInS) } )
+  let $remote := $uris[starts-with(.,'http://') or starts-with(.,'https://')]
+  let $local := $uris[starts-with(.,'#')]
+  return
+  map:merge((
+   for $uri at $pos in $remote 
+   let $dummy := if ($pos mod 100 = 0) then local:log("Accessing remote reference " || $pos || "/" || count($remote)) else ()
+   return map { $uri : local:check-resource-uri($uri, $timeoutInS) },  
+   for $uri in $local[map:contains($idMap,substring(.,2))] return map { $uri : 'application/gml+xml' },  
+   for $uri in $local[not(map:contains($idMap,substring(.,2)))] return map { $uri : 'idNotFound' },  
+   for $uri in $uris[not(starts-with(.,'#') or starts-with(.,'http://') or starts-with(.,'https://'))] return map { $uri : 'notHTTP' }
+  ))
 };
 
 (:
@@ -146,8 +157,8 @@ return
         let $codes := for $codeUri in $codeUris return fn:substring-after($codeUri, $url || '/')
         return
           $codes
-    		} catch * { 
-    			error((),'Code list ' || $url || ' cannot be accessed.')
+        } catch * { 
+          error((),'Code list ' || $url || ' cannot be accessed.')
       }
 };
 
@@ -162,9 +173,9 @@ let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
   if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
-     error((),'Code list ' || $clurl || ' cannot be accessed.')
+     error((),'Code list ' || $url || ' cannot be accessed.')
   else if ($valid_clurl = 'TIMEOUT') then
-    error((),'Access to code list ' || $clurl || ' timed out.')
+    error((),'Access to code list ' || $url || ' timed out.')
   else if (not(starts-with($valid_clurl,'text/xml') or starts-with($valid_clurl,'application/xml') or starts-with($valid_clurl,'application/atom+xml'))) then
     error((),'Unknown resource type encountered when accessing the atom representation of code list ' || $url || ' at URL ' || $clurl || '.')
   else
@@ -172,8 +183,8 @@ return
         let $root := fn:doc($clurl)/element()
         return
           $root//atom:entry
-		} catch * { 
-			error((),'Code list ' || $clurl || ' cannot be accessed.')
+    } catch * { 
+      error((),'Code list ' || $url || ' cannot be accessed.')
     }
 };
 

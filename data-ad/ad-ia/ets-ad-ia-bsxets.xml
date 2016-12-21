@@ -11,7 +11,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia" target="_
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
-  <reference>../../inspire-bsxets.xq</reference>
+  <reference>../../inspire-noggeo-bsxets.xq</reference>
 	<version>0.1.0</version>
 	<author>PwC</author>
 	<creationDate>2016-11-28T00:00:00Z</creationDate>
@@ -193,9 +193,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" 
 									<parent ref="EIDee715d8b-e282-40d9-9392-8699db3bf7d7"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := ('Building', 'AbstractConstruction')
+let $target := ('Building', 'BuildingPart')
 let $hrefs := $features[self::*:Address]/*:building/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, 'Building or AbstractConstruction')
+let $messages := local:check-feature-references($hrefs, $target, 'AbstractConstruction')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)	
@@ -333,7 +333,7 @@ return
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDbf269ddb-61e8-4991-b850-3e42878ef386">
-									<label>ad-ia.b.9: Address.Locator.AddressLocator.withinScopeOf</label>
+									<label>ad-ia.b.9: Address.locator.AddressLocator.withinScopeOf</label>
 									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
 Relevant requirements:
 <ul>
@@ -345,7 +345,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-ia/features" 
 									<expression>
 let $target := ('ThoroughfareName', 'AddressAreaName', 'PostalDescriptor', 'AdminUnitName')
 let $hrefs := $features[self::*:Address]/*:locator/*:AddressLocator/*:withinScopeOf/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, 'AddressComponent')
+let $messages := local:check-feature-references($hrefs, $target, 'AddressComponent',1)
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)	

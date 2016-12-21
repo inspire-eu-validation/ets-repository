@@ -36,11 +36,11 @@ declare namespace wfs='http://www.opengis.net/wfs/2.0';
 declare namespace xsi='http://www.w3.org/2001/XMLSchema-instance'; 
 declare namespace xlink='http://www.w3.org/1999/xlink'; 
 declare namespace etf='http://www.interactive-instruments.de/etf/2.0';
-declare namespace uuid='java.util.UUID';
 declare namespace atom='http://www.w3.org/2005/Atom';
+declare namespace uuid='java.util.UUID';
 
-import module namespace functx = 'http://www.functx.com';
-import module namespace http = 'http://expath.org/ns/http-client';
+import module namespace functx='http://www.functx.com';
+import module namespace http='http://expath.org/ns/http-client';
 
 declare variable $limitErrors external := 1000;
 declare variable $validationErrors external := ''; 
@@ -108,15 +108,17 @@ declare function local:status($stati as xs:string*) as xs:string
 };
 
 (: 'notHTTP' = not a HTTP(S) URL
+   'idNotFound' = a bare name Xpointer was provided, but not found
    'TIMEOUT' = not accessible within timeout limits 
    HTTP status code = resource not available, the status code may point to the reason
    media type = accessible :)
-
 declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:integer) as xs:string
 {
   if (starts-with($uri,'http://') or starts-with($uri,'https://')) then
     try { 
-      let $response := http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true'/>, $uri) 
+		   let $loginfo := local:log('Checking URL: ''' || $uri || '''')
+		   let $query := "import module namespace http = 'http://expath.org/ns/http-client'; declare variable $timeoutInS external; declare variable $uri external; http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true'/>, $uri)"
+			let $response := xquery:eval($query, map{ 'timeoutInS' : $timeoutInS, 'uri': $uri }, map{ 'timeout': $timeoutInS })
       return
       if ($response/@status=('200','204')) then
           $response/http:header[lower-case(@name)='content-type']/@value
@@ -124,12 +126,11 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
         $response/@status
     } catch * 
     { 
-      'TIMEOUT' 
+		let $logerror := local:log($err:description || ' URL: ' || $uri)
+      return 'TIMEOUT' 
     }
   else if (starts-with($uri,'#')) then
-    let $response := $features[@gml:id=substring($uri,2)] 
-    return
-    if ($response) then
+    if (map:contains($idMap,substring($uri,2))) then
       'application/gml+xml'
     else
       'idNotFound'
@@ -139,40 +140,73 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 
 declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer) as map(*)
 {
-  map:merge( for $uri in $uris return map { $uri : local:check-resource-uri($uri, $timeoutInS) } )
+  let $remote := $uris[starts-with(.,'http://') or starts-with(.,'https://')]
+  let $local := $uris[starts-with(.,'#')]
+  return
+  map:merge((
+   for $uri at $pos in $remote 
+   let $dummy := if ($pos mod 100 = 0) then local:log("Accessing remote reference " || $pos || "/" || count($remote)) else ()
+   return map { $uri : local:check-resource-uri($uri, $timeoutInS) },  
+   for $uri in $local[map:contains($idMap,substring(.,2))] return map { $uri : 'application/gml+xml' },  
+   for $uri in $local[not(map:contains($idMap,substring(.,2)))] return map { $uri : 'idNotFound' },  
+   for $uri in $uris[not(starts-with(.,'#') or starts-with(.,'http://') or starts-with(.,'https://'))] return map { $uri : 'notHTTP' }
+  ))
 };
 
 declare function local:check-feature-references($hrefs as node()*, $targets as xs:string*, $expected as xs:string) as element()*
 {
-let $dummy := if (count($hrefs)>10) then local:log("Checking " || count($hrefs) || " feature references - this may take awhile...") else ()
+  local:check-feature-references($hrefs, $targets, $expected, 0)
+};
+
+declare function local:check-feature-references($hrefs as node()*, $targets as xs:string*, $expected as xs:string, $level as xs:integer) as element()*
+{
+let $urls := fn:distinct-values($hrefs)
+let $dummy := if (count($urls)>100) then local:log("Checking up to " || count($urls) || " feature references - this may take awhile...") else ()
+let $map := local:check-resource-uris($urls, 30)
 let $messages := 
-  (for $href in $hrefs
-   let $feature := $href/../..
-   let $fid := string($feature/@gml:id)
-   let $url := string($href)
-   let $validuri := local:check-resource-uri($url, 30)
+  (for $url at $pos in $urls
+   let $validuri := map:get($map, $url)
+   let $dummy := if ($pos mod 100 = 0) then local:log("Checking feature reference " || $pos || "/" || count($urls)) else ()
+   let $sourcefeatures := if ($level=1) then $hrefs[.=$url]/../../../..
+    else if ($level=2) then $hrefs[.=$url]/../../../../../..
+    else $hrefs[.=$url]/../..
    return
    if ($validuri = 'notHTTP') then
-    local:addMessage('TR.urlNotHttp2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
+    for $feature in $sourcefeatures
+    let $fid := string($feature/@gml:id)
+    return local:addMessage('TR.urlNotHttp2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
   else if ($validuri = 'idNotFound') then
-    local:addMessage('TR.idNotFound2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
+    for $feature in $sourcefeatures
+    let $fid := string($feature/@gml:id)
+    return local:addMessage('TR.idNotFound2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url })
   else if ($validuri = 'TIMEOUT') then
-    local:addMessage('TR.resourceNotAccessibleTimeout2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'timeout': '30' })
+    for $feature in $sourcefeatures
+    let $fid := string($feature/@gml:id)
+    return local:addMessage('TR.resourceNotAccessibleTimeout2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'timeout': '30' })
   else if (matches($validuri,'\d{3}')) then
-    local:addMessage('TR.resourceNotAccessible2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'status' : $validuri })
+    for $feature in $sourcefeatures
+    let $fid := string($feature/@gml:id)
+    return local:addMessage('TR.resourceNotAccessible2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'status' : $validuri })
   else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/gml+xml') or starts-with($validuri,'application/xml')) then
     try { 
       let $root := 
-        if (starts-with($url,'#')) then $features[@gml:id=substring($url,2)]
+        if (starts-with($url,'#')) then map:get($idMap,substring($url,2))
         else fn:doc($url)/element()
       return
       if (local-name($root)=$targets) then ()
-      else local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'elementNameExpected': $expected, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
+      else 
+       for $feature in $sourcefeatures
+       let $fid := string($feature/@gml:id)
+       return local:addMessage('TR.unknownXMLResource2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'elementNameExpected': $expected, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
     } catch * { 
-      local:addMessage('TR.resourceNotAccessibleException2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'message': $err:description })
+      for $feature in $sourcefeatures
+      let $fid := string($feature/@gml:id)
+      return local:addMessage('TR.resourceNotAccessibleException2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'message': $err:description })
     }
   else
-    local:addMessage('TR.unknownResourceType2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'mediaType': $validuri })
+    for $feature in $sourcefeatures
+    let $fid := string($feature/@gml:id)
+    return local:addMessage('TR.unknownResourceType2', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'url': $url, 'mediaType': $validuri })
   )[position() le $limitErrors]
 return
 (local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
@@ -183,16 +217,40 @@ declare function local:return-reference($href as node()) as element()?
 {
    try { 
      let $url := string($href)
-     let $validuri := local:check-resource-uri($url, 30)
      let $root := 
-       if (starts-with($url,'#')) then $features[@gml:id=substring($url,2)]
+       if (starts-with($url,'#')) then map:get($idMap,substring($url,2))
        else fn:doc($url)/element()
      return $root
    } catch * { 
+     (: this is not for information accessibility checks, so we ignore 404s etc. :)
    }
 };
 
-declare function local:check-code-list-values($features3 as element()*, $features4 as element()*, $property as xs:string, $uri as xs:string) as element()*
+declare function local:return-references($urls as xs:string*) as map(*)
+{
+   let $dummy := if (count($urls)>100) then local:log("Checking up to " || count($urls) || " references - this may take awhile...") else ()
+   return
+	map:merge( for $url at $pos in $urls
+    let $dummy := if ($pos mod 100 = 0) then local:log("Accessing reference " || $pos || "/" || count($urls)) else ()
+    return map { $url : 
+     try { 
+      let $root := 
+       if (starts-with($url,'#')) then map:get($idMap,substring($url,2))
+       else fn:doc($url)/element()
+      return $root
+     } catch * { 
+      (: this is not for information accessibility checks, so we ignore 404s etc. :)
+     }
+    }
+   )
+};
+
+declare function local:check-code-list-values($objects3 as element()*, $objects4 as element()*, $property as xs:string, $uri as xs:string) as element()*
+{
+	local:check-code-list-values($objects3, $objects4, $property, $uri, 0)
+};
+
+declare function local:check-code-list-values($objects3 as element()*, $objects4 as element()*, $property as xs:string, $uri as xs:string, $level as xs:integer) as element()*
 {
 let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
 let $cluri := $uri || '/' || $clname || '.en.atom'
@@ -202,13 +260,22 @@ if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code li
 else
 let $valuesURI := $clfeed//atom:entry/atom:id/text()
 let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
-let $featuresWithErrors := ($features3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $features4[*[local-name()=$property and not(@xsi:nil='true') and not(@xlink:href=$valuesURI)]])[position() le $limitErrors]
+let $objectsWithErrors := ($objects3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $objects4[*[local-name()=$property and not(@xsi:nil='true') and not(@xlink:href=$valuesURI)]])[position() le $limitErrors]
+let $featuresWithErrors :=
+    if ($level=1) then $objectsWithErrors/../..
+    else if ($level=2) then $objectsWithErrors/../../../..
+    else if ($level=3) then $objectsWithErrors/../../../../../..
+    else $objectsWithErrors
 return
 (local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
+ for $object in $objectsWithErrors
+   let $feature :=  if ($level=1) then $object/../..
+    else if ($level=2) then $object/../../../..
+    else if ($level=3) then $object/../../../../../..
+    else $object
    order by $feature/@gml:id
-   let $v4 := fn:starts-with(namespace-uri($feature/*[local-name()=$property]),'http://inspire.ec.europa.eu/schemas/')
-   let $value := if ($v4) then $feature/*[local-name()=$property]/@xlink:href else $feature/*[local-name()=$property]/text()
+   let $v4 := fn:starts-with(namespace-uri($object/*[local-name()=$property]),'http://inspire.ec.europa.eu/schemas/')
+   let $value := if ($v4) then $object/*[local-name()=$property]/@xlink:href else $object/*[local-name()=$property]/text()
    return
      local:addMessage('TR.disallowedCodeListValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': $property, 'value': string($value), 'codelist' : $uri }))  
 };
@@ -267,7 +334,7 @@ return
 :)
 declare function local:get-codes-in-atom-format($url as xs:string, $langId as xs:string) as element()*
 {
-let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata-)?codelist/)?')
+let $clname := if ($url = 'http://inspire.ec.europa.eu/theme') then 'theme' else functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata\-)?codelist/)?')
 let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
 return
@@ -287,7 +354,6 @@ return
     }
 };
 
-
 (:
 @throws: an error that explains why the invocation failed
 :)
@@ -301,10 +367,12 @@ declare function local:get-code-titles($url as xs:string, $langIds as xs:string*
   return $codesAsAtomEntries/atom:title/text()
 };
 
-
-declare function local:is-valid-date-or-dateTime($dateString as xs:string) as xs:boolean
+declare function local:is-valid-date-or-dateTime($dateString as xs:string?) as xs:boolean
 {
-  let $date := 
+   if (not($dateString)) then
+   	false()
+   else
+	let $date := 
     try {
       let $tmp := xs:date($dateString)
       return
