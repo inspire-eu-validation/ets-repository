@@ -238,7 +238,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/constraint
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := 'm2'
-let $featuresWithErrors := $features[self::*:BasicPropertyUnit or self::*:CadastralParcel and *:areaValue and not (*:areaValue/@uom and *:areaValue/@uom=$units)][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:CadastralParcel or self::*:BasicPropertyUnit) and *:areaValue and not (*:areaValue/@uom and *:areaValue/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
@@ -271,7 +271,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/constraint
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $units := 'm'
-let $featuresWithErrors := $features[self::*:CadastralBoundary or self::*:CadastralZoning and *:estimatedAccuracy and not (*:estimatedAccuracy/@uom and *:estimatedAccuracy/@uom=$units)][position() le $limitErrors]
+let $featuresWithErrors := $features[(self::*:CadastralBoundary or self::*:CadastralZoning) and *:estimatedAccuracy and not (*:estimatedAccuracy/@uom and *:estimatedAccuracy/@uom=$units)][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
