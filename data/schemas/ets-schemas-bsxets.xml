@@ -6,7 +6,7 @@
 	<label>Conformance class: INSPIRE GML application schemas, General requirements</label>
 	<description><![CDATA[This test suite examines GML documents against basic requirements for the GML encoding for spatial data sets in INSPIRE. This only covers application-schema-independent, generic requirements. Requirements related to specific application schemas are part of conformance classes with a dependency on this conformance class.<br/><br/>
 <b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
-Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are not fully supported.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml" target="_blank">Conformance Class 'INSPIRE GML encoding'</a><br/><br/>
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-encoding/3.3/inspire-gml" target="_blank">Conformance Class 'INSPIRE GML encoding'</a></li></ul>]]></description>
@@ -300,16 +300,15 @@ return
 									<description><![CDATA[Verify that no spatial topology types are used, i.e. check that none of the GML object elements for spatial topology are used as child elements of a feature from the application schema.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::cp3:* or self::cp:*)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]  
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:Node|self::gml:Edge|self::gml:Face|self::gml:TopoSolid|self::gml:TopoPoint|self::gml:TopoCurve|self::gml:TopoSurface|self::gml:TopoVolume|self::gml:TopoComplex]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -331,16 +330,15 @@ return
 									<description><![CDATA[Verify that only linear interpolation is used, i.e. check that none of the nonlinear GML curve segment object elements are used as child elements of a feature from the application schema.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $featuresWithErrors := $featuresToInspect[.//gml:Curve/gml:segments/*[not(self::gml:LineStringSegment)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -362,16 +360,15 @@ return
 									<description><![CDATA[Verify that only gml:Polygon or gml:Surface are used, i.e. check that none of the disallowed GML surface object elements are used as child elements of a feature from the application schema.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:OrientableSurface|self::gml:CompositeSurface|self::gml:PolyhedralSurface|self::gml:Tin|self::gml:TriangulatedSurface]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -393,16 +390,15 @@ return
 									<description><![CDATA[Verify that only planar interpolation is used, i.e. check that only PolygonPatch is used as a GML surface patch object elements in features from the application schema.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $featuresWithErrors := $featuresToInspect[.//gml:Surface/gml:patches/*[not(self::gml:PolygonPatch)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -424,16 +420,15 @@ return
 									<description><![CDATA[Verify that only valid GML geometry elements are used, i.e. check that none of the disallowed GML geometry object elements are used as child elements of a feature from the application schema.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:Solid|self::gml:MultiSolid|self::gml:CompositeSolid|self::gml:CompositeCurve|self::gml:Grid]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -455,16 +450,15 @@ return
 									<description><![CDATA[Verify that in points only gml:pos is used for coordinates.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $featuresWithErrors := $featuresToInspect[.//gml:Point/*[not(self::gml:pos)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -486,16 +480,15 @@ return
 									<description><![CDATA[Verify that in curves and surfaces only gml:posList is used for coordinates.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:LineString|self::gml:LineStringSegment|self::gml:LinearRing]/*[not(self::gml:posList)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -517,16 +510,15 @@ return
 									<description><![CDATA[Verify that geometry aggregates do not use the GML array property elements, i.e. check that the only the regular property elements are used, but not the array property elements. For example, for a gml:MultiPoint, only gml:pointMember may be used, not gml:pointMembers.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $featuresWithErrors := $featuresToInspect[.//*[self::gml:MultiPoint/gml:pointMembers|self::gml:MultiCurve/gml:curveMembers|self::gml:MultiSurface/gml:surfaceMembers|self::gml:MultiGeometry/gml:geometryMembers]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -548,16 +540,15 @@ return
 									<description><![CDATA[Coordinate reference systems may have 1, 2 or 3 dimensions, i.e. check all occurances of srsDimension and for values greater than '3'.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $featuresWithErrors := $featuresToInspect[.//@srsDimension &gt; 3][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -579,16 +570,15 @@ return
 									<description><![CDATA[Verify that in curves and surfaces only gml:posList is used for coordinates, i.e. validate all geometry elements of a feature from the application schema using a geometry library.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Article 12 (1): Other Requirements and Rules. The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li></ul>
-<b>Known limitations:</b>
+<b>Note:</b>
 <ul>
-<li>Currently only CadastralParcel features are excluded (the only Annex I objects that are excluded from this requirement).</li>
+<li>Cadastral Parcel and Building 3D features are excluded from this requirement.</li>
 </ul>
 Source: <a href="" target="_blank">Abstract Test Case 'Simple features'</a>]]></description>
 									<parent ref="EID73531400-70ac-4374-83fd-5df504d5cfba"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: add other feature types to exclude; extend with subtypes :)
-let $featuresToInspect := $features[not(self::*:CadastralParcel)]  
+let $featuresToInspect := $features[not(self::cp3:* or self::cp:* or self::bu-core3d3:* or self::bu-core3d:*)]
 let $messages := for $feature in $featuresToInspect
   return
 	try {
@@ -677,7 +667,6 @@ Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]><
 									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: extend with subtypes :)
 let $features3 := $features[*/gn3:GeographicalName]
 let $features4 := $features[*/gn:GeographicalName]
 let $messages := local:check-code-list-values-gn($features3, $features4, 'grammaticalNumber', 'http://inspire.ec.europa.eu/codelist/GrammaticalNumberValue')
@@ -714,7 +703,6 @@ Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]><
 									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: extend with subtypes :)
 let $features3 := $features[*/gn3:GeographicalName]
 let $features4 := $features[*/gn:GeographicalName]
 let $messages := local:check-code-list-values-gn($features3, $features4, 'grammaticalGender', 'http://inspire.ec.europa.eu/codelist/GrammaticalGenderValue')
@@ -751,7 +739,6 @@ Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]><
 									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: extend with subtypes :)
 let $features3 := $features[*/gn3:GeographicalName]
 let $features4 := $features[*/gn:GeographicalName]
 let $messages := local:check-code-list-values-gn($features3, $features4, 'nameStatus', 'http://inspire.ec.europa.eu/codelist/NameStatusValue')
@@ -788,7 +775,6 @@ Source: <a href="" target="_blank">Abstract Test Case 'Code list values'</a>]]><
 									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-(: TODO: extend with subtypes :)
 let $features3 := $features[*/gn3:GeographicalName]
 let $features4 := $features[*/gn:GeographicalName]
 let $messages := local:check-code-list-values-gn($features3, $features4, 'nativeness', 'http://inspire.ec.europa.eu/codelist/NativenessValue')
