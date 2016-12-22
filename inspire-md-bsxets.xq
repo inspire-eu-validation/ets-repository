@@ -306,7 +306,7 @@ declare variable $schemapath := $projDir || file:dir-separator() || "schemas" ||
 declare variable $dbDir external;
 declare variable $dbBaseName external := "md";
 declare variable $dbCount external := 1;
-declare variable $etsFile external := $projDir || file:dir-separator() || "metadata" || file:dir-separator() || "iso" || file:dir-separator() || "ets-md-iso-bsxets.xml";
+declare variable $etsFile external := $projDir || file:dir-separator() || "data" || file:dir-separator() || "interoperability-metadata" || file:dir-separator() || "ets-md-iop-bsxets.xml";
 (: Project internals :)
 declare variable $testQueryFile := "testquery-md.xq";
 
