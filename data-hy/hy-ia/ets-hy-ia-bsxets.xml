@@ -11,7 +11,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia" target="_
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
-  <reference>../../inspire-bsxets.xq</reference>
+  <reference>../../inspire-noggeo-bsxets.xq</reference>
 	<version>0.1.0</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
@@ -101,7 +101,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia/features" 
 									<expression>
 let $targets := ('HydroNode', 'WatercourseLink', 'WatercourseLinkSequence', 'WatercourseSeparatedCrossing', 'Watercourse', 'StandingWater', 'Wetland', 'GlacierSnowfield', 'Shore', 'DrainageBasin', 'RiverBasin', 'LandWaterBoundary', 'Embankment', 'Ford', 'Lock', 'Sluice', 'DamOrWeir', 'ShorelineConstruction', 'Crossing', 'SpringOrSeep', 'VanishingPoint', 'Rapids', 'Falls')
 let $hrefs := $features[self::hy-p3:* or self::hy-p:* or self::hy-n3:* or self::hy-n:*]/*:relatedHydroObject/@xlink:href
-let $messages := local:check-feature-references($hrefs, $targets, 'HydroObject')
+let $messages := local:check-feature-references($hrefs, $targets, 'HydroObject', 'relatedHydroObject')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)									
@@ -131,7 +131,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia/features" 
 									<expression>
 let $targets := 'WatercourseLink'
 let $hrefs := $features[self::*:WatercourseSeparatedCrossing]/*:element/@xlink:href
-let $messages := local:check-feature-references($hrefs, $targets, 'WatercourseLink')
+let $messages := local:check-feature-references($hrefs, $targets, 'WatercourseLink', 'element')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)									
@@ -161,7 +161,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia/features" 
 									<expression>
 let $target := 'HydroNode'
 let $hrefs := $features[self::*:WatercourseLink]/*:startNode/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target)
+let $messages := local:check-feature-references($hrefs, $target, $target, 'startNode')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)									
@@ -191,7 +191,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia/features" 
 									<expression>
 let $target := 'HydroNode'
 let $hrefs := $features[self::*:WatercourseLink]/*:endNode/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target)
+let $messages := local:check-feature-references($hrefs, $target, $target, 'endNode')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)									
@@ -221,7 +221,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia/features" 
 									<expression>
 let $target := 'Shore'
 let $hrefs := $features[self::*:Watercourse or self::*:StandingWater]/*:bank/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target)
+let $messages := local:check-feature-references($hrefs, $target, $target, 'bank')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)									
@@ -251,7 +251,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia/features" 
 									<expression>
 let $target := ('DrainageBasin','RiverBasin')
 let $hrefs := $features[self::*:Watercourse or self::*:StandingWater]/*:drainsBasin/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, 'DrainageBasin')
+let $messages := local:check-feature-references($hrefs, $target, 'DrainageBasin', 'drainsBasin')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)									
@@ -281,7 +281,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia/features" 
 									<expression>
 let $target := ('Watercourse','StandingWater')
 let $hrefs := $features[self::*:Watercourse or self::*:StandingWater]/*:neighbour/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, 'SurfaceWater')
+let $messages := local:check-feature-references($hrefs, $target, 'SurfaceWater', 'neighbour')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)									
@@ -311,7 +311,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-ia/features" 
 									<expression>
 let $target := ('Watercourse','StandingWater')
 let $hrefs := $features[self::*:DrainageBasin or self::*:RiverBasin]/*:outlet/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, 'SurfaceWater')
+let $messages := local:check-feature-references($hrefs, $target, 'SurfaceWater', 'outlet')
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  $messages)									

@@ -139,7 +139,10 @@ return
 									<label>md-iso.a.3: Access and use conditions</label>
 									<description><![CDATA[<p>Conditions applying to access and use must be described at least once for the metadata resource.</p>
 <p>The test checks if a useLimitation element is provided and it is not an empty characterstring.<br/><br/>
-If no conditions apply to the access and use of the resource, "no conditions apply" shall be used. If conditions are unknown, "conditions unknown" shall be used. Descriptions of terms and conditions, including where applicable, the corresponding fees shall be provided through this element or a link where these terms and conditions are described. The content needs to be checked manually, only the basic tests can be executed automatically.</p>
+If no conditions apply to the access and use of the resource, "no conditions apply" shall be used.<br/><br/>
+If conditions are unknown, "conditions unknown" shall be used.<br/><br/>
+Descriptions of terms and conditions, including where applicable, the corresponding fees shall be provided through this element or a link where these terms and conditions are described.<br/><br/>
+The basic test to detect missing or empty use limitation information is executed. If this basic check passes, the content needs to be checked manually for correctness.</p>
 <p>Relevant requirement(s):</p>
 <ul>
 <li>TG MD Requirement 33: If no conditions apply to the access and use of the resource, ‘no conditions apply’ shall be used. If conditions are unknown, ‘conditions unknown’ shall be used.</li>
@@ -163,7 +166,15 @@ let $messages :=
 return
 (if ($messages) then 'FAILED' else 'PASSED_MANUAL',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
+ if ($messages) then $messages 
+ else
+  for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $useLimitations := $record/gmd:identificationInfo[1]/*/gmd:resourceConstraints/*/gmd:useLimitation/*
+	 return
+	  if (some $useLim in $useLimitations satisfies string-length(normalize-space($useLim/text())) &gt; 0) then 
+	  local:addMessage('TR.checkUseLimitation', map { 'filename': local:filename($record), 'id': $rid, 'text': string-join($useLimitations, '; ') })
+	  else ())
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -697,7 +708,7 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels and gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage]
-let $urls := $recordsToInspect/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
+let $urls := fn:distinct-values($recordsToInspect/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text())
 let $map := local:check-resource-uris($urls, 30)
 let $messages := (for $record in $recordsToInspect
   let $rid := $record/gmd:fileIdentifier/*/text()
@@ -1011,7 +1022,7 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service' and gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage]
-let $urls := $recordsToInspect/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
+let $urls := fn:distinct-values($recordsToInspect/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text())
 let $map := local:check-resource-uris($urls, 30)
 let $messages := (for $record in $recordsToInspect
   let $rid := $record/gmd:fileIdentifier/*/text()
@@ -1341,12 +1352,13 @@ let $messages :=
 	 if (not($thesauri)) then ()
 	 else for $thesaurus in $thesauri
 		let $title := $thesaurus/*/gmd:title/*/text()
+		let $keywords := string-join($thesaurus/../gmd:keyword/*/text(), '; ')
 		let $hasExpectedDate := boolean($thesaurus/*/gmd:date/*[gmd:date/*/text() and gmd:dateType/*/@codeListValue = ('publication','revision','creation')])
 		return
-		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid }) 
-		 else if (string-length(normalize-space($title)) = 0) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid })
+		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords }) 
+		 else if (string-length(normalize-space($title)) = 0) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords })
 		 else (),
-		 if (not($hasExpectedDate)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title) then $title else '' }) else ()
+		 if (not($hasExpectedDate)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title) then $title else '', 'keywords' : $keywords }) else ()
 		)
 	)[position() le $limitErrors]
 return

@@ -18,7 +18,6 @@ declare namespace uuid='java.util.UUID';
 
 import module namespace functx = 'http://www.functx.com';
 import module namespace http = 'http://expath.org/ns/http-client';
-import module namespace ggeo = 'de.interactive_instruments.etf.bsxm.GmlGeoX';
 
 declare variable $limitErrors external := 1000;
 declare variable $validationErrors external := ''; 
@@ -101,12 +100,14 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 			let $response := xquery:eval($query, map{ 'timeoutInS' : $timeoutInS, 'uri': $uri }, map{ 'timeout': $timeoutInS })
 			return
 			if ($response/@status=('200','204')) then
-		  		$response/http:header[lower-case(@name)='content-type']/@value
+			   let $contenttype := $response/http:header[lower-case(@name)='content-type']/@value
+		  		return
+		  		if ($contenttype) then $contenttype else 'application/octet-stream'
 			else
 				$response/@status
 		} catch * 
 		{ 
-			let $logerror := local:log($err:description || ' URL: ' || $uri)
+			let $logerror := local:log('Exception: ' || $err:description || ' URL: ' || $uri)
 			return 'TIMEOUT' 
 		}
 	else if (starts-with($uri,'#')) then
@@ -128,7 +129,7 @@ declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as x
   map:merge((
    for $uri at $pos in $remote 
    let $dummy := if ($pos mod 100 = 0) then local:log("Accessing remote reference " || $pos || "/" || count($remote)) else ()
-   return map { $uri : local:check-resource-uri($uri, $timeoutInS) },  
+   return map { $uri : local:check-resource-uri($uri, $timeoutInS) },
    for $uri in $local[map:contains($idMap,substring(.,2))] return map { $uri : 'application/gml+xml' },  
    for $uri in $local[not(map:contains($idMap,substring(.,2)))] return map { $uri : 'idNotFound' },  
    for $uri in $uris[not(starts-with(.,'#') or starts-with(.,'http://') or starts-with(.,'https://'))] return map { $uri : 'notHTTP' }

@@ -144,17 +144,28 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/schema-v
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $errors := (for $file in $db
-  let $start := prof:current-ms()
+ return
+ try { 
   let $root := $file/element()
-  let $messages := validate:xsd-info($file)
+  let $logentry := local:log('Validating ' || local:filename($root))
+  let $start := prof:current-ms()
+  let $query := "declare variable $file external; validate:xsd-info($file)"
+  let $messages := xquery:eval($query, map{ 'file': $file }, map{ 'timeout': 60 })
+  (:let $messages := validate:xsd-info($file):)
   let $duration := prof:current-ms()-$start
-  let $logentry := local:log('Validating ' || local:filename($root) || ': ' || $duration || ' ms')
   let $errors := count($messages)
+  let $logentry := local:log('Duration: ' || $duration || ' ms. Errors: ' || $errors || '.')
   return
    if ($errors&gt;0) then
     (local:addMessage('TR.invalidSchema', map { 'filename': local:filename($root), 'count': string($errors) }),
      for $message in $messages return local:addMessage('TR.xmlSchemaError', map { 'filename': local:filename($root), 'error': $message }))
-   else ())[position() le $limitErrors]						 
+   else ()
+ } catch * 
+ { 
+	let $logerror := local:log('Exception: ' || $err:description)
+   return local:addMessage('TR.timeoutFileOperation', map { 'filename': local:filename($file/element()), 'description': $err:description })
+ }
+ )[position() le $limitErrors]						 
 return
 (if ($errors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.filesWithErrors', count($errors[@ref eq 'TR.invalidSchema'])),
@@ -667,9 +678,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/code-lis
 									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features3 := $features[*/gn3:GeographicalName]
-let $features4 := $features[*/gn:GeographicalName]
-let $messages := local:check-code-list-values-gn($features3, $features4, 'grammaticalNumber', 'http://inspire.ec.europa.eu/codelist/GrammaticalNumberValue')
+let $objects3 := $features/*/gn3:GeographicalName
+let $objects4 := $features/*/gn:GeographicalName
+let $messages := local:check-code-list-values($objects3, $objects4, 'grammaticalNumber', 'http://inspire.ec.europa.eu/codelist/GrammaticalNumberValue', 1)
 return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -703,9 +714,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/code-lis
 									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features3 := $features[*/gn3:GeographicalName]
-let $features4 := $features[*/gn:GeographicalName]
-let $messages := local:check-code-list-values-gn($features3, $features4, 'grammaticalGender', 'http://inspire.ec.europa.eu/codelist/GrammaticalGenderValue')
+let $objects3 := $features/*/gn3:GeographicalName
+let $objects4 := $features/*/gn:GeographicalName
+let $messages := local:check-code-list-values($objects3, $objects4, 'grammaticalGender', 'http://inspire.ec.europa.eu/codelist/GrammaticalGenderValue', 1)
 return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -739,9 +750,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/code-lis
 									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features3 := $features[*/gn3:GeographicalName]
-let $features4 := $features[*/gn:GeographicalName]
-let $messages := local:check-code-list-values-gn($features3, $features4, 'nameStatus', 'http://inspire.ec.europa.eu/codelist/NameStatusValue')
+let $objects3 := $features/*/gn3:GeographicalName
+let $objects4 := $features/*/gn:GeographicalName
+let $messages := local:check-code-list-values($objects3, $objects4, 'nameStatus', 'http://inspire.ec.europa.eu/codelist/NameStatusValue', 1)
 return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -775,9 +786,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas/code-lis
 									<parent ref="EID9a4ba802-3d2b-4d07-8aef-caa0df54cb62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features3 := $features[*/gn3:GeographicalName]
-let $features4 := $features[*/gn:GeographicalName]
-let $messages := local:check-code-list-values-gn($features3, $features4, 'nativeness', 'http://inspire.ec.europa.eu/codelist/NativenessValue')
+let $objects3 := $features/*/gn3:GeographicalName
+let $objects4 := $features/*/gn:GeographicalName
+let $messages := local:check-code-list-values($objects3, $objects4, 'nativeness', 'http://inspire.ec.europa.eu/codelist/NativenessValue', 1)
 return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -822,7 +833,7 @@ return
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
    return
-     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one of the two attributes pronunciationSoundLink and pronunciationIPA shall not be void.'}))
+     local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one of the two attributes pronunciationSoundLink and pronunciationIPA shall not be void, if the pronunciation property is provided.', 'additionalInfo' : '' }))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
