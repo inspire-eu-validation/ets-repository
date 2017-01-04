@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite id="EID733af9a0-312b-4f71-9aa2-977cd2134d23" xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-tn/tn-dc</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Data consistency, Transport Networks</label>
+	<description><![CDATA[This test suite examines a data set against theme-specific requirements related to the consistency of the data.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are not fully supported.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-dc" target="_blank">Conformance Class 'Data consistency, Transport Networks'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency" target="_blank">Conformance Class 'Data consistency'</a></li>
+</ul>]]></description>
+	<reference>../../inspire-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>PwC</author>
+	<creationDate>2016-12-09T00:00:00Z</creationDate>
+	<lastEditor>PwC</lastEditor>
+	<lastUpdateDate>2016-12-16T00:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID169dad4a-2b71-4077-9e85-e686b7373b05"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+	  <testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID733af9a0-312b-4f71-9aa2-977cd2134d23"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID562e5045-5cdc-492a-be67-55b551ab3045">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID733af9a0-312b-4f71-9aa2-977cd2134d23"/>
+			<testCases>
+				<TestCase id="EIDdc3b76de-68d5-46a6-bbe3-da0abb973f0f">
+					<label>Spatial consistency</label>
+					<description>Verify that the spatial information is consistent.</description>
+					<parent ref="EID562e5045-5cdc-492a-be67-55b551ab3045"/>
+					<testSteps>
+						<TestStep id="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDdc3b76de-68d5-46a6-bbe3-da0abb973f0f"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID9fb4a73a-8e08-4bc8-a608-b353dcb99d53">
+									<label>hy-dc.a.1: Each Transport Network Link or Node geometry is within a Network Area geometry (Road Transport Networks)</label>
+									<description><![CDATA[Verify that Transport Networks centreline representations and nodes in the Road Transport Network are located within the extent of the area representation of the same object.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 7.9.1 (1): Theme-specific Requirements – Consistency between spatial data sets. Transport Networks centreline representations and nodes shall always be located within the extent of the area representation of the same object.</li>
+</ul>
+Source: <a href="https://github.com/inspire-eu-validation/data-tn/blob/3.2/tn-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
+									<parent ref="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $TransportLinkNode := $features[self::*:RoadLink|self::*:RoadNode]
+let $NetworkArea := $features[self::*:RoadServiceArea|self::*:RoadArea|self::*:VehicleTrafficArea]
+return
+if (count($TransportLinkNode) = 0 or count($NetworkArea) = 0)
+then 'PASSED'
+else
+let $featuresWithErrors :=
+(for $candidate in $TransportLinkNode
+return
+try {
+let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centrelineGeometry or self::*:geometry]/*[1])
+let $env := ggeo:envelope($candidate_geometry)
+let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+let $other_geometries := for $feature in $other_features[self::*:RoadServiceArea|self::*:RoadArea|self::*:VehicleTrafficArea] 
+ where $feature/*:geometry/*[1][self::gml:Polygon|self::gml:Surface|self::gml:MultiSurface]
+ return ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+let $union := ggeo:union($other_geometries)
+return if (not(ggeo:contains($union,$candidate_geometry))) then $candidate else ()
+} catch * {
+$candidate
+})[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'PASSED_MANUAL' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.notWithin', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.notWithin"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDdb7ae736-a7b8-41e2-ae62-4f98076bc6c4">
+									<label>hy-dc.a.2: Each Transport Network Link or Node geometry is within a Network Area geometry (Railway Transport Networks)</label>
+									<description><![CDATA[Verify that Transport Networks centreline representations and nodes in the Railway Transport Network are located within the extent of the area representation of the same object.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 7.9.1 (1): Theme-specific Requirements – Consistency between spatial data sets. Transport Networks centreline representations and nodes shall always be located within the extent of the area representation of the same object.</li>
+</ul>
+Source: <a href="https://github.com/inspire-eu-validation/data-tn/blob/3.2/tn-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
+									<parent ref="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $TransportLinkNode := $features[self::*:RailwayLink|self::*:RailwayNode|self::*:RailwayYardNode|self::*:RailwayStationNode]
+let $NetworkArea := $features[self::*:RailwayArea|self::*:RailwayStationArea|self::*:RailwayYardArea]
+return
+if (count($TransportLinkNode) = 0 or count($NetworkArea) = 0)
+then 'PASSED'
+else
+let $featuresWithErrors :=
+(for $candidate in $TransportLinkNode
+return
+try {
+let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centrelineGeometry or self::*:geometry]/*[1])
+let $env := ggeo:envelope($candidate_geometry)
+let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+let $other_geometries := for $feature in $other_features[self::*:RailwayArea|self::*:RailwayStationArea|self::*:RailwayYardArea] 
+ where $feature/*:geometry/*[1][self::gml:Polygon|self::gml:Surface|self::gml:MultiSurface]
+ return ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+let $union := ggeo:union($other_geometries)
+return if (not(ggeo:contains($union,$candidate_geometry))) then $candidate else ()
+} catch * {
+$candidate
+})[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'PASSED_MANUAL' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.notWithin', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.notWithin"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID3da8c41a-e1f1-47bc-8f60-1c92cfa02feb">
+									<label>hy-dc.a.3: Each Transport Network Link or Node geometry is within a Network Area geometry (Waterway Transport Networks)</label>
+									<description><![CDATA[Verify that Transport Networks centreline representations and nodes in the Waterway Transport Network are located within the extent of the area representation of the same object.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 7.9.1 (1): Theme-specific Requirements – Consistency between spatial data sets. Transport Networks centreline representations and nodes shall always be located within the extent of the area representation of the same object.</li>
+</ul>
+Source: <a href="https://github.com/inspire-eu-validation/data-tn/blob/3.2/tn-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
+									<parent ref="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $TransportLinkNode := $features[self::*:WaterwayLink|self::*:WaterwayNode|self::*:PortNode]
+let $NetworkArea := $features[self::*:FairwayArea|self::*:PortArea]
+return
+if (count($TransportLinkNode) = 0 or count($NetworkArea) = 0)
+then 'PASSED'
+else
+let $featuresWithErrors :=
+(for $candidate in $TransportLinkNode
+return
+try {
+let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centrelineGeometry or self::*:geometry]/*[1])
+let $env := ggeo:envelope($candidate_geometry)
+let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+let $other_geometries := for $feature in $other_features[self::*:FairwayArea|self::*:PortArea] 
+ where $feature/*:geometry/*[1][self::gml:Polygon|self::gml:Surface|self::gml:MultiSurface]
+ return ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+let $union := ggeo:union($other_geometries)
+return if (not(ggeo:contains($union,$candidate_geometry))) then $candidate else ()
+} catch * {
+$candidate
+})[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.notWithin', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.notWithin"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID9a50d25b-fe51-4142-b0b3-f90455e65158">
+									<label>hy-dc.a.4: Each Transport Network Link or Node geometry is within a Network Area geometry (Air Transport Networks)</label>
+									<description><![CDATA[Verify that Transport Networks centreline representations and nodes in the Air Transport Network are located within the extent of the area representation of the same object.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 7.9.1 (1): Theme-specific Requirements – Consistency between spatial data sets. Transport Networks centreline representations and nodes shall always be located within the extent of the area representation of the same object.</li>
+</ul>
+Source: <a href="https://github.com/inspire-eu-validation/data-tn/blob/3.2/tn-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
+									<parent ref="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $TransportLinkNode := $features[self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival|self::*:Navaid|self::*:DesignatedPoint|self::*:RunwayCentrelinePoint|self::*:TouchDownLiftOff|self::*:AerodromeNode]
+let $NetworkArea := $features[self::*:AerodromeArea|self::*:AirspaceArea|self::*:ApronArea|self::*:RunwayArea|self::*:TaxiwayArea]
+return
+if (count($TransportLinkNode) = 0 or count($NetworkArea) = 0)
+then 'PASSED'
+else
+let $featuresWithErrors :=
+(for $candidate in $TransportLinkNode
+return
+try {
+let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centrelineGeometry or self::*:geometry]/*[1])
+let $env := ggeo:envelope($candidate_geometry)
+let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+let $other_geometries := for $feature in $other_features[self::*:AerodromeArea|self::*:AirspaceArea|self::*:ApronArea|self::*:RunwayArea|self::*:TaxiwayArea]
+ where $feature/*:geometry/*[1][self::gml:Polygon|self::gml:Surface|self::gml:MultiSurface]
+ return ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+let $union := ggeo:union($other_geometries)
+return if (not(ggeo:contains($union,$candidate_geometry))) then $candidate else ()
+} catch * {
+$candidate
+})[position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   return
+     local:addMessage('TR.notWithin', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.notWithin"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDead98020-36ba-4574-b03c-b688254f99e8">
+									<label>tn-dc.a.5: Manual review</label>
+									<description><![CDATA[Verify that transport networks are spatially connected across data sets. Review the data maintenance procedures and perform spot checks to verify that connectivity between transport networks across state borders and – where applicable – also across regional borders (and data sets) within Member States is established and maintained by the respective authorities, using the cross-border connectivity mechanisms provided by the NetworkConnection type.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Annex II Section 7.9.1 (2): Theme-specific Requirements – Consistency between spatial data sets. Connectivity between transport networks across state borders and – where applicable – also across regional borders (and data sets) within Member States shall be established and maintained by the respective authorities, using the cross-border connectivity mechanisms provided by the NetworkConnection type.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/3.2/tn-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
+									<parent ref="EIDb7d9c5fe-5943-4d7a-857a-5669beb7b647"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>NOT_APPLICABLE</expression>
+									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
