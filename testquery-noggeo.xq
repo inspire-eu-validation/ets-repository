@@ -164,6 +164,11 @@ declare function local:check-feature-references($hrefs as node()*, $targets as x
 
 declare function local:check-feature-references($hrefs as node()*, $targets as xs:string*, $expected as xs:string, $property as xs:string, $level as xs:integer) as element()*
 {
+  local:check-feature-references($hrefs, $targets, $expected, $property, $level, 'NONE')
+};
+
+declare function local:check-feature-references($hrefs as node()*, $targets as xs:string*, $expected as xs:string, $property as xs:string, $level as xs:integer, $specialCase as xs:string) as element()*
+{
 let $urls := fn:distinct-values($hrefs)
 let $dummy := if (count($urls)>100) then local:log("Analyzing up to " || count($urls) || " feature references - this may take awhile...") else ()
 let $map := local:check-resource-uris($urls, 30)
@@ -197,7 +202,16 @@ let $messages :=
         if (starts-with($url,'#')) then map:get($idMap,substring($url,2))
         else fn:doc($url)/element()
       return
-      if (local-name($root)=$targets) then ()
+      if ($specialCase='NONE' and local-name($root)=$targets) then ()
+      else if ($specialCase='formOfRoadNode' and local-name($root)='RoadServiceArea') then ()
+      else if ($specialCase='formOfRoadNode' and local-name($root)='RoadNode') then
+       if ($root[((tn-ro3:formOfRoadNode/text() eq 'roadServiceArea') or (tn-ro:formOfRoadNode/@xlink:href eq 'http://inspire.ec.europa.eu/codelist/FormOfRoadNodeValue/roadServiceArea'))]) then ()
+       else 
+        for $feature in $sourcefeatures
+         let $fid := string($feature/@gml:id)
+         let $v4 := fn:starts-with(namespace-uri($root/*:formOfRoadNode),'http://inspire.ec.europa.eu/schemas/')
+         let $value := if ($v4) then $root/tn-ro:formOfRoadNode/@xlink:href else $root/tn-ro3:formOfRoadNode/text()
+         return local:addMessage('TR.incorrectFormOfRoadNodeValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': $fid, 'property': $property, 'url': $url, 'value': string($value) }) 
       else 
        for $feature in $sourcefeatures
        let $fid := string($feature/@gml:id)

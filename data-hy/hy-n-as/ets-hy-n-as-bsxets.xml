@@ -149,7 +149,7 @@ return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 							<testAssertions>
 								<TestAssertion id="EID9ab2a8f4-0bec-46c9-ac46-645cdc53d20b">
 									<label>hy-n-as.b.1: No free hydrographic nodes</label>
-									<description><![CDATA[verify for each HydroNode that the geometry (a gml:Point) is located at a position that touches a WatercourseLink.centerlineGeometry (a gml:LineString or gml:Curve), i.e. that the node is at the start or end of a watercourse link.<br/><br/>
+									<description><![CDATA[verify for each HydroNode that the geometry (a gml:Point) is located at a position that touches a WatercourseLink.centrelineGeometry (a gml:LineString or gml:Curve), i.e. that the node is at the start or end of a watercourse link.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 8.7.4 (3): Theme-specific Requirements – Geometry representation. In a hydrographic network data set which contains nodes, these nodes shall only be present where Watercourse Links connect or end.</li>
@@ -170,7 +170,7 @@ let $env := ggeo:envelope($candidate_geometry)
 let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
 let $touches :=
 for $feature in $other_features[self::*:WatercourseLink]
-let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centerlineGeometry/*[1])
+let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centrelineGeometry/*[1])
 return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
 return if (not($touches)) then $candidate else ())[position() le $limitErrors]
 return
@@ -258,7 +258,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/identifi
 								</TestAssertion>
 								<TestAssertion id="EID924a4b60-ddb6-4672-90c2-159e503cfd1d">
 									<label>hy-n-as.c.2: Linear references</label>
-									<description><![CDATA[VFor each NetworkProperty feature that links to a WatercourseLink or a WatercourseLinkSequence, verify that any linear references are consistent with the length of the geometry of the network feature.<br/><br/>
+									<description><![CDATA[For each NetworkProperty feature that links to a WatercourseLink or a WatercourseLinkSequence, verify that any linear references are consistent with the length of the geometry of the network feature.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 8.7.3 (2): Theme-specific Requirements – Modelling of object references. When linear referencing is used in hydrographic Network data, the position of referenced properties on links and link sequences shall be expressed as distances measured along the supplied geometry of the underlying link object(s). Note: Linear referencing is not used in the INSPIRE application schemas for the theme Hydrography.</li>
@@ -288,7 +288,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/identifi
 							<testAssertions>
 								<TestAssertion id="EIDfcbbb958-809e-4233-a983-8463b0b0d844">
 									<label>hy-n-as.d.1: Link centrelines</label>
-									<description><![CDATA[Verify that the centrelines of watercourse links fall within the extent of the physical real world object that they represent, if the WatercourseLink feature is indicated as not being 'fictitious', i.e. check for each WatercourseLink object with a property 'fictitious' with a value 'false' that its centerline geometry falls within the extent of the physical real world object that they represent.<br/><br/>
+									<description><![CDATA[Verify that the centrelines of watercourse links fall within the extent of the physical real world object that they represent, if the WatercourseLink feature is indicated as not being 'fictitious', i.e. check for each WatercourseLink object with a property 'fictitious' with a value 'false' that its centreline geometry falls within the extent of the physical real world object that they represent.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 8.7.6: Theme-specific Requirements – Centrelines. The centrelines of watercourse objects shall fall within the extent of the physical real world object that they represent if the Watercourse Link is indicated as not being 'fictitious'.</li>
@@ -317,10 +317,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/link-cen
 							<testAssertions>
 								<TestAssertion id="EID4de76c1f-a99a-4ff5-a688-800021f63af9">
 									<label>hy-n-as.e.1: Connectivity at crossings</label>
-									<description><![CDATA[Verify that all hydrographic nodes are at the start or end of a watercourse link. For each WatercourseLink with a startNode or endNode property, verify that the distance between the start or end of the centerlineGeometry and the geometry of the start and end HydroNode is smaller than the connectivityTolerance.<br/><br/>
+									<description><![CDATA[Verify that all hydrographic nodes are at the start or end of a watercourse link. For each WatercourseLink with a startNode or endNode property, verify that the distance between the start or end of the centrelineGeometry and the geometry of the start and end HydroNode is smaller than the connectivityTolerance.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 8.7.7 (1): Theme-specific Requirements – Ensuring Network Connectivity. Wherever a connection exists in a hydrographic network, all connected link ends and the optional node that take part in this connection have to be positioned at a distance of less than the connectivity tolerance from each other.</li>
+</ul>
+<b>Known limitations:</b>
+<ul>
+<li>To use a connectivityTolerance parameter would require that all geometries are first converted to a meter-based CRS, eg ETRS89 LAEA or LCC, which is currently not supported by the geometry library. In addition, it is unclear how to handle geometries outside of continental Europe. Therefore, the assertion has been classified as "manual" in this Executable Test Suite.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/network-connectivity" target="_blank">Abstract Test Case 'Network connectivity'</a>]]></description>
 									<parent ref="EID1a6fec7b-bcc8-4d3c-9658-af116b6cd47b"/>
@@ -330,10 +334,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/network-
 								</TestAssertion>
 								<TestAssertion id="EID87866a02-fa9c-428a-bb9b-c22a7e80fa7e">
 									<label>hy-n-as.e.2: Unconnected nodes</label>
-									<description><![CDATA[For each WatercourseLink verify that the only HydroNodes in the distance around the start or end of the centerlineGeometry are the nodes associated via the startNode and endNode properties.<br/><br/>
+									<description><![CDATA[For each WatercourseLink verify that the only HydroNodes in the distance around the start or end of the centrelineGeometry are the nodes associated via the startNode and endNode properties.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 8.7.7 (2): Theme-specific Requirements – Ensuring Network Connectivity. Link ends and nodes that are not connected shall always be separated by a distance that is greater than the connectivity tolerance.</li>
+</ul>
+<b>Known limitations:</b>
+<ul>
+<li>To use a connectivityTolerance parameter would require that all geometries are first converted to a meter-based CRS, eg ETRS89 LAEA or LCC, which is currently not supported by the geometry library. In addition, it is unclear how to handle geometries outside of continental Europe. Therefore, the assertion has been classified as "manual" in this Executable Test Suite.</li>
 </ul>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as/network-connectivity" target="_blank">Abstract Test Case 'Network connectivity'</a>]]></description>
 									<parent ref="EID1a6fec7b-bcc8-4d3c-9658-af116b6cd47b"/>
