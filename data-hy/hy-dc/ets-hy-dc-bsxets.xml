@@ -79,16 +79,21 @@ then 'PASSED'
 else
 let $featuresWithErrors :=
 (for $candidate in $networkelements
+return
+try {
 let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centrelineGeometry or self::*:geometry]/*[1])
 let $env := ggeo:envelope($candidate_geometry)
 let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
-let $isWithin :=
-for $feature in $other_features[self::*:Watercourse|self::*:StandingWater]
-let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
-return if (ggeo:isWithin($candidate_geometry,$other_geometry)) then $feature else ()
-return if (not($isWithin)) then $candidate else ())[position() le $limitErrors]
+let $other_geometries := for $feature in $other_features[self::*:Watercourse|self::*:StandingWater] 
+ where $feature/*:geometry/*[1][self::gml:Polygon|self::gml:Surface|self::gml:MultiSurface]
+ return ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+let $union := ggeo:union($other_geometries)
+return if (not(ggeo:contains($union,$candidate_geometry))) then $candidate else ()
+} catch * {
+$candidate
+})[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+(if ($featuresWithErrors) then 'PASSED_MANUAL' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
