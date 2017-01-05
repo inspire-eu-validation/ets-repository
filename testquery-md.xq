@@ -121,15 +121,24 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 		'notHTTP'
 };
 
+declare function local:check-http-uris($uris as xs:string*, $timeoutInS as xs:integer, $max as xs:integer, $errors as xs:integer, $map as map(*)) as map(*)
+{
+  if (count($uris)=0) then $map
+  else if ($errors ge $limitErrors) then map:merge(( $map, for $uri in $uris return map{ $uri: 'SKIPPED' } )) (: too many errors already identified, skipping the remaining URIs :)
+  else
+   let $result := local:check-resource-uri($uris[1], $timeoutInS) 
+   let $newmap := map:merge( ($map, map{ $uris[1] : $result }) )
+   let $newerrors := if (matches($result,'(TIMEOUT|\d{3})')) then $errors+1 else $errors
+   return local:check-http-uris($uris[position() gt 1], $timeoutInS, $max, $newerrors, $newmap)
+};
+
 declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer) as map(*)
 {
   let $remote := $uris[starts-with(.,'http://') or starts-with(.,'https://')]
   let $local := $uris[starts-with(.,'#')]
   return
   map:merge((
-   for $uri at $pos in $remote 
-   let $dummy := if ($pos mod 100 = 0) then local:log("Accessing remote reference " || $pos || "/" || count($remote)) else ()
-   return map { $uri : local:check-resource-uri($uri, $timeoutInS) },
+   local:check-http-uris($remote, $timeoutInS, count($remote), 0, map{}),
    for $uri in $local[map:contains($idMap,substring(.,2))] return map { $uri : 'application/gml+xml' },  
    for $uri in $local[not(map:contains($idMap,substring(.,2)))] return map { $uri : 'idNotFound' },  
    for $uri in $uris[not(starts-with(.,'#') or starts-with(.,'http://') or starts-with(.,'https://'))] return map { $uri : 'notHTTP' }
@@ -162,7 +171,6 @@ return
           error((),'Code list ' || $url || ' cannot be accessed.')
       }
 };
-
 
 (:
 @throws: an error that explains why the code list could not be accessed
