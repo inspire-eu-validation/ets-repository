@@ -188,6 +188,14 @@ let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media
 return try {
   xquery:eval($query, map {'records': $records, 'idMap': map:merge($records ! map:entry(fn:string(gmd:fileIdentifier/*/text()), .)), 'validationErrors': $validationErrors, 'db': $db, 'encoding': $encoding, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile, 'schemapath': $schemapath })
 } catch * {
+let $text := '[' || $err:code || '] ' || $err:description || ' 
+' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
+let $message := 
+  <message xmlns='http://www.interactive-instruments.de/etf/2.0' ref='TR.systemError'>
+   <translationArguments>
+    <argument token='text'>{$text}</argument>
+   </translationArguments>
+  </message>
 let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
 let $moduleresultid := 'EID' || uuid:randomUUID()
@@ -201,11 +209,12 @@ let $caseresultid := 'EID' || uuid:randomUUID()
         for $assertion in $step//*[local-name()='TestAssertion']
           return            
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
+    <messages>{$message}</messages>
     <parent ref='{$stepresultid}'/>
     <resultedFrom ref='{$assertion/@id}'/>
     <startTimestamp>{fn:current-dateTime()}</startTimestamp>
     <duration>0</duration>
-    <status>SKIPPED</status>
+    <status>FAILED</status>
   </TestAssertionResult>
 
       return 
@@ -215,7 +224,7 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 <resultedFrom ref='{$step/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<status>FAILED</status>
 </TestStepResult>
 
     return
@@ -225,7 +234,7 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 <resultedFrom ref='{$case/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<status>FAILED</status>
 </TestCaseResult>
 
 return 
@@ -235,13 +244,10 @@ return
 <resultedFrom ref='{$module/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<status>FAILED</status>
 </TestModuleResult>
 
-let $text := 'System error in the Executable Test Suite. Please contact a system administrator. Error information:
-[' || $err:code || '] ' || $err:description || ' 
-' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
-let $logentry := file:append($logFile, $text || file:line-separator(), map { 'method': 'text', 'media-type': 'text/plain' })
+let $logentry := file:append($logFile, 'System error in the Executable Test Suite. Please contact a system administrator. Error information:' || file:line-separator() || $text || file:line-separator(), map { 'method': 'text', 'media-type': 'text/plain' })
 let $logout := prof:dump($text)
 return
 <TestTaskResult xmlns="http://www.interactive-instruments.de/etf/2.0" id='{$testTaskResultId}'>

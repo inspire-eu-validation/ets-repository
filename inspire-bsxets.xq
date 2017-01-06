@@ -179,6 +179,14 @@ let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media
 return try {
   xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(@gml:id), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile })
 } catch * {
+let $text := '[' || $err:code || '] ' || $err:description || ' 
+' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
+let $message := 
+  <message xmlns='http://www.interactive-instruments.de/etf/2.0' ref='TR.systemError'>
+   <translationArguments>
+    <argument token='text'>{$text}</argument>
+   </translationArguments>
+  </message>
 let $test-module-results :=
 for $module in $ets//*[local-name()='TestModule']
 let $moduleresultid := 'EID' || uuid:randomUUID()
@@ -192,11 +200,12 @@ let $caseresultid := 'EID' || uuid:randomUUID()
         for $assertion in $step//*[local-name()='TestAssertion']
           return            
   <TestAssertionResult xmlns='http://www.interactive-instruments.de/etf/2.0' id='EID{uuid:randomUUID()}'>
+    <messages>{$message}</messages>
     <parent ref='{$stepresultid}'/>
     <resultedFrom ref='{$assertion/@id}'/>
     <startTimestamp>{fn:current-dateTime()}</startTimestamp>
     <duration>0</duration>
-    <status>SKIPPED</status>
+    <status>FAILED</status>
   </TestAssertionResult>
 
       return 
@@ -206,7 +215,7 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 <resultedFrom ref='{$step/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<status>FAILED</status>
 </TestStepResult>
 
     return
@@ -216,7 +225,7 @@ let $caseresultid := 'EID' || uuid:randomUUID()
 <resultedFrom ref='{$case/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<status>FAILED</status>
 </TestCaseResult>
 
 return 
@@ -226,13 +235,10 @@ return
 <resultedFrom ref='{$module/@id}'/>
 <startTimestamp>{fn:current-dateTime()}</startTimestamp>
 <duration>0</duration>
-<status>SKIPPED</status>
+<status>FAILED</status>
 </TestModuleResult>
 
-let $text := 'System error in the Executable Test Suite. Please contact a system administrator. Error information:
-[' || $err:code || '] ' || $err:description || ' 
-' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
-let $logentry := file:append($logFile, $text || file:line-separator(), map { 'method': 'text', 'media-type': 'text/plain' })
+let $logentry := file:append($logFile, 'System error in the Executable Test Suite. Please contact a system administrator. Error information:' || file:line-separator() || $text || file:line-separator(), map { 'method': 'text', 'media-type': 'text/plain' })
 let $logout := prof:dump($text)
 return
 <TestTaskResult xmlns="http://www.interactive-instruments.de/etf/2.0" id='{$testTaskResultId}'>
@@ -293,9 +299,9 @@ declare variable $queryFile external :=  $tmpDir || file:dir-separator() || $tes
 declare variable $statisticalReportTableType external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "StatisticalReportTableType-EID8bb8f162-1082-434f-bd06-23d6507634b8.xml";
 declare variable $translationTemplateBundle external := $projDir || file:dir-separator() || "include-metadata" || file:dir-separator() || "TranslationTemplateBundle-EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52.xml";
 declare variable $dbDir external;
-declare variable $dbBaseName external := "ad";
+declare variable $dbBaseName external := "e-tn-ra";
 declare variable $dbCount external := 1;
-declare variable $etsFile external := $projDir || file:dir-separator() || "data-ad" || file:dir-separator() || "ad-dc" || file:dir-separator() || "ets-ad-dc-bsxets.xml";
+declare variable $etsFile external := $projDir || file:dir-separator() || "data-tn" || file:dir-separator() || "tn-as" || file:dir-separator() || "ets-tn-as-bsxets.xml";
 (: Project internals :)
 declare variable $testQueryFile := "testquery.xq";
 
