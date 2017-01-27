@@ -14,7 +14,7 @@ def errMsgBuilder = ''<<''
 def lineSep = System.getProperty("line.separator")
 
 new File('../').eachFileRecurse(FILES) { file ->
-    if(file.name.startsWith('ets-') && file.name.endsWith('-bsxets.xml')) {
+    if((file.name.startsWith('ets-') && file.name.endsWith('-bsxets.xml')) || file.name.endsWith('-soapui-project.xml')) {
         println "Parsing $file"
         def xml = xmlSlurper.parse(file);
         def ids = xml.'**'.findAll{ it.@id != "" }.'@id'
