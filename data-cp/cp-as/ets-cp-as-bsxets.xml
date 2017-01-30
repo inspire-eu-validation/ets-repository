@@ -136,12 +136,14 @@ let $messages :=
    let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
    let $check := ggeo:relate($other_geometry, $candidate_geometry, 'FTFF*FT*T') 
 	return if ($check) then $feature else ()
+  let $dummy := local:log($candidate/@gml:id || ': ' || string-join($onBoundary/@gml:id, ', '))
   return 
   if (not($onBoundary)) then () 
   else
     let $union := ggeo:union($onBoundary)
-    (: TODO reduce to line strings that are not closed, requires a new isClosed() function in GmlGeoX :)
+    (: reduce to line strings that are not closed, requires a new isClosed() function in GmlGeoX :)
     let $linestrings := functx:get-matches($union,'LINESTRING\s?\([\d,\.\s]+\)')[fn:string-length(.)>0]
+    let $dummy := local:log($candidate/@gml:id || ': ' || $union)
     return local:addMessage('TR.openBoundary', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'featureType2' : local-name($onBoundary[1]), 'gmlids': string-join($onBoundary/@gml:id, ''', '''), 'openBoundaries': fn:string-join($linestrings, ', ') })
    } catch * { 
    })[position() le $limitErrors]
@@ -150,10 +152,7 @@ return
  local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
  $messages)
 									</expression>
-									<testItemType ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
-									<!-- disabled for now, see TODO
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-									-->
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>
