@@ -356,9 +356,9 @@ return
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $element := $feature//gml:Curve/gml:segments/*[not(self::gml:LineStringSegment)][1]
+   let $elements := $feature//gml:Curve/gml:segments/*[not(self::gml:LineStringSegment)]
    return
-     local:addMessage('TR.invalidInterpolationFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($element) }))
+     local:addMessage('TR.invalidInterpolationFound', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'elementName': name($elements[1]) }))
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
