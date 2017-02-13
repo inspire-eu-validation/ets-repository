@@ -164,10 +164,10 @@ let $messages :=
   (for $candidate in $candidates
    order by $candidate/@gml:id
   let $level := if ($candidate[au3:nationalLevel[1]/text()='5thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/5thOrder']) then '6thOrder'
-                else if ($candidate[au3:nationalLevel[1]/text()='4thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder']) then '5thOrder'
-                else if ($candidate[au3:nationalLevel[1]/text()='3rdOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder']) then '4thOrder'
-                else if ($candidate[au3:nationalLevel[1]/text()='2ndOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder']) then '3rdOrder'
-                else if ($candidate[au3:nationalLevel[1]/text()='1stOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder']) then '2ndOrder'
+                else if ($candidate[au3:nationalLevel[1]/text()='4thOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/4thOrder']) then ('5thOrder', '6thOrder')
+                else if ($candidate[au3:nationalLevel[1]/text()='3rdOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/3rdOrder']) then ('4thOrder', '5thOrder', '6thOrder')
+					 else if ($candidate[au3:nationalLevel[1]/text()='2ndOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/2ndOrder']) then ('3rdOrder', '4thOrder', '5thOrder', '6thOrder')
+                else if ($candidate[au3:nationalLevel[1]/text()='1stOrder' or au:nationalLevel[1]/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder']) then ('2ndOrder', '3rdOrder', '4thOrder', '5thOrder', '6thOrder')
                 else ()
   return
   for $href in $candidate/*:lowerLevelUnit[not(@xsi:nil='true')]/@xlink:href 
