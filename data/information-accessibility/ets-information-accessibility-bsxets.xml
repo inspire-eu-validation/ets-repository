@@ -69,8 +69,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/information-acce
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $uris := distinct-values(($features//@srsName,$features//@frame))
-let $urimap := local:check-resource-uris($uris, 30)
-let $errorregex := '^(notHTTP|idNotFound|TIMEOUT|\d{3})$'
+let $urimap := local:check-resource-uris($uris, 30, true())
+let $errorregex := '^(notHTTP|idNotFound|EXCEPTION|\d{3})$'
 let $featuresWithErrors := $features[.//@srsName[matches(map:get($urimap,.),$errorregex)] or .//@frame[matches(map:get($urimap,.),$errorregex)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
