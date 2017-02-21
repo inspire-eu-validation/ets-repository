@@ -13,6 +13,8 @@ declare namespace xlink='http://www.w3.org/1999/xlink';
 declare namespace etf='http://www.interactive-instruments.de/etf/2.0';
 declare namespace atom='http://www.w3.org/2005/Atom';
 declare namespace wfs='http://www.opengis.net/wfs/2.0'; 
+declare namespace wcs='http://www.opengis.net/wcs/2.0'; 
+declare namespace sos='http://www.opengis.net/sos/2.0'; 
 declare namespace wms='http://www.opengis.net/wms'; 
 declare namespace uuid='java.util.UUID';
 
@@ -88,27 +90,31 @@ declare function local:status($stati as xs:string*) as xs:string
 
 (: 'notHTTP' = not a HTTP(S) URL
    'idNotFound' = a bare name Xpointer was provided, but not found
-   'TIMEOUT' = not accessible within timeout limits 
+   'EXCEPTION ...' = an exception occurred
    HTTP status code = resource not available, the status code may point to the reason
    media type = accessible :)
-declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:integer) as xs:string
+declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:integer, $redirect as xs:boolean) as xs:string
 {
-	if (starts-with($uri,'http://') or starts-with($uri,'https://')) then
+   if ($uri=('http://','https://')) then
+		'notHTTP'
+	else if (starts-with($uri,'http://') or starts-with($uri,'https://')) then
 		try { 
 		   let $loginfo := local:log('Checking URL: ''' || $uri || '''')
-		   let $query := "import module namespace http = 'http://expath.org/ns/http-client'; declare variable $timeoutInS external; declare variable $uri external; http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true'/>, $uri)"
-			let $response := xquery:eval($query, map{ 'timeoutInS' : $timeoutInS, 'uri': $uri }, map{ 'timeout': $timeoutInS })
+		   let $query := "import module namespace http = 'http://expath.org/ns/http-client'; declare variable $timeoutInS external; declare variable $redirect external; declare variable $uri external; http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true' follow-redirect='{$redirect}'/>, $uri)"
+			let $response := xquery:eval($query, map{ 'timeoutInS' : $timeoutInS, 'uri': $uri, 'redirect': $redirect }, map{ 'timeout': $timeoutInS })
 			return
 			if ($response/@status=('200','204')) then
 			   let $contenttype := $response/http:header[lower-case(@name)='content-type']/@value
 		  		return
 		  		if ($contenttype) then $contenttype else 'application/octet-stream'
+			else if ($redirect and $response/@status=('301','302','303','307')) then
+				local:check-resource-uri($response/http:header[@name='Location']/@value, $timeoutInS, $redirect)				
 			else
 				$response/@status
 		} catch * 
 		{ 
 			let $logerror := local:log('Exception: ' || $err:description || ' URL: ' || $uri)
-			return 'TIMEOUT' 
+			return 'EXCEPTION ' || $err:description 
 		}
 	else if (starts-with($uri,'#')) then
 		let $response := $records[@id=substring($uri,2)] 
@@ -121,24 +127,24 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 		'notHTTP'
 };
 
-declare function local:check-http-uris($uris as xs:string*, $timeoutInS as xs:integer, $max as xs:integer, $errors as xs:integer, $map as map(*)) as map(*)
+declare function local:check-http-uris($uris as xs:string*, $timeoutInS as xs:integer, $max as xs:integer, $errors as xs:integer, $map as map(*), $redirect as xs:boolean) as map(*)
 {
   if (count($uris)=0) then $map
   else if ($errors ge $limitErrors) then map:merge(( $map, for $uri in $uris return map{ $uri: 'SKIPPED' } )) (: too many errors already identified, skipping the remaining URIs :)
   else
-   let $result := local:check-resource-uri($uris[1], $timeoutInS) 
+   let $result := local:check-resource-uri($uris[1], $timeoutInS, $redirect) 
    let $newmap := map:merge( ($map, map{ $uris[1] : $result }) )
-   let $newerrors := if (matches($result,'(TIMEOUT|\d{3})')) then $errors+1 else $errors
-   return local:check-http-uris($uris[position() gt 1], $timeoutInS, $max, $newerrors, $newmap)
+   let $newerrors := if (matches($result,'(EXCEPTION|\d{3})')) then $errors+1 else $errors
+   return local:check-http-uris($uris[position() gt 1], $timeoutInS, $max, $newerrors, $newmap, $redirect)
 };
 
-declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer) as map(*)
+declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as xs:integer, $redirect as xs:boolean) as map(*)
 {
   let $remote := $uris[starts-with(.,'http://') or starts-with(.,'https://')]
   let $local := $uris[starts-with(.,'#')]
   return
   map:merge((
-   local:check-http-uris($remote, $timeoutInS, count($remote), 0, map{}),
+   local:check-http-uris($remote, $timeoutInS, count($remote), 0, map{}, $redirect),
    for $uri in $local[map:contains($idMap,substring(.,2))] return map { $uri : 'application/gml+xml' },  
    for $uri in $local[not(map:contains($idMap,substring(.,2)))] return map { $uri : 'idNotFound' },  
    for $uri in $uris[not(starts-with(.,'#') or starts-with(.,'http://') or starts-with(.,'https://'))] return map { $uri : 'notHTTP' }
@@ -152,12 +158,12 @@ declare function local:get-code-list-values($url as xs:string) as xs:string*
 {
 let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata-)?codelist/)?')
 let $clurl := $url || '/' || $clname || '.en.atom'
-let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
+let $valid_clurl := try { local:check-resource-uri($clurl, 30, false()) } catch * { false() }
 return
   if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
      error((),'Code list ' || $url || ' cannot be accessed.')
-  else if ($valid_clurl = 'TIMEOUT') then
-    error((),'Access to code list ' || $url || ' timed out.')
+  else if (starts-with($valid_clurl, 'EXCEPTION')) then
+    error((),'Access to code list ' || $url || ' failed or timed out.')
   else if (not(starts-with($valid_clurl,'text/xml') or starts-with($valid_clurl,'application/xml') or starts-with($valid_clurl,'application/atom+xml'))) then
     error((),'Unknown resource type encountered when accessing the atom representation of code list ' || $url || ' at URL ' || $clurl || '.')
   else
@@ -179,12 +185,12 @@ declare function local:get-codes-in-atom-format($url as xs:string, $langId as xs
 {
 let $clname := if ($url = 'http://inspire.ec.europa.eu/theme') then 'theme' else functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata\-)?codelist/)?')
 let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
-let $valid_clurl := try { local:check-resource-uri($clurl, 30) } catch * { false() }
+let $valid_clurl := try { local:check-resource-uri($clurl, 30, false()) } catch * { false() }
 return
   if ($valid_clurl = ('notHTTP','idNotFound') or matches($valid_clurl,'\d{3}')) then
      error((),'Code list ' || $url || ' cannot be accessed.')
-  else if ($valid_clurl = 'TIMEOUT') then
-    error((),'Access to code list ' || $url || ' timed out.')
+  else if (starts-with($valid_clurl, 'EXCEPTION')) then
+    error((),'Access to code list ' || $url || ' failed or timed out.')
   else if (not(starts-with($valid_clurl,'text/xml') or starts-with($valid_clurl,'application/xml') or starts-with($valid_clurl,'application/atom+xml'))) then
     error((),'Unknown resource type encountered when accessing the atom representation of code list ' || $url || ' at URL ' || $clurl || '.')
   else
