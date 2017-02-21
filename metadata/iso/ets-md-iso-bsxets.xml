@@ -696,7 +696,7 @@ return
 <li>if the linkage element contains an element of type gmd:URL.</li>
 <li>if the element content is a syntactically correct URL.</li>
 <li>if the referenced resource is accessible.</li>
-<li>if the response identifies the linkage as a known Harmonised Spatial Data Service type or a Network Service type, the test checks if appropriate linkage to dataset is available. The linkage is established via the Metadata URL for WMS, WFS and Atom based services. Otherwise a final manual test is suggested to the tester (to test if any of the linkages points to a webpage with further instructions or a client application that directly accesses the service).</li>
+<li>if the response identifies the linkage as a known Harmonised Spatial Data Service type or a Network Service type, the test checks if appropriate linkage to dataset is available. The linkage is established via the Metadata URL for WMS, WFS, WCS, SOS and Atom based services. Otherwise a final manual test is suggested to the tester (to test if any of the linkages points to a webpage with further instructions or a client application that directly accesses the service).</li>
 </ul>
 <p>Relevant requirements:</p>
 <ul>
@@ -732,7 +732,7 @@ let $messages := (for $record in $recordsToInspect
       try { 
       	let $root := fn:doc($url)/element()
         	return
-        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::atom:feed]) then ()
+        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
 			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
 		} catch * { 
 			local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
@@ -1046,7 +1046,7 @@ let $messages := (for $record in $recordsToInspect
       try { 
       	let $root := fn:doc($url)/element()
         	return
-        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::atom:feed]) then ()
+        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
 			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
 		} catch * { 
 			local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })

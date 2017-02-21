@@ -13,6 +13,8 @@ declare namespace xlink='http://www.w3.org/1999/xlink';
 declare namespace etf='http://www.interactive-instruments.de/etf/2.0';
 declare namespace atom='http://www.w3.org/2005/Atom';
 declare namespace wfs='http://www.opengis.net/wfs/2.0'; 
+declare namespace wcs='http://www.opengis.net/wcs/2.0'; 
+declare namespace sos='http://www.opengis.net/sos/2.0'; 
 declare namespace wms='http://www.opengis.net/wms'; 
 declare namespace uuid='java.util.UUID';
 
