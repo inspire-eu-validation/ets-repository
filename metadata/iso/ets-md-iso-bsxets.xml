@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a></li></ul>]]></description>
 	<reference>../../inspire-md-bsxets.xq</reference>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-30T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-02-21T17:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2017-02-22T13:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID3b9846c7-3940-4795-ae1d-0b5d82375c76"/>
 	</tags>
@@ -726,7 +726,7 @@ let $messages := (for $record in $recordsToInspect
 	   local:addMessage('TR.idNotFound', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
     else if (starts-with($validuri, 'EXCEPTION')) then
 		local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
-    else if (matches($validuri,'\d{3}')) then
+    else if (matches($validuri,'^\d{3}$')) then
 		local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
     else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
       try { 
@@ -1039,7 +1039,7 @@ let $messages := (for $record in $recordsToInspect
 	   local:addMessage('TR.idNotFound', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
     else if (starts-with($validuri, 'EXCEPTION')) then
 		local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
-    else if (matches($validuri,'\d{3}')) then
+    else if (matches($validuri,'^\d{3}$')) then
 		local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
     else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
       try { 
@@ -1098,7 +1098,7 @@ let $messages :=
 			local:addMessage('TR.idNotFound', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
       else if (starts-with($validuri, 'EXCEPTION')) then
 	   	local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
-		else if (matches($validuri,'\d{3}')) then
+		else if (matches($validuri,'^\d{3}$')) then
 			local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
 		else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
 			try { 
