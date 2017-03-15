@@ -1009,7 +1009,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-service/3.1/atom-pr
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="d82ba567-ee3b-4df4-be82-dc754c146e97" name="Test if the dataset feed contains at least one link to a registry"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.existsNonEmptyText("/atom:feed/atom:link[@rel='describedby' and @type='text/html']/@href", "TR.missingLinkToRegistry");</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="59246a83-610b-4a03-9864-c882200e24ab" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Multiple links for multiple physical files" searchProperties="true"><con:description><![CDATA[
+
+a.exists(
+	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']", 
+	"TR.missingLinkToRegistry"
+);
+
+a.existsNonEmptyText(
+	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']/@href",
+	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']/@href", 
+	"TR.missingLinkToRegistry"
+);</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="59246a83-610b-4a03-9864-c882200e24ab" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Multiple links for multiple physical files" searchProperties="true"><con:description><![CDATA[
 Test for dataset which are provided in multiple physical files, that each file is linked via a separate link element. Each of these link elements shall have a "rel" value equal to "section".
 <br/>
 <br/>
