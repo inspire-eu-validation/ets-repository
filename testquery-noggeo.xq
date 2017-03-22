@@ -414,11 +414,11 @@ declare function local:testDesignationConstraint($features3 as element()*, $feat
 let $allowedValuesURI := local:getAllowedValuesURI( 'http://inspire.ec.europa.eu/codelist/' || $codelist )
 let $allowedValuesCode := local:getAllowedValuesCode( $allowedValuesURI, $codelist )
 let $valuesCode := fn:distinct-values($features3/ps3:siteDesignation/*[ps3:designationScheme=$scheme]/ps3:designation/text())
-let $valuesURI := fn:distinct-values($features4/ps:siteDesignation/*[ps:designationScheme=concat('http://inspire.ec.europa.eu/codelist/DesignationSchemeValue/',$scheme)]/ps:designation/@xlink:href)
+let $valuesURI := fn:distinct-values($features4/ps:siteDesignation/*[ps:designationScheme/@xlink:href=concat('http://inspire.ec.europa.eu/codelist/DesignationSchemeValue/',$scheme)]/ps:designation/@xlink:href)
 let $badvaluesCode := functx:value-except($valuesCode,$allowedValuesCode)
 let $badvaluesURI := functx:value-except($valuesURI,$allowedValuesURI)
 let $featuresWithErrors3 := $features3[ps3:siteDesignation/*[ps3:designationScheme=$scheme]/ps3:designation/text()=$badvaluesCode]
-let $featuresWithErrors4 := $features4[ps:siteDesignation/*[ps:designationScheme=$scheme]/ps:designation/@xlink:href=$badvaluesURI]
+let $featuresWithErrors4 := $features4[ps:siteDesignation/*[ps:designationScheme/@xlink:href=concat('http://inspire.ec.europa.eu/codelist/DesignationSchemeValue/',$scheme)]/ps:designation/@xlink:href=$badvaluesURI]
 return
 (for $feature in $featuresWithErrors3
    order by $feature/@gml:id
@@ -427,7 +427,7 @@ return
      local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Sites must use designations from an appropriate designation scheme.', 'additionalInfo': 'For designation scheme ''' || $scheme || ''' the following disallowed value(s) have been used: ' || string-join($values,', ') || '. Allowed values are: ' || string-join($allowedValuesCode,', ') || '.' }),
  for $feature in $featuresWithErrors4
    order by $feature/@gml:id
-   let $values := $feature/ps:siteDesignation/*[ps:designationScheme=$scheme]/ps:designation/@xlink:href[.=$badvaluesURI]
+   let $values := $feature/ps:siteDesignation/*[ps:designationScheme/@xlink:href=concat('http://inspire.ec.europa.eu/codelist/DesignationSchemeValue/',$scheme)]/ps:designation/@xlink:href[.=$badvaluesURI]
    return
      local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Sites must use designations from an appropriate designation scheme.', 'additionalInfo': 'For designation scheme ''' || $scheme || ''' the following disallowed value(s) have been used: ' || string-join($values,', ') || '. Allowed values are: ' || string-join($allowedValuesURI,', ') || '.' }))
 };
