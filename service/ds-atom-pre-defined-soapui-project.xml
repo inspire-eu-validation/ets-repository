@@ -27,401 +27,7 @@ Util.updateCredentials(testRunner);
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties><con:property><con:name>etf.ShortDescription</con:name><con:value/></con:property><con:property><con:name>etf.Author</con:name><con:value>Thijs Brentjens</con:value></con:property><con:property><con:name>etf.LastEditor</con:name><con:value>Jon Herrmann</con:value></con:property><con:property><con:name>etf.ExpectedResults</con:name><con:value/></con:property><con:property><con:name>etf.CreationDate</con:name><con:value>2015-05-26T22:28:55.523+02:00</con:value></con:property><con:property><con:name>etf.LastUpdateDate</con:name><con:value>2015-05-26T22:28:55.523+02:00</con:value></con:property><con:property><con:name>etf.Version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>etf.AssociatedRequirements</con:name><con:value/></con:property><con:property><con:name>etf.Status</con:name><con:value>IMPLEMENTED</con:value></con:property></con:properties></con:testCase><con:testCase id="ce5a6d78-3a71-4ded-8b2e-fcc4d71d6849" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Basic checks passed and Feed still accessible" searchProperties="true"><con:description>Check if the feed is available and the Test initialisation phase has been completed successfully.</con:description><con:settings/><con:testStep type="httprequest" name="Check URL is accessible" id="7c915733-5218-4594-9e9a-066192707f1e"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="9b545ae2-2132-4a06-b34a-4e191e3ef083" name="Check URL is accessible" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="6fb90bcf-0fb8-40d0-a34b-dc79e2392d4e" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="33c888b8-a272-4bc8-86b6-30966df1b6d4" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="8e7403f0-6689-45d2-9eb2-3f83bc3be359" name="root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite name="Service Feed" id="0af18529-fba3-4b30-8235-0e7bbff486a1" disabled="true"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="false" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Dataset feed basic elements" searchProperties="true" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="" id="c8d8a92e-b829-4c07-9b4e-96a9d2b5f18c"><con:settings/><con:testStep type="httprequest" name="ValidateServiceFeed" id="98440512-070d-4516-b3f3-31ee9b38df05"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="ValidateServiceFeed" id="aa7ab224-dd85-4a7e-a92a-9f1b569b161b" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="GroovyScriptAssertion" id="bcc471de-8117-498a-b2d1-fcdf1e396010" name="Feed Service Metadata link exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.existsNonEmptyText("/atom:feed/atom:link[@rel='describedby' and (@type='application/xml' or @type='application/vnd.iso.19139+xml' or @type='application/vnd.ogc.csw.GetRecordByIdResponse_xml')]/@href");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="f26fc815-93c3-45e5-8ca7-2b1555a96d4d" name="Feed link to self exists and has proper language references"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-import de.interactive_instruments.xtf.*
-SOAPUI_I.init(log, context, messageExchange)
-final ProjectHelper ph = new ProjectHelper()
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.equals(
-  "/atom:feed/atom:link[@rel='self' and @type='application/atom+xml' and ((exists(/atom:feed/atom:title/@xml:lang) and @hreflang=/atom:feed/atom:title/@xml:lang) or @hreflang=/os:OpenSearchDescription/os:Language[1])]/@href",
-  "/atom:feed/atom:link with @rel='self'",
-  messageExchange.getEndpoint(),
-  "TR.incorrectFeedSelfReference"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="5b48f0ee-9048-45b9-b999-fbf6bdd499fc" name=" Feed link to OpenSearch Description Document exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"/atom:feed/atom:link[@rel='search' and @type='application/opensearchdescription+xml']/@href",
-	"TR.missingOpenSearchDescriptionDocumentLink"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="88eb8b42-4424-4ada-b79f-e768d70c2738" name="Feed id refers to self URL"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-import de.interactive_instruments.xtf.*
-SOAPUI_I.init(log, context, messageExchange)
-final ProjectHelper ph = new ProjectHelper()
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.equals(
-  "/atom:feed/atom:id",
-  "/atom:feed/atom:id",
-  messageExchange.getEndpoint(),
-  "TR.feedIdDoesNotReferToEndpoint"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="3c81e829-c259-45fb-9691-88cf09823e29" name="Feed contains rights information"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.exists(
-  "/atom:feed/atom:rights",
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="ee5c9507-aedc-426d-939b-1527463e8efc" name="Feed contains updated information"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.isTrue(
-  "year-from-dateTime(xs:dateTime(/atom:feed/atom:updated)) > 0",
-  "TR.missingFeedUpdatedInformation"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="781c5a44-feb9-48cf-888b-c4c553507651" name="Each entry has an element INSPIRE identifier code"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[string-length(inspire_dls:spatial_dataset_identifier_code)=0]"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="f55e85e0-649f-44f4-8132-64992db8670e" name="Each entry has an element INSPIRE identifier element namespace"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[string-length(inspire_dls:spatial_dataset_identifier_namespace)=0]"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="4c727de2-fc3f-4d57-af4a-3166ee663692" name="Each entry has a valid Dataset metadata link, referring to a file of type 'application/xml'"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[string-length(atom:link[@rel='describedby' and @type='application/xml']/@href)=0]"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="7c69b82a-f007-4fde-b368-b418e3628e89" name="Each entry has exactly one Dataset Feed link"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[count(atom:link[@rel='alternate' and @type='application/atom+xml'])!=1]",
-  "TR.multipleDatasetFeedLinks"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="e83ecd45-60f6-4451-85ed-a2ad67b4cda2" name="Each entry has an id"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[string-length(atom:id)=0]",
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="5e2003cf-8332-4e10-9910-62d3c1749b55" name="Each entry's id is a URI"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[substring(atom:id,1,4)!='http']",
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="57d1e335-c844-441e-a880-cfd964c81ccb" name="Each entry has a title"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[string-length(atom:title)=0]",
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="36a93287-84fb-484b-a7e0-dbe751bf1764" name="Each entry has an element updated"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[year-from-dateTime(xs:dateTime(atom:updated)) &lt;=0]",
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="0598b9dd-69f3-46d5-8353-407f4e81baee" name="Each entry has an element category, including a term and label, to refer to CRSs."><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.notExists(
-  "//atom:entry[count(atom:category[string-length(@term)>0 and string-length(@label)>0])&lt;1]",
-);</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="transfer" name="PropertyTransferService" id="d1c02700-00ca-41e5-938f-bd3b8a3edc72"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>serviceMetadataUrl</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>ValidateServiceFeed</con:sourceStep><con:sourcePath>declare namespace atom='http://www.w3.org/2005/Atom';
-declare namespace georss='http://www.georss.org/georss';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-
-/atom:feed/atom:link[@rel='describedby' and (@type='application/vnd.iso.19139+xml' or @type='application/vnd.ogc.csw.GetRecordByIdResponse_xml')][1]/@href</con:sourcePath><con:targetType xsi:nil="true"/><con:targetStep>#Project#</con:targetStep><con:upgraded>true</con:upgraded></con:transfers><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" transferChildNodes="false" useXQuery="false" ignoreEmpty="false"><con:name>serviceFeedXml</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>ValidateServiceFeed</con:sourceStep><con:sourcePath/><con:targetType xsi:nil="true"/><con:targetStep>#Project#</con:targetStep><con:upgraded>true</con:upgraded></con:transfers><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" disabled="false" entitize="false" ignoreEmpty="false" transferChildNodes="false" transferToAll="false" useXQuery="false"><con:name>openSearchDescriptionUrl</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>ValidateServiceFeed</con:sourceStep><con:sourcePath>declare namespace atom='http://www.w3.org/2005/Atom';
-declare namespace georss='http://www.georss.org/georss';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-
-/atom:feed/atom:link[@rel='search' and @type='application/opensearchdescription+xml']/@href</con:sourcePath><con:targetType xsi:nil="true"/><con:targetStep>#Project#</con:targetStep><con:targetPath xsi:nil="true"/><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="761e6a04-2ee9-4ab7-856c-5f1005fbdd42" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Dataset feed link download dataset" searchProperties="true"><con:settings/><con:properties/></con:testCase><con:properties><con:property><con:name>etf.AssociatedRequirements</con:name><con:value>M-01</con:value></con:property></con:properties></con:testSuite><con:testSuite name="Service Feed - Service Metadata" id="83d249bd-b00d-464d-8d37-60e4ef59febf" disabled="true"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="false" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Service Metadata Mandatory" searchProperties="true" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="" id="a37629ff-b17f-46f4-8b3c-cb1dc39b9436"><con:settings/><con:testStep type="groovy" name="CleanupAuthorization" id="b17739ce-14f5-411f-846f-a9dc578ca792"><con:settings/><con:config><script>//import com.eviware.soapui.support.types.StringToStringsMap;
-//
-//def reqName = "GetServiceMetadata"
-//// remove any Authorization header if provided for the service (because this request is for metadata)
-//def newheaders = new StringToStringsMap()
-//def header = testRunner.testCase.testSteps[reqName].httpRequest.getRequestHeaders()
-// header.each
-// {
-//  if (key!="Authorization") {
-//       newheaders.put(key,val)
-//  }
-// }
-//testRunner.testCase.testSteps[reqName].getHttpRequest().setRequestHeaders(newheaders);</script></con:config></con:testStep><con:testStep type="httprequest" name="GetServiceMetadata" id="e69ce56b-735d-4309-817f-dbfd93f51c3b"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="GetServiceMetadata" id="a3a8edb6-5ece-4bce-a916-429489f7c8a3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceMetadataUrl}</con:endpoint><con:request/><con:assertion type="XQuery Match" name="M-02##serviceIdentification: Service metadata contains ServiceIdentification" id="7ffb79cc-0b1a-4a44-a89c-570ce67b37c1"><con:configuration><path>declare namespace srv='http://www.isotc211.org/2005/srv';
-declare namespace gmd='http://www.isotc211.org/2005/gmd';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-
-&lt;result>AssertionFailures:
-{
-let $value:=//srv:SV_ServiceIdentification
-return
-if (exists($value))
-then ""
-else "the referred service Metadata document does not seem to be INSPIRE Service Metadata. It does not have an XML element srv:ServiceIdentififcation. Check the metadata document."
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-02##serviceIdentificationDatasetRef: Service metadata contains at least one dataset reference (operatesOn)" id="d1a366b1-25e8-4fe0-ad65-6ff06a82b60c"><con:configuration><path>declare namespace srv='http://www.isotc211.org/2005/srv';
-declare namespace gmd='http://www.isotc211.org/2005/gmd';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-
-&lt;result>AssertionFailures:
-{
-let $value:=//srv:operatesOn/@uuidref
-return
-if (exists($value))
-then ""
-else "the service metadata does not contain a dataset reference (operatesOn). Check the metadata document."
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result>
-</content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="transfer" name="Property Transfer" id="c049cd90-413c-4886-a3d7-82f90e461d7f"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>mdIdentifierslist</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>GetServiceMetadata</con:sourceStep><con:sourcePath>declare namespace gmd='http://www.isotc211.org/2005/gmd';
-declare namespace srv='http://www.isotc211.org/2005/srv';
-declare namespace gco='http://www.isotc211.org/2005/gco';
-string-join(//srv:operatesOn/@uuidref,',')</con:sourcePath><con:targetType xsi:nil="true"/><con:targetStep>#Project#</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:properties><con:property><con:name>save_responses</con:name><con:value>TRUE</con:value></con:property><con:property><con:name>traces_dir</con:name><con:value>../../../logs/traces/</con:value></con:property><con:property><con:name>MAIN_TESTSTEP</con:name><con:value>GetServiceMetadata</con:value></con:property><con:property><con:name>etf.ShortDescription</con:name><con:value/></con:property><con:property><con:name>etf.Author</con:name><con:value>Thijs Brentjens</con:value></con:property><con:property><con:name>etf.LastEditor</con:name><con:value>Jon Herrmann</con:value></con:property><con:property><con:name>etf.ExpectedResults</con:name><con:value/></con:property><con:property><con:name>etf.CreationDate</con:name><con:value>2015-05-26T22:28:57.108+02:00</con:value></con:property><con:property><con:name>etf.LastUpdateDate</con:name><con:value>2015-05-26T22:28:57.108+02:00</con:value></con:property><con:property><con:name>etf.Version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>etf.AssociatedRequirements</con:name><con:value/></con:property><con:property><con:name>etf.Status</con:name><con:value>IMPLEMENTED</con:value></con:property></con:properties></con:testCase><con:properties><con:property><con:name>etf.AssociatedRequirements</con:name><con:value>M-02</con:value></con:property></con:properties></con:testSuite><con:testSuite name="Service Feed - Dataset Metadata" id="2c7ceadb-48aa-45ff-91c4-c42ef62d86a0" disabled="true"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="false" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Dataset Metadata Mandatory" searchProperties="true" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="" id="4b721728-ab13-4f0c-bad2-ffa12be55ae8"><con:settings/><con:testStep type="properties" name="Transfer_Properties" id="5dcdced7-2a23-4db0-9d30-2585f477a47c"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>urlToTest</con:name><con:value>https://apps.geoportal.NRW.de/soapServices/CSWStartup?Service=CSW&amp;Version=2.0.2&amp;Request=GetRecordById&amp;ElementSetName=full&amp;outputSchema=http://www.isotc211.org/2005/gmd&amp;Id=f76697a2-42d8-486e-9f30-c3b4c71506e2</con:value></con:property><con:property><con:name>urlToTestEncoded</con:name><con:value/></con:property><con:property><con:name>serviceFeedXml</con:name><con:value><![CDATA[<feed xmlns="http://www.w3.org/2005/Atom" xmlns:georss="http://www.georss.org/georss" xmlns:inspire_dls="http://inspire.ec.europa.eu/schemas/inspire_dls/1.0">
-   <title>INSPIRE Download Service Feed: Atom-Feed Digitale Orthophotos BodenauflÃ¶sung 20 cm</title>
-   <link href="https://www.opengeodata.nrw.de/produkte/geobasis/dop/dop20/index.html" rel="alternate" title="HTML Version: Atom-Feed Digitale Orthophotos BodenauflÃ¶sung 20 cm" type="text/html"/>
-   <link href="https://apps.geoportal.NRW.de/soapServices/CSWStartup?Service=CSW&amp;Version=2.0.2&amp;Request=GetRecordById&amp;ElementSetName=full&amp;outputSchema=http://www.isotc211.org/2005/gmd&amp;Id=c72796a4-71af-421d-8a2e-d220f9de6c94" rel="describedby" title="Download Service Feed Metadata" type="application/xml"/>
-   <link href="https://www.opengeodata.nrw.de/produkte/geobasis/dop/dop20/c72796a4-71af-421d-8a2e-d220f9de6c94" hreflang="de" rel="self" title="INSPIRE Download Service Feed: Atom-Feed Digitale Orthophotos BodenauflÃ¶sung 20 cm" type="application/atom+xml"/>
-   <author>
-      <name>Geobasis NRW</name>
-      <email>geobasis@bezreg-koeln.nrw.de</email>
-   </author>
-   <subtitle type="html">Download des NRW-Datenbestands Digitale Orthophotos BodenauflÃ¶sung 20 cm (DOP20) als Atom-Feed.</subtitle>
-   <id>https://www.opengeodata.nrw.de/produkte/geobasis/dop/dop20/c72796a4-71af-421d-8a2e-d220f9de6c94</id>
-   <rights>Nutzungsbedingungen: Ab 01.01.2017 gelten die Lizenzbedingungen â€žDatenlizenz Deutschland - Namensnennung - Version 2.0â€œ bzw. â€ždl-de/by-2-0â€� (https://www.govdata.de/dl-de/by-2-0) mit den dort geforderten Angaben zum Quellenvermerk. Als Rechteinhaber und Bereitsteller ist â€žLand NRWâ€œ, sowie das Jahr des Datenbezugs in Klammern, als Datensatz (URI) ist der Ressourcen-Identifikator https://registry.gdi-de.org/id/de.nw/DOP20 anzugeben. HaftungsbeschrÃ¤nkung - FÃ¼r die KompatibilitÃ¤t der zur VerfÃ¼gung gestellten Daten oder eines Dienstes mit den Systemen des Nutzers, die inhaltliche Richtigkeit, eine bestimmte DatenqualitÃ¤t oder die dauerhafte Bereitstellung wird keine Haftung Ã¼bernommen. Davon ausgenommen sind SchadensersatzansprÃ¼che auf Grund einer Verletzung des Lebens, des KÃ¶rpers und der Gesundheit. Ebenfalls ausgenommen ist die Haftung fÃ¼r SchÃ¤den, die auf einer vorsÃ¤tzlichen oder grob fahrlÃ¤ssigen Pflichtverletzung beruhen. Eine Ã¼ber gesetzliche SchadensersatzansprÃ¼che hinausgehende Haftung ist ausgeschlossen.</rights>
-   <updated>2017-01-16T22:00:00Z</updated>
-   <entry>
-      <title>INSPIRE Dataset Feed: Digitale Orthophotos BodenauflÃ¶sung 20 cm</title>
-      <link href="https://www.opengeodata.nrw.de/produkte/geobasis/dop/dop20/f76697a2-42d8-486e-9f30-c3b4c71506e2" rel="alternate" title="INSPIRE Dataset Feed: Digitale Orthophotos BodenauflÃ¶sung 20 cm" type="application/atom+xml"/>
-      <link href="https://www.opengeodata.nrw.de/produkte/geobasis/dop/dop20/index.html" rel="alternate" title="HTML Version: Digitale Orthophotos BodenauflÃ¶sung 20 cm" type="text/html"/>
-      <link href="https://apps.geoportal.NRW.de/soapServices/CSWStartup?Service=CSW&amp;Version=2.0.2&amp;Request=GetRecordById&amp;ElementSetName=full&amp;outputSchema=http://www.isotc211.org/2005/gmd&amp;Id=f76697a2-42d8-486e-9f30-c3b4c71506e2" rel="describedby" title="INSPIRE Dataset Feed: Digitale Orthophotos BodenauflÃ¶sung 20 cm" type="application/xml"/>
-      <category label="EPSG:25832" term="http://www.opengis.net/def/crs/EPSG/0/25832"/>
-      <author>
-         <name>Geobasis NRW</name>
-         <email>geobasis@bezreg-koeln.nrw.de</email>
-      </author>
-      <id>https://www.opengeodata.nrw.de/produkte/geobasis/dop/dop20/c72796a4-71af-421d-8a2e-d220f9de6c94</id>
-      <updated>2017-02-28T22:00:00Z</updated>
-      <summary type="html"><![CDATA[Orthophotos sind hochauflÃ¶sende, verzerrungsfreie, maÃŸstabsgetreue Abbildungen der ErdoberflÃ¤che. Sie werden durch photogrammetrische Verfahren in Kenntnis der Orientierungsparameter und unter Hinzunahme eines Digitalen GelÃ¤ndemodells aus Luftbildern hergestellt, die als Senkrechtaufnahmen vorliegen. Digitale Orthophotos sind georeferenziert, liegen flÃ¤chendeckend vor und werden in einem 3-jÃ¤hrigen Zyklus erneuert. Sie werden nach dem Produktstandard des Landes, der auf den Festlegungen eines AdV-Standards (AdV Arbeitsgemeinschaft der Vermessungsverwaltungen der LÃ¤nder) beruht, hergestellt und nach ihrer BodenauflÃ¶sung (cm pro Pixel; Ground Sample Distance, GSD) bezeichnet. Digitale Orthophotos DOP20 weisen eine BodenauflÃ¶sung von 20cm/Pixel auf. Es handelt sich um 4-Kanal Multispektralbilder mit der Kanalbelegung RGBI (Rot-GrÃ¼n-Blau-Infrarot). </br></br><strong>Hinweis:</strong> Diese Daten stehen unter der <a href="https://www.govdata.de/dl-de/by-2-0" target="_blank">Datenlizenz Deutschland Namensnennung 2.0</a>, Bereitsteller: Land NRW (2017). Informationen zum korrekten Quellenvermerk finden Sie <a href="http://www.bezreg-koeln.nrw.de/brk_internet/geobasis/lizenzbedingungen_geobasis_nrw.pdf" target="_blank">hier</a>.</br></br><strong>WeiterfÃ¼hrende Informationen:</strong></br><a target="_blank" href="http://www.bezreg-koeln.nrw.de/brk_internet/geobasis/luftbilderzeugnisse/digitale_orthophotos/index.html">http://www.bezreg-koeln.nrw.de/brk_internet/geobasis/luftbilderzeugnisse/digitale_orthophotos/index.html</a></br><a target="_blank" href="https://www.geoportal.nrw/suche?lang=de&searchTerm=f76697a2-42d8-486e-9f30-c3b4c71506e2">Metadaten im GEOportal.NRW</a>]]]]>><![CDATA[</summary>
-      <georss:box>50.30 5.80 52.60 9.50</georss:box>
-      <inspire_dls:spatial_dataset_identifier_code>DOP20</inspire_dls:spatial_dataset_identifier_code>
-      <inspire_dls:spatial_dataset_identifier_namespace>https://registry.gdi-de.org/id/de.nw</inspire_dls:spatial_dataset_identifier_namespace>
-   </entry>
-</feed>]]></con:value></con:property><con:property><con:name>mdIdentifiersDatasetMetadata</con:name><con:value/></con:property></con:properties></con:config></con:testStep><con:testStep type="httprequest" name="GetServiceFeed" id="4ebdef08-c0ae-496c-a210-b7994d8f9e0d"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="GetServiceFeed" id="a7870488-e57a-4581-b602-6a0994d0d71b" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="XQuery Match" name="M-01##req14: Each entry has a valid Dataset metadata link, referring to a file of type 'application/xml'" id="ecd43631-277f-4386-bc54-57bbe181ed5a"><con:configuration><path>declare namespace atom='http://www.w3.org/2005/Atom';
-declare namespace georss='http://www.georss.org/georss';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-
-&lt;result>AssertionFailures:
-{
-for $entry in //atom:entry
-where string-length($entry/atom:link[@rel='describedby' and @type='application/xml']/@href)=0
-return
-concat ("Entry: ",$entry/atom:id," has no Dataset metadata link with type 'application/xml'. ")
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="transfer" name="Property Transfer" id="c3d4dffd-0280-4f27-874a-9afe055692cd"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>serviceFeedXml</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>GetServiceFeed</con:sourceStep><con:targetType>serviceFeedXml</con:targetType><con:targetStep>Transfer_Properties</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="groovy" name="RunMetadataDatasetTest" id="0b7a322b-c58f-4594-ba8d-af38163d1f0e"><con:settings/><con:config><script>import de.interactive_instruments.xtf.*;
-SOAPUI_I.init(log,context,testRunner);
-
-ProjectHelper ph = new ProjectHelper();
-def serviceFeedXmlHolder = ph.getTransferPropertyAsXml("serviceFeedXml")
-//Pull out the metadataURLs
-def metadataUrlNodes = serviceFeedXmlHolder.getNodeValues("//*:entry/*:link[@rel='describedby' and @type='application/xml']/@*:href");
-log.info("metadataUrlNodes: " + metadataUrlNodes);
-
-// clear url to test
-ph.setTransferProperty("urlToTest","")
-ph.setTransferProperty("mdIdentifiersDatasetMetadata",'');
-
-// run GetMetadata test for each url
-for( url in metadataUrlNodes ) {
-   ph.setTransferProperty("urlToTest",url)
-   ph.runTestStep("GetMetadata")
-   ph.runTestStep("PropertyTransferMD_Identifier")
-}</script></con:config></con:testStep><con:testStep type="httprequest" name="GetMetadata" id="a3ac5286-332c-46ef-a34e-844a8b675a96"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="GetMetadata" id="922ccb5e-80b9-4eb7-bd55-11caf58800f8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#urlToTest}</con:endpoint><con:request/><con:assertion type="XQuery Match" name="M-03##MD_Metadata: Metadata has root element MD_Metadata" id="791bab28-4b99-4904-8da6-23c8d4b781c8"><con:configuration><path>declare namespace gmd='http://www.isotc211.org/2005/gmd';
-declare namespace csw='http://www.opengis.net/cat/csw/2.0.2';
-
-&lt;result>AssertionFailures:
-{
-let $value:=//gmd:MD_Metadata
-return
-if (exists($value))
-then ""
-else "the referred dataset Metadata document does not seem to be ISO Metadata. It does not have an XML element gmd:Metadata. Check the URL in the MetadataURL of the layer. URL: '${#urlToTestEncoded}'"
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-03##fileIdentifierDataset: Metadata fileIdentifier exists" id="1c758d06-90f8-4303-98b4-e9240a654378"><con:configuration><path>declare namespace gmd='http://www.isotc211.org/2005/gmd';
-
-&lt;result>AssertionFailures:
-{
-let $fileIdentifier:=//gmd:MD_Metadata/gmd:fileIdentifier
-return
-if (string-length($fileIdentifier)=0)
-then "there is no fileIdentifier defined in the Metadata."
-else ""
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-03##identifierInServiceMD: The MD_Identifier exists in the ServiceMetadata" id="2b22d662-9c6c-4f88-8b81-c280fd111a7d"><con:configuration><path>declare namespace gmd='http://www.isotc211.org/2005/gmd';
-declare namespace gco='http://www.isotc211.org/2005/gco';
-
-&lt;result>AssertionFailures:
-{
-let $id:=//gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gco:CharacterString
-return
-if (contains('${#Project#MdIdentifiersList}', $id))
-then ""
-else concat("the MD_Identifier ",$id," does not exist in the service metadata. The MD_identifier is found in the metadata document at URL: '${#urlToTestEncoded}'. The service metadata refers to these identifiers: '${#Project#MdIdentifiersList}'")
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result>
-</content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>#urlToTest</con:name><con:value>#urlToTest</con:value><con:style>TEMPLATE</con:style><con:default>#urlToTest</con:default></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="transfer" name="PropertyTransferMD_Identifier" id="755c1b08-b24d-4dd4-839a-efed47e79dc2"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>addMD_IdentiferToList</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>GetMetadata</con:sourceStep><con:sourcePath>declare namespace gmd='http://www.isotc211.org/2005/gmd';
-declare namespace gco='http://www.isotc211.org/2005/gco';
-
-string-join(('${#Project#mdIdentifiersDatasetMetadata}',//gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gco:CharacterString),',')</con:sourcePath><con:targetType xsi:nil="true"/><con:targetStep>#Project#</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="groovy" name="CompareDatasetIdentifiers" id="e2e532a9-132b-4848-bbf4-bef4dc98e680"><con:settings/><con:config><script>// This script tests whether all identifiers from the Service Metadata are mentioned in a Dataset metadata record
-// and the other way around: all identifers from the Dataset metadata are mentioned in the Service Metadata
-// check that:
-// from list 1, all identifiers are present in list 2
-// from list 2, all identifiers are present in list 1
-def serviceMdDatasetIds = testRunner.testCase.testSuite.project.getPropertyValue("MdIdentifiersList").split(',');
-def datasetMdDatasetIds = testRunner.testCase.testSuite.project.getPropertyValue("mdIdentifiersDatasetMetadata").split(',');
-
-// check 1: from service metadata, all dataset identifiers are mentioned in the dataset metadata (at least) once
-for (sid in serviceMdDatasetIds) {
-	def datasetIdFromServiceMetadataPresent = false;
-	for (mid in datasetMdDatasetIds) {
-		if (mid==sid) {
-			datasetIdFromServiceMetadataPresent = true;
-		}
-	}
-	if (datasetIdFromServiceMetadataPresent) {
-		log.info("The id mentioned in Service Metadata " + sid + " is present in the identifiers from the Dataset Metadata (" + testRunner.testCase.testSuite.project.getPropertyValue("mdIdentifiersDatasetMetadata") + ") ")
-	} else {
-		log.error("The id mentioned in Service Metadata " + sid + " is NOT present in the identifiers from the Dataset Metadata (" + testRunner.testCase.testSuite.project.getPropertyValue("mdIdentifiersDatasetMetadata") + ") ")
-	}
-	assert datasetIdFromServiceMetadataPresent;
-}
-
-// now the other way around
-// check 2: from dataset metadata, all dataset identifiers are mentioned in the service metadata (at least) once
-
-for (mid in datasetMdDatasetIds) {
-	if (mid.length() > 0) {
-		def datasetIdFromDatasetMetadataPresent = false;
-		for (sid in serviceMdDatasetIds) {
-			if (mid==sid) {
-				datasetIdFromDatasetMetadataPresent = true;
-			}
-		}
-		if (datasetIdFromDatasetMetadataPresent) {
-			log.info("The id mentioned in Dataset Metadata " + mid + " is present in the identifiers from the Service Metadata (" + testRunner.testCase.testSuite.project.getPropertyValue("MdIdentifiersList") + ")")
-		} else {
-			log.error("The id mentioned in Dataset Metadata " + mid + " is NOT present in the identifiers from the Service Metadata (" + testRunner.testCase.testSuite.project.getPropertyValue("MdIdentifiersList") + ")")
-		}
-		assert datasetIdFromDatasetMetadataPresent;
-	}
-}</script></con:config></con:testStep><con:properties><con:property><con:name>save_responses</con:name><con:value>TRUE</con:value></con:property><con:property><con:name>traces_dir</con:name><con:value>../../../logs/traces/</con:value></con:property><con:property><con:name>MAIN_TESTSTEP</con:name><con:value>GetMetadata</con:value></con:property><con:property><con:name>etf.ShortDescription</con:name><con:value/></con:property><con:property><con:name>etf.Author</con:name><con:value>Thijs Brentjens</con:value></con:property><con:property><con:name>etf.LastEditor</con:name><con:value>Jon Herrmann</con:value></con:property><con:property><con:name>etf.ExpectedResults</con:name><con:value/></con:property><con:property><con:name>etf.CreationDate</con:name><con:value>2015-05-26T22:28:58.352+02:00</con:value></con:property><con:property><con:name>etf.LastUpdateDate</con:name><con:value>2015-05-26T22:28:58.352+02:00</con:value></con:property><con:property><con:name>etf.Version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>etf.AssociatedRequirements</con:name><con:value/></con:property><con:property><con:name>etf.Status</con:name><con:value>IMPLEMENTED</con:value></con:property></con:properties></con:testCase><con:properties><con:property><con:name>etf.AssociatedRequirements</con:name><con:value>M-03</con:value></con:property></con:properties></con:testSuite><con:testSuite name="TODO OpenSearch Description" id="052c4969-3beb-4d0c-9233-0a6507224734" disabled="true"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase failOnError="false" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="OpenSearch Mandatory" searchProperties="true" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="" id="155ba2b3-d78c-4547-b3ae-bc64ba7e330d"><con:settings/><con:testStep type="httprequest" name="GetOpenSearchDescription" id="15705f04-6203-4cd5-beaf-409bad6cdfc5"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="GetOpenSearchDescription" id="255e52ee-2f99-4ea3-8f9e-eff888074aa9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#openSearchDescriptionUrl}</con:endpoint><con:request/><con:assertion type="XQuery Match" name="M-05##req39: OpenSearchDescription contains URL reference to itself(XQuery)" id="5e22a372-c05b-44ea-b252-d6dab157329b"><con:configuration><path>declare namespace os='http://a9.com/-/spec/opensearch/1.1/';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-
-&lt;result>AssertionFailures:
-{
-let $osurl:=/os:OpenSearchDescription/os:Url[@rel='self' and @type='application/opensearchdescription+xml' and replace(@template,":80","")=replace('${#Project#openSearchDescriptionUrl}',":80","")]
-return
-if (exists($osurl))
-then ""
-else "The OpenSearchDescription does NOT a URL reference to itself. Make sure that the element /OpenSearchDescription/Url with @rel='self' and @type='application/opensearchdescription+xml' exists and refers to the URL of the OpenSearchDescription itself (in this case: '${#Project#openSearchDescriptionUrl}')"
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-05##req40: OpenSearchDescription contains a template URL for generic search queries" id="af4bd0fc-27dc-4412-811c-c961501c77b6"><con:configuration><path>declare namespace os='http://a9.com/-/spec/opensearch/1.1/';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-
-&lt;result>AssertionFailures:{
-let $templateurl:=/os:OpenSearchDescription/os:Url[@rel='results' and (@type='application/atom+xml' or @type='text/html') and starts-with(@template,'http')]
-return
-if (exists($templateurl))
-then ""
-else "The OpenSearchDescription does NOT contain a template URL for generic search queries. Make sure that the element /OpenSearchDescription/Url with @rel='results' and @type='application/atom+xml' or @type='text/html' exists and is a URL."
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-05##req41: OpenSearchDescription contains a &quot;Url&quot; element that describes a template URL for the Describe Spatial Data Set operation" id="8e6b49e5-1d33-43ba-8eba-9dac9577380d"><con:configuration><path>declare namespace os='http://a9.com/-/spec/opensearch/1.1/';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-
-&lt;result>AssertionFailures:
-{
-let $templateurl:=/os:OpenSearchDescription/os:Url[@rel='describedby' and @type='application/atom+xml' and starts-with(@template,'http') and contains(@template,'spatial_dataset_identifier_code') and contains(@template,'spatial_dataset_identifier_namespace') and contains(@template,'language')]
-return
-if (exists($templateurl))
-then ""
-else "The OpenSearchDescription does NOT contain a template URL for the Describe Spatial Data Set operation. Make sure that the element /OpenSearchDescription/Url with @rel='describedby' and @type='application/atom+xml' exists and that the URL contains the INSPIRE parameters for spatial_dataset_identifier_code, spatial_dataset_identifier_namespace and language"
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-05##req42: OpenSearchDescription contains a &quot;Url&quot; element that describes a template URL for the Get Spatial Data Set operation" id="70f0ebb6-f73c-4b60-b59f-56bb068f17b1"><con:configuration><path>declare namespace os='http://a9.com/-/spec/opensearch/1.1/';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-
-&lt;result>AssertionFailures:
-{
-let $templateurl:=/os:OpenSearchDescription/os:Url[@rel='results' and starts-with(@template,'http') and contains(@template,'crs') and contains(@template,'spatial_dataset_identifier_code') and contains(@template,'spatial_dataset_identifier_namespace') and contains(@template,'language')]
-return
-if (exists($templateurl))
-then ""
-else " The OpenSearchDescription does NOT contain a Url element that describes a template URL for the Get Spatial Data Set operation. Make sure that the element /OpenSearchDescription/Url with @rel='results'exists and that the URL contains the INSPIRE parameters for crs,spatial_dataset_identifier_code, spatial_dataset_identifier_namespace and language."
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-05##req43: the OpenSearchDescription contains 'Query' examples with 'spatial_dataset_identifier_code' and 'spatial_dataset_identifier_namespace' attributes" id="a512c292-93ba-428c-86f5-20ec564a6d03"><con:configuration><path>declare namespace os='http://a9.com/-/spec/opensearch/1.1/';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-
-&lt;result>AssertionFailures:
-{
-let $nrqueries:=count(/os:OpenSearchDescription/os:Query[@role='example' and string-length(@inspire_dls:spatial_dataset_identifier_code) > 0 and string-length(@inspire_dls:spatial_dataset_identifier_namespace) > 0 ])
-return
-if ($nrqueries > 0)
-then ""
-else "The OpenSearchDescription does NOT contain 'Query' examples with 'spatial_dataset_identifier_code' and 'spatial_dataset_identifier_namespace' attributes. Make sure that for each dataset identifier Query examples are available."
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="groovy" name="RunTestsForAllQueryExamples" id="10ad9063-c79e-401c-a957-75e1ac0cbec8"><con:settings/><con:config><script>props = testRunner.testCase.testSteps['Properties']
-
-def groovyUtils = new com.eviware.soapui.support.GroovyUtils(context);
-def osdXmlHolder = groovyUtils.getXmlHolder(props.getPropertyValue("openSearchDescription"))
-osdXmlHolder.namespaces["os"] = "http://a9.com/-/spec/opensearch/1.1/";
-osdXmlHolder.namespaces["xlink"] = "http://www.w3.org/1999/xlink";
-osdXmlHolder.namespaces["inspire_dls"] = "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0";
-
-// Pull out the query examples
-//def queryExamples = osdXmlHolder.getNodeValues("/os:OpenSearchDescription/os:Query[@role='example' and string-length(@inspire_dls:spatial_dataset_identifier_code) > 0 and string-length(@inspire_dls:spatial_dataset_identifier_namespace) > 0]");
-def queryExamples = osdXmlHolder.getDomNodes("/os:OpenSearchDescription/os:Query[@role='example' and string-length(@inspire_dls:spatial_dataset_identifier_code) > 0 and string-length(@inspire_dls:spatial_dataset_identifier_namespace) > 0]");
-
-log.info("queryExamples: " + queryExamples)
-
-// Then run test for each example's values
-for( i in queryExamples )
-{
-   def id_namespace = i.attributes.getNamedItem("inspire_dls:spatial_dataset_identifier_namespace").getNodeValue()
-   def id_code = i.attributes.getNamedItem("inspire_dls:spatial_dataset_identifier_code").getNodeValue()
-   def availableCrs = i.attributes.getNamedItem("inspire_dls:crs").getNodeValue()
-   // log.info(availableCrs)
-   // construct the describe spatial dataset URL
-   // now construct the url, take into account optional parameters( marked by a ? before })
-   def describeDataSetUrl = props.getPropertyValue("describeSpatialDatasetUrl").replaceAll('\\?}','}')
-   // fix for NGR: because asking for port 80 explicitly, causes an invalid HTTP request-error
-   describeDataSetUrl = describeDataSetUrl.replace(":80","")
-   describeDataSetUrl = describeDataSetUrl.replaceAll('\\{inspire_dls:spatial_dataset_identifier_namespace\\}',id_namespace)
-   describeDataSetUrl = describeDataSetUrl.replaceAll('\\{inspire_dls:spatial_dataset_identifier_code\\}',id_code)
-   describeDataSetUrl = describeDataSetUrl.replaceAll('\\{language\\}', props.getPropertyValue("firstLanguage"))
-   log.info("The OpenSearch Description URL example: " + describeDataSetUrl)
-
-   props.setPropertyValue("describeDataSetUrl",describeDataSetUrl)
-   props.setPropertyValue("describeDataSetUrlEncoded",describeDataSetUrl.replaceAll('&amp;','&amp;amp;'))
-   props.setPropertyValue("availableCrs", availableCrs)
-   testRunner.runTestStepByName("ResolveDescribeDatasetUrl")
-
-   // now get the CRS to create the request for getting the Dataset with the CRS parameter
-   testRunner.runTestStepByName("PropertyTransferCRS")
-
-   // construct the getcribe spatial dataset URL
-   // This test only request for one media type, so for one Url of rel="results"
-   // now construct the url, take into account optional parameters( marked by a ? before })
-   def dataSetUrl = props.getPropertyValue("getSpatialDatasetUrl").replaceAll('\\?}','}')
-   // fix for NGR: because asking for port 80 explicitly, causes an invalid HTTP request-error
-   dataSetUrl = dataSetUrl.replace(":80","")
-   dataSetUrl = dataSetUrl.replaceAll('\\{inspire_dls:spatial_dataset_identifier_namespace\\}',id_namespace)
-   dataSetUrl = dataSetUrl.replaceAll('\\{inspire_dls:spatial_dataset_identifier_code\\}',id_code)
-   dataSetUrl = dataSetUrl.replaceAll('\\{inspire_dls:crs\\}', availableCrs)
-   dataSetUrl = dataSetUrl.replaceAll('\\{language\\}', props.getPropertyValue("firstLanguage"))
-
-   props.setPropertyValue("dataSetUrl",dataSetUrl)
-   props.setPropertyValue("dataSetUrlEncoded",dataSetUrl.replaceAll('&amp;','&amp;amp;'))
-   testRunner.runTestStepByName("ResolveGetDatasetUrl")
-}</script></con:config></con:testStep><con:testStep type="httprequest" name="ResolveDescribeDatasetUrl" id="8ad4a151-9ec6-4986-b9e1-3be207b14ca9"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="ResolveDescribeDatasetUrl" id="c7c86153-a4f0-4665-bd63-ac5010a5f98c" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#describeDataSetUrl}</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" name="Response starts within 30 seconds" id="c4371336-29f2-4359-aa01-5fb9b97629d5"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-05##OSD_AtomReponse: Response is Atom feed with at least one category with a CRS" id="a1e2971e-c332-43a2-b093-9889f255c556"><con:configuration><path>declare namespace os='http://a9.com/-/spec/opensearch/1.1/';
-declare namespace atom='http://www.w3.org/2005/Atom';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-
-&lt;result>AssertionFailures:
-{
-let $nrcategories:=count(//atom:entry/atom:category[string-length(@term) > 0])
-return
-if ($nrcategories >0)
-then ""
-else "The describe dataset URL response of '${Transfer_Properties#describeDataSetUrlEncoded}' is NOT an Atom feed with at least one category with a CRS."
-}
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="transfer" name="PropertyTransferCRS" id="7e39051d-a84a-4425-b6ce-781a52f5cf98"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false"><con:name>availableCrs</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>ResolveDescribeDatasetUrl</con:sourceStep><con:sourcePath>declare namespace atom='http://www.w3.org/2005/Atom';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-
-//atom:entry/atom:category[string-length(@term) > 0][1]/@term</con:sourcePath><con:targetType xsi:nil="true"/><con:targetStep>ResolveGetDatasetUrl</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="httprequest" name="ResolveGetDatasetUrl" id="193d16ab-d45a-47a9-aa31-f204050a1694"><con:settings/><con:config method="HEAD" xsi:type="con:HttpRequest" name="ResolveGetDatasetUrl" id="76199de5-751c-4795-891e-fe789027290c" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="${#mediaType}" xmlns="http://eviware.com/soapui/config"/></con:setting></con:settings><con:endpoint>${#dataSetUrl}</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" name="Response starts within 30 seconds" id="23a615ef-c786-4d64-bd64-604a07e17768"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" name="Valid HTTP Status Codes: 200,206,301,302,303" id="942d2723-928b-42ae-b09a-4987a59b92ab"><con:configuration><codes>200,206,301,302,303</codes></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties><con:property><con:name>save_responses</con:name><con:value>TRUE</con:value></con:property><con:property><con:name>traces_dir</con:name><con:value>../../../logs/traces/</con:value></con:property><con:property><con:name>MAIN_TESTSTEP</con:name><con:value>GetOpenSearchDescription</con:value></con:property><con:property><con:name>etf.ShortDescription</con:name><con:value/></con:property><con:property><con:name>etf.Author</con:name><con:value>Thijs Brentjens</con:value></con:property><con:property><con:name>etf.LastEditor</con:name><con:value>Jon Herrmann</con:value></con:property><con:property><con:name>etf.ExpectedResults</con:name><con:value/></con:property><con:property><con:name>etf.CreationDate</con:name><con:value>2015-05-26T22:29:01.567+02:00</con:value></con:property><con:property><con:name>etf.LastUpdateDate</con:name><con:value>2015-05-26T22:29:01.567+02:00</con:value></con:property><con:property><con:name>etf.Version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>etf.AssociatedRequirements</con:name><con:value/></con:property><con:property><con:name>etf.Status</con:name><con:value>IMPLEMENTED</con:value></con:property></con:properties></con:testCase><con:properties><con:property><con:name>etf.AssociatedRequirements</con:name><con:value>M-05</con:value></con:property></con:properties></con:testSuite><con:testSuite id="59c49d09-616a-4a70-a918-2f31d345e38f" name="Download Service Feed"><con:description>Test module for checking the top-level Download Service Feed.
+a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite id="59c49d09-616a-4a70-a918-2f31d345e38f" name="Download Service Feed"><con:description>Test module for checking the top-level Download Service Feed.
 &lt;br/>&lt;br/>
 &lt;b>Known limitations: &lt;/b> Response schema validation is not implemented yet.</con:description><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="b87b5132-cb6c-44cb-9215-e588fc1e3344" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Contact information" searchProperties="true"><con:description><![CDATA[The test case requests the Download Service feed and checks if the response contains the author name and email address.
 <br/>
@@ -718,7 +324,7 @@ a.notExists(
 final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 a.isFalse(
-  "year-from-dateTime( xs:dateTime(//atom:entry/atom:updated) ) &lt; 2012",
+  "//atom:entry/atom:updated/year-from-dateTime( xs:dateTime( . ) ) &lt; 2012",
   "TR.dateIsBefore2012"
 );</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="afc0153c-5f03-4e66-b0d6-4f866a13fcbb" name="Date is not in the future"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 import de.interactive_instruments.TimeUtils;
@@ -727,7 +333,7 @@ final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS)
 final String now = TimeUtils.dateToIsoString( new Date() )
 
 a.isFalse(
-  "xs:dateTime(//atom:entry/atom:updated) > xs:dateTime('"+now+"')",
+  "//atom:entry/atom:updated/xs:dateTime(.) > xs:dateTime('"+now+"')",
   "TR.dateIsInTheFuture"
 );</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="59e31b8c-2277-4491-b38b-9b067fd88f9b" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Updated element" searchProperties="true"><con:description><![CDATA[The test case requests the Download Service feed and checks if it provides a 'updated' element.
 <br/>
@@ -751,7 +357,7 @@ a.isTrue(
 final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 a.isFalse(
-  "year-from-dateTime( xs:dateTime(//atom:entry/atom:updated) ) &lt; 2012",
+  "//atom:entry/atom:updated/year-from-dateTime( xs:dateTime( . ) ) &lt; 2012",
   "TR.dateIsBefore2012"
 );</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="68cf959b-8629-4c39-89f2-1988e0fa5487" name="Date is not in the future"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 import de.interactive_instruments.TimeUtils;
@@ -760,7 +366,7 @@ final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS)
 final String now = TimeUtils.dateToIsoString( new Date() )
 
 a.isFalse(
-  "xs:dateTime(//atom:entry/atom:updated) > xs:dateTime('"+now+"')",
+  "//atom:entry/atom:updated/xs:dateTime(.) > xs:dateTime('"+now+"')",
   "TR.dateIsInTheFuture"
 );</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="4abfa6f3-4dd7-4a6e-8a07-c172ecf0ed3c" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Provide a title element" searchProperties="true"><con:description><![CDATA[The test case requests the Download Service feed and checks if it provides a 'title' element.
 <br/>
@@ -1026,7 +632,7 @@ a.isTrue(
 final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 a.isFalse(
-  "year-from-dateTime( xs:dateTime(/atom:feed/atom:updated) ) &lt; 2012",
+  "//atom:entry/atom:updated/year-from-dateTime( xs:dateTime( . ) ) &lt; 2012",
   "TR.dateIsBefore2012"
 );</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="ca40e458-362b-440c-a992-6efabf463339" name="Date is not in the future"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 import de.interactive_instruments.TimeUtils;
@@ -1035,7 +641,7 @@ final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS)
 final String now = TimeUtils.dateToIsoString( new Date() )
 
 a.isFalse(
-  "xs:dateTime(/atom:feed/atom:updated) > xs:dateTime('"+now+"')",
+  "//atom:entry/atom:updated/xs:dateTime(.) > xs:dateTime('"+now+"')",
   "TR.dateIsInTheFuture"
 );</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="8d0d9cdd-efca-42e8-ad1f-7eb66aa638d5" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Each entry has CRS information" searchProperties="true"><con:description><![CDATA[
 Check that each entry in the Dataset feed one valid category element is provided for the CRS.
@@ -1168,7 +774,7 @@ Relevant Requirements:
 </ul>
 <br/>
 <br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-service/3.1/atom-pre-defined/dataset-feed-link-media-type" target="_blank">Abstract Test Case 'Use INSPIRE media-types only'</a>]]></con:description><con:settings/><con:testStep type="properties" name="Transfer_Properties" id="3bda7cfc-b100-44bb-90e6-c3592561f0e1"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>mediaTypes</con:name><con:value>application/x-shapefile,application/x-filegdb,image/tiff,application/gml+xml,application/x-gmz,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,image/jp2,application/x-ecw,application/x-ascii-grid,application/x-oracledump,application/x-las,application/x-laz,application/x-tab,application/x-tab-raster,text/csv,application/x-worldfile</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="httprequest" name="INSPIREMediaTypes" id="8ef21a6b-902d-4585-ae34-e5af27262ef2"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="INSPIREMediaTypes" id="adb1af26-53e6-42c5-8dc0-e0cb68a9e7f6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the list of INSPIRE media types.</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://inspire.ec.europa.eu/media-types/</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" id="a61ee1c3-679f-4b80-9921-5a7d63bf35a2" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" name="HTTP status code is 200" id="61bcb190-62eb-4566-93cb-5b834f382c4b"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="0f67038e-b384-4b15-b82e-0cd0c70e2c23" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-service/3.1/atom-pre-defined/dataset-feed-link-media-type" target="_blank">Abstract Test Case 'Use INSPIRE media-types only'</a>]]></con:description><con:settings/><con:testStep type="properties" name="Transfer_Properties" id="3bda7cfc-b100-44bb-90e6-c3592561f0e1"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>mediaTypes</con:name><con:value>x-shapefilex-filegdbgml+xmlx-gmzvnd.google-earth.kml+xmlvnd.google-earth.kmzx-ecwx-ascii-gridx-oracledumpx-lasx-lazx-tabx-tab-rasterx-worldfile tiffjp2 csv</con:value></con:property><con:property><con:name>mediaTypeUrl</con:name><con:value>http://inspire.ec.europa.eu/media-types/text</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="httprequest" name="Get INSPIRE Media Types" id="8ef21a6b-902d-4585-ae34-e5af27262ef2"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="Get INSPIRE Media Types" id="b759303e-f4cd-4dce-bdca-814f46ad1175" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the list of INSPIRE media types from http://inspire.ec.europa.eu/media-types with 'Accept'-Header 'application/atom+xml'</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/atom+xml" xmlns="http://eviware.com/soapui/config"/></con:setting></con:settings><con:endpoint>http://inspire.ec.europa.eu/media-types</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" id="c947b341-320a-4f0b-96aa-3a351ee25a10" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" name="HTTP status code is 200" id="e3c9511c-4101-4915-81b9-aba6e2072815"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="44852025-6fca-456f-acf1-95e7c7f2dd8a" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="3df8c60f-a520-4f3a-afa0-1446c757112c" name="ID is INSPIRE media types"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
@@ -1176,9 +782,41 @@ a.equals(
 	"/atom:feed/atom:id",
 	"atom:id", 
 	"http://inspire.ec.europa.eu/media-types"
-);</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="transfer" name="PropertyTransferMediaTypes" id="876d8f3a-42ce-4907-b5a1-d960c6a5bf29"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false" disabled="false"><con:name>MediaTypes</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>INSPIREMediaTypes</con:sourceStep><con:sourcePath>declare namespace atom='http://www.w3.org/2005/Atom';
+);</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="groovy" name="Iterate over Media Type entries" id="0b46fce1-085e-4564-b97c-dce9ed762b8f"><con:settings/><con:config><script>import de.interactive_instruments.xtf.*;
+SOAPUI_I.init(log,context,testRunner);
+import de.interactive_instruments.UriUtils;
 
-string-join(//atom:entry/atom:title,',')</con:sourcePath><con:targetType>mediaTypes</con:targetType><con:targetStep>Transfer_Properties</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="httprequest" name="Get Dataset Feed" id="af1e117e-aac8-4ada-8750-6eaee997df3c"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="e46405cb-0bb3-406c-8bb6-ae9a1dbcf338" name="Get Dataset Feed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the Dataset Feed and check if it contains valid INSPIRE media types</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#TestSuite#feedEntryURL}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b6a56e5f-482f-4b20-85d3-6b052872f9d4" name="HTTP status code is 200"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="f2e49918-0cf7-4e6d-8c6c-941ef3f85113" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="9bc2521f-a127-45d6-aaaa-18f9b623ab84" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+ProjectHelper ph = new ProjectHelper();
+def xmlHolder = ph.getTestStepResult("Get INSPIRE Media Types")
+
+def mediaTypeUrls = xmlHolder.getNodeValues( "/*:feed/*:entry/*:link[@rel='self']/@href" );
+def mediaBaseTypes = xmlHolder.getNodeValues( "/*:feed/*:entry/*:title" );
+log.info("mediaTypeUrls: " + mediaTypeUrls);
+
+// clear url to test
+ph.setTransferProperty("mediaTypeUrl", "")
+ph.setTransferProperty("mediaTypes", "")
+
+for(int i=0; i &lt; mediaTypeUrls.size(); i++) {
+	final String url = mediaTypeUrls[i];
+	final String baseType = mediaBaseTypes[i];
+			
+	log.info("Using URL: "+url)
+	ph.setTransferProperty("mediaTypeUrl", url)
+	ph.runTestStep("Get INSPIRE Media Subtype");
+	def respXmlHolder = ph.getTestStepResult("Get INSPIRE Media Subtype")
+	def extractedMediaTypes = respXmlHolder.getNodeValue( "string-join(/*:feed/*:entry/*:title, '')" );
+	final String mediaTypes = ph.getTransferProperty("mediaTypes")
+	if(mediaTypes!="") {
+		ph.setTransferProperty("mediaTypes", mediaTypes+" "+extractedMediaTypes)
+	}else{
+		ph.setTransferProperty("mediaTypes", extractedMediaTypes)
+	}
+}
+
+ph.disableTestSteps(["Get INSPIRE Media Subtype"]);</script></con:config></con:testStep><con:testStep type="httprequest" name="Get INSPIRE Media Subtype" id="0531fe14-2169-4a9e-a1da-30040ea73277" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="Get INSPIRE Media Subtype" id="4396cec5-e91d-45ec-96ba-ff4adfc3d10e" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the list of INSPIRE media sub types with 'Accept'-Header 'application/atom+xml'</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/atom+xml" xmlns="http://eviware.com/soapui/config"/></con:setting></con:settings><con:endpoint>${Transfer_Properties#mediaTypeUrl}</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" id="7b4d43eb-cfbd-47b2-aeae-9d1fc802d78d" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" name="HTTP status code is 200" id="7389eee5-84b7-4333-8848-9f5b394c9d67"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="75bb53c4-17e8-4cb4-b6c6-72a5c6cc1819" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>Transfer_Properties#mediaTypeUrl</con:name><con:value>Transfer_Properties#mediaTypeUrl</con:value><con:style>TEMPLATE</con:style><con:default>Transfer_Properties#mediaTypeUrl</con:default></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="httprequest" name="Get Dataset Feed" id="af1e117e-aac8-4ada-8750-6eaee997df3c"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="e46405cb-0bb3-406c-8bb6-ae9a1dbcf338" name="Get Dataset Feed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the Dataset Feed and check if it contains valid INSPIRE media types</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#TestSuite#feedEntryURL}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b6a56e5f-482f-4b20-85d3-6b052872f9d4" name="HTTP status code is 200"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="f2e49918-0cf7-4e6d-8c6c-941ef3f85113" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="9bc2521f-a127-45d6-aaaa-18f9b623ab84" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:assertion type="XQuery Match" id="b88e3063-f589-47ef-8ef3-18a87d85c4f6" name="Only media types listed in the INSPIRE media-types register at http://inspire.ec.europa.eu/media-types/ shall be used"><con:configuration><path><![CDATA[declare namespace atom='http://www.w3.org/2005/Atom';
 declare namespace georss='http://www.georss.org/georss';
@@ -1447,7 +1085,7 @@ for( i in dataSetUrlNodes )
    props.setPropertyValue("dataSetURL",i)
    testRunner.runTestStepByName("ResolveDatasetLink")
    // testRunner.runTestStepByName("Tracer")
-}</script></con:config></con:testStep><con:testStep type="httprequest" name="ResolveDatasetLink" id="59a32c2c-e930-4fa5-ac61-f2f94d55bdb8"><con:settings/><con:config method="HEAD" xsi:type="con:HttpRequest" name="ResolveDatasetLink" id="c7b20ade-cf00-46e8-9f46-e437f393da54" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#dataSetURL}</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" name="Response starts within 30 seconds (using HTTP HEAD)" id="fced5ec0-ac9b-4792-bba9-0d1682a5c048"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties><con:property><con:name>save_responses</con:name><con:value>TRUE</con:value></con:property><con:property><con:name>traces_dir</con:name><con:value>../../../logs/traces/</con:value></con:property><con:property><con:name>MAIN_TESTSTEP</con:name><con:value>ValidateDatasetFeed</con:value></con:property><con:property><con:name>etf.ShortDescription</con:name><con:value/></con:property><con:property><con:name>etf.Author</con:name><con:value>Thijs Brentjens</con:value></con:property><con:property><con:name>etf.LastEditor</con:name><con:value>Jon Herrmann</con:value></con:property><con:property><con:name>etf.ExpectedResults</con:name><con:value/></con:property><con:property><con:name>etf.CreationDate</con:name><con:value>2015-05-26T22:28:59.403+02:00</con:value></con:property><con:property><con:name>etf.LastUpdateDate</con:name><con:value>2015-05-26T22:28:59.404+02:00</con:value></con:property><con:property><con:name>etf.Version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>etf.AssociatedRequirements</con:name><con:value/></con:property><con:property><con:name>etf.Status</con:name><con:value>IMPLEMENTED</con:value></con:property></con:properties></con:testCase><con:properties><con:property><con:name>feedEntryURL</con:name><con:value>http://www.gis-rest.nrw.de/atomFeed/rest/atom/ce127d47-27d1-4f49-a4dc-65cc1dac339e</con:value></con:property></con:properties></con:testSuite><con:testSuite id="c4154735-aa8a-40cb-9bbf-fba0ef78c7e2" name="OpenSearch Description"><con:description>Test module for checking the OpenSearch Description which is referenced by a Service Feed.
+}</script></con:config></con:testStep><con:testStep type="httprequest" name="ResolveDatasetLink" id="59a32c2c-e930-4fa5-ac61-f2f94d55bdb8"><con:settings/><con:config method="HEAD" xsi:type="con:HttpRequest" name="ResolveDatasetLink" id="c7b20ade-cf00-46e8-9f46-e437f393da54" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#dataSetURL}</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" name="Response starts within 30 seconds (using HTTP HEAD)" id="fced5ec0-ac9b-4792-bba9-0d1682a5c048"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties><con:property><con:name>save_responses</con:name><con:value>TRUE</con:value></con:property><con:property><con:name>traces_dir</con:name><con:value>../../../logs/traces/</con:value></con:property><con:property><con:name>MAIN_TESTSTEP</con:name><con:value>ValidateDatasetFeed</con:value></con:property><con:property><con:name>etf.ShortDescription</con:name><con:value/></con:property><con:property><con:name>etf.Author</con:name><con:value>Thijs Brentjens</con:value></con:property><con:property><con:name>etf.LastEditor</con:name><con:value>Jon Herrmann</con:value></con:property><con:property><con:name>etf.ExpectedResults</con:name><con:value/></con:property><con:property><con:name>etf.CreationDate</con:name><con:value>2015-05-26T22:28:59.403+02:00</con:value></con:property><con:property><con:name>etf.LastUpdateDate</con:name><con:value>2015-05-26T22:28:59.404+02:00</con:value></con:property><con:property><con:name>etf.Version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>etf.AssociatedRequirements</con:name><con:value/></con:property><con:property><con:name>etf.Status</con:name><con:value>IMPLEMENTED</con:value></con:property></con:properties></con:testCase><con:properties><con:property><con:name>feedEntryURL</con:name><con:value/></con:property></con:properties></con:testSuite><con:testSuite id="c4154735-aa8a-40cb-9bbf-fba0ef78c7e2" name="OpenSearch Description"><con:description>Test module for checking the OpenSearch Description which is referenced by a Service Feed.
 &lt;br/>&lt;br/>
 &lt;b>Known limitations: &lt;/b> Response schema validation is not implemented yet.</con:description><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="c7150cb1-fa7f-4589-9871-330bca1aa351" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Get OpenSearch Description link" searchProperties="true"><con:description>Technical Test Case to retrieve and set theURL to the OpenSearch Description. This Test Case depends on the Test Case 'Link to OpenSearch Description document' in the 'Download Service Feed' test module.</con:description><con:settings/><con:testStep type="testcasedependency" name="OpenSearch Description link exists" id="3713d57c-f2b6-4c66-819f-49c493039e5f"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>6359d6da-1e37-423f-b543-018979b665e2</con:targetTestCase><con:properties><con:property><con:name>openSearchLanguages</con:name></con:property></con:properties><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="Get Service Feed" id="f150efa8-92d2-4fab-bfdf-e1ffbe8ff684"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="cd189a05-957c-490a-9fb3-966394eab9e4" name="Get Service Feed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Requests the Service Feed and set the URL to the OpenSearch description.</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b98e8d08-b750-4911-a3ed-a1b55ea4f400" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="8c018d06-fce0-4029-9c58-62e544d85b07" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="3cee0dcc-2196-40ab-bd5f-a2ef0ed0d0d8" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
