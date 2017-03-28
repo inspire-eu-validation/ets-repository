@@ -116,6 +116,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-cp/3.1/cp-as/mor" targe
 								<TestAssertion id="EIDbe281220-e6b9-47ab-925e-a41015b6337e">
 									<label>cp-as.b.1: Cadastral boundaries corresponding to the outline of a cadastral parcel form closed ring(s).</label>
 									<description><![CDATA[Check that cadastral boundaries corresponding to the outline of a cadastral parcel form closed ring(s).<br/><br/>
+Known limitation: Currently the assertion is disabled as ETF version 1 does not support testing, if a line string is closed. Once all deployments of the INSPIRE validator use the ETF version 2 software, the test will be updated and enabled.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 6.3.2 (2): Theme-specific Requirements. If cadastral boundaries are provided, the cadastral boundaries corresponding to the outline of a cadastral parcel shall form closed ring(s).</li>
@@ -133,26 +134,33 @@ let $messages :=
   let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
   let $onBoundary :=
   for $feature in $other_features[self::*:CadastralBoundary]
+   return
+   try {
    let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
    let $check := ggeo:relate($other_geometry, $candidate_geometry, 'FTFF*FT*T') 
 	return if ($check) then $feature else ()
-  let $dummy := local:log($candidate/@gml:id || ': ' || string-join($onBoundary/@gml:id, ', '))
+   } catch * { 
+		let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+	}    
   return 
   if (not($onBoundary)) then () 
   else
     let $union := ggeo:union($onBoundary)
-    (: reduce to line strings that are not closed, requires a new isClosed() function in GmlGeoX :)
+    (: TODO reduce to line strings that are not closed, requires a new isClosed() function in GmlGeoX :)
     let $linestrings := functx:get-matches($union,'LINESTRING\s?\([\d,\.\s]+\)')[fn:string-length(.)>0]
     let $dummy := local:log($candidate/@gml:id || ': ' || $union)
     return local:addMessage('TR.openBoundary', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'featureType2' : local-name($onBoundary[1]), 'gmlids': string-join($onBoundary/@gml:id, ''', '''), 'openBoundaries': fn:string-join($linestrings, ', ') })
    } catch * { 
+		let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
    })[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
  $messages)
 									</expression>
-									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<testItemType ref="EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2"/>
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>

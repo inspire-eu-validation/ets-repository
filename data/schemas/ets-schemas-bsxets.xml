@@ -601,9 +601,8 @@ let $messages := for $feature in $featuresToInspect
 			return
 				local:addMessage('TR.invalidGeometry', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'text': $message/text() })
 	} catch * { 
-		let $dummy := local:log($err:code || ' - ' || $err:description || ' - ' || $err:module || ' - ' || $err:line-number || ' - ' || $err:column-number || ' - ' || $err:additional)
-		return
-		(: parsing exceptions already covered by gmlas.d.11 :) ()
+		let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
 	}
 return
 (if ($messages) then 'FAILED' else 'PASSED',

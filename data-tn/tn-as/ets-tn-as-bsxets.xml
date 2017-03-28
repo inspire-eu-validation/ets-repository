@@ -487,15 +487,27 @@ then 'PASSED'
 else
 	let $featuresWithErrors :=
 	(for $candidate in $nodes
+	  return
+	  try {
 		let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
 		let $env := ggeo:envelope($candidate_geometry)
  		let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
 		let $touches := 
 		(for $feature in $other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]
+		 return
+		 try { 
 			let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centrelineGeometry/*[1])
 			return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
+		 } catch * {
+			let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+			return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+		 }	
 		) 
 		return if (not($touches)) then $candidate else ()
+	  } catch * {
+		let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+	  }		
 	)[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',

@@ -84,13 +84,21 @@ try {
 let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centrelineGeometry or self::*:geometry]/*[1])
 let $env := ggeo:envelope($candidate_geometry)
 let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
-let $other_geometries := for $feature in $other_features[self::*:Watercourse|self::*:StandingWater] 
+let $other_geometries := 
+ for $feature in $other_features[self::*:Watercourse|self::*:StandingWater] 
  where $feature/*:geometry/*[1][self::gml:Polygon|self::gml:Surface|self::gml:MultiSurface]
- return ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+ return
+ try {
+   ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+ } catch * { 
+	let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+ }  
 let $union := ggeo:union($other_geometries)
 return if (not(ggeo:contains($union,$candidate_geometry))) then $candidate else ()
 } catch * {
-$candidate
+	let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
 })[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'PASSED_MANUAL' else 'PASSED',
