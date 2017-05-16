@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-n-as" target=
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-gml" target="_blank">Conformance Class 'GML application schemas, Hydrography'</a></li></ul>]]></description>
 	<reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-02-21T17:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2017-03-29T07:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID83fc91d3-bdf1-486e-ba8f-cd2c43e14413"/>
 	</tags>
@@ -165,14 +165,26 @@ then 'PASSED'
 else
 let $featuresWithErrors :=
 (for $candidate in $nodes
+return
+try {
 let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
 let $env := ggeo:envelope($candidate_geometry)
 let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
 let $touches :=
 for $feature in $other_features[self::*:WatercourseLink]
+return
+try {
 let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centrelineGeometry/*[1])
 return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
-return if (not($touches)) then $candidate else ())[position() le $limitErrors]
+} catch * {
+	let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+}
+return if (not($touches)) then $candidate else ()
+} catch * {
+	let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+})[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),

@@ -12,11 +12,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency" target="_blank">Conformance Class 'Data consistency'</a></li>
 </ul>]]></description>
 	<reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.0</version>
+	<version>0.2.1</version>
 	<author>PwC</author>
 	<creationDate>2016-09-13T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-02-21T17:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2017-03-29T07:00:00Z</lastUpdateDate>
  	<tags>
 		<tag ref="EIDfe1f3796-0ebf-4960-a6f7-f935e087fa4b"/>
 	</tags>
@@ -336,12 +336,16 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/3.1/au-dc/area" targ
 									<expression>
 let $messages :=
 (for $candidate in $features[self::*:AdministrativeUnit]
+ return
+ try {
   let $level := substring-after(data($candidate/au3:nationalLevel[1]/text() | $candidate/au:nationalLevel[1]/@xlink:href),'http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/')
   let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
   let $env := ggeo:envelope($candidate_geometry)
   let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
   for $feature in $other_features[self::*:AdministrativeUnit and (au:nationalLevel/@xlink:href = $candidate/au:nationalLevel/@xlink:href or au3:nationalLevel/text() = $candidate/au3:nationalLevel/text()) and not (@gml:id = $candidate/@gml:id)]
    order by $candidate/@gml:id, $feature/@gml:id
+   return
+   try {
    let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
    let $check := ggeo:relate($candidate_geometry, $other_geometry, 'F********') 
 	return 
@@ -349,7 +353,16 @@ let $messages :=
 	else 
 	let $intersection := string(ggeo:intersection($candidate_geometry, $other_geometry))
 	let $polygons := functx:get-matches($intersection,'POLYGON\s?\(\s?\([\d,\.\s]+\)\s?\)')[fn:string-length(.)>0]
-	return local:addMessage('TR.AdministrativeUnitArea', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'gmlid2': string($feature/@gml:id), 'level': $level, 'sharedArea': fn:string-join($polygons, ', ') }))[position() le $limitErrors]
+	return local:addMessage('TR.AdministrativeUnitArea', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'gmlid2': string($feature/@gml:id), 'level': $level, 'sharedArea': fn:string-join($polygons, ', ') })
+	} catch * { 
+		let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+	}
+ } catch * { 
+	let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+ }
+)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
@@ -390,17 +403,30 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/3.1/au-dc/boundary" 
 									<expression>
 let $messages :=
 (for $candidate in $features[self::*:AdministrativeBoundary]
+ return
+ try {
   let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
   let $env := ggeo:envelope($candidate_geometry)
   let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
   let $onBoundary :=
   for $feature in $other_features[self::*:AdministrativeUnit]
+  return
+  try {
    let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
    let $check := ggeo:relate($candidate_geometry, $other_geometry, 'FTFF*FT*T') 
 	return if ($check) then $feature else ()
+  } catch * { 
+		let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+  }
   return 
   if ($onBoundary) then () 
-  else local:addMessage('TR.AdministrativeBoundaryOnUnit', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id) }))[position() le $limitErrors]
+  else local:addMessage('TR.AdministrativeBoundaryOnUnit', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id) })
+ } catch * { 
+	let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+ }
+)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
@@ -440,11 +466,15 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/3.1/au-dc/condominiu
 									<expression>
 let $messages :=
 (for $candidate in $features[self::*:Condominium]
+ return
+ try {
   let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
   let $env := ggeo:envelope($candidate_geometry)
   let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
   for $feature in $other_features[self::*:AdministrativeUnit]
-   order by $candidate/@gml:id, $feature/@gml:id
+  order by $candidate/@gml:id, $feature/@gml:id
+  return
+  try {
    let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
    let $check := ggeo:relate($candidate_geometry, $other_geometry, 'F********') 
 	return 
@@ -452,7 +482,16 @@ let $messages :=
 	else 
 	let $intersection := string(ggeo:intersection($candidate_geometry, $other_geometry))
    let $polygons := functx:get-matches($intersection,'POLYGON\s?\(\s?\([\d,\.\s]+\)\s?\)')[fn:string-length(.)>0]
-   return local:addMessage('TR.wrongSpatialCondominiumExtent', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'gmlid2': string($feature/@gml:id), 'sharedArea': fn:string-join($polygons, ', ') }))[position() le $limitErrors]
+   return local:addMessage('TR.wrongSpatialCondominiumExtent', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id), 'gmlid2': string($feature/@gml:id), 'sharedArea': fn:string-join($polygons, ', ') })
+  } catch * { 
+		let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+  } 
+ } catch * { 
+	let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+ }
+)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
