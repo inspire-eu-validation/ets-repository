@@ -49,7 +49,8 @@ new File('../').eachFileRecurse(FILES) { file ->
         println "Parsing $file"
         def xml = xmlSlurper.parse(file);
         def ids = xml.'**'.findAll{
-          it.@id != "" && !it.@id.text().startsWith("com.eviware") }.'@id'
+          it.@id != "" && !it.@id.text().startsWith("com.eviware") && !it.@id.text().startsWith("ProjectSettings")
+        }.'@id'
         ids.each { i ->
             // gpath attribute cast required
             String id = i
