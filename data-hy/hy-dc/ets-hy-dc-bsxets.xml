@@ -12,11 +12,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/data-consistency" target="_blank">Conformance Class 'Data consistency'</a></li>
 </ul>]]></description>
 	<reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.0</version>
+	<version>0.2.2</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-02-21T17:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2017-05-16T13:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID83fc91d3-bdf1-486e-ba8f-cd2c43e14413"/>
 	</tags>
@@ -67,7 +67,7 @@ Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 8.7.1 (1): Theme-specific Requirements – Consistency between spatial data sets. Hydrography links, centrelines and nodes shall always be located within the extent of the area representation of the same object.</li>
 </ul>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HY_v3.1.pdf">INSPIRE Data Specification on Hydrography, A.1.7, A.3.6</a>]]></description>
 									<parent ref="EID743cca00-3b22-41dc-9eb8-d9de0ebfa086"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -84,13 +84,21 @@ try {
 let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*[self::*:centrelineGeometry or self::*:geometry]/*[1])
 let $env := ggeo:envelope($candidate_geometry)
 let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
-let $other_geometries := for $feature in $other_features[self::*:Watercourse|self::*:StandingWater] 
+let $other_geometries := 
+ for $feature in $other_features[self::*:Watercourse|self::*:StandingWater] 
  where $feature/*:geometry/*[1][self::gml:Polygon|self::gml:Surface|self::gml:MultiSurface]
- return ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+ return
+ try {
+   ggeo:getGeometry($feature/@gml:id,$feature/*:geometry/*[1])
+ } catch * { 
+	let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+ }  
 let $union := ggeo:union($other_geometries)
 return if (not(ggeo:contains($union,$candidate_geometry))) then $candidate else ()
 } catch * {
-$candidate
+	let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
 })[position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'PASSED_MANUAL' else 'PASSED',
@@ -113,7 +121,7 @@ Relevant requirements:
 <ul>
 <li>IR Requirement Annex II Section 8.7.1 (2): Theme-specific Requirements – Consistency between spatial data sets. Connectivity between hydrographic networks across state borders and – where applicable – also across regional borders (and data sets) within Member States shall be established and maintained by the respective authorities, using the cross-border connectivity mechanisms provided by the NetworkConnection type.</li>
 </ul>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/spatial" target="_blank">Abstract Test Case 'Spatial consistency'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HY_v3.1.pdf">INSPIRE Data Specification on Hydrography, A.1.7, A.3.6</a>]]></description>
 									<parent ref="EID871889b6-5664-4498-8762-849fb77a084f"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>NOT_APPLICABLE</expression>
@@ -140,7 +148,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/spatial" t
 									<description><![CDATA[Verify that attributes are consistent with the reporting under the Water Framework Directive, i.e. review for each feature that all attribution is the same as the equivalent property of that object used for reporting obligations under Directive 2000/60/EC.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Annex II Section 8.7.1 (3): Theme-specific Requirements – Consistency between spatial data sets. All attribution of objects in this schema shall be the same as the equivalent property of that object used for reporting obligations under Directive 2000/60/EC.</li></ul>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/thematic" target="_blank">Abstract Test Case 'Thematic consistency'</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/thematic" target="_blank">Abstract Test Case 'Thematic consistency'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HY_v3.1.pdf">INSPIRE Data Specification on Hydrography, A.3.6</a>]]></description>
 									<parent ref="EID4d44f8ec-e62f-400a-a151-21b6f5547b07"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>NOT_APPLICABLE</expression>
@@ -167,7 +175,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/thematic" 
 									<description><![CDATA[Verify that identifiers are reusing authoritative, pan-European sources, i.e. review for each feature that, if a geographical name is used as a unique hydrologic ID for an object in this specification that it is derived, where possible, from a pan-European Gazetteer or another authoritative, pan-European source.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Annex II Section 8.7.2 (1): Theme-specific Requirements – Identifier management. If a geographical name is used as a unique hydrologic ID for an object in this specification then it shall be derived, where possible, from a pan-European Gazetteer or another authoritative, pan-European source.</li></ul>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/identifiers" target="_blank">Abstract Test Case 'Identifiers'</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/identifiers" target="_blank">Abstract Test Case 'Identifiers'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HY_v3.1.pdf">INSPIRE Data Specification on Hydrography, A.3.7</a>]]></description>
 									<parent ref="EIDfed82929-a3b7-4e48-8e06-29f42e90ed62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>NOT_APPLICABLE</expression>
@@ -178,7 +186,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/identifier
 									<description><![CDATA[Verify that identifiers are consistent with the reporting under the Water Framework Directive, i.e. review for each feature that the localId attribute of the external object identifier is the same as the ID used for reporting obligations under Directive 2000/60/EC.<br/><br/>
 Relevant requirements:
 <ul><li>IR Requirement Annex II Section 8.7.2 (2): Theme-specific Requirements – Identifier management. The localId attribute of the external object identifier of a spatial object shall be the same as the ID used for reporting obligations under Directive 2000/60/EC.</li></ul>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/identifiers" target="_blank">Abstract Test Case 'Identifiers'</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/3.1/hy-dc/identifiers" target="_blank">Abstract Test Case 'Identifiers'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HY_v3.1.pdf">INSPIRE Data Specification on Hydrography, A.3.7</a>]]></description>
 									<parent ref="EIDfed82929-a3b7-4e48-8e06-29f42e90ed62"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>NOT_APPLICABLE</expression>
