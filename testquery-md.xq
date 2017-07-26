@@ -156,7 +156,7 @@ declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as x
 :)
 declare function local:get-code-list-values($url as xs:string) as xs:string*
 {
-let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata-)?codelist/)?')
+let $clname := functx:substring-after-last-match($url, 'http(s)?://inspire.ec.europa.eu/((metadata-)?codelist/)?')
 let $clurl := $url || '/' || $clname || '.en.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30, false()) } catch * { false() }
 return
@@ -168,9 +168,12 @@ return
     error((),'Unknown resource type encountered when accessing the atom representation of code list ' || $url || ' at URL ' || $clurl || '.')
   else
       try { 
+        let $normalizedUrl := functx:substring-after-last-match($url, 'http(s)?:')
         let $clfeed := fn:doc($clurl)
         let $codeUris := $clfeed//atom:entry/atom:id/text()
-        let $codes := for $codeUri in $codeUris return fn:substring-after($codeUri, $url || '/')
+        let $codes := for $codeUri in $codeUris
+          let $normalizedCodeUri := functx:substring-after-last-match($codeUri, 'http(s)?:')
+          return fn:substring-after($normalizedCodeUri, $normalizedUrl || '/')
         return
           $codes
         } catch * { 
@@ -183,7 +186,7 @@ return
 :)
 declare function local:get-codes-in-atom-format($url as xs:string, $langId as xs:string) as element()*
 {
-let $clname := if ($url = 'http://inspire.ec.europa.eu/theme') then 'theme' else functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata\-)?codelist/)?')
+let $clname := if ($url = 'http://inspire.ec.europa.eu/theme') then 'theme' else functx:substring-after-last-match($url, 'http(s)?://inspire.ec.europa.eu/((metadata\-)?codelist/)?')
 let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30, false()) } catch * { false() }
 return
