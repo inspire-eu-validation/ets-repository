@@ -1113,7 +1113,7 @@ let $messages :=
 			local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri })
 	)[position() le $limitErrors]
 return
-(if ($messages//@ref = ('TR.operatesOnWithoutXlink','TR.resourceNotAccessible','TR.resourceNotAccessibleException','TR.idNotFound','TR.urlNotHttp','TR.operatesOnWithoutDatasetOrSeriesRecord','TR.unknownResourceType')) then 'FAILED' else 'PASSED',
+(if ($messages//@ref = ('TR.operatesOnWithoutXlink','TR.resourceNotAccessible','TR.resourceNotAccessibleException','TR.idNotFound','TR.urlNotHttp','TR.operatesOnWithoutDatasetOrSeriesRecord')) then 'FAILED' else if ($messages) then 'PASSED_MANUAL' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 			      </expression>
@@ -1121,6 +1121,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.operatesOnWithoutXlink"/>
 										<translationTemplate ref="TR.urlNotHttp"/>
+										<translationTemplate ref="TR.idNotFound"/>
 										<translationTemplate ref="TR.resourceNotAccessibleException"/>
 										<translationTemplate ref="TR.resourceNotAccessible"/>
 										<translationTemplate ref="TR.operatesOnWithoutDatasetOrSeriesRecord"/>
