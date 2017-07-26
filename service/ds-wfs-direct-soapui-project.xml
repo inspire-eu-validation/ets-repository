@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <con:soapui-project name="Conformance Class: Download Service - Direct WFS" resourceRoot="${projectDir}" soapui-version="5.3.0" abortOnError="false" runType="SEQUENTIAL" activeEnvironment="Default" id="ed2d3501-d700-4ff9-b9bf-070dece8ddbd" xmlns:con="http://eviware.com/soapui/config"><con:description><![CDATA[This test suite examines an OGC Web Feature Service against the requirements related to the conformance class “Web Feature Service and Filter Encoding implementation of
-Direct Access Download Service” in INSPIRE. This conformance class does not specify any requirements in addition to the dependencies to conformance classes specified by the OGC standard documents WFS 2.0 and FES 2.0. This Executable Test Suite, therefore, depends on the OGC <a href="http://cite.opengeospatial.org/teamengine/about/wfs/2.0.0/site/">WFS 2.0 Conformance Test Suite</a>, which is invoked automatically. 
+Direct Access Download Service” in INSPIRE. This conformance class does not specify any requirements in addition to the dependencies to conformance classes specified by the OGC standard documents WFS 2.0 and FES 2.0. This Executable Test Suite, therefore, depends on the OGC <a href="http://cite.opengeospatial.org/teamengine/about/wfs/2.0.0/site/">WFS 2.0 Conformance Test Suite</a>, which is invoked automatically.
 <br/> <br/>
 The Executable Test Suite is divided into two test modules. In the first module 'Initialization and basic checks', basic queries are send to the service to ensure the endpoints are available. The 'Capabilities' test module contains a test case that checks, if the Capabilities document of the service declares all required Conformance Classes.
 <br/> <br/>
@@ -106,7 +106,19 @@ if (endpoint.getQuery()) {
           <con:encoding>UTF-8</con:encoding>
           <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
           <con:request/>
-          <con:assertion type="Response SLA Assertion" name="30 seconds timeout" id="2946eb3a-9956-4ff0-b6f3-3638ba207951"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="56c7f2ee-d3be-4a10-8e1f-32693af823bd"/><con:assertion type="Valid HTTP Status Codes" id="5d58bd8b-7b9a-4f64-a89a-d6b7edab6bb5" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="34afec82-c237-456c-b5a8-942dc7a47ed0" name="Expect a Capabilities root element"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+          <con:assertion type="Response SLA Assertion" name="30 seconds timeout" id="2946eb3a-9956-4ff0-b6f3-3638ba207951"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="56c7f2ee-d3be-4a10-8e1f-32693af823bd"/><con:assertion type="Valid HTTP Status Codes" id="5d58bd8b-7b9a-4f64-a89a-d6b7edab6bb5" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="61b88fdb-aa30-4d17-a6d5-bd05f6beed91" name="No invalid characters before XML prolog"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+import de.interactive_instruments.*
+
+if(!messageExchange.hasResponse()) {
+  throw new TranslatableAssertionError("TR.noDataReturned")
+}
+
+if(messageExchange.responseContent.size()>7) {
+	final String xmlProlog = messageExchange.responseContent.substring(0,7);
+	if(!xmlProlog.trim().startsWith("&lt;?xml")) {
+		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog)
+	}
+}</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="34afec82-c237-456c-b5a8-942dc7a47ed0" name="Expect a Capabilities root element"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/wfs:WFS_Capabilities", "TR.missingCapabilitiesRootElement");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="a78eddd5-3384-484f-813c-30eee0999ca3" name="Expect Capabilites in version 2.0.0"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);

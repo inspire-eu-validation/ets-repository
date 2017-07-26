@@ -100,7 +100,19 @@ if (endpoint.getQuery()) {
           <con:encoding>UTF-8</con:encoding>
           <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
           <con:request/>
-          <con:assertion type="Response SLA Assertion" name="30 seconds timeout" id="f4835519-c036-4bdb-a8fa-641c29d2c8ff"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="befdb812-5725-403d-bc81-678b76c63f29"/><con:assertion type="Valid HTTP Status Codes" id="6920c40a-e2ff-40c7-bbda-8531e4354b32" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="569e5be5-a54e-436d-8328-d0328fb8c03f" name="Expect a Capabilities root element"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+          <con:assertion type="Response SLA Assertion" name="30 seconds timeout" id="f4835519-c036-4bdb-a8fa-641c29d2c8ff"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="befdb812-5725-403d-bc81-678b76c63f29"/><con:assertion type="Valid HTTP Status Codes" id="6920c40a-e2ff-40c7-bbda-8531e4354b32" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="90c088bd-0c65-4589-a78d-e363723136a1" name="No invalid characters before XML prolog"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+import de.interactive_instruments.*
+
+if(!messageExchange.hasResponse()) {
+  throw new TranslatableAssertionError("TR.noDataReturned")
+}
+
+if(messageExchange.responseContent.size()>39) {
+	final String xmlProlog = messageExchange.responseContent.substring(0,7);
+	if(!xmlProlog.trim().startsWith("&lt;?xml")) {
+		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog)
+	}
+}</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="569e5be5-a54e-436d-8328-d0328fb8c03f" name="Expect a Capabilities root element"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/wfs:WFS_Capabilities", "TR.missingCapabilitiesRootElement");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="03534d3b-47a5-4f39-9231-812a0ae13b90" name="Expect Capabilites in version 2.0.0"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
