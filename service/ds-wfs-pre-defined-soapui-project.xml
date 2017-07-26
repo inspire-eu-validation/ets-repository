@@ -2536,6 +2536,9 @@ if(!SUtils.isNullOrEmpty(user)) {
 
 int getHttpResponseCode(String url, def credentials){
 	def connection = UriUtils.openConnection( new URI(UriUtils.ensureUrlEncodedParams(url)), credentials )
+	if (!(connection instanceof HttpURLConnection)) {
+		throw new IllegalArgumentException("Cannot open a HTTP connection for URL '"+url+"'");
+	}
 	connection.setConnectTimeout(11000);
 	connection.setReadTimeout(91000);
 	connection.setRequestMethod("GET");
@@ -2547,9 +2550,13 @@ assert schemaLocations != null, "Response does not contain xsi:schemaLocation at
 if(schemaLocations!=null) {
 	for(schemaLocation in schemaLocations) {
 		log.info("Checking "+schemaLocation);
-		int responseCode = getHttpResponseCode(schemaLocation,null);
-		if(200 &lt;= responseCode &amp;&amp; responseCode >= 400) {
-				throw new TranslatableAssertionError("TR.schemaNotAccessible", "url", schemaLocation, "code", String.valueOf(responseCode));	
+		try {
+			int responseCode = getHttpResponseCode(schemaLocation,null);
+			if(200 &lt;= responseCode &amp;&amp; responseCode >= 400) {
+					throw new TranslatableAssertionError("TR.schemaNotAccessible", "url", schemaLocation, "code", String.valueOf(responseCode));	
+			}
+		}catch(IllegalArgumentException e) {
+			throw new TranslatableAssertionError("TR.notAnHttpUrl", "url", schemaLocation);	
 		}
 	}
 }
