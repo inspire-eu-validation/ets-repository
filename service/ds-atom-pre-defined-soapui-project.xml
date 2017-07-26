@@ -786,14 +786,14 @@ Relevant Requirements:
 </ul>
 <br/>
 <br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-service/3.1/atom-pre-defined/dataset-feed-link-media-type" target="_blank">Abstract Test Case 'Use INSPIRE media-types only'</a>]]></con:description><con:settings/><con:testStep type="properties" name="Transfer_Properties" id="3bda7cfc-b100-44bb-90e6-c3592561f0e1"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>mediaTypes</con:name><con:value>x-shapefilex-filegdbgml+xmlx-gmzvnd.google-earth.kml+xmlvnd.google-earth.kmzx-ecwx-ascii-gridx-oracledumpx-lasx-lazx-tabx-tab-rasterx-worldfile tiffjp2 csv</con:value></con:property><con:property><con:name>mediaTypeUrl</con:name><con:value>http://inspire.ec.europa.eu/media-types/text</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="httprequest" name="Get INSPIRE Media Types" id="8ef21a6b-902d-4585-ae34-e5af27262ef2"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="Get INSPIRE Media Types" id="b759303e-f4cd-4dce-bdca-814f46ad1175" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the list of INSPIRE media types from http://inspire.ec.europa.eu/media-types with 'Accept'-Header 'application/atom+xml'</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/atom+xml" xmlns="http://eviware.com/soapui/config"/></con:setting></con:settings><con:endpoint>http://inspire.ec.europa.eu/media-types</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" id="c947b341-320a-4f0b-96aa-3a351ee25a10" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" name="HTTP status code is 200" id="e3c9511c-4101-4915-81b9-aba6e2072815"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="44852025-6fca-456f-acf1-95e7c7f2dd8a" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-service/3.1/atom-pre-defined/dataset-feed-link-media-type" target="_blank">Abstract Test Case 'Use INSPIRE media-types only'</a>]]></con:description><con:settings/><con:testStep type="properties" name="Transfer_Properties" id="3bda7cfc-b100-44bb-90e6-c3592561f0e1"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>mediaTypes</con:name><con:value>x-shapefilex-filegdbgml+xmlx-gmzvnd.google-earth.kml+xmlvnd.google-earth.kmzx-ecwx-ascii-gridx-oracledumpx-lasx-lazx-tabx-tab-rasterx-worldfile tiffjp2 csv</con:value></con:property><con:property><con:name>mediaTypeUrl</con:name><con:value>https://inspire.ec.europa.eu/media-types/text</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="httprequest" name="Get INSPIRE Media Types" id="8ef21a6b-902d-4585-ae34-e5af27262ef2"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="Get INSPIRE Media Types" id="b759303e-f4cd-4dce-bdca-814f46ad1175" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the list of INSPIRE media types from https://inspire.ec.europa.eu/media-types with 'Accept'-Header 'application/atom+xml'</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/atom+xml" xmlns="http://eviware.com/soapui/config"/></con:setting></con:settings><con:endpoint>https://inspire.ec.europa.eu/media-types</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" id="c947b341-320a-4f0b-96aa-3a351ee25a10" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" name="HTTP status code is 200" id="e3c9511c-4101-4915-81b9-aba6e2072815"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="44852025-6fca-456f-acf1-95e7c7f2dd8a" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="3df8c60f-a520-4f3a-afa0-1446c757112c" name="ID is INSPIRE media types"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equals(
 	"/atom:feed/atom:id",
-	"atom:id", 
-	"http://inspire.ec.europa.eu/media-types"
+	"atom:id",
+	"https://inspire.ec.europa.eu/media-types"
 );</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="groovy" name="Iterate over Media Type entries" id="0b46fce1-085e-4564-b97c-dce9ed762b8f"><con:settings/><con:config><script>import de.interactive_instruments.xtf.*;
 SOAPUI_I.init(log,context,testRunner);
 import de.interactive_instruments.UriUtils;
@@ -812,7 +812,7 @@ ph.setTransferProperty("mediaTypes", "")
 for(int i=0; i &lt; mediaTypeUrls.size(); i++) {
 	final String url = mediaTypeUrls[i];
 	final String baseType = mediaBaseTypes[i];
-			
+
 	log.info("Using URL: "+url)
 	ph.setTransferProperty("mediaTypeUrl", url)
 	ph.runTestStep("Get INSPIRE Media Subtype");
@@ -830,7 +830,7 @@ ph.disableTestSteps(["Get INSPIRE Media Subtype"]);</script></con:config></con:t
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>Transfer_Properties#mediaTypeUrl</con:name><con:value>Transfer_Properties#mediaTypeUrl</con:value><con:style>TEMPLATE</con:style><con:default>Transfer_Properties#mediaTypeUrl</con:default></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="httprequest" name="Get Dataset Feed" id="af1e117e-aac8-4ada-8750-6eaee997df3c"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="e46405cb-0bb3-406c-8bb6-ae9a1dbcf338" name="Get Dataset Feed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the Dataset Feed and check if it contains valid INSPIRE media types</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#TestSuite#feedEntryURL}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b6a56e5f-482f-4b20-85d3-6b052872f9d4" name="HTTP status code is 200"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="f2e49918-0cf7-4e6d-8c6c-941ef3f85113" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="9bc2521f-a127-45d6-aaaa-18f9b623ab84" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:assertion type="XQuery Match" id="b88e3063-f589-47ef-8ef3-18a87d85c4f6" name="Only media types listed in the INSPIRE media-types register at http://inspire.ec.europa.eu/media-types/ shall be used"><con:configuration><path><![CDATA[declare namespace atom='http://www.w3.org/2005/Atom';
+a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:assertion type="XQuery Match" id="b88e3063-f589-47ef-8ef3-18a87d85c4f6" name="Only media types listed in the INSPIRE media-types register at https://inspire.ec.europa.eu/media-types/ shall be used"><con:configuration><path><![CDATA[declare namespace atom='http://www.w3.org/2005/Atom';
 declare namespace georss='http://www.georss.org/georss';
 declare namespace xlink='http://www.w3.org/1999/xlink';
 declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
@@ -839,7 +839,7 @@ declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1
 {
 for $entry in //atom:entry
 where contains('${#mediaTypes}', $entry/atom:link[@rel='alternate']/@type)!=true
-return 
+return
 (<links>$entry/atom:link[@rel='alternate']/@href</links>,
 <ids>$entry/atom:id</ids>,
 <types>$entry/atom:link[@rel='alternate']/@type</types>)
@@ -1056,7 +1056,7 @@ for $entry in //atom:entry[./atom:link[@rel='section'] and count(./atom:link[@re
 return
 concat ("If multiple files are provided, then the links shall be of rel='section' and there shall be a content element or alternate link as a description. The entry with id ", $entry/atom:id ,  " does not have this.")
 }
-&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-04##req34: Only media types listed in the INSPIRE media-types register at http://inspire.ec.europa.eu/media-types/ shall be used." id="4b9ecdf9-3b55-45f6-9343-d08cb5d04b56"><con:configuration><path>declare namespace atom='http://www.w3.org/2005/Atom';
+&lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-04##req34: Only media types listed in the INSPIRE media-types register at https://inspire.ec.europa.eu/media-types/ shall be used." id="4b9ecdf9-3b55-45f6-9343-d08cb5d04b56"><con:configuration><path>declare namespace atom='http://www.w3.org/2005/Atom';
 declare namespace georss='http://www.georss.org/georss';
 declare namespace xlink='http://www.w3.org/1999/xlink';
 declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
@@ -1066,7 +1066,7 @@ declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1
 for $entry in //atom:entry
 where contains('${#mediaTypes}', $entry/atom:link[@rel='alternate']/@type)!=true
 return
-concat("The alternate link ",$entry/atom:link[@rel='alternate']/@href," for entry with id ",$entry/atom:id," offers a media type '",$entry/atom:link[@rel='alternate']/@type,"' that is not in the INSPIRE list at http://inspire.ec.europa.eu/media-types/. ")
+concat("The alternate link ",$entry/atom:link[@rel='alternate']/@href," for entry with id ",$entry/atom:id," offers a media type '",$entry/atom:link[@rel='alternate']/@type,"' that is not in the INSPIRE list at https://inspire.ec.europa.eu/media-types/. ")
 }
 &lt;/result></path><content>&lt;result>AssertionFailures:&lt;/result></content><allowWildcards>false</allowWildcards></con:configuration></con:assertion><con:assertion type="XQuery Match" name="M-04##req35: Each entry shall have an element category for the CRS" id="86273ea9-66e7-41d8-a171-3a8db6cbbcfc"><con:configuration><path>declare namespace atom='http://www.w3.org/2005/Atom';
 declare namespace georss='http://www.georss.org/georss';
@@ -1205,12 +1205,12 @@ def invokedUrls = [] as HashSet
 for( node in getSpatialDataSetUrlTemplates ) {
 	String getSpatialDataSetUrlTemplate = node.attributes.getNamedItem("template").getNodeValue()
 	String mimeType = node.attributes.getNamedItem("type").getNodeValue()
-	
+
 	log.info("Using template URL: "+getSpatialDataSetUrlTemplate);
 	def parameters = UriUtils.getQueryParameters(getSpatialDataSetUrlTemplate, false)
 	final Map&lt;String, String> cleanParameters = new HashMap&lt;String, List&lt;String>>();
 	final String endpoint = UriUtils.withoutQueryParameters(getSpatialDataSetUrlTemplate)
-	
+
 	for(int j=0; j&lt;codes.size(); j++) {
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_code", codes[j] )
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
@@ -1229,7 +1229,7 @@ for( node in getSpatialDataSetUrlTemplates ) {
 					invokedUrls.add(url);
 				}
 			}
-		}		
+		}
 	}
 }</script></con:config></con:testStep><con:testStep type="httprequest" name="Get Spatial Dataset" id="ea92f351-8560-4190-b129-202d1de67410"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="aedd00a3-7612-4084-8c64-19eff6289f73" name="Get Spatial Dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Checks if the content-type of the Get Spatial Dataset response equals the media-type from the Open Search Description document</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${Transfer_Properties#getSpatialDatasetUrl}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="90ac1268-2c6a-46d4-94da-cb1a595847b2" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="4c8b189c-31ec-4098-8f45-6952a58780c6" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="c95e40fe-2036-475c-82d1-60630520a937" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
@@ -1316,12 +1316,12 @@ def invokedUrls = [] as HashSet
 for( node in describeSpatialDataSetUrlTemplates ) {
 	String describeSpatialDataSetUrlTemplate = node.attributes.getNamedItem("template").getNodeValue()
 	String mimeType = node.attributes.getNamedItem("type").getNodeValue()
-	
+
 	log.info("Using template URL: "+describeSpatialDataSetUrlTemplate);
 	def parameters = UriUtils.getQueryParameters(describeSpatialDataSetUrlTemplate, false)
 	final Map&lt;String, String> cleanParameters = new HashMap&lt;String, List&lt;String>>();
 	final String endpoint = UriUtils.withoutQueryParameters(describeSpatialDataSetUrlTemplate)
-	
+
 	for(int j=0; j&lt;codes.size(); j++) {
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_code", codes[j] )
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
@@ -1336,7 +1336,7 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 					ph.runTestStep("Describe Spatial Dataset");
 					invokedUrls.add(url);
 				}
-			}		
+			}
 	}
 }</script></con:config></con:testStep><con:testStep type="httprequest" name="Describe Spatial Dataset" id="1693ebfb-e21b-457b-9fe3-ebee745d2204"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="587079db-efb1-4b30-b66d-8d120515daec" name="Describe Spatial Dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Checks if the content-type of the Get Spatial Dataset response equals the media-type from the Open Search Description document</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${Transfer_Properties#describeSpatialDataSetUrl}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="d77ce483-2a5c-42af-b442-0043e535de70" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="a1a33924-7e37-4ae9-9d59-24c5bf976d8e" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="fbb9511f-dd9a-4be4-b8ba-d35eb2039432" name="Response content-type is a'pplication/atom+xml'"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
@@ -1346,7 +1346,7 @@ if(messageExchange.responseHeaders["Content-Type"]==null) {
 
 if(!messageExchange.responseHeaders['Content-Type'][0].contains("application/atom+xml")) {
 	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "application/atom+xml", "actual", messageExchange.responseHeaders['Content-Type'][0]);
-}</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>Transfer_Properties#describeSpatialDataSetUrl</con:name><con:value>Transfer_Properties#describeSpatialDataSetUrl</con:value><con:style>TEMPLATE</con:style><con:default>Transfer_Properties#describeSpatialDataSetUrl</con:default></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="34cb9ce5-899c-4f79-bfea-80166b6f6287" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Query examples for each dataset" searchProperties="true"><con:description><![CDATA[The test case requests the OpenSearch Description document and checks if it provides a Describe Spatial Dataset and Get Spatial Dataset url. 
+}</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>Transfer_Properties#describeSpatialDataSetUrl</con:name><con:value>Transfer_Properties#describeSpatialDataSetUrl</con:value><con:style>TEMPLATE</con:style><con:default>Transfer_Properties#describeSpatialDataSetUrl</con:default></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="34cb9ce5-899c-4f79-bfea-80166b6f6287" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Query examples for each dataset" searchProperties="true"><con:description><![CDATA[The test case requests the OpenSearch Description document and checks if it provides a Describe Spatial Dataset and Get Spatial Dataset url.
 For each category CRS from the Describe Spatial Dataset response a Get Spatial Dataset request with the CRS, the provided inspire_dls:spatial_dataset_identifier_code and inspire_dls:spatial_dataset_identifier_namespace is invoked.
 <br/>
 <br/>
@@ -1417,12 +1417,12 @@ def invokedUrls = [] as HashSet
 for( node in describeSpatialDataSetUrlTemplates ) {
 	String describeSpatialDataSetUrlTemplate = node.attributes.getNamedItem("template").getNodeValue()
 	String mimeType = node.attributes.getNamedItem("type").getNodeValue()
-	
+
 	log.info("Using template URL: "+describeSpatialDataSetUrlTemplate);
 	def parameters = UriUtils.getQueryParameters(describeSpatialDataSetUrlTemplate, false)
 	final Map&lt;String, String> cleanParameters = new HashMap&lt;String, List&lt;String>>();
 	final String endpoint = UriUtils.withoutQueryParameters(describeSpatialDataSetUrlTemplate)
-	
+
 	for(int j=0; j&lt;codes.size(); j++) {
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_code", codes[j] )
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
@@ -1438,7 +1438,7 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 					ph.runTestStep("Iterate over Get Spatial Dataset URL");
 					invokedUrls.add(url);
 				}
-			}		
+			}
 	}
 }</script></con:config></con:testStep><con:testStep type="httprequest" name="Describe Spatial Dataset" id="8dadd33c-6020-4533-827c-f01dbcebf4f2"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="537e81ea-ecc6-4d0d-a717-0487a31b29b4" name="Describe Spatial Dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Checks if the content-type of the Get Spatial Dataset response equals the media-type from the Open Search Description document</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${Transfer_Properties#describeSpatialDataSetUrl}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b4f5a27b-e2d2-40d0-bcfc-c58962e49e58" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="bc1f86a5-e03a-43de-bb43-124085e61f12" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="e3ad2fd7-379c-4d9f-807f-db7975c3b0e6" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
@@ -1505,12 +1505,12 @@ def invokedUrls = [] as HashSet
 for( node in getSpatialDataSetUrlTemplates ) {
 	String getSpatialDataSetUrlTemplate = node.attributes.getNamedItem("template").getNodeValue()
 	String mimeType = node.attributes.getNamedItem("type").getNodeValue()
-	
+
 	log.info("Using template URL: "+getSpatialDataSetUrlTemplate);
 	def parameters = UriUtils.getQueryParameters(getSpatialDataSetUrlTemplate, false)
 	final Map&lt;String, String> cleanParameters = new HashMap&lt;String, List&lt;String>>();
 	final String endpoint = UriUtils.withoutQueryParameters(getSpatialDataSetUrlTemplate)
-	
+
 	for(int j=0; j&lt;codes.size(); j++) {
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_code", codes[j] )
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
@@ -1529,11 +1529,11 @@ for( node in getSpatialDataSetUrlTemplates ) {
 					invokedUrls.add(url);
 				}
 			}
-		}		
+		}
 	}
 }</script></con:config></con:testStep><con:testStep type="httprequest" name="Get Spatial Dataset" id="3e55838a-6ac8-422c-84f3-a958d9956095"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="63775fb4-531b-4f13-9c75-2d4365bcecb2" name="Get Spatial Dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Checks if the content-type of the Get Spatial Dataset response equals the media-type from the Open Search Description document</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${Transfer_Properties#getSpatialDatasetUrl}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="48c19232-171e-4726-80d5-e8e18c7ac347" name="HTTP status code 200,206,301,302 or 303 is returned"><con:configuration><codes>200,206,301,302,303</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="8bb0253c-0901-4714-babe-8175b5e71aa5" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="71d855f0-318b-4449-87cf-5841eb9f68e2" name="Root element 'feed' exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>Transfer_Properties#getSpatialDatasetUrl</con:name><con:value>Transfer_Properties#getSpatialDatasetUrl</con:value><con:style>TEMPLATE</con:style><con:default>Transfer_Properties#getSpatialDatasetUrl</con:default></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="6b2a0d87-fca5-4e6d-ac49-3c338d08e10a" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="URI to itself" searchProperties="true"><con:description><![CDATA[The test case requests the OpenSearch Description document and checks if it provides a self URL. 
+a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>Transfer_Properties#getSpatialDatasetUrl</con:name><con:value>Transfer_Properties#getSpatialDatasetUrl</con:value><con:style>TEMPLATE</con:style><con:default>Transfer_Properties#getSpatialDatasetUrl</con:default></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="6b2a0d87-fca5-4e6d-ac49-3c338d08e10a" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="URI to itself" searchProperties="true"><con:description><![CDATA[The test case requests the OpenSearch Description document and checks if it provides a self URL.
 <br/>
 <br/>
 Relevant Requirements:
