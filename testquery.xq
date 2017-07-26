@@ -271,15 +271,18 @@ declare function local:check-code-list-values($objects3 as element()*, $objects4
 
 declare function local:check-code-list-values($objects3 as element()*, $objects4 as element()*, $property as xs:string, $uri as xs:string, $level as xs:integer) as element()*
 {
-let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
+let $clname := functx:substring-after-last-match($uri, 'http(s)?://inspire.ec.europa.eu/codelist/')
 let $cluri := $uri || '/' || $clname || '.en.atom'
 let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
 return
 if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' })
 else
+let $normalizedUri := functx:substring-after-last-match($uri, 'http(s)?:')
 let $valuesURI := $clfeed//atom:entry/atom:id/text()
-let $valuesCode := for $value in $valuesURI return fn:substring-after($value, $uri || '/')
-let $objectsWithErrors := ($objects3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $objects4[*[local-name()=$property and not(@xsi:nil='true') and not(@xlink:href=$valuesURI)]])[position() le $limitErrors]
+let $valuesCode := for $value in $valuesURI 
+  let $normalizedCodeUri := functx:substring-after-last-match($value, 'http(s)?:')
+  return fn:substring-after($normalizedCodeUri, $normalizedUri || '/')
+let $objectsWithErrors := ($objects3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $objects4[*[local-name()=$property and not(@xsi:nil='true') and not(functx:substring-after-last-match(@xlink:href, 'http(s)?:')=functx:substring-after-last-match($valuesURI, 'http(s)?:'))]])[position() le $limitErrors]
 let $featuresWithErrors :=
     if ($level=1) then $objectsWithErrors/../..
     else if ($level=2) then $objectsWithErrors/../../../..
@@ -305,7 +308,7 @@ return
 :)
 declare function local:get-code-list-values($url as xs:string) as xs:string*
 {
-let $clname := functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata-)?codelist/)?')
+let $clname := functx:substring-after-last-match($url, 'http(s)?://inspire.ec.europa.eu/((metadata-)?codelist/)?')
 let $clurl := $url || '/' || $clname || '.en.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30, false()) } catch * { false() }
 return
@@ -317,9 +320,12 @@ return
     error((),'Unknown resource type encountered when accessing the atom representation of code list ' || $url || ' at URL ' || $clurl || '.')
   else
       try { 
+        let $normalizedUrl := functx:substring-after-last-match($url, 'http(s)?:')
         let $clfeed := fn:doc($clurl)
         let $codeUris := $clfeed//atom:entry/atom:id/text()
-        let $codes := for $codeUri in $codeUris return fn:substring-after($codeUri, $url || '/')
+        let $codes := for $codeUri in $codeUris
+          let $normalizedCodeUri := functx:substring-after-last-match($codeUri, 'http(s)?:')
+          return fn:substring-after($normalizedCodeUri, $normalizedUrl || '/')
         return
           $codes
         } catch * { 
@@ -332,7 +338,7 @@ return
 :)
 declare function local:get-codes-in-atom-format($url as xs:string, $langId as xs:string) as element()*
 {
-let $clname := if ($url = 'http://inspire.ec.europa.eu/theme') then 'theme' else functx:substring-after-last-match($url, 'http://inspire.ec.europa.eu/((metadata\-)?codelist/)?')
+let $clname := if (matches($url, 'http(s)?://inspire.ec.europa.eu/theme')) then 'theme' else functx:substring-after-last-match($url, 'http(s)?://inspire.ec.europa.eu/((metadata\-)?codelist/)?')
 let $clurl := $url || '/' || $clname || '.' || $langId || '.atom'
 let $valid_clurl := try { local:check-resource-uri($clurl, 30, false()) } catch * { false() }
 return
@@ -398,14 +404,14 @@ declare function local:is-valid-date-or-dateTime($dateString as xs:string?) as x
 
 declare function local:testDesignationConstraint($features3 as element()*, $features4 as element()*, $scheme as xs:string, $codelist as xs:string ) as element()*
 {
-let $allowedValuesURI := local:getAllowedValuesURI( 'http://inspire.ec.europa.eu/codelist/' || $codelist )
+let $allowedValuesURI := local:getAllowedValuesURI( 'https://inspire.ec.europa.eu/codelist/' || $codelist )
 let $allowedValuesCode := local:getAllowedValuesCode( $allowedValuesURI, $codelist )
 let $valuesCode := fn:distinct-values($features3/ps3:siteDesignation/*[ps3:designationScheme=$scheme]/ps3:designation/text())
-let $valuesURI := fn:distinct-values($features4/ps:siteDesignation/*[ps:designationScheme=concat('http://inspire.ec.europa.eu/codelist/DesignationSchemeValue/',$scheme)]/ps:designation/@xlink:href)
+let $valuesURI := fn:distinct-values($features4/ps:siteDesignation/*[ps:designationScheme/@xlink:href=concat('https://inspire.ec.europa.eu/codelist/DesignationSchemeValue/',$scheme)]/ps:designation/@xlink:href)
 let $badvaluesCode := functx:value-except($valuesCode,$allowedValuesCode)
 let $badvaluesURI := functx:value-except($valuesURI,$allowedValuesURI)
 let $featuresWithErrors3 := $features3[ps3:siteDesignation/*[ps3:designationScheme=$scheme]/ps3:designation/text()=$badvaluesCode]
-let $featuresWithErrors4 := $features4[ps:siteDesignation/*[ps:designationScheme=$scheme]/ps:designation/@xlink:href=$badvaluesURI]
+let $featuresWithErrors4 := $features4[ps:siteDesignation/*[ps:designationScheme/@xlink:href=concat('https://inspire.ec.europa.eu/codelist/DesignationSchemeValue/',$scheme)]/ps:designation/@xlink:href=$badvaluesURI]
 return
 (for $feature in $featuresWithErrors3
    order by $feature/@gml:id
@@ -414,14 +420,14 @@ return
      local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Sites must use designations from an appropriate designation scheme.', 'additionalInfo': 'For designation scheme ''' || $scheme || ''' the following disallowed value(s) have been used: ' || string-join($values,', ') || '. Allowed values are: ' || string-join($allowedValuesCode,', ') || '.' }),
  for $feature in $featuresWithErrors4
    order by $feature/@gml:id
-   let $values := $feature/ps:siteDesignation/*[ps:designationScheme=$scheme]/ps:designation/@xlink:href[.=$badvaluesURI]
+   let $values := $feature/ps:siteDesignation/*[ps:designationScheme/@xlink:href=concat('https://inspire.ec.europa.eu/codelist/DesignationSchemeValue/',$scheme)]/ps:designation/@xlink:href[.=$badvaluesURI]
    return
      local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Sites must use designations from an appropriate designation scheme.', 'additionalInfo': 'For designation scheme ''' || $scheme || ''' the following disallowed value(s) have been used: ' || string-join($values,', ') || '. Allowed values are: ' || string-join($allowedValuesURI,', ') || '.' }))
 };
 
 declare function local:getAllowedValuesURI( $uri as xs:string ) as xs:string*
 {
-  let $clname := fn:substring-after($uri, 'http://inspire.ec.europa.eu/codelist/')
+  let $clname := functx:substring-after-last-match($uri, 'http(s)?://inspire.ec.europa.eu/codelist/')
   let $cluri := $uri || '/' || $clname || '.en.atom'
   let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
   return
