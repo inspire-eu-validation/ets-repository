@@ -758,13 +758,37 @@ final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS)
 a.notExists(
   "//atom:entry[count(atom:category[string-length(@term)>0 and string-length(@label)>0])&lt;1]",
   "TR.missingCategory"
-);</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="transfer" name="Property Transfer" id="a0a2ff26-1e10-40ab-960c-4423c452a197"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>Categories</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>Get Service Feed</con:sourceStep><con:sourcePath>string-join(//*:entry/*:category[string-length(@term)>0 and string-length(@label)>0]/@term, ',')</con:sourcePath><con:targetType>categories</con:targetType><con:targetStep>Transfer_Properties</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="httprequest" name="Get Dataset Feed" id="76d165b9-d41b-45eb-b7e6-27fc900f7f15"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="e3bc1024-36a3-4a7a-804d-f9c1da35c6a4" name="Get Dataset Feed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#TestSuite#feedEntryURL}</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" id="a2fd9611-3fc5-4fb3-a708-e5400fd2b9c0" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" id="03b95227-e284-4279-87f2-9928c6a4eccc" name="HTTP status code is 200"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="450d4218-9461-496d-aa2f-33a2b3b8389b" name="Root element 'feed' exists"><con:configuration/></con:assertion><con:assertion type="GroovyScriptAssertion" id="acf3709f-6fc4-4d4c-b025-2b49f702bbc5" name="Alternative link types are unique"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+);</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="transfer" name="Property Transfer" id="a0a2ff26-1e10-40ab-960c-4423c452a197"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>Categories</con:name><con:sourceType>ResponseAsXml</con:sourceType><con:sourceStep>Get Service Feed</con:sourceStep><con:sourcePath>string-join(//*:entry/*:category[string-length(@term)>0 and string-length(@label)>0]/@term, ',')</con:sourcePath><con:targetType>categories</con:targetType><con:targetStep>Transfer_Properties</con:targetStep><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="httprequest" name="Get Dataset Feed" id="76d165b9-d41b-45eb-b7e6-27fc900f7f15"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="e3bc1024-36a3-4a7a-804d-f9c1da35c6a4" name="Get Dataset Feed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Requests the Dataset Feed and checks the CRS and alternate link combinations.</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#TestSuite#feedEntryURL}</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" id="a2fd9611-3fc5-4fb3-a708-e5400fd2b9c0" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" id="03b95227-e284-4279-87f2-9928c6a4eccc" name="HTTP status code is 200"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="450d4218-9461-496d-aa2f-33a2b3b8389b" name="Root element 'feed' exists"><con:configuration/></con:assertion><con:assertion type="GroovyScriptAssertion" id="c15a6218-8819-40b8-a364-eb9720a3838b" name="Exactly one category per entry"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.equalPathValues(
-	"count(//atom:entry[./atom:link[@rel='alternate']]/atom:link/@type)",
-	"count(distinct-values(//atom:entry[./atom:link[@rel='alternate']]/atom:link/@type))",
-	"TR.uniqueAlternateLinkTypes"
-);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="e118dccc-6f1b-4376-a577-7e8ae13cd41e" name="Category terms in this Dataset feed exist in the Download Service Feed"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+a.equals(
+	"count(//atom:entry[count(atom:category[@term])>1])",
+	"//atom:entry[count(atom:category[@term])>1]",
+	"0",
+	"TR.exactlyOneCategoryPerEntry"
+);</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="acf3709f-6fc4-4d4c-b025-2b49f702bbc5" name="Exactly one alternate link type per Dataset feed entry"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+a.equals(
+	"count(//atom:entry[count(distinct-values(atom:link[@rel='alternate']/@type))>1])",
+	"//atom:entry[count(distinct-values(atom:link[@rel='alternate']/@type))>1]",
+	"0",
+	"TR.exactlyOneAlternateLinkTypePerEntry"
+);</scriptText></con:configuration></con:assertion><con:assertion type="XQuery Match" id="81bdd847-687d-4597-ba58-99963ff3635a" name="Alternate link types and CRS combinations are unique"><con:configuration><path><![CDATA[<etfTranslate what='TR.uniqueAlternateLinkTypes'>
+{
+
+    let $sortedValues := for $entry in //*:entry
+    order by $entry/*:category[1]/@term, $entry/*:link[@rel = 'alternate'][1]/@type
+    return concat('CRS ', $entry/*:category[1]/@term, ' with type ', $entry/*:link[@rel = 'alternate'][1]/@type, '   ')
+    
+    let $duplicates := $sortedValues[let $pos := position() return . = $sortedValues[$pos+1]]
+    let $duplicateCount := count( $duplicates )
+    let $distinctDuplicates := distinct-values( $duplicates )
+    
+    return if ($duplicateCount > 0) then 
+        (<count> { $duplicateCount } </count>,<duplicates> { $distinctDuplicates } </duplicates>) 
+        else ()
+
+}
+</etfTranslate>]]></path><content>&lt;etfTranslate what='TR.uniqueAlternateLinkTypes'/></content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="e118dccc-6f1b-4376-a577-7e8ae13cd41e" name="Category terms in this Dataset feed exist in the Download Service Feed"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 final String terms = context.expand( '${Transfer_Properties#categories}' );
