@@ -275,14 +275,14 @@ let $clname := functx:substring-after-last-match($uri, 'http(s)?://inspire.ec.eu
 let $cluri := $uri || '/' || $clname || '.en.atom'
 let $clfeed := if (fn:doc-available($cluri)) then fn:doc($cluri) else ()
 return
-if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || 'cannot be accessed.' })
+if (not($clfeed)) then local:addMessage('TR.systemError', map { 'text': 'Code list ' || $uri || ' cannot be accessed.' })
 else
 let $normalizedUri := functx:substring-after-last-match($uri, 'http(s)?:')
-let $valuesURI := $clfeed//atom:entry/atom:id/text()
-let $valuesCode := for $value in $valuesURI 
-  let $normalizedCodeUri := functx:substring-after-last-match($value, 'http(s)?:')
-  return fn:substring-after($normalizedCodeUri, $normalizedUri || '/')
-let $objectsWithErrors := ($objects3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $objects4[*[local-name()=$property and not(@xsi:nil='true') and not(functx:substring-after-last-match(@xlink:href, 'http(s)?:')=functx:substring-after-last-match($valuesURI, 'http(s)?:'))]])[position() le $limitErrors]
+let $normalizedValuesUri := for $valueUri in $clfeed//atom:entry/atom:id/text()
+  return functx:substring-after-last-match($valueUri, 'http(s)?:')
+let $valuesCode := for $value in $normalizedValuesUri 
+  return fn:substring-after($value, $normalizedUri || '/')
+let $objectsWithErrors := ($objects3[*[local-name()=$property and not(@xsi:nil='true') and not(text()=$valuesCode)]] | $objects4[*[local-name()=$property and not(@xsi:nil='true') and not(functx:substring-after-last-match(@xlink:href, 'http(s)?:')=$normalizedValuesUri)]])[position() le $limitErrors]
 let $featuresWithErrors :=
     if ($level=1) then $objectsWithErrors/../..
     else if ($level=2) then $objectsWithErrors/../../../..
