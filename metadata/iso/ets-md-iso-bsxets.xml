@@ -84,7 +84,7 @@ The title is a characteristic, and often unique, name by which the resource is k
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $title := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:title/*
+	 let $title := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:title/*[1]
 	 return
 	 if (not($title)) then
 		local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
@@ -115,7 +115,7 @@ The abstract is a brief narrative summary of the content of the resource and pro
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $abstract := $record/gmd:identificationInfo[1]/*/gmd:abstract/*
+	 let $abstract := $record/gmd:identificationInfo[1]/*/gmd:abstract/*[1]
 	 return
 	 if (not($abstract)) then
 		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
@@ -155,7 +155,7 @@ The basic test to detect missing or empty use limitation information is executed
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $useLimitations := $record/gmd:identificationInfo[1]/*/gmd:resourceConstraints/*/gmd:useLimitation/*
+	 let $useLimitations := $record/gmd:identificationInfo[1]/*/gmd:resourceConstraints/*/gmd:useLimitation/*[1]
 	 return
 	 if (not($useLimitations)) then
 		local:addMessage('TR.noUseLimitation', map { 'filename': local:filename($record), 'id': $rid })
@@ -170,7 +170,7 @@ return
  else
   for $record in $records
 	let $rid := $record/gmd:fileIdentifier/*/text()
-	let $useLimitations := $record/gmd:identificationInfo[1]/*/gmd:resourceConstraints/*/gmd:useLimitation/*
+	let $useLimitations := $record/gmd:identificationInfo[1]/*/gmd:resourceConstraints/*/gmd:useLimitation/*[1]
 	 return
 	  if (some $useLim in $useLimitations satisfies string-length(normalize-space($useLim/text())) &gt; 0) then 
 	  local:addMessage('TR.checkUseLimitation', map { 'filename': local:filename($record), 'id': $rid, 'text': string-join($useLimitations, '; ') })
@@ -261,12 +261,12 @@ let $messages :=
 	 else
 	 for $spec in $specifications
 		return
-		if (not($spec/gmd:CI_Citation/gmd:title/*[string-length(normalize-space(text())) &gt; 0])) then
+		if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
 			local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
-			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*/text() })
+			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 		else if (not($spec/ancestor::gmd:DQ_DomainConsistency)) then
-			local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*/text() })
+			local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 		else ()
 	)[position() le $limitErrors]
 return
@@ -342,8 +342,8 @@ let $messages :=
 	 let $pocs := $record/gmd:contact/* (: At least one gmd:contact is required - the XML Schema validation checks whether this condition is met. :)
 	 return
 		for $poc in $pocs
-		let $organisationName := $poc/gmd:organisationName/*
-		let $emails := $poc/gmd:contactInfo/*/gmd:address/*/gmd:electronicMailAddress/*/text()
+		let $organisationName := $poc/gmd:organisationName/*[1]
+		let $emails := $poc/gmd:contactInfo/*/gmd:address/*/gmd:electronicMailAddress/*[1]/text()
 		return 
 		(if (not($organisationName) or string-length(normalize-space($organisationName/text())) = 0) then
 			local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid }) else (),
@@ -463,8 +463,8 @@ let $messages :=
 		local:addMessage('TR.noPointOfContact', map { 'filename': local:filename($record), 'id': $rid })
 	 else
 		for $poc in $pocs
-		let $organisationName := $poc/gmd:organisationName/*
-		let $emails := $poc/gmd:contactInfo/*/gmd:address/*/gmd:electronicMailAddress/*/text()
+		let $organisationName := $poc/gmd:organisationName/*[1]
+		let $emails := $poc/gmd:contactInfo/*/gmd:address/*/gmd:electronicMailAddress/*[1]/text()
 		return 
 		(if (not($organisationName) or string-length(normalize-space($organisationName/text())) = 0) then
 			local:addMessage('TR.noPOCOrganisationName', map { 'filename': local:filename($record), 'id': $rid }) else (),
@@ -921,7 +921,7 @@ let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListV
 let $messages :=   
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $lineageStatement := $record/gmd:dataQualityInfo/*/gmd:lineage/*/gmd:statement/*
+	 let $lineageStatement := $record/gmd:dataQualityInfo/*/gmd:lineage/*/gmd:statement/*[1]
 	 return 
 	 if (count($lineageStatement) ne 1) then
 		local:addMessage('TR.wrongNumberOfLineageStatements',  map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($lineageStatement)) })
@@ -981,7 +981,7 @@ let $messages :=
 		return
 		(for $record in $recordsToInspect
 		 let $rid := $record/gmd:fileIdentifier/*/text()
-		 let $type := $record/gmd:identificationInfo/*/srv:serviceType/*/text()
+		 let $type := $record/gmd:identificationInfo/*/srv:serviceType/*[1]/text()
 		 return
 		 if (not(count($type) = 1)) then
 			local:addMessage('TR.exactlyOneServiceType', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($type)) })
@@ -1155,7 +1155,7 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $keywords := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:keyword/*
+	 let $keywords := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:keyword/*[1]
 	 return
 	 if (not($keywords)) then
 		local:addMessage('TR.noKeywords', map { 'filename': local:filename($record), 'id': $rid })
@@ -1308,7 +1308,7 @@ Relevant requirement(s):</p>
 let $messages :=    
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $thesaurusTitles := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text()
+	 let $thesaurusTitles := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*[1]/text()
 	 let $duplicateTitles := $thesaurusTitles[index-of($thesaurusTitles,.)[2]]
 	 return 
 	 if (count($duplicateTitles) &gt; 0) then
@@ -1351,8 +1351,8 @@ let $messages :=
 	 return
 	 if (not($thesauri)) then ()
 	 else for $thesaurus in $thesauri
-		let $title := $thesaurus/*/gmd:title/*/text()
-		let $keywords := string-join($thesaurus/../gmd:keyword/*/text(), '; ')
+		let $title := $thesaurus/*/gmd:title/*[1]/text()
+		let $keywords := string-join($thesaurus/../gmd:keyword/*[1]/text(), '; ')
 		let $hasExpectedDate := boolean($thesaurus/*/gmd:date/*[gmd:date/*/text() and gmd:dateType/*/@codeListValue = ('publication','revision','creation')])
 		return
 		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords }) 
