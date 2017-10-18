@@ -83,8 +83,8 @@ let $uris :=
 let $urimap := local:check-resource-uris($uris, 30, true())
 let $errorregex := '(^notHTTP$|^idNotFound$|^EXCEPTION|^\d{3}$)'
 let $featuresWithErrors := if (count($uris)=0) then () else
-	$featuresToInspect[*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] or
-		*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]][position() le $limitErrors]
+	$featuresToInspect[*:siteDesignation/*/*:designationScheme[@xlink:href and matches(map:get($urimap,@xlink:href),$errorregex)] or
+		*:siteDesignation/*/*:designation[@xlink:href and matches(map:get($urimap,@xlink:href),$errorregex)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else if ($features[self::ps3:ProtectedSite]) then 'PASSED_MANUAL' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
