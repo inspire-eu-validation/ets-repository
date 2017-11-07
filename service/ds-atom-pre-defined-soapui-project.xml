@@ -691,8 +691,11 @@ SOAPUI_I.init(log, context, messageExchange)
 final ProjectHelper ph = new ProjectHelper()
 final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
-a.notExists(
-  "//atom:entry/atom:link[(@rel='alternate' and @type!='application/atom+xml' and number(@length) > 0) or (@rel='section')]"
+a.isTrue(
+  "count(//*:entry/*:link[(@rel='alternate' and @type!='application/atom+xml') or (@rel='section')])=1 or "+ 
+  "count(//*:entry/*:link[(@rel='alternate' and @type!='application/atom+xml') or (@rel='section')]/@hreflang) = "+ 
+  "count(//*:entry/*:link[(@rel='alternate' and @type!='application/atom+xml') or (@rel='section')])",
+  "TR.missingLanguageForDownloadLink"
 );</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="55c069c6-94a5-4651-9af9-8246cc146022" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Links for Spatial Object Types" searchProperties="true"><con:description><![CDATA[
 Test if the dataset feed contains at least one link to a registry
 <br/>
