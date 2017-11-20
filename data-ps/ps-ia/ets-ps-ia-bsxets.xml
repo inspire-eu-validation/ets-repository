@@ -12,11 +12,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
   <reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.2.2</version>
+	<version>0.2.3</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-05-16T13:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2017-10-18T13:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDb1b53238-efe4-4975-8e2d-a194c20a2e74"/>
 	</tags>
@@ -83,8 +83,8 @@ let $uris :=
 let $urimap := local:check-resource-uris($uris, 30, true())
 let $errorregex := '(^notHTTP$|^idNotFound$|^EXCEPTION|^\d{3}$)'
 let $featuresWithErrors := if (count($uris)=0) then () else
-	$featuresToInspect[*:siteDesignation/*/*:designationScheme[matches(map:get($urimap,@xlink:href),$errorregex)] or
-		*:siteDesignation/*/*:designation[matches(map:get($urimap,@xlink:href),$errorregex)]][position() le $limitErrors]
+	$featuresToInspect[*:siteDesignation/*/*:designationScheme[@xlink:href and matches(map:get($urimap,@xlink:href),$errorregex)] or
+		*:siteDesignation/*/*:designation[@xlink:href and matches(map:get($urimap,@xlink:href),$errorregex)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else if ($features[self::ps3:ProtectedSite]) then 'PASSED_MANUAL' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
