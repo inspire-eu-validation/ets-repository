@@ -456,7 +456,7 @@ let $geometryParsingErrors :=
     return 
     if ($geom) then 
       try { 
-        prof:void(ggeo:index(db:node-pre($feature),db:name($feature),$feature/@gml:id,$geom)) } 
+        prof:void(ggeo:index($feature,$feature/@gml:id,$geom)) } 
       catch * { 
         map:entry($feature/@gml:id,$err:description)
       }
