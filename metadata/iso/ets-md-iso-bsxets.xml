@@ -1105,7 +1105,7 @@ let $messages :=
 				let $root := fn:doc($url)/element()
 				return
 				if ($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]) then ()
-				else local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': $root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue }) 
+				else local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) }) 
 			} catch * { 
 				local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
 			}
