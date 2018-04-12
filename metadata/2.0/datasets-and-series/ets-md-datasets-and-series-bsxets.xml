@@ -15,7 +15,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-se
 Pre-requisite conformance classes: Common Requirements
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank"></a></li></ul>]]>
 	</description>
-	<reference>../../inspire-md-bsxets.xq</reference>
+	<reference>../../../inspire-md-bsxets.xq</reference>
 	<version>0.2.5</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-30T00:00:00Z</creationDate>
@@ -46,9 +46,6 @@ Pre-requisite conformance classes: Common Requirements
 	<supportedTestObjectTypes>
 		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
 	</supportedTestObjectTypes>
-	<dependencies>
-		<!--<executableTestSuite ref="EIDe3500038-e37c-4dcf-806c-6bc82d585b3b"/>-->
-	</dependencies>
 	<testModules>
 		<TestModule id="EIDfdc858d9-6a37-4dad-b74b-43b53a8b38dd">
 			<label>IGNORE</label>
@@ -107,11 +104,11 @@ return
 						<TestStep id="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141">
 							<label>IGNORE</label>
 							<description>IGNORE</description>
-							<parent ref="EID979c19da-48f9-416d-b751-37ef13912bc6"/>
+							<parent ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<statementForExecution>not applicable</statementForExecution>
-							<testItemType ref="EID979c19da-48f9-416d-b751-37ef13912bc6"/>
+							<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 							<testAssertions>
-								<TestAssertion id="EIDcacf6ca7-b5df-49e3-8577-dbc76cd6d72a">
+								<TestAssertion id="EIDfeb08775-3d07-4849-bd27-3a549c92d289">
 									<label>md datasets-and-series 1.2: Only one identification info section</label>
 									<description><![CDATA[<p>The test checks if a property of gmd:MD_Metadata element shall contain only one gmd:MD_DataIdentification element.</p>
 <p>This test case only applies to records with a hierarchyLevel value 'dataset' or 'series'.</p><p>Requirement involved:</p>
@@ -137,7 +134,7 @@ return
 										<translationTemplate ref="TR.identificationInfo"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EIDfeb08775-3d07-4849-bd27-3a549c92d289">
+								<TestAssertion id="EID06911d33-b5a3-4b76-b8ee-d473ebf3c8f4">
 									<label>md datasets-and-series 1.3: Unique resource identifier</label>
 									<description>
 <![CDATA[<p>A unique identifier identifying the resource must be given.</p><p>The test first checks, if a unique identifier is given and if it is of type MD_Identifier or RS_Identifier. The contained code element may not be empty.</p><p>This test case only applies to records with a hierarchyLevel value 'dataset' or 'series'.</p><p>Requirement involved:</p><ul><li><a target="">TG MD, 3.1.2.1 - Req 1.3</a></li></ul><p>Source:  Abstract Test Case 'Unique resource identifier'</p>]]></description>
@@ -146,24 +143,26 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $distinctRecordIdentifiers :=   for $rec in $records
-  return
+let $distinctRecordIdentifiers :=   
+	for $rec in $records
+  	return
     distinct-values($rec/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*/text())
 let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($distinctRecordIdentifiers,.)[2]]
-let $messages := 	(for $record in $recordsToInspect
-	 let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
-	 let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*/text()
-	 return
-	 if (not($identifiers)) then
-		local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-	 else
-		for $identifier in $identifiers
+let $messages := 	
+	(for $record in $recordsToInspect
+		let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+		let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*/text()
 		return
-		if (string-length(normalize-space($identifier)) = 0) then
-			local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-		else if ($identifier = $duplicateDistinctRecordIdentifiers) then
-			local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': $identifier })
-		else ()
+		if (not($identifiers)) then
+			local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+		else
+			for $identifier in $identifiers
+			return
+			if (string-length(normalize-space($identifier)) = 0) then
+				local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+			else if ($identifier = $duplicateDistinctRecordIdentifiers) then
+				local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': $identifier })
+			else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -200,14 +199,14 @@ let $messages :=
 			let $codeValues := local:get-code-list-values($inspireThemesCodeListURL)
 			let $codes := ($codeTitles,$codeValues)
 			return
-			(for $record in $recordsToInspect
-			 let $rid := $record/gmd:fileIdentifier/*/text()
-			 let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/CI_Citation/gmd:title/*/text() = $THEMES_TITLE]
-			 return 			 			 
-			 if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
-				local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
-			 else ()
-			)[position() le $limitErrors]
+				(for $record in $recordsToInspect
+					let $rid := $record/gmd:fileIdentifier/*/text()
+					let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/CI_Citation/gmd:title/*/text() = $THEMES_TITLE]
+					return 			 			 
+					if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
+						local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
+					else ()
+				)[position() le $limitErrors]
 		} catch * {       						
 			local:addMessage('TR.systemError',  map { 'text': $err:description }) 				
 		}
@@ -233,17 +232,18 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $messages := 	(for $record in $recordsToInspect
-	 let $countResolutions := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution)
-	 let $countScale := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale)
-	 let $countDistance := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance)
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 return
-	 if (($countResolutions &gt; 0) and ($countScale = 0) and ($countDistance = 0)) then
-	 	local:addMessage('TR.noResolutions', map { 'filename': local:filename($record), 'id': $rid })
-	 else if (($countScale &gt; 0) and ($countDistance &gt; 0)) then
-		local:addMessage('TR.mixedResolutions', map { 'filename': local:filename($record), 'id': $rid })
-	 else ()
+let $messages := 	
+	(for $record in $recordsToInspect
+		let $countResolutions := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution)
+		let $countScale := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale)
+		let $countDistance := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance)
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		return
+		if (($countResolutions &gt; 0) and ($countScale = 0) and ($countDistance = 0)) then
+			local:addMessage('TR.noResolutions', map { 'filename': local:filename($record), 'id': $rid })
+		else if (($countScale &gt; 0) and ($countDistance &gt; 0)) then
+			local:addMessage('TR.mixedResolutions', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -271,18 +271,18 @@ let $codes := ('aar','abk','ace','ach','ada','ady','afa','afh','afr','ain','aka'
 let $messages :=    	
 	if (not($recordsToInspect)) then ()
 	else
-	(for $record in $recordsToInspect    		 
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode	 	 
-	 return
-	 if (not($languageCodes)) then
-		local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
-	 else 		
-		let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
-		return
-		if ($wrongCodeValues) then
-			local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-		else ()     	
+		(for $record in $recordsToInspect    		 
+			let $rid := $record/gmd:fileIdentifier/*/text()
+			let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode	 	 
+			return
+			if (not($languageCodes)) then
+				local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
+			else 		
+				let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
+				return
+				if ($wrongCodeValues) then
+					local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
+				else ()     	
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -307,19 +307,20 @@ return
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $codes := ('biota','boundaries','climatologyMeteorologyAtmosphere','economy','elevation','environment','farming','geoscientificInformation','health','imageryBaseMapsEarthCover','inlandWaters','intelligenceMilitary','location','oceans','planningCadastre','society','structure','transportation','utilitiesCommunication')
-let $messages :=   	(for $record in $recordsToInspect
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $topicCategories := $record/gmd:identificationInfo[1]/*/gmd:topicCategory/*
-	 return 	 
-	 if (not($topicCategories[self::gmd:MD_TopicCategoryCode])) then
-		local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
-	 else 
-	 	let $topic := fn:string($record/gmd:identificationInfo[1]/*/gmd:topicCategory/gmd:MD_TopicCategoryCode)
-		let $wrongCodeValues := $topic[not(. = $codes)]
-		return
-		if ($wrongCodeValues) then
-			local:addMessage('TR.invalidTopicCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-		else ()
+let $messages :=   	
+	(for $record in $recordsToInspect
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $topicCategories := $record/gmd:identificationInfo[1]/*/gmd:topicCategory/*
+		return 	 
+		if (not($topicCategories[self::gmd:MD_TopicCategoryCode])) then
+			local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
+		else 
+			let $topic := fn:string($record/gmd:identificationInfo[1]/*/gmd:topicCategory/gmd:MD_TopicCategoryCode)
+			let $wrongCodeValues := $topic[not(. = $codes)]
+			return
+			if ($wrongCodeValues) then
+				local:addMessage('TR.invalidTopicCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
+			else ()
 
 	)[position() le $limitErrors] 
 return
@@ -342,9 +343,6 @@ return
 					<label>Distribution</label>
 					<description>Execute tests that apply for all dataset / dataset series metadata records on elements that are child elements of the section of the XML document: Distribution Information (property of the gmd:MD_Metadata element). This section contains information about who makes a resource available and how to get it.</description>
 					<parent ref="EIDfdc858d9-6a37-4dad-b74b-43b53a8b38dd"/>
-					<dependencies>
-						<testCase ref="EID2ee0045f-cf8d-4979-9d7d-76cb465a0314"/>
-					</dependencies>
 					<testSteps>
 						<TestStep id="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef">
 							<label>IGNORE</label>
@@ -362,13 +360,14 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $messages := 	(for $record in $recordsToInspect
-	let $rid := $record/gmd:fileIdentifier/*/text()
-  	let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()
-	return
-	if (not($urls)) then
-		local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
-	else ()
+let $messages := 	
+	(for $record in $recordsToInspect
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()
+		return
+		if (not($urls)) then
+			local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -391,16 +390,17 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $messages := 	(for $record in $recordsToInspect
-	let $rid := $record/gmd:fileIdentifier/*/text()
-	let $dataQuality := $record/gmd:dataQualityInfo[count(gmd:DQ_DataQuality)=1]
-	let $codelist := $record[gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = $levels]
-	return 	 
-	if (not($dataQuality)) then
-		local:addMessage('TR.wrongNumberOfDataQuality', map { 'filename': local:filename($record), 'id': $rid })
-	else if (not($codelist)) then
-		local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
-	else ()
+let $messages := 	
+	(for $record in $recordsToInspect
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $dataQuality := $record/gmd:dataQualityInfo[count(gmd:DQ_DataQuality)=1]
+		let $codelist := $record[gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = $levels]
+		return 	 
+		if (not($dataQuality)) then
+			local:addMessage('TR.wrongNumberOfDataQuality', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($codelist)) then
+			local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -455,7 +455,7 @@ let $messages :=
 					local:addMessage('TR.noDateForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
 				else if (not($dateLength = 8) and not($dateLength = 10)) then
 					local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
+				else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication')])) then
 					local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
 				(:else if (not($spec/ancestor::gmd:DQ_DomainConsistency)) then:)
 					(:local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title }):)
