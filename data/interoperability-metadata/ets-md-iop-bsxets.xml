@@ -162,11 +162,11 @@ let $messages :=
 		local:addMessage('TR.noEncoding', map { 'filename': local:filename($record), 'id': $rid })
 	 else for $format in $formats
 	   return 
-	   (if ($format/gmd:MD_Format/gmd:name/gco:CharacterString) then () else
+	   (if ($format/gmd:MD_Format/gmd:name/*) then () else
 		 local:addMessage('TR.incompleteEncoding', map { 'filename': local:filename($record), 'id': $rid, 'missing': 'name' }),
-	    if ($format/gmd:MD_Format/gmd:version/gco:CharacterString) then () else
+	    if ($format/gmd:MD_Format/gmd:version/*) then () else
 		 local:addMessage('TR.incompleteEncoding', map { 'filename': local:filename($record), 'id': $rid, 'missing': 'version' }),
-	    if ($format/gmd:MD_Format/gmd:specification/gco:CharacterString) then () else
+	    if ($format/gmd:MD_Format/gmd:specification/*) then () else
 		 local:addMessage('TR.incompleteEncoding', map { 'filename': local:filename($record), 'id': $rid, 'missing': 'specification' }))
 	)[position() le $limitErrors]
 return
