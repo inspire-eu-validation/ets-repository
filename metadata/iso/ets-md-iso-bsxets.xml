@@ -1357,6 +1357,10 @@ let $messages :=
 		return
 		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords }) 
 		 else if (string-length(normalize-space($title)) = 0) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords })
+		 else if ($title = 'GEMET - INSPIRE themes, version 1.0') then
+			if ($thesaurus/*/gmd:date/*[gmd:date/*/text() != '2008-06-01' or gmd:dateType/*/@codeListValue != 'publication']) then 
+				local:addMessage('TR.invalidDateForThesaurusGemet',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords })				
+			else()
 		 else (),
 		 if (not($hasExpectedDate)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title) then $title else '', 'keywords' : $keywords }) else ()
 		)
