@@ -251,24 +251,27 @@ Relevant requirement(s):</p>
 <p>Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/ds-specification" target="_blank">Abstract Test Case 'Dataset specification'</a></p>]]></description>
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>
+									<expression>									
 let $messages := 
 	(for $record in $records
+	 let $existDQ_ConformanceResult := false
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/*/gmd:specification
-	 return 
+	 let $DQ_ConformanceResults := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+	 return (
+	 if (not($DQ_ConformanceResults)) then 
+		local:addMessage('TR.noDQConformanceResults', map { 'filename': local:filename($record), 'id': $rid })
+	 else (),
 	 if (not($specifications)) then () (: Only failure situations are reported, no warnings :)
 	 else
-	 for $spec in $specifications
+	 for $spec in $specifications 
 		return
 		if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
 			local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
 			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
-		else if (not($spec/ancestor::gmd:DQ_DomainConsistency)) then
-			local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 		else ()
-	)[position() le $limitErrors]
+	))[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -278,7 +281,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.noTitleForSpecification"/>
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
-										<translationTemplate ref="TR.noDQDomainConsistencyParent"/>
+										<translationTemplate ref="TR.noDQConformanceResults"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
