@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID8aaef94b-6a4d-47ab-a5d0-70ad5cb28b08" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID8aaef94b-6a4d-47ab-a5d0-70ad5cb28b08" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
 	<itemHash>bQ==</itemHash>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-ad/ad-as</remoteResource>
 	<localPath>/auto</localPath>
@@ -352,9 +352,9 @@ let $featuresWithErrors :=
 	    let $element := map:get($map, fn:string($href))
 	    return
 	    if (not($element)) then () (: ignore unresolvable links here, this is handled by the information accessibility tests :)
-	    else 
+	    else
 	    	if (not($element[self::*:AdminUnitName])) then () (: ignore non AdminUnitName components :)
-	    	else 
+	    	else
 	    		if ($element/ad3:level/text()='1stOrder' or $element/ad:level/@xlink:href='http://inspire.ec.europa.eu/codelist/AdministrativeHierarchyLevel/1stOrder') then
 	    			$element
 	    		else ()
@@ -364,7 +364,7 @@ let $featuresWithErrors :=
 	else $candidate
 )[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
@@ -392,7 +392,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-as/constraint
 									<expression>
 let $featuresWithErrors := $features[self::*:Address and (count(*:position/*:GeographicPosition/*:default[text()='true']) ne 1)][position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED', 
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
@@ -561,14 +561,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ad/3.1/ad-as/country-ad
 									<expression>
 let $Addresses := $features[self::*:Address]
 let $CountAddresses := count($Addresses)
-let $map := map:merge( 
+let $map := map:merge(
   for $Address at $pos in $Addresses
   let $nodes := $Address/*:component/@xlink:href | $Address/*:locator/*:AddressLocator/*:designator/*:LocatorDesignator/*:designator | $Address/*:locator/*:AddressLocator/*:name/*:LocatorName/*:name
   return map { $pos : string-join(functx:sort($nodes),';') }
 )
 let $values := map:for-each( $map, function($key, $val){ $val })
 let $duplicates := $values[index-of($values, .)[2]]
-let $posWithErrors := 
+let $posWithErrors :=
   (for $key in (1 to $CountAddresses)
    let $val := map:get($map, $key)
    return if ($val = $duplicates) then $key else ()
