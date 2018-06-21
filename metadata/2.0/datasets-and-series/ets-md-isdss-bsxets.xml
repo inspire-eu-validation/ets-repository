@@ -144,7 +144,6 @@ let $messages :=
 		else 						
 			for $crs in $crsIdentifiers
 				let $code := $crs/gmd:code/*[1]/text()
-				let $codeSpace := $crs/gmd:codeSpace/*[1]/text()
 				let $codeNumber := fn:substring($code,fn:string-length($urlOpengis)+1,4)
 				let $invalidCodeValues := $codeNumber[not(. = $epsgCodes)]
 				let $invalidCodeValues2 := $code[not(. = $urlCodes)]
@@ -153,8 +152,6 @@ let $messages :=
 					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
 				else if (($invalidCodeValues) and ($invalidCodeValues2)) then
 					local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
-				else if ($codeSpace) then
-					local:addMessage('TR.invalidCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
 				else () 		
 	)[position() le $limitErrors] 
 return
@@ -168,7 +165,6 @@ return
 										<translationTemplate ref="TR.noCrsIdentifier"/>
 										<translationTemplate ref="TR.noCrsCode"/>
 										<translationTemplate ref="TR.invalidCrsCode"/>
-										<translationTemplate ref="TR.invalidCrsCodeSpace"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDef8d3d22-be0f-4618-88a2-2bc0bbfc8077">
