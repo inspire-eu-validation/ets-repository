@@ -1,0 +1,910 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite 
+	xmlns="http://www.interactive-instruments.de/etf/2.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	id="EID59692c11-df86-49ad-be7f-94a1e1ddd8da" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/metadata/2.0</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records.</label>
+	<description>
+		<![CDATA[<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
+There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/README#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.
+<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target="_blank">Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records</a><br/><br/>
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank"></a></li></ul>]]>
+	</description>
+	<reference>../../../inspire-md-bsxets.xq</reference>
+	<version>0.2.5</version>
+	<author>interactive instruments GmbH</author>
+	<creationDate>2016-08-30T00:00:00Z</creationDate>
+	<lastEditor>interactive instruments GmbH</lastEditor>
+	<lastUpdateDate>2017-12-07T20:45:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for metadata XML test objects">
+		<!-- TODO clean up, currently disabled due to open issues with schema validation
+		<parameter name="encoding" required="false"><defaultValue>CSW ISO AP 1.0.0</defaultValue><description ref="TR.metadataEncoding"/><allowedValues>^(CSW ISO AP 1\.0\.0|ISO/TS 19139)$</allowedValues><type>string</type></parameter><parameter name="Schema_file" required="false"><description ref="TR.metadataSchema"/><allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)?$</allowedValues><type>string</type></parameter>
+		-->
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
+	</supportedTestObjectTypes>
+	<testModules>
+		<TestModule id="EID137a11bc-4f87-4a55-ab71-59d03e6b28da">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID59692c11-df86-49ad-be7f-94a1e1ddd8da"/>
+			<testCases>
+				<TestCase id="EID3599b1d5-0b91-49af-aec5-876f849b6d17">
+					<label>Common Requirements</label>
+					<description>Execute tests that apply for all metadata records on elements that are directly child elements of the root node of the XML document: MD_Metadata node.
+					</description>
+					<parent ref="EID137a11bc-4f87-4a55-ab71-59d03e6b28da"/>
+					<testSteps>
+						<TestStep id="195437ba-3ca2-4b95-ab5d-3d33469605dd">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID3599b1d5-0b91-49af-aec5-876f849b6d17"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+							
+								<TestAssertion id="EIDb4e5f829-347b-4f98-b407-c51c3a8b95b1">
+									<label>md common C.1: XML Schema</label>
+									<description><![CDATA["<p>The document shall pass schema validation without errors using the following XML schema definitions:</p>
+<p>[CSW2 AP ISO] XML Schema ,</p>
+<p>[ISO 19139] XML Schema as available in the ISO repository , or</p>
+<p>[ISO 19139] XML Schema as available in the OGC schema repository15.</p>
+<p>All three of these XML Schemas declare the same namespace.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+(: TODO BaseX validation is incomplete and needs to be replaced by a custom validation module, see 'known limitations' :)
+let $errors := (
+	if ($validationErrors) then
+		for $error in $validationErrors
+		return local:addMessage('TR.validationError', map { 'text': $error })
+	else
+		for $file in $db
+		  return 
+			 if ($file/element()/@xsi:schemaLocation) then 
+				let $start := prof:current-ms()
+				let $infos := validate:xsd-info($file)
+				let $duration := prof:current-ms()-$start
+				let $logentry := local:log('Validating file ' || local:filename($file) || ': ' || $duration || ' ms')
+				let $errors := count($infos)
+				return
+				  if ($errors&gt;0) then
+					 (local:addMessage('TR.invalidSchema', map { 'filename': local:filename($file), 'count': string($errors) }),
+					  for $info in $infos return local:addMessage('TR.xmlSchemaError', map { 'filename': local:filename($file), 'error': $info }))
+				  else ()
+			 else
+				for $record in $records[db:path(.)=db:path($file/element())]
+				  let $id := $record/gmd:fileIdentifier/gco:CharacterString/text()
+				  let $infos := validate:xsd-info($record)
+				  let $errors := count($infos)
+				  return
+					 if ($errors&gt;0) then
+						(local:addMessage('TR.invalidSchemaRecord', map { 'filename': local:filename($record), 'id': $id, 'count': string($errors) }),
+						for $info in $infos return local:addMessage('TR.xmlSchemaErrorRecord', map { 'filename': local:filename($record), 'id': $id, 'error': $info }))
+					 else ())[position() le $limitErrors]
+return
+(if ($errors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.filesWithErrors', count($errors[@ref eq 'TR.invalidSchema'])),
+ local:error-statistics('TR.recordsWithErrors', count($errors[@ref eq 'TR.invalidSchemaRecord'])),
+ $errors[position() le $limitErrors])
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.xmlSchemaError"/>
+										<translationTemplate ref="TR.invalidSchema"/>
+										<translationTemplate ref="TR.filesWithErrors"/>
+										<translationTemplate ref="TR.xmlSchemaErrorRecord"/>
+										<translationTemplate ref="TR.invalidSchemaRecord"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<!----><TestAssertion id="EID3332086f-c3b3-486c-a059-10c685c54645">
+									<label>md common req C.2: Root Element</label>
+									<description><![CDATA[<p>The metadata for an INSPIRE data set, data set or service should be encoded using the root element MD_Metadata.</p>]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series', 'service')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count($recordsWithErrors)),
+ for $record in $recordsWithErrors
+   let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+   order by $rid
+   let $levels := $record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
+)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<!----><TestAssertion id="EID3d196b81-ae85-4c1f-a4d5-65bccf16addd">
+									<label>md common req C.3: Encoding of Code List Values</label>
+									<description><![CDATA[<p>The INSPIRE metadata elements that are assigned to the code lists in [ISO 19139] using the Code List Value attribute must identify the code list * corresponding to the value (as defined in the tables in [ISO 19115]).</p>]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series', 'services')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ 
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
+)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<!----><TestAssertion id="EID8b68e1af-d5d3-437f-8d0a-83460d98bbdf">
+									<label>md common req C.4: Encoding of Free Text Values</label>
+									<description><![CDATA["<p>Check the use of free text elements of type gco: CharacterString_PropertyType in the </p>
+<p>* INSPIRE metadata and see if they meet any of the 3 ways to be defined:</p>
+
+<p>* 1. Using the gco:CharacterString child element.</p>
+<p>* 2. Using gmx:Anchor child element, or </p>
+<p>* 3. Using the xsi:type attribute and provide both gco:CharacterString and gmd:PT_FreeText child elements. </p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ 
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
+)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EIDebdda4b4-0bb4-4255-a36a-db4fe540065c">
+									<label>md common req C.5: Language Code</label>
+									<description><![CDATA["<p>* This test case only applies to records with a [hierarchyLevel](#hierarchyLevel) value 'dataset' or 'series'.</p>
+
+<p>* The test first checks if a [gmd:LanguageCode](#langcode) object is given and contains a codeList and 
+codeListValue attribute.</p>
+
+<p>* It is then checked if the codeListValue attribute contains a valid 3-letter language code (one of the values of 
+enumeration type [languageISO6392B](http://inspire.ec.europa.eu/schemas/common/1.0/common.xsd).</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series','service')]
+let $codes := ('aar','abk','ace','ach','ada','ady','afa','afh','afr','ain','aka','akk','alb','ale','alg','alt','amh','ang','anp','apa','ara','arc','arg','arm','arn','arp','art','arw','asm','ast','ath','aus','ava','ave','awa','aym','aze','bad','bai','bak','bal','bam','ban','baq','bas','bat','bej','bel','bem','ben','ber','bho','bih','bik','bin','bis','bla','bnt','bos','bra','bre','btk','bua','bug','bul','bur','byn','cad','cai','car','cat','cau','ceb','cel','cha','chb','che','chg','chi','chk','chm','chn','cho','chp','chr','chu','chv','chy','cmc','cop','cor','cos','cpe','cpf','cpp','cre','crh','crp','csb','cus','cze','dak','dan','dar','day','del','den','dgr','din','div','doi','dra','dsb','dua','dum','dut','dyu','dzo','efi','egy','eka','elx','eng','enm','epo','est','ewe','ewo','fan','fao','fat','fij','fil','fin','fiu','fon','fre','frm','fro','frr','frs','fry','ful','fur','gaa','gay','gba','gem','geo','ger','gez','gil','gla','gle','glg','glv','gmh','goh','gon','gor','got','grb','grc','gre','grn','gsw','guj','gwi','hai','hat','hau','haw','heb','her','hil','him','hin','hit','hmn','hmo','hrv','hsb','hun','hup','iba','ibo','ice','ido','iii','ijo','iku','ile','ilo','ina','inc','ind','ine','inh','ipk','ira','iro','ita','jav','jbo','jpn','jpr','jrb','kaa','kab','kac','kal','kam','kan','kar','kas','kau','kaw','kaz','kbd','kha','khi','khm','kho','kik','kin','kir','kmb','kok','kom','kon','kor','kos','kpe','krc','krl','kro','kru','kua','kum','kur','kut','lad','lah','lam','lao','lat','lav','lez','lim','lin','lit','lol','loz','ltz','lua','lub','lug','lui','lun','luo','lus','mac','mad','mag','mah','mai','mak','mal','man','mao','map','mar','mas','may','mdf','mdr','men','mga','mic','min','mis','mkh','mlg','mlt','mnc','mni','mno','moh','mon','mos','mul','mun','mus','mwl','mwr','myn','myv','nah','nai','nap','nau','nav','nbl','nde','ndo','nds','nep','new','nia','nia','nic','niu','nno','nob','nog','non','nor','nqo','nso','nub','nwc','nya','nym','nyn','nyo','nzi','oci','oji','ori','orm','osa','oss','ota','oto','paa','pag','pal','pam','pan','pap','pau','peo','per','phi','phn','pli','pol','pon','por','pra','pro','pus','qaa-qtz','que','raj','rap','rar','roa','roh','rom','rum','run','rup','rus','sad','sag','sah','sai','sal','sam','san','sas','sat','scn','sco','sel','sem','sga','sgn','shn','sid','sin','sio','sit','sla','slo','slv','sma','sme','smi','smj','smn','smo','sms','sna','snd','snk','sog','som','son','sot','spa','srd','srn','srp','srr','ssa','ssw','suk','sun','sus','sux','swa','swe','syc','syr','tah','tai','tam','tat','tel','tem','ter','tet','tgk','tgl','tha','tib','tig','tir','tiv','tkl','tlh','tli','tmh','tog','ton','tpi','tsi','tsn','tso','tuk','tum','tup','tur','tut','tvl','twi','tyv','udm','uga','uig','ukr','umb','und','urd','uzb','vai','ven','vie','vol','vot','wak','wal','war','was','wel','wen','wln','wol','xal','xho','yao','yap','yid','yor','ypk','zap','zbl','zen','zha','znd','zul','zun','zxx','zza')
+let $messages :=    
+	if (not($recordsToInspect)) then ()
+	else
+	(for $record in $recordsToInspect    
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode	 
+	 return
+	 if (not($languageCodes)) then
+		local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
+	 else 
+		let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
+		return
+		if ($wrongCodeValues) then
+		local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
+		else ()     
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EIDead447bf-7ace-4b13-b9b1-a80f8566c9cb">
+									<label>md common req C.6: Metadata Point of Contact</label>
+									<description><![CDATA["<p>Check the point of contact for the party responsible for the metadata. The multiplicity of this element is one or more.
+They have to come defined through the children elements:</p>
+
+<p>Name of the responsible organization with a non-empty free text element content.</p>
+
+<p>The email address of the organization with a free text element not empty.</p>
+
+<p>The value for the Role coded from the Code List Value [ISO 19139] CI_RoleCode.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $pocs := $record/gmd:contact/* (: At least one gmd:contact is required - the XML Schema validation checks whether this condition is met. :)
+	 return
+	 if (some $poc in $pocs satisfies (not($poc/gmd:role/*) or not($poc/gmd:role/*/@codeListValue = 'pointOfContact'))) then
+		local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'pocs': fn:string-join($pocs/gmd:role/*/@codeListValue,', ') })
+	 else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<!----><TestAssertion id="EID0b6c9678-31d1-4c7a-8183-6a4f4da60017">
+									<label>md common req C.7: Metadata Date</label>
+									<description><![CDATA["<p>You must indicate the last update date of the metadata description for each metadata record from the dateStamp.</p>
+
+<p>If no updates have been made, the creation date of the metadata will be used.</p>
+
+<p>The multiplicity of this element is one or more.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series', 'service')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ 
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
+)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID34195fe7-0d77-46bb-b74e-489463cadd2f">
+									<label>md common req C.8: Resource Title</label>
+									<description><![CDATA["<p>Check the readability and clarity of the metadata title. Its content will be a free text element not empty in the metadata language.</p>
+<p>The multiplicity of the element is one.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $title := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:title/*[1]
+	 return
+	 if (not($title)) then
+		local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
+	 else if (string-length(normalize-space($title/text())) = 0) then
+		local:addMessage('TR.emptyTitle', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID346ca433-1f21-4e4e-8fec-524d24fd6647">
+									<label>md common req C.9: Resource Abstract</label>
+									<description><![CDATA["<p>Provide a brief narrative summary on the content of the data set, data series or services described.</p>
+
+<p>It will be coded using an abstract element with a non-empty free text element content in the metadata language.</p>
+
+<p>The multiplicity of this element is one.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $abstract := $record/gmd:identificationInfo[1]/*/gmd:abstract/*[1]
+	 return
+	 if (not($abstract)) then
+		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
+	 else if (string-length(normalize-space($abstract/text())) = 0) then
+		local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID87ee2219-2ba5-4a27-91ac-2b3bf5730012">
+									<label>md common req C.10: Responsible Organization</label>
+									<description><![CDATA["<p>Check the point of contact for the organisation responsible for the establishment, management, maintenance and distribution of the described resource. The multiplicity of this element is one or more.
+They have to come defined through the children elements:</p>
+
+<p>Name of the organisation organization with a non-empty free text element content.</p>
+
+<p>The email address of the organization with a free text element not empty.</p>
+
+<p>The value for the Role coded from the Code List Value [ISO 19139] CI_RoleCode.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $iso19115_CIRoleCode := ('resourceProvider','custodian','owner','user','distributor','originator','pointOfContact','principalInvestigator','processor','publisher','author')
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $pocs := $record/gmd:identificationInfo/*/gmd:pointOfContact/*
+	 return
+	 if (not($pocs)) then
+		local:addMessage('TR.noPointOfContact', map { 'filename': local:filename($record), 'id': $rid })
+	 else if (some $poc in $pocs satisfies (not($poc/gmd:role/*) or not($poc/gmd:role/*/@codeListValue = $iso19115_CIRoleCode))) then
+		local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid, 'pocs': fn:string-join($pocs/gmd:role/*/@codeListValue,', ') })
+	 else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID01ae1fe1-1990-4716-ae09-88d1208b408c">
+									<label>md common req C.11: Temporal References</label>
+									<description><![CDATA["<p>The information on the temporal dimension of the data will be described by a set of dates referring to a temporary reference system and will be expressed in accordance with ISO 8601.</p>
+
+<p>The default reference system will be the Gregorian calendar. For this there must be at least one date element.</p>
+
+<p>To specify the value of the date precision, the gco element will be used: Date</p>
+
+<p>To specify the value of the date and time precision, the gco element will be used: DateTime</p>
+
+<p>The date type will be specified through the Date Type element with a corresponding value from the Code List Value [ISO 19139].</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $timePeriods := $record/gmd:identificationInfo[1]/*/*[self::gmd:extent or self::srv:extent]/*/gmd:temporalElement/*/gmd:extent/*[self::gml:TimePeriod or self::gml31:TimePeriod]
+	 let $invalidTimePeriods := 
+		for $timePeriod in $timePeriods
+		return
+		if (not($timePeriod[(not(*:begin) or *:begin/*:TimeInstant) and (not(*:end) or *:end/*:TimeInstant)])) then $timePeriod
+		else ()
+	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/*
+	 let $relevantTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('publication','revision','creation')]
+	 return
+	 if ($invalidTimePeriods) then
+		local:addMessage('TR.timePeriodWithoutInlineTimeInstant', map { 'filename': local:filename($record), 'id': $rid })
+	 else if(not($relevantTempRefs)) then
+		local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<!----><TestAssertion id="EID109cce73-7e80-432e-a3e0-450e231f4120">
+									<label>md common req C.12: Not More than one Date of Creation</label>
+									<description><![CDATA[<p>Check that at most one Creation date exists.</p>]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ 
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
+)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<!----><TestAssertion id="EID6b4e043c-7624-4b3c-8b0c-bec547d2f8f6">
+									<label>md common req C.13: Not More than one Date of Last Revision</label>
+									<description><![CDATA[<p>Check that at most one Revision date exists.</p>]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ 
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
+)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID87f6008e-d7fc-452f-8ab6-d50e8c413a61">
+									<label>md common req C.14: Temporal Extent</label>
+									<description><![CDATA["<p>If a temporary reference is provided, its coding is checked through the element encoded using the element gmd:EX_Extent with one or more elements gmd:EX_TemporalExtent.</p>
+
+<p>The value of each of these elements can be an individual date or a period of time between two dates.</p>
+
+<p>For individual dates, the gml:timePosition element is evaluated with the date value given in accordance with [ISO 8601]</p>
+
+<p>For a period of time it must contain a TimePeriod child element that contains the start and end dates of the period:</p>
+
+<p>Check that beginPosition does not have attribute @frame (which means that the default reference system is used) and whether the date is valid.</p>
+<p>Check that endPosition does not have attribute @frame (which means that the default reference system is used) and whether the date is valid.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $timePeriods := $record/gmd:identificationInfo[1]/*/*[self::gmd:extent or self::srv:extent]/*/gmd:temporalElement/*/gmd:extent/*[self::gml:TimePeriod or self::gml31:TimePeriod]
+	 let $invalidTimePeriods := 
+		for $timePeriod in $timePeriods
+		return
+		if (not($timePeriod[(not(*:begin) or *:begin/*:TimeInstant) and (not(*:end) or *:end/*:TimeInstant)])) then $timePeriod
+		else ()
+	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/*
+	 let $relevantTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('publication','revision','creation')]
+	 return
+	 if ($invalidTimePeriods) then
+		local:addMessage('TR.timePeriodWithoutInlineTimeInstant', map { 'filename': local:filename($record), 'id': $rid })
+	 else if(not($relevantTempRefs)) then
+		local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
+	 
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $timePeriods := $record/gmd:identificationInfo[1]/*/*[self::gmd:extent or self::srv:extent]/*/gmd:temporalElement/*/gmd:extent/*[self::gml:TimePeriod or self::gml31:TimePeriod]
+	 let $invalidTimePeriods := 
+		for $timePeriod in $timePeriods
+		let $beginDate := ($timePeriod/*:begin/*:TimeInstant/*:timePosition/text(), $timePeriod/*:beginPosition/text())
+		let $endDate := ($timePeriod/*:end/*:TimeInstant/*:timePosition/text(), $timePeriod/*:endPosition/text())
+		(: NOTE: we exclude the case in which a gml:begin or gml:end references the gml:TimeInstant; this situation is checked by another test that this test depends upon :)
+		let $validDate := (not($beginDate) or local:is-valid-date-or-dateTime($beginDate)) and (not($endDate) or local:is-valid-date-or-dateTime($endDate))
+		return
+		if ($validDate) then ()
+		else $timePeriod
+	 let $frameOnBeginPosition := boolean($timePeriods/*:beginPosition/*/@frame)
+	 let $frameOnEndPosition := boolean($timePeriods/*:endPosition/*/@frame)
+	 let $frameOnPeriod := boolean($timePeriods/@frame)
+	 let $frameOnInstant := boolean($timePeriods/*:begin/*/@frame | $timePeriods/*:end/*/*:timePosition/@frame)
+	 let $frameOnTimePosition := boolean($timePeriods/*:begin/*/@frame | $timePeriods/*:end/*/*:timePosition/@frame)
+	 let $relevantDates := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/*[gmd:dateType/*/@codeListValue = ('publication','revision','creation')]/gmd:date/*
+	 let $invalidRelevantDates := 
+		for $relevantDate in $relevantDates
+		let $validDate := local:is-valid-date-or-dateTime($relevantDate)
+		return
+		if ($validDate) then ()
+		else $relevantDate
+	 return
+	 (if ($invalidTimePeriods) then 
+	 	let $invalidDates :=
+			for $timePeriod in $timePeriods
+			let $beginDate := ($timePeriod/*:begin/*:TimeInstant/*:timePosition/text(), $timePeriod/*:beginPosition/text())
+			let $endDate := ($timePeriod/*:end/*:TimeInstant/*:timePosition/text(), $timePeriod/*:endPosition/text())
+			return
+			(if (local:is-valid-date-or-dateTime($beginDate)) then () else $beginDate,
+			 if (local:is-valid-date-or-dateTime($endDate)) then () else $endDate)
+		return
+ 		local:addMessage('TR.timePeriodWithInvalidDate', map { 'filename': local:filename($record), 'id': $rid, 'dates': fn:string-join($invalidDates, ', ') }) else (),
+	  if ($frameOnBeginPosition) then 
+ 		local:addMessage('TR.timePeriodWithFrameOnBeginPosition', map { 'filename': local:filename($record), 'id': $rid }) else (),
+	  if ($frameOnEndPosition) then 
+		local:addMessage('TR.timePeriodWithFrameOnEndPosition', map { 'filename': local:filename($record), 'id': $rid }) else (),
+	  if ($frameOnPeriod) then 
+		local:addMessage('TR.timePeriodWithFrame', map { 'filename': local:filename($record), 'id': $rid }) else (),
+	  if ($frameOnInstant) then 
+		local:addMessage('TR.timePeriodWithFrameOnTimeInstant', map { 'filename': local:filename($record), 'id': $rid }) else (),
+	  if ($frameOnTimePosition) then 
+		local:addMessage('TR.timePeriodWithFrameOnTimePosition', map { 'filename': local:filename($record), 'id': $rid }) else (),
+	  if ($invalidRelevantDates) then
+		local:addMessage('TR.invalidRelevantDate', map { 'filename': local:filename($record), 'id': $rid, 'dates': fn:string-join($relevantDates, ', ') }) else ())
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID8b24397c-9472-475e-ac0d-b36f5b8c8d30">
+									<label>md common req C.15: Keyword Originating CV</label>
+									<description><![CDATA["<p>The controlled vocabulary of origin of a keyword must be cited using Citation element, and its children elements:
+</p>
+<p>The vocabulary title will be given using the title, and will be free text not empty.</p>
+
+<p>The date of publication of the vocabulary will be given through the Date elements and the code for the Date Type.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/*/gmd:specification
+	 return 
+	 if (not($specifications)) then () (: Only failure situations are reported, no warnings :)
+	 else
+	 for $spec in $specifications
+		return
+		if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
+			local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
+			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+		else if (not($spec/ancestor::gmd:DQ_DomainConsistency)) then
+			local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<!----><TestAssertion id="EIDda190473-844a-44a7-8924-673d213b4582">
+									<label>md common req C.16: Group Keywords by CV</label>
+									<description><![CDATA[<p>The keywords that come from the same vocabulary controlled under an element Keywords will be grouped.</p>]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ 
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
+)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EIDf7e5c9d6-7a5c-47cc-9c95-1d4f3a5f92eb">
+									<label>md common req C.17: Limitations on Public Access</label>
+									<description><![CDATA["<p>Check the information about the existence and its reasons in the limitations of public access to the data set. To do this, the element Legal Constraints will be used.</p>
+
+<p>The limitations (or lack thereof) will include both specifications of the restriction:</p>
+
+<p>An Restriction Code element will be given with a value from the ""otherRestrictions"" Code List Value</p>
+
+<p>And at least one instance Other Constraints that points to one of the values in the code list for ""LimitationsOnPublicAccess26"". In the case of no access limitations, this element must point to the value of the ""noLimitations"" code list.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $iso19115_MD_ClassificationCode := ('unclassified','restricted','confidential','secret','topSecret')
+let $iso19115_MD_RestrictionCode_without_otherRestrictions := ('copyright','patent','patentPending','trademark','license','intellectualPropertyRights','restricted')
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $resourceConstraints := $record/gmd:identificationInfo/*/gmd:resourceConstraints/*
+	 let $validConstraints := 
+		for $resCon in $resourceConstraints
+			let $oneValidAccessConstraint := 
+				if ($resCon[gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue ='otherRestrictions' and string-length(normalize-space(fn:string-join(gmd:otherConstraints/*/text(),', '))) &gt; 0]) then true()
+				else if($resCon/gmd:accessConstraints/gmd:MD_RestrictionCode[@codeListValue = $iso19115_MD_RestrictionCode_without_otherRestrictions]) then true()
+				else false()
+			let $oneValidClassification := boolean($resCon/gmd:classification/gmd:MD_ClassificationCode[@codeListValue = $iso19115_MD_ClassificationCode])
+			return 
+			if ($oneValidAccessConstraint or $oneValidClassification) then $resCon else ()
+	 return
+	 if ($validConstraints) then ()
+	 else local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID410b57a6-0314-4506-9352-19042f1723cd">
+									<label>md common req C.18: Conditions for Access and Use</label>
+									<description><![CDATA["<p>Check the restrictions of access and use of the service through the element LegalConstraints, which is used to describe the non-technical access conditions and that.</p>
+
+<p>The multiplicity of this element is one or more.</p>
+
+<p>This information will be coded by giving an instance of the element gmd:AccessConstraints or gmd:UseConstraints.</p>
+
+<p>In both cases, it will be verified that there is a child element Restriction with a Code List Value defined.</p>
+
+<p>At least one instance of Other Constraints will also be given to describe the actual constraints from the code list ConditionsApplyingToAccessAndUse.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $iso19115_MD_ClassificationCode := ('unclassified','restricted','confidential','secret','topSecret')
+let $iso19115_MD_RestrictionCode_without_otherRestrictions := ('copyright','patent','patentPending','trademark','license','intellectualPropertyRights','restricted')
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $resourceConstraints := $record/gmd:identificationInfo/*/gmd:resourceConstraints/*
+	 let $validConstraints := 
+		for $resCon in $resourceConstraints
+			let $oneValidAccessConstraint := 
+				if ($resCon[gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue ='otherRestrictions' and string-length(normalize-space(fn:string-join(gmd:otherConstraints/*/text(),', '))) &gt; 0]) then true()
+				else if($resCon/gmd:accessConstraints/gmd:MD_RestrictionCode[@codeListValue = $iso19115_MD_RestrictionCode_without_otherRestrictions]) then true()
+				else false()
+			let $oneValidClassification := boolean($resCon/gmd:classification/gmd:MD_ClassificationCode[@codeListValue = $iso19115_MD_ClassificationCode])
+			return 
+			if ($oneValidAccessConstraint or $oneValidClassification) then $resCon else ()
+	 return
+	 if ($validConstraints) then ()
+	 else local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID701be21b-1158-4055-9594-67a4e2005e38">
+									<label>md common req C.19: Geographical Bounding Box</label>
+									<description><![CDATA["<p>Check if it's a valid geographic extend. It is described by 4 elements: westBoundLongitude, eastBoundLongitude, southBoundLatitude and northBoundLatitude. The test performs the following checks on them:</p>
+
+<p>Is a correctly formatted westBoundLongitude given at gmd:westBoundLongitude/gco:Decimal.</p>
+<p>Is the following constraint given: -180.00 ≤ westBoundLongitude ≤ 180.00</p>
+<p>Is a correctly formatted eastBoundLongitude given at gmd:eastBoundLongitude/gco:Decimal.</p>
+<p>Is the following constraint given: -180.00 ≤ eastBoundLongitude ≤ 180.00</p>
+<p>Is a correctly formatted southBoundLongitude given at gmd:southBoundLongitude/gco:Decimal.</p>
+<p>Is the following constraint given: -90.00 ≤ southBoundLatitude ≤ northBoundLatitudev
+<p>Is a correctly formatted northBoundLongitude given at gmd:northBoundLongitude/gco:Decimal.</p>
+<p>Is the following constraint given: southBoundLatitude ≤ northBoundLatitude ≤ 90.00;</p><p>
+The bounding box shall be expressed in decimal degree with a precision of at least 2 decimals.</p>
+<p>
+The bounding box shall be as small as possible. This requires a manual check.</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series', 'service')
+let $regex := '^-?\d+\.\d{2,}'
+let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
+let $messages := 
+	(for $record in $recordsToInspect
+	 let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+	 let $bboxes := $record/gmd:identificationInfo[1]/*/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+	 return
+	 if (not($bboxes)) then
+		local:addMessage('TR.noGeographicBoundingBox', map { 'filename': local:filename($record), 'id': $rid })
+	 else
+		let $invalidbboxes :=
+			for $bbox in $bboxes
+			let $west := $bbox/gmd:westBoundLongitude/*/text()
+			let $east := $bbox/gmd:eastBoundLongitude/*/text()
+			let $south := $bbox/gmd:southBoundLatitude/*/text()
+			let $north := $bbox/gmd:northBoundLatitude/*/text() 
+			return     
+			if (($west and matches($west,$regex) and fn:number($west) &gt;= -180 and fn:number($west) &lt;= 180) and
+				 ($east and matches($east,$regex) and fn:number($east) &gt;= -180 and fn:number($east) &lt;= 180) and
+				 ($south and matches($south,$regex) and fn:number($south) &gt;= -90 and fn:number($south) &lt;= 90) and
+				 ($north and matches($north,$regex) and fn:number($north) &gt;= -90 and fn:number($north) &lt;= 90) and
+				 (fn:number($south) &lt;= fn:number($north))
+				) then ()
+			else $bbox
+		return
+		if ($invalidbboxes) then
+			for $bbox in $invalidbboxes
+			let $west := $bbox/gmd:westBoundLongitude/*/text()
+			let $east := $bbox/gmd:eastBoundLongitude/*/text()
+			let $south := $bbox/gmd:southBoundLatitude/*/text()
+			let $north := $bbox/gmd:northBoundLatitude/*/text() 
+			return
+			local:addMessage('TR.invalidGeographicBoundingBox', map { 'filename': local:filename($record), 'id': $rid, 'west': $west, 'east': $east, 'south': $south, 'north': $north })
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($messages//@ref = ('TR.noGeographicBoundingBox','TR.invalidGeographicBoundingBox')) then 'FAILED' else if ($recordsToInspect) then 'PASSED_MANUAL' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EIDf55f2448-c4d5-4af0-a83b-40ccd0d2a7df">
+									<label>md common req C.20: Conformity Statement</label>
+									<description><![CDATA[<p>The test first checks if there is at least one conformance result of type gmd:DQ_ConformanceResult.</p>]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series', 'service')
+let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
+let $messages := 
+	(for $record in $recordsToInspect
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $confResPasses := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:pass
+	 return 
+	 if (not($confResPasses)) then
+		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
+	 else
+		for $confResPass in $confResPasses
+		return
+		if (not($confResPass/*) and not($confResPass/@gco:nilReason = 'unknown')) then
+			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+		else () (: Schema validation will ensure that the content of $confResPass is a gco:Boolean with boolean value :)
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID1f9ddbc5-679b-44b0-bd6f-db14c9c348a9">
+									<label>md common req C.21: Conformity Specification</label>
+									<description><![CDATA[<p>The test first checks if there is at least one conformance result of type gmd:DQ_ConformanceResult.</p>]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/*/gmd:specification
+	 return 
+	 if (not($specifications)) then () (: Only failure situations are reported, no warnings :)
+	 else
+	 for $spec in $specifications
+		return
+		if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
+			local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
+			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+		else if (not($spec/ancestor::gmd:DQ_DomainConsistency)) then
+			local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EID614cd750-a8a2-4256-908c-e452c2b4e506">
+									<label>md common req C.22: Conformity Degree</label>
+									<description><![CDATA["<p>A property Pass with boolean value will be included with ""true"" value within the degree of ConformanceResult if the resource is compliant and ""false"" otherwise.</p>
+
+<p>If the conformance has not yet been evaluated, the gmd:pass element shall be empty and contain a nil reason attribute with value ""unknown""</p>"]]></description>
+									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series', 'service')
+let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
+let $messages := 
+	(for $record in $recordsToInspect
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $confResPasses := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:pass
+	 return 
+	 if (not($confResPasses)) then
+		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
+	 else
+		for $confResPass in $confResPasses
+		return
+		if (not($confResPass/*) and not($confResPass/@gco:nilReason = 'unknown')) then
+			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+		else () (: Schema validation will ensure that the content of $confResPass is a gco:Boolean with boolean value :)
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+								-
+								
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
