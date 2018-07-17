@@ -342,8 +342,8 @@ let $messages :=
 	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gco:Date
 	 let $creationTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('creation')]
 	 return
- if(not($creationTempRefs)) then
-		local:addMessage('TR.noCreationDate', map { 'filename': local:filename($record), 'id': $rid })
+ if(count($creationTempRefs) ne 1) then
+		local:addMessage('TR.oneCreationDate', map { 'filename': local:filename($record), 'id': $rid })
 	 else ()
 	)[position() le $limitErrors]
 return
@@ -353,6 +353,7 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.oneCreationDate"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -369,8 +370,8 @@ let $messages :=
 	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gco:Date
 	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('revision')]
 	 return
-if(not($revisionTempRefs)) then
-		local:addMessage('TR.noRevisionDate', map { 'filename': local:filename($record), 'id': $rid })
+if(count($revisionTempRefs) ne 1) then
+		local:addMessage('TR.oneRevisionDate', map { 'filename': local:filename($record), 'id': $rid })
 	 else ()
 	)[position() le $limitErrors]
 return
@@ -380,7 +381,7 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.noRevisionDate"/>
+										<translationTemplate ref="oneRevisionDate"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
