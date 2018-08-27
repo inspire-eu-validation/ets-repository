@@ -252,23 +252,28 @@ Relevant requirement(s):</p>
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>									
+let $levels := ('dataset', 'series')
+let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]									
 let $messages := 
-	(for $record in $records
+	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/*/gmd:specification
+	 let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification
 	 let $DQ_ConformanceResults := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
-	 return (
-	 if (not($DQ_ConformanceResults)) then 
-		local:addMessage('TR.noDQConformanceResults', map { 'filename': local:filename($record), 'id': $rid })
-	 else (),
-	 if (not($specifications)) then () (: Only failure situations are reported, no warnings :)
+	 return 
+	 if (not($specifications)) then local:addMessage('TR.noSpecifications', map { 'filename': local:filename($record), 'id': $rid })
 	 else
-	 for $spec in $specifications 
-		return
-		if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
-			local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
-			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+	 for $DQ_ConformanceResult in $DQ_ConformanceResults
+		let $spec := $DQ_ConformanceResult/gmd:specification
+		return (
+		if (not($spec)) then ()
+		else
+			if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
+				local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+			else (),
+		if (not($DQ_ConformanceResult/gmd:pass/gco:Boolean)) then
+			local:addMessage('TR.noBooleanValueForPass', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 		else ()
 	))[position() le $limitErrors]
 return
@@ -280,7 +285,8 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.noTitleForSpecification"/>
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
-										<translationTemplate ref="TR.noDQConformanceResults"/>
+										<translationTemplate ref="TR.noSpecifications"/>
+										<translationTemplate ref="TR.noBooleanValueForPass"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -1228,9 +1234,12 @@ let $messages :=
 			(for $record in $recordsToInspect
 			 let $rid := $record/gmd:fileIdentifier/*/text()
 			 let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]
+			 let $hasExpectedDate := boolean($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*[gmd:date/*/text() = '2008-06-01' and gmd:dateType/*/@codeListValue = 'publication' and gmd:dateType/*/text() = 'publication'])
 			 return 
 			 if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
 				local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
+			 else if (not($hasExpectedDate)) then
+				local:addMessage('TR.invalidDateForThesaurusGemet',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
 			 else ()
 			)[position() le $limitErrors]
 		} catch * {       
@@ -1244,6 +1253,7 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noKeywordFromINSPIREThemes"/>
+										<translationTemplate ref="TR.invalidDateForThesaurusGemet"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -1359,10 +1369,6 @@ let $messages :=
 		return
 		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords }) 
 		 else if (string-length(normalize-space($title)) = 0) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords })
-		 else if ($title = 'GEMET - INSPIRE themes, version 1.0') then
-			if ($thesaurus/*/gmd:date/*[gmd:date/*/text() != '2008-06-01' or gmd:dateType/*/@codeListValue != 'publication']) then 
-				local:addMessage('TR.invalidDateForThesaurusGemet',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords })				
-			else()
 		 else (),
 		 if (not($hasExpectedDate)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title) then $title else '', 'keywords' : $keywords }) else ()
 		)
@@ -1377,7 +1383,6 @@ return
 										<translationTemplate ref="TR.noTitleForThesaurus"/>
 										<translationTemplate ref="TR.emptyTitleForThesaurus"/>
 										<translationTemplate ref="TR.invalidDateForThesaurus"/>
-										<translationTemplate ref="TR.invalidDateForThesaurusGemet"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
