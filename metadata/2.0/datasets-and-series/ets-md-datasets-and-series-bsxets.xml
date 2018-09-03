@@ -147,30 +147,32 @@ return
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $distinctRecordIdentifiers :=   
-	for $rec in $records
-  	return
+    for $rec in $records
+    return
     distinct-values($rec/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*/text())
 let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($distinctRecordIdentifiers,.)[2]]
-let $messages := 	
-	(for $record in $recordsToInspect
-		let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
-		let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*/text()
-		return
-		if (not($identifiers)) then
-			local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-		else
-			for $identifier in $identifiers
-			return
-			if (string-length(normalize-space($identifier)) = 0) then
-				local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-			else if ($identifier = $duplicateDistinctRecordIdentifiers) then
-				local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': $identifier })
-			else ()
-	)[position() le $limitErrors]
+let $messages :=    
+    (for $record in $recordsToInspect
+        let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+        let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*
+        return
+        if (not($identifiers)) then
+            local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+        else
+            for $identifier in $identifiers
+            return
+            if (not($identifier)) then
+                local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+            else if (not($identifier/@xlink:href) or not(fn:string-length(normalize-space($identifier/@xlink:href)) &gt; 0)) then
+                local:addMessage('TR.emptyXlinkHrefIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+            else if ($identifier = $duplicateDistinctRecordIdentifiers) then
+                local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': $identifier })
+            else ()
+    )[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -310,26 +312,26 @@ return
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $codes := ('biota','boundaries','climatologyMeteorologyAtmosphere','economy','elevation','environment','farming','geoscientificInformation','health','imageryBaseMapsEarthCover','inlandWaters','intelligenceMilitary','location','oceans','planningCadastre','society','structure','transportation','utilitiesCommunication')
-let $messages :=   	
-	(for $record in $recordsToInspect
-		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $topicCategories := $record/gmd:identificationInfo[1]/*/gmd:topicCategory/*
-		return 	 
-		if (not($topicCategories[self::gmd:MD_TopicCategoryCode])) then
-			local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
-		else 
-			let $topic := fn:string($record/gmd:identificationInfo[1]/*/gmd:topicCategory/gmd:MD_TopicCategoryCode)
-			let $wrongCodeValues := $topic[not(. = $codes)]
-			return
-			if ($wrongCodeValues) then
-				local:addMessage('TR.invalidTopicCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-			else ()
+let $messages :=    
+    (for $record in $recordsToInspect
+        let $rid := $record/gmd:fileIdentifier/*/text()
+        let $topicCategories := $record/gmd:identificationInfo[1]/*/gmd:topicCategory/*
+        return   
+        if (not($topicCategories[self::gmd:MD_TopicCategoryCode])) then
+            local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
+        else 
+            let $topics := $record/gmd:identificationInfo[1]/*/gmd:topicCategory/gmd:MD_TopicCategoryCode/text()
+            let $wrongCodeValues := $topics[not(. = $codes)]
+            return
+            if ($wrongCodeValues) then
+                local:addMessage('TR.invalidTopicCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
+            else ()
 
-	)[position() le $limitErrors] 
+    )[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -497,21 +499,21 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $messages :=   	
-	(for $record in $recordsToInspect
-		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $lineageStatement := $record/gmd:dataQualityInfo/*/gmd:lineage/LI_Lineage/gmd:statement/*[1]
-		return 	 
-		if (count($lineageStatement) ne 1) then
-			local:addMessage('TR.wrongNumberOfLineageStatements',  map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($lineageStatement)) })
-		else if (string-length(normalize-space($lineageStatement/text())) = 0) then
-			local:addMessage('TR.emptyLineageStatement',  map { 'filename': local:filename($record), 'id': $rid })
-		else ()        	
-	)[position() le $limitErrors] 
+let $messages :=    
+    (for $record in $recordsToInspect
+        let $rid := $record/gmd:fileIdentifier/*/text()
+        let $lineageStatement := $record/gmd:dataQualityInfo/*/gmd:lineage/gmd:LI_Lineage/gmd:statement/*[1]
+        return   
+        if (count($lineageStatement) ne 1) then
+            local:addMessage('TR.wrongNumberOfLineageStatements',  map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($lineageStatement)) })
+        else if (string-length(normalize-space($lineageStatement/text())) = 0) then
+            local:addMessage('TR.emptyLineageStatement',  map { 'filename': local:filename($record), 'id': $rid })
+        else ()         
+    )[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
