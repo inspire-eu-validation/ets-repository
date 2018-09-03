@@ -84,7 +84,7 @@ let $messages :=
 	else
 	(for $record in $recordsToInspect    
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode	 
+	 let $languageCodes := $record/gmd:language/gmd:LanguageCode	 
 	 return
 	 if (not($languageCodes)) then
 		local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
@@ -188,7 +188,7 @@ let $levels := ('dataset', 'series', 'service')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $messages := 	
 	(for $record in $recordsToInspect
-		let $countMetadataDate := count($record/gmd:dateStamp)
+		let $countMetadataDate := count($record/*/gmd:dateStamp)
 		let $rid := $record/gmd:dateStamp/*/text()
 		return
 		if (($countMetadataDate &gt; 0)) then
@@ -339,7 +339,7 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gco:Date
+	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
 	 let $creationTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('creation')]
 	 return
  if(count($creationTempRefs) ne 1) then
@@ -367,7 +367,7 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gco:Date
+	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gmd:CI_Date
 	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('revision')]
 	 return
 if(count($revisionTempRefs) ne 1) then
