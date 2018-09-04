@@ -65,7 +65,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 							<statementForExecution>not applicable</statementForExecution>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
-<TestAssertion id="EIDebdda4b4-0bb4-4255-a36a-db4fe540065c">
+							<TestAssertion id="EIDebdda4b4-0bb4-4255-a36a-db4fe540065c">
 									<label>md common req C.5: Language Code</label>
 									<description><![CDATA["<p>* This test case only applies to records with a [hierarchyLevel](#hierarchyLevel) value 'dataset' or 'series'.</p>
 
@@ -77,28 +77,28 @@ enumeration type [languageISO6392B](http://inspire.ec.europa.eu/schemas/common/1
 									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series','service')]
-let $codes := ('aar','abk','ace','ach','ada','ady','afa','afh','afr','ain','aka','akk','alb','ale','alg','alt','amh','ang','anp','apa','ara','arc','arg','arm','arn','arp','art','arw','asm','ast','ath','aus','ava','ave','awa','aym','aze','bad','bai','bak','bal','bam','ban','baq','bas','bat','bej','bel','bem','ben','ber','bho','bih','bik','bin','bis','bla','bnt','bos','bra','bre','btk','bua','bug','bul','bur','byn','cad','cai','car','cat','cau','ceb','cel','cha','chb','che','chg','chi','chk','chm','chn','cho','chp','chr','chu','chv','chy','cmc','cop','cor','cos','cpe','cpf','cpp','cre','crh','crp','csb','cus','cze','dak','dan','dar','day','del','den','dgr','din','div','doi','dra','dsb','dua','dum','dut','dyu','dzo','efi','egy','eka','elx','eng','enm','epo','est','ewe','ewo','fan','fao','fat','fij','fil','fin','fiu','fon','fre','frm','fro','frr','frs','fry','ful','fur','gaa','gay','gba','gem','geo','ger','gez','gil','gla','gle','glg','glv','gmh','goh','gon','gor','got','grb','grc','gre','grn','gsw','guj','gwi','hai','hat','hau','haw','heb','her','hil','him','hin','hit','hmn','hmo','hrv','hsb','hun','hup','iba','ibo','ice','ido','iii','ijo','iku','ile','ilo','ina','inc','ind','ine','inh','ipk','ira','iro','ita','jav','jbo','jpn','jpr','jrb','kaa','kab','kac','kal','kam','kan','kar','kas','kau','kaw','kaz','kbd','kha','khi','khm','kho','kik','kin','kir','kmb','kok','kom','kon','kor','kos','kpe','krc','krl','kro','kru','kua','kum','kur','kut','lad','lah','lam','lao','lat','lav','lez','lim','lin','lit','lol','loz','ltz','lua','lub','lug','lui','lun','luo','lus','mac','mad','mag','mah','mai','mak','mal','man','mao','map','mar','mas','may','mdf','mdr','men','mga','mic','min','mis','mkh','mlg','mlt','mnc','mni','mno','moh','mon','mos','mul','mun','mus','mwl','mwr','myn','myv','nah','nai','nap','nau','nav','nbl','nde','ndo','nds','nep','new','nia','nia','nic','niu','nno','nob','nog','non','nor','nqo','nso','nub','nwc','nya','nym','nyn','nyo','nzi','oci','oji','ori','orm','osa','oss','ota','oto','paa','pag','pal','pam','pan','pap','pau','peo','per','phi','phn','pli','pol','pon','por','pra','pro','pus','qaa-qtz','que','raj','rap','rar','roa','roh','rom','rum','run','rup','rus','sad','sag','sah','sai','sal','sam','san','sas','sat','scn','sco','sel','sem','sga','sgn','shn','sid','sin','sio','sit','sla','slo','slv','sma','sme','smi','smj','smn','smo','sms','sna','snd','snk','sog','som','son','sot','spa','srd','srn','srp','srr','ssa','ssw','suk','sun','sus','sux','swa','swe','syc','syr','tah','tai','tam','tat','tel','tem','ter','tet','tgk','tgl','tha','tib','tig','tir','tiv','tkl','tlh','tli','tmh','tog','ton','tpi','tsi','tsn','tso','tuk','tum','tup','tur','tut','tvl','twi','tyv','udm','uga','uig','ukr','umb','und','urd','uzb','vai','ven','vie','vol','vot','wak','wal','war','was','wel','wen','wln','wol','xal','xho','yao','yap','yid','yor','ypk','zap','zbl','zen','zha','znd','zul','zun','zxx','zza')
-let $messages :=    
-	if (not($recordsToInspect)) then ()
-	else
-	(for $record in $recordsToInspect    
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $languageCodes := $record/gmd:language/gmd:LanguageCode	 
-	 return
-	 if (not($languageCodes)) then
-		local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
-	 else 
-		let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
-		return
-		if ($wrongCodeValues) then
-		local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-		else ()     
-	)[position() le $limitErrors]
-return
-(if ($messages) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
+									let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series','service')]
+									let $codes := ('aar','abk','ace','ach','ada','ady','afa','afh','afr','ain','aka','akk','alb','ale','alg','alt','amh','ang','anp','apa','ara','arc','arg','arm','arn','arp','art','arw','asm','ast','ath','aus','ava','ave','awa','aym','aze','bad','bai','bak','bal','bam','ban','baq','bas','bat','bej','bel','bem','ben','ber','bho','bih','bik','bin','bis','bla','bnt','bos','bra','bre','btk','bua','bug','bul','bur','byn','cad','cai','car','cat','cau','ceb','cel','cha','chb','che','chg','chi','chk','chm','chn','cho','chp','chr','chu','chv','chy','cmc','cop','cor','cos','cpe','cpf','cpp','cre','crh','crp','csb','cus','cze','dak','dan','dar','day','del','den','dgr','din','div','doi','dra','dsb','dua','dum','dut','dyu','dzo','efi','egy','eka','elx','eng','enm','epo','est','ewe','ewo','fan','fao','fat','fij','fil','fin','fiu','fon','fre','frm','fro','frr','frs','fry','ful','fur','gaa','gay','gba','gem','geo','ger','gez','gil','gla','gle','glg','glv','gmh','goh','gon','gor','got','grb','grc','gre','grn','gsw','guj','gwi','hai','hat','hau','haw','heb','her','hil','him','hin','hit','hmn','hmo','hrv','hsb','hun','hup','iba','ibo','ice','ido','iii','ijo','iku','ile','ilo','ina','inc','ind','ine','inh','ipk','ira','iro','ita','jav','jbo','jpn','jpr','jrb','kaa','kab','kac','kal','kam','kan','kar','kas','kau','kaw','kaz','kbd','kha','khi','khm','kho','kik','kin','kir','kmb','kok','kom','kon','kor','kos','kpe','krc','krl','kro','kru','kua','kum','kur','kut','lad','lah','lam','lao','lat','lav','lez','lim','lin','lit','lol','loz','ltz','lua','lub','lug','lui','lun','luo','lus','mac','mad','mag','mah','mai','mak','mal','man','mao','map','mar','mas','may','mdf','mdr','men','mga','mic','min','mis','mkh','mlg','mlt','mnc','mni','mno','moh','mon','mos','mul','mun','mus','mwl','mwr','myn','myv','nah','nai','nap','nau','nav','nbl','nde','ndo','nds','nep','new','nia','nia','nic','niu','nno','nob','nog','non','nor','nqo','nso','nub','nwc','nya','nym','nyn','nyo','nzi','oci','oji','ori','orm','osa','oss','ota','oto','paa','pag','pal','pam','pan','pap','pau','peo','per','phi','phn','pli','pol','pon','por','pra','pro','pus','qaa-qtz','que','raj','rap','rar','roa','roh','rom','rum','run','rup','rus','sad','sag','sah','sai','sal','sam','san','sas','sat','scn','sco','sel','sem','sga','sgn','shn','sid','sin','sio','sit','sla','slo','slv','sma','sme','smi','smj','smn','smo','sms','sna','snd','snk','sog','som','son','sot','spa','srd','srn','srp','srr','ssa','ssw','suk','sun','sus','sux','swa','swe','syc','syr','tah','tai','tam','tat','tel','tem','ter','tet','tgk','tgl','tha','tib','tig','tir','tiv','tkl','tlh','tli','tmh','tog','ton','tpi','tsi','tsn','tso','tuk','tum','tup','tur','tut','tvl','twi','tyv','udm','uga','uig','ukr','umb','und','urd','uzb','vai','ven','vie','vol','vot','wak','wal','war','was','wel','wen','wln','wol','xal','xho','yao','yap','yid','yor','ypk','zap','zbl','zen','zha','znd','zul','zun','zxx','zza')
+									let $messages :=    
+										if (not($recordsToInspect)) then ()
+										else
+										(for $record in $recordsToInspect    
+										 let $rid := $record/gmd:fileIdentifier/*/text()
+										 let $languageCodes := $record/gmd:language/gmd:LanguageCode	 
+										 return
+										 if (not($languageCodes)) then
+											local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
+										 else 
+											let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
+											return
+											if ($wrongCodeValues) then
+											local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
+											else ()     
+										)[position() le $limitErrors]
+									return
+									(if ($messages) then 'FAILED' else 'PASSED',
+									 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+									 $messages)
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -107,7 +107,8 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EIDebdda4b4-0bb4-4255-a36a-db4fe540065c">
+								
+								
 								<TestAssertion id="EIDead447bf-7ace-4b13-b9b1-a80f8566c9cb">
 									<label>md common req C.6: Metadata Point of Contact</label>
 									<description><![CDATA["<p>Check the point of contact for the party responsible for the metadata. The multiplicity of this element is one or more.
