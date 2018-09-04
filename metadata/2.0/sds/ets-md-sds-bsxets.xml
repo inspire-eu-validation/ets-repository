@@ -302,7 +302,7 @@ let $messages :=
 			if (not($urls)) then
 				local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
 			else
-				let $X= $X+1
+				let $X:=0
 				for $href in $urls
 					let $url := string($href)
 					let $validuri := map:get($map, $url)
@@ -320,7 +320,7 @@ let $messages :=
 							let $root := fn:doc($url)/element()
 							return
 							if ($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = 'service']) then (
-								let $X= $X+1
+								$X+1
 							)
 							else 
 								local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) }) 
