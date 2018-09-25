@@ -331,6 +331,7 @@ return
 									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $dt := ('CI_DateTypeCode','http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode')							
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
@@ -338,7 +339,7 @@ let $messages :=
 	 let $creationTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('creation')]
 	 return
  if(count($creationTempRefs) ne 1) then
-		local:addMessage('TR.oneCreationDate', map { 'filename': local:filename($record), 'id': $rid })
+		local:addMessage('TR.moreThanOneCreationDate', map { 'filename': local:filename($record), 'id': $rid })
 	 else ()
 	)[position() le $limitErrors]
 return
@@ -348,7 +349,7 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.oneCreationDate"/>
+										<translationTemplate ref="TR.moreThanOneCreationDate"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -366,7 +367,7 @@ let $messages :=
 	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('revision')]
 	 return
 if(count($revisionTempRefs) ne 1) then
-		local:addMessage('TR.oneRevisionDate', map { 'filename': local:filename($record), 'id': $rid })
+		local:addMessage('TR.moreThanOneRevisionDate', map { 'filename': local:filename($record), 'id': $rid })
 	 else ()
 	)[position() le $limitErrors]
 return
@@ -376,7 +377,7 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.oneRevisionDate"/>
+										<translationTemplate ref="TR.moreThanOneRevisionDate"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
