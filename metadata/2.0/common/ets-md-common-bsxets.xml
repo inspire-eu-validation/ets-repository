@@ -247,6 +247,7 @@ They have to come defined through the children elements:</p>
 									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $iso19115_CIRoleCode := ('resourceProvider','custodian','owner','user','distributor','originator','pointOfContact','principalInvestigator','processor','publisher','author')
 let $regex := '^[a-zA-Z0-9\._%\+-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}$'
 let $messages := 
 	(for $record in $records
@@ -259,11 +260,13 @@ let $messages :=
 		return 
 		(if (not($organisationName) or string-length(normalize-space($organisationName/text())) = 0) then
 			local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid }) else (),
+     if (not($poc/gmd:role/*) or not($poc/gmd:role/*/@codeListValue = $iso19115_CIRoleCode)) then
+			local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid }) else (),
 		 if (not($emails)) then
 			local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 		 else if (some $email in $emails satisfies not(matches($email,$regex))) then
-		 	for $email in $emails 
-		 	where not(matches($email,$regex))
+		 	for $email in $emails
+		 	where (not(matches($email,$regex)) or string-length($email)=0)
 			return
 				local:addMessage('TR.invalidMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid, 'email': $email }) 
 		 else ()
@@ -278,6 +281,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.noMetadataContactOrganisationName"/>
 										<translationTemplate ref="TR.invalidMetadataContactEmailAddress"/>
+                    <translationTemplate ref="TR.noPointOfContactRole"/>                   
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -298,18 +302,10 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $timePeriods := $record/gmd:identificationInfo[1]/*/*[self::gmd:extent or self::srv:extent]/*/gmd:temporalElement/*/gmd:extent/*[self::gml:TimePeriod or self::gml31:TimePeriod]
-	 let $invalidTimePeriods := 
-		for $timePeriod in $timePeriods
-		return
-		if (not($timePeriod[(not(*:begin) or *:begin/*:TimeInstant) and (not(*:end) or *:end/*:TimeInstant)])) then $timePeriod
-		else ()
 	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/*
 	 let $relevantTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('publication','revision','creation')]
 	 return
-	 if ($invalidTimePeriods) then
-		local:addMessage('TR.timePeriodWithoutInlineTimeInstant', map { 'filename': local:filename($record), 'id': $rid })
-	 else if(not($relevantTempRefs)) then
+	 if(not($relevantTempRefs)) then
 		local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
 	 else ()
 	)[position() le $limitErrors]
@@ -331,14 +327,14 @@ return
 									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $dt := ('CI_DateTypeCode','http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode')							
+let $dt := ('CI_DateTypeCode','http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')	
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
 	 let $creationTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('creation')]
 	 return
- if(count($creationTempRefs) ne 1) then
+ if(count($creationTempRefs) ne 1 and count($creationTempRefs) ne 0) then
 		local:addMessage('TR.moreThanOneCreationDate', map { 'filename': local:filename($record), 'id': $rid })
 	 else ()
 	)[position() le $limitErrors]
@@ -360,13 +356,14 @@ return
 									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $dt := ('CI_DateTypeCode','http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')	
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gmd:CI_Date
-	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('revision')]
+	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeList = $dt and gmd:dateType/*/@codeListValue = 'revision']
 	 return
-if(count($revisionTempRefs) ne 1) then
+if(count($revisionTempRefs) ne 1 and count($revisionTempRefs) ne 0) then
 		local:addMessage('TR.moreThanOneRevisionDate', map { 'filename': local:filename($record), 'id': $rid })
 	 else ()
 	)[position() le $limitErrors]
@@ -395,11 +392,15 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gmd:CI_Date
-	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('revision')]
+	 let $timePeriods := $record/gmd:identificationInfo[1]/*/*[self::gmd:extent or self::srv:extent]/*/gmd:temporalElement/*/gmd:extent/*[self::gml:TimePeriod or self::gml31:TimePeriod]
+	 let $invalidTimePeriods := 
+		for $timePeriod in $timePeriods
+		return
+		if (not($timePeriod[(not(*:begin) or *:begin/*:TimeInstant) and (not(*:end) or *:end/*:TimeInstant)])) then $timePeriod
+		else ()
 	 return
-if(count($revisionTempRefs) ne 1) then
-		local:addMessage('TR.oneRevisionDate', map { 'filename': local:filename($record), 'id': $rid })
+	 if ($invalidTimePeriods) then
+		local:addMessage('TR.timePeriodWithoutInlineTimeInstant', map { 'filename': local:filename($record), 'id': $rid })
 	 else ()
 	)[position() le $limitErrors]
 return
@@ -409,7 +410,7 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.oneRevisionDate"/>
+										<translationTemplate ref="TR.timePeriodWithoutInlineTimeInstant"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -424,12 +425,21 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gmd:CI_Date
-	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('revision')]
+	 let $thesauri := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName
 	 return
-if(count($revisionTempRefs) ne 1) then
-		local:addMessage('TR.oneRevisionDate', map { 'filename': local:filename($record), 'id': $rid })
-	 else ()
+	 if (not($thesauri)) then ()
+	 else for $thesaurus in $thesauri
+		let $title := $thesaurus/*/gmd:title/*[1]/text()
+		let $hasExpectedDate := boolean($thesaurus/*/gmd:date/*[gmd:date/*/text() and gmd:dateType/*/@codeListValue = ('publication')])
+		return
+		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid}) 
+		 else if (string-length(normalize-space($title)) = 0) then
+     local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+		 else (),
+		 if (not($hasExpectedDate)) then 
+     local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title) then $title else ''}) 
+     else ()
+		)
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -438,8 +448,10 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.oneRevisionDate"/>
-										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noTitleForThesaurus"/>
+										<translationTemplate ref="TR.emptyTitleForThesaurus"/>
+										<translationTemplate ref="TR.invalidDateForThesaurus"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="76f901ca-c00f-11e8-a355-529269fb1459">
@@ -451,26 +463,24 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/gmd:CI_Date
-	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('revision')]
+	 let $keywords := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*
 	 return
-if(count($revisionTempRefs) ne 1) then
-		local:addMessage('TR.oneRevisionDate', map { 'filename': local:filename($record), 'id': $rid })
-	 else ()
+	 (if (not($keywords)) then
+		local:addMessage('TR.noKeywords', map { 'filename': local:filename($record), 'id': $rid })
+	 else if ($keywords[string-length(normalize-space(text())) = 0]) then ()
+	 else local:addMessage('TR.emptyKeywords', map { 'filename': local:filename($record), 'id': $rid }))
 	)[position() le $limitErrors]
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages) then 'FAILED' else 'PASSED MANUAL',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
-							  		</expression>
+ $messages)</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.oneRevisionDate"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noKeywords"/>
+										<translationTemplate ref="TR.emptyKeywords"/>
 									</translationTemplates>
 								</TestAssertion>
-								
-								
 							<TestAssertion id="EIDf7e5c9d6-7a5c-47cc-9c95-1d4f3a5f92eb">
 									<label>md common req C.17: Limitations on Public Access</label>
 									<description><![CDATA[<p>Check the information about the existence and its reasons in the limitations of public access to the data set. To do this, the element Legal Constraints will be used.</p>
@@ -488,16 +498,14 @@ let $iso19115_MD_RestrictionCode_without_otherRestrictions := ('copyright','pate
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $resourceConstraints := $record/gmd:identificationInfo/*/gmd:resourceConstraints/*
+	 let $resourceConstraints := $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
 	 let $validConstraints := 
 		for $resCon in $resourceConstraints
 			let $oneValidAccessConstraint := 
-				if ($resCon[gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue ='otherRestrictions' and string-length(normalize-space(fn:string-join(gmd:otherConstraints/*/text(),', '))) &gt; 0]) then true()
-				else if($resCon/gmd:accessConstraints/gmd:MD_RestrictionCode[@codeListValue = $iso19115_MD_RestrictionCode_without_otherRestrictions]) then true()
-				else false()
-			let $oneValidClassification := boolean($resCon/gmd:classification/gmd:MD_ClassificationCode[@codeListValue = $iso19115_MD_ClassificationCode])
+				if ($resCon[./gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue ='otherRestrictions'] and $resCon[./gmd:otherConstraints/gmx:Anchor/@xlink:href='http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a']) then true()
+       	else false()
 			return 
-			if ($oneValidAccessConstraint or $oneValidClassification) then $resCon else ()
+			if ($oneValidAccessConstraint) then $resCon else ()
 	 return
 	 if ($validConstraints) then ()
 	 else local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
@@ -573,9 +581,10 @@ The bounding box shall be as small as possible. This requires a manual check.</p
 									<parent ref="EID195437ba-3ca2-4b95-ab5d-3d33469605dd"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $levels := ('dataset', 'series', 'service')
+let $values := ('dataset', 'series')
 let $regex := '^-?\d+\.\d{2,}'
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)]
+let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $values]
 let $messages := 
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
@@ -610,7 +619,11 @@ let $messages :=
 		else ()
 	)[position() le $limitErrors]
 return
-(if ($messages//@ref = ('TR.noGeographicBoundingBox','TR.invalidGeographicBoundingBox')) then 'FAILED' else if ($recordsToInspect) then 'PASSED_MANUAL' else 'PASSED',
+(
+  if ($messages//@ref = ('TR.noGeographicBoundingBox','TR.invalidGeographicBoundingBox')) then 'FAILED'
+  else if ($recordsWithErrors) then 'FAILED'
+  else if ($recordsToInspect) then 'PASSED_MANUAL'
+  else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 							  		</expression>
@@ -670,13 +683,13 @@ let $messages :=
 	 else
 	 for $spec in $specifications
 		return
-		if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
+		(if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
 			local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
+		else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication')])) then
 			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 		else if (not($spec/ancestor::gmd:DQ_DomainConsistency)) then
 			local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
-		else ()
+		else ())
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -711,7 +724,9 @@ let $messages :=
 	 else
 		for $confResPass in $confResPasses
 		return
-		if (not($confResPass/*) and not($confResPass/@gco:nilReason = 'unknown')) then
+		if (not($confResPass/*) and not($confResPass/@gco:nilReason = 'unknown') and not($confResPass/gco:Boolean)) then
+			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+   else if (($confResPass/gco:Boolean) and not($confResPass/gco:Boolean/text()='true' or $confResPass/gco:Boolean/text()='false')) then
 			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
 		else () (: Schema validation will ensure that the content of $confResPass is a gco:Boolean with boolean value :)
 	)[position() le $limitErrors]
