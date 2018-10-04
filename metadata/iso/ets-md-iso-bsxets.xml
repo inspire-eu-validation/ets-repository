@@ -718,6 +718,27 @@ let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels and gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage]
 let $urls := fn:distinct-values($recordsToInspect/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text())
 let $map := local:check-resource-uris($urls, 30, true())
+let $first_validation := (for $record in $recordsToInspect
+  let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
+  return
+  if (not($urls)) then ()
+  else
+  for $url in $urls
+    let $validuri := map:get($map, $url)
+    return
+    if ($validuri = 'notHTTP') then ()
+    else if ($validuri = 'idNotFound') then ()
+    else if (starts-with($validuri, 'EXCEPTION')) then ()
+    else if (matches($validuri,'^\d{3}$')) then ()
+    else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
+      try { 
+      	let $root := fn:doc($url)/element()
+        	return
+        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then 'validuri'
+			else ()
+		} catch * { 
+      }
+    else ())[position() le $limitErrors]
 let $messages := (for $record in $recordsToInspect
   let $rid := $record/gmd:fileIdentifier/*/text()
   let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
@@ -737,14 +758,16 @@ let $messages := (for $record in $recordsToInspect
     else if (matches($validuri,'^\d{3}$')) then
 		local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
     else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
-      try {
-      	let $root := fn:doc($url)/element()
-        	return
-        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
+	  if ($first_validation = 'validuri') then ()
+	  else
+		  try {
+			let $root := fn:doc($url)/element()
+			return
+			if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
 			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) })
-		} catch * {
-			local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
-      }
+		  } catch * {
+				local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
+		  }
     else
        local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri }))[position() le $limitErrors]
 return
