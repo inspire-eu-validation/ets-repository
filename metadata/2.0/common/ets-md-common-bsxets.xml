@@ -254,40 +254,36 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $iso19115_CIRoleCode := ('resourceProvider','custodian','owner','user','distributor','originator','pointOfContact','principalInvestigator','processor','publisher','author')
-let $regex := '^[a-zA-Z0-9\._%\+-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}$'
 let $messages := 
-	(for $record in $records
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $pocs := $record/gmd:contact/* (: At least one gmd:contact is required - the XML Schema validation checks whether this condition is met. :)
-	 return
-		for $poc in $pocs
-		let $organisationName := $poc/gmd:organisationName/*[1]
-		let $emails := $poc/gmd:contactInfo/*/gmd:address/*/gmd:electronicMailAddress/*[1]/text()
-		return 
-		(if (not($organisationName) or string-length(normalize-space($organisationName/text())) = 0) then
-			local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid }) else (),
-     if (not($poc/gmd:role/*) or not($poc/gmd:role/*/@codeListValue = $iso19115_CIRoleCode)) then
-			local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid }) else (),
-		 if (not($emails)) then
-			local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
-		 else if (some $email in $emails satisfies not(matches($email,$regex))) then
-		 	for $email in $emails
-		 	where (not(matches($email,$regex)) or string-length($email)=0)
-			return
-				local:addMessage('TR.invalidMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid, 'email': $email }) 
-		 else ()
-		)
-	)[position() le $limitErrors]
-return
-(if ($messages) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
+		(for $record in $records
+		 let $rid := $record/gmd:fileIdentifier/*/text()
+		 let $pocs := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+		 return
+		 if(not($pocs)) then 
+		 	local:addMessage('TR.missingElement', map { 'element': 'CI_ResponsibleParty', 'xpath': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty' })
+		 else
+		 for $poc in $pocs
+		 let $orgName := $poc/gmd:organisationName
+		 let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+		 return
+		 	if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
+				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
+		 	else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
+				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
+		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
+				local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid })
+		 	else ()
+		)[position() le $limitErrors]
+	return
+	(if ($messages) then 'FAILED' else 'PASSED',
+	 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+	 $messages)
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noMetadataContactOrganisationName"/>
 										<translationTemplate ref="TR.invalidMetadataContactEmailAddress"/>
-                    <translationTemplate ref="TR.noPointOfContactRole"/>                   
+                    					<translationTemplate ref="TR.noPointOfContactRole"/>                   
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
