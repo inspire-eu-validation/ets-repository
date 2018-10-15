@@ -149,14 +149,10 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 									<expression>
 let $levels := ('dataset', 'series', 'service')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $messages := 	
-	(for $record in $recordsToInspect
-		let $countMetadataDate := count($record/*/gmd:dateStamp)
-		let $rid := $record/gmd:dateStamp/*/text()
-		return
-		if (($countMetadataDate &gt; 0)) then
-			local:addMessage('TR.oneDateStamp', map { 'filename': local:filename($record), 'id': $rid })
-		else ()
+let $messages :=
+	(if (count($records/gmd:dateStamp) != 1 or not($records/gmd:dateStamp/gco:DateTime) or not($records/gmd:dateStamp/gco:DateTime/node())) then
+		local:addMessage('TR.oneDateStamp', map { 'filename': local:filename($records), 'id': $records/gmd:fileIdentifier/*/text() })
+	else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
