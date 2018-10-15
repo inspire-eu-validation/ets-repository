@@ -222,16 +222,17 @@ return
 									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
-	(for $record in $records
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $abstract := $record/gmd:identificationInfo[1]/*/gmd:abstract/*[1]
-	 return
-	 if (not($abstract)) then
-		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
-	 else if (string-length(normalize-space($abstract/text())) = 0) then
-		local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($record), 'id': $rid })
-	 else ()
+let $messages :=
+	(let $abstract := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract
+	let $rid := $records/gmd:fileIdentifier/*/text()
+	return
+	if (not($abstract)) then
+		local:addMessage('TR.noAbstract', map { 'filename': local:filename($records), 'id': $rid })
+	else if (count($abstract) != 1) then
+		local:addMessage('TR.noAbstract', map { 'filename': local:filename($records), 'id': $rid })
+	else if (not($abstract/gco:CharacterString/node() or $abstract/gmx:Anchor/node())) then
+		local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($records), 'id': $rid })
+	else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
