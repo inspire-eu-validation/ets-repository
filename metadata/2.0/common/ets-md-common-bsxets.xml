@@ -440,22 +440,19 @@ let $regex := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $thesauri := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName
+	 let $thesauri := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName
 	 return
-	 if (not($thesauri)) then ()
+	 if(not($thesauri)) then ()
 	 else for $thesaurus in $thesauri
-		let $title := $thesaurus/*/gmd:title/*[1]/text()
-    let $date := $thesaurus/gmd:CI_Citation/gmd:date/*
-		let $hasExpectedDate := ($thesaurus/*/gmd:date/*[gmd:date/*/text() and gmd:dateType/*/@codeListValue = ('publication')])
-		return
-		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid}) 
-		 else if (string-length(normalize-space($title)) = 0) then
-     local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
-		 else (),
-		 if (not($hasExpectedDate)) then 
-       local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title) then $title else ''}) 
-      else()
-		)
+	 let $title := $thesaurus/gmd:CI_Citation/gmd:title
+	 let $date := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date
+	 let $dateTypeCode := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+	 return 
+	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
