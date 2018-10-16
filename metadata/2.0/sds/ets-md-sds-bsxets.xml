@@ -177,43 +177,6 @@ return
 									</translationTemplates>
 								</TestAssertion>
 
-								<TestAssertion id="EID23817dc1-026b-4c8b-812f-35bd9e5caf51">
-									<label>md sds 3.3: Spatial Resolution</label>
-									<description>
-<![CDATA[<p>The spatial resolution restriction text shall include either: an equivalent scale as integer valued scale denominator, or a resolution distance using a numerical length value and with a unit of length.</p><p>This test case only applies to records with a hierarchyLevel value 'service'.</p><p>Requirement involved:</p><ul>
-<li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD 4.1.2.1 - Req 3.3</a></li></ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/spatial-resolution"" target=""_blank""> Abstract Test Case 'Spatial Resolution '</a>]]>
-									</description>
-									<parent ref="EIDa389f1a0-803b-4748-ad13-3fc4a3bb9d73"/>
-									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>
-<!-- DONE -->
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
-let $messages :=
-	if (not($recordsToInspect)) then
-		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
-	else
-	
-		(for $record in $recordsToInspect
-			let $abstract := $record/gmd:identificationInfo[1]/*/gmd:abstract
-			let $rid := $record/gmd:fileIdentifier/*/text()
-			return
-			if (not($abstract)) then
-				local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
-			else ()
-		)[position() le $limitErrors]
-return
- (if ($messages//@ref = ('TR.isNotService','TR.noAbstract','TR.systemError')) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
-							  </expression>
-									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-									<translationTemplates>
-										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.isNotService"/>
-										<translationTemplate ref="TR.noAbstract"/>
-									</translationTemplates>
-								</TestAssertion>
-
 								<TestAssertion id="EID3dbd5b9f-5bd7-4033-a921-6f51a032e383">
 									<label>md sds 3.4: Spatial Data Service Category</label>
 									<description>
