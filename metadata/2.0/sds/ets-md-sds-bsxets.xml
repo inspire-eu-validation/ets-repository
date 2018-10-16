@@ -81,25 +81,38 @@ Pre-requisite conformance classes: none]]></description>
 								<TestAssertion id="EID646e587c-c43e-4643-b955-7228a6d3d054">
 									<label>md sds 3.1: Resource Type</label>
 									<description>
-									<![CDATA[<p>Checks that a resource type is provided as a service.</p><p>Requirement involved:</p>
-<ul><li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD, 4.1.1.1 - Req 3.1</a></li></ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/resource-type"" target=""_blank""> Abstract Test Case 'Resource Type'</a>]]>
+									<![CDATA[<p>Test that a resource type is provided as service.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/resource-type" target="_blank">Resource Type</a></p>]]>									
 									</description>
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- DONE -->									
-let $values := ('service')
-let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+<!-- DONE -->
+let $listvalues := ('service')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $listvalues)][position() le $limitErrors]
+let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $listvalues][position() le $limitErrors]
+let $messages :=
+	if ($recordsWithErrors) then
+		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsWithErrors), 'count': string(count($recordsWithErrors)) })
+	else
+		for $record in $recordsToInspect
+			let $level := $record/gmd:hierarchyLevel/gmd:MD_ScopeCode
+			let $rid := $record/gmd:fileIdentifier/*/text()
+			let $levelname := $record/gmd:hierarchyLevelName/gco:CharacterString
+			return
+			if (count($level) != 1) then
+				local:addMessage('TR.wrongMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($level)) })
+			else if (not($levelname)) then
+				local:addMessage('TR.missingElement', map { 'filename': local:filename($record), 'element': $levelname })
+			else if(count($levelname) != 1) then
+				local:addMessage('TR.wrongMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($levelname)) })
+			else if (not($levelname/node())) then
+				local:addMessage('TR.emptyHierarchyLevelName', map { 'filename': local:filename($record), 'element': $levelname })
+			else()
 return
-(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count($recordsWithErrors)),
- for $record in $recordsWithErrors
-   let $rid := $record/gmd:fileIdentifier/*/text()
-   order by $rid
-   let $levels := $record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue
-   return
-     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
-)
+(if ($messages) then 'FAILED' else 'PASSED',
+ 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -129,8 +142,8 @@ return
 								<TestAssertion id="EIDe8cb1dee-640a-4cfe-977f-b3dd93485fbd">
 									<label>md sds 3.2: Service Identification Element</label>
 									<description>
-									<![CDATA[<p>The test checks if a Service Identification is contained in an element gmd:identificationInfo for identifying an INSPIRE Spatial Data Service.</p><p>This test case only applies to records with a hierarchyLevel value 'service'.</p><p>Requirement involved:</p><ul>
-<li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD,4.1.2 - Req 3.2</a></li></ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/service-identification-element"" target=""_blank""> Abstract Test Case ' Service Identification Element '</a>]]>
+									<![CDATA[<p>Test that a resource identifier identifying the resource is given.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/service-identification-element" target="_blank">Service Identification Element</a></p>]]>									
 									</description>
 									<parent ref="EIDa389f1a0-803b-4748-ad13-3fc4a3bb9d73"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
@@ -142,15 +155,17 @@ let $messages :=
 		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
 	else
 		(for $record in $recordsToInspect
-			let $srvIdElements := $records[gmd:identificationInfo[1]/srv:SV_ServiceIdentification]
+			let $srvIdElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification
 			let $rid := $record/gmd:fileIdentifier/*/text()
 			return
 			if (not($srvIdElements)) then
 				local:addMessage('TR.serviceIdentificationNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
-			else ()
+			else if (count($srvIdElements) != 1) then
+				local:addMessage('TR.wrongMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
+			else()
 		)[position() le $limitErrors]
 return
-(if ($messages//@ref = ('TR.isNotService','TR.serviceIdentificationNotFound','TR.systemError')) then 'FAILED' else 'PASSED',
+(if ($messages) then 'FAILED' else 'PASSED',
  	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 							  </expression>
