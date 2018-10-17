@@ -101,13 +101,11 @@ let $messages :=
 			let $levelname := $record/gmd:hierarchyLevelName/gco:CharacterString
 			return
 			if (count($level) != 1) then
-				local:addMessage('TR.wrongMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($level)) })
-			else if (not($levelname)) then
-				local:addMessage('TR.missingElement', map { 'filename': local:filename($record), 'element': $levelname })
+				local:addMessage('TR.wrongHierarchyLevelMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($level)) })
 			else if(count($levelname) != 1) then
-				local:addMessage('TR.wrongMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($levelname)) })
+				local:addMessage('TR.wrongHierarchyLevelNameMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($levelname)) })
 			else if (not($levelname/node())) then
-				local:addMessage('TR.emptyHierarchyLevelName', map { 'filename': local:filename($record), 'element': $levelname })
+				local:addMessage('TR.emptyHierarchyLevelName', map { 'filename': local:filename($record), 'id': $rid })
 			else()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -118,6 +116,9 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.hierarchyLevel"/>
+										<translationTemplate ref="TR.wrongHierarchyLevelMultiplicity"/>
+										<translationTemplate ref="TR.wrongHierarchyLevelNameMultiplicity"/>
+										<translationTemplate ref="TR.emptyHierarchyLevelName"/>
 									</translationTemplates>
 								</TestAssertion>
 
@@ -161,7 +162,7 @@ let $messages :=
 			if (not($srvIdElements)) then
 				local:addMessage('TR.serviceIdentificationNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
 			else if (count($srvIdElements) != 1) then
-				local:addMessage('TR.wrongMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
+				local:addMessage('TR.wrongServiceIdentificationMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
 			else()
 		)[position() le $limitErrors]
 return
@@ -174,35 +175,51 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.serviceIdentificationNotFound"/>
+										<translationTemplate ref="TR.wrongServiceIdentificationMultiplicity"/>
 									</translationTemplates>
 								</TestAssertion>
 
 								<TestAssertion id="EID3dbd5b9f-5bd7-4033-a921-6f51a032e383">
 									<label>md sds 3.4: Spatial Data Service Category</label>
 									<description>
-<![CDATA[<p>A gmd:keyword element shall be included with the title of the theme as a Non-empty Free Text Element empty CharacterString content in the language of the metadata</p><p>This test case only applies to records with a hierarchyLevel value 'service'.</p><p>Requirement involved:</p><ul>
-<li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD,4.1.2.2 - Req 3.4</a></li></ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/sds-category"" target=""_blank""> Abstract Test Case '  Spatial Data Service Category '</a>]]>
+									<![CDATA[<p>Test that a Spatial Data Service category or subcategory is given.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/sds-category" target="_blank">SDS Category Keywords</a></p>]]>									
 									</description>
 									<parent ref="EIDa389f1a0-803b-4748-ad13-3fc4a3bb9d73"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 <!-- DONE -->
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
+let $validCategories := ('humanInteractionService','humanCatalogueViewer','humanGeographicViewer','humanGeographicSpreadsheetViewer','humanServiceEditor','humanChainDefinitionEditor','humanWorkflowEnactmentManager','humanGeographicFeatureEditor','humanGeographicSymbolEditor','humanFeatureGeneralizationEditor','humanGeographicDataStructureViewer')
 let $messages :=
 	if (not($recordsToInspect)) then
 		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
 	else
 		(for $record in $recordsToInspect
-			let $keywordElements := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:keyword
+			let $keywordElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString
 			let $rid := $record/gmd:fileIdentifier/*/text()
 			return
 			if (not($keywordElements)) then
 				local:addMessage('TR.keywordElementNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
-			else ()
+			else
+
+				let $valid :=
+					(for $keyword in $keywordElements
+						return
+						if ( $keyword/text() = $validCategories ) then
+							true()
+						else()
+					)[position() le $limitErrors]
+
+				return
+				if ( not($valid = true())  ) then
+					local:addMessage('TR.missingValidKeywordElement', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
+				else()
+
 		)[position() le $limitErrors]
 return
- (if ($messages//@ref = ('TR.isNotService','TR.keywordElementNotFound','TR.systemError')) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+(if ($messages) then 'FAILED' else 'PASSED',
+ 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -210,14 +227,15 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.keywordElementNotFound"/>
+										<translationTemplate ref="TR.missingValidKeywordElement"/>
 									</translationTemplates>
 								</TestAssertion>
 
 								<TestAssertion id="EID5189e7ff-121d-48d1-a000-8d327bd6350a">
 									<label>md sds 3.5: Spatial Data Service Type</label>
 									<description>
-<![CDATA[<p>Exactly one name describing the type of service must be given.</p><p>First, a check is performed to establish whether the serviceType element occurs exactly once in the document.</p><p>The test then checks if the element gco:LocalName contains text that equals one of the types given in <a> http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/SpatialDataServiceType.es.xml </a></p><p>This test case only applies to records with a hierarchyLevel value 'service'.</p><p>Requirement involved:</p><ul>
-<li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD 2.2 - Req 3.5</a></li></ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/sds-type"" target=""_blank""> Abstract Test Case 'Spatial Data Service Type '</a>]]>
+									<![CDATA[<p>Test that a Spatial Data Service category or subcategory is given.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/sds-type" target="_blank">SDS Type</a></p>]]>									
 									</description>
 									<parent ref="EIDa389f1a0-803b-4748-ad13-3fc4a3bb9d73"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
@@ -233,7 +251,7 @@ let $messages :=
 		return
 		(for $record in $recordsToInspect
 		 	let $rid := $record/gmd:fileIdentifier/*/text()
-		 	let $type := $record/gmd:identificationInfo[1]/*/srv:serviceType/gco:LocalName/text()
+		 	let $type := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/text()
 		 	return
 			if (not(count($type) = 1)) then
 				local:addMessage('TR.exactlyOneServiceType', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($type)) })
@@ -242,8 +260,8 @@ let $messages :=
 			else ()
 		)[position() le $limitErrors]
 return
- (if ($messages//@ref = ('TR.isNotService','TR.exactlyOneServiceType','TR.noTypeFromSpatialDataServiceType','TR.systemError')) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+(if ($messages) then 'FAILED' else 'PASSED',
+ 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -258,7 +276,8 @@ return
 								<TestAssertion id="EID8c227df0-8692-45ec-a734-26bd7d0e6752">
 									<label>md sds 3.6: Coupled Resource</label>
 									<description>
-<![CDATA[<p>The srv:operatesOn element shall be a HTTP URI that when retrieved using HTTP GET should return the metadata document describing the dataset exposed by this service. </p><p>The multiplicity of this element is zero or more.</p><p>This test case only applies to records with a hierarchyLevel value 'service'.</p><p>Requirement involved:</p><ul><li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD 4.1.2.4 - Req 3.6</a></li></ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/coupled-resource"" target=""_blank""> Abstract Test Case 'Linking to Provided Data Sets Using Coupled Resource '</a>]]>
+									<![CDATA[<p>Test that an operatesOn element refers to the target spatial data set(s) of the service, being implemented by reference.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/coupled-resource" target="_blank">Coupled Resource</a></p>]]>									
 									</description>
 									<parent ref="EIDa389f1a0-803b-4748-ad13-3fc4a3bb9d73"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
@@ -279,7 +298,6 @@ let $messages :=
 			if (not($urls)) then
 				local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
 			else
-				let $X:=0
 				for $href in $urls
 					let $url := string($href)
 					let $validuri := map:get($map, $url)
@@ -295,12 +313,11 @@ let $messages :=
 					else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
 						try { 
 							let $root := fn:doc($url)/element()
+							let $validCodes := ('dataset','series')
 							return
-							if ($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = 'service']) then (
-								$X+1
-							)
-							else 
+							if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
 								local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) }) 
+							else ()
 						} catch * { 
 							local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
 						}
@@ -308,8 +325,8 @@ let $messages :=
 						local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri })
 		)[position() le $limitErrors]
 return
- (if ($messages//@ref = ('TR.isNotService','TR.operatesOnWithoutXlink','TR.urlNotHttp','TR.idNotFound','TR.isNotService','TR.resourceNotAccessibleException','TR.resourceNotAccessible','TR.operatesOnWithoutDatasetOrSeriesRecord','TR.unknownResourceType','TR.systemError')) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+(if ($messages) then 'FAILED' else 'PASSED',
+ 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -347,9 +364,8 @@ return
 								<TestAssertion id="EIDc7d8d79c-7abe-4cdc-a085-cfb1acc961f0">
 									<label>md sds 3.7: Resource Locator</label>
 									<description>
-<![CDATA[<p>Check that a resource locator linking to the described service shall be given if online access to this service is available.</p><p>
-The multiplicity of this element is one or more.</p><p>This test case only applies to records with a hierarchyLevel value 'service'.</p><p>Requirement involved:</p><ul><li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD 4.1.3.1 - Req 3.7</a></li></ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/resource-locator"" target=""_blank""> Abstract Test Case ' Resource Locator for Services'</a>]]>
-
+									<![CDATA[<p>Test that a resource locator linking to the described Spatial Data Service is given if online access is available. If not, tests that is provided an URL pointing to an online resource providing additional information of the service, if available.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/resource-locator" target="_blank">Resource Locator</a></p>]]>									
 									</description>
 									<parent ref="EIDfbfd8ade-195d-4d9d-aac3-28350b53387b"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
@@ -362,15 +378,19 @@ let $messages :=
 	else
 		(for $record in $recordsToInspect
 			let $rid := $record/gmd:fileIdentifier/*/text()
-			let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/*/gmd:linkage/gmd:URL/text()
+			let $distributionInfoElements := $record/gmd:distributionInfo/gmd:MD_Distribution
 			return
-			if (not($urls)) then
-				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
-			else ()
+			(for $distribution in $distributionInfoElements
+				let $urls := $distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()
+				return
+				if (not($urls)) then
+					local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
+				else ()
+			)[position() le $limitErrors]
 		)[position() le $limitErrors]
 return
- (if ($messages//@ref = ('TR.isNotService','TR.linkageWithoutURL','TR.systemError')) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+(if ($messages) then 'FAILED' else 'PASSED',
+ 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -401,11 +421,13 @@ return
 								<TestAssertion id="EID34c2fbc3-9b47-4aab-9681-f5d2839ecf7b">
 									<label>md sds 3.8: Only One Data Quality Element</label>
 									<description>
-<![CDATA[<p>The test checks that shall be exactly one gmd:DQ_DataQuality element scoped to the entire described services.</p><p>This test case only applies to records with a hierarchyLevel value 'service'.</p><p>Requirement involved:</p><ul><li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD, 4.1.4.1 - Req 3.8</a></li></ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/only-one-dq-element"" target=""_blank""> Abstract Test Case 'Data Quality Info Section'</a>]]>
+									<![CDATA[<p>Test that a resource locator linking to the described Spatial Data Service is given if online access is available. If not, tests that is provided an URL pointing to an online resource providing additional information of the service, if available.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/only-one-dq-element" target="_blank">Only One Data Quality Info Element</a></p>]]>									
 									</description>
 									<parent ref="EIDe1fd463f-2056-4aa1-8c30-c625ad98a60c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+<!-- DONE -->
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
 let $messages := 	
 	if (not($recordsToInspect)) then
@@ -413,20 +435,21 @@ let $messages :=
 	else
 		(for $record in $recordsToInspect
 			let $rid := $record/gmd:fileIdentifier/*/text()
-			let $dataQuality := $record/gmd:dataQualityInfo[count(gmd:DQ_DataQuality)=1]
-
-			let $codelist := $record[gmd:dataQualityInfo[1]/*/gmd:scope/*/gmd:level/gmd:MD_ScopeCode/@codeListValue = 'service']
-
-			return 	 
-			if (not($dataQuality)) then
+			let $dataQuality := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality
+			let $codeList := $record[gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = 'service']
+			let $scopeDescription := $record/gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:levelDescription/gmd:MD_ScopeDescription/gmd:other/gco:CharacterString/node()
+			return
+			if ( count($dataQuality) != 1 ) then
 				local:addMessage('TR.oneDataQuality', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($codelist)) then
+			else if ( not($codeList) ) then
 				local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
-			else ()
+			else if ( not($scopeDescription) ) then
+				local:addMessage('TR.missingScopeDescription', map { 'filename': local:filename($record), 'id': $rid })
+			else()
 		)[position() le $limitErrors]
 return
- (if ($messages//@ref = ('TR.isNotService','TR.oneDataQuality','TR.invalidCodeList','TR.systemError')) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+(if ($messages) then 'FAILED' else 'PASSED',
+ 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -435,6 +458,7 @@ return
 										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.oneDataQuality"/>
 										<translationTemplate ref="TR.invalidCodeList"/>
+										<translationTemplate ref="TR.missingScopeDescription"/>
 									</translationTemplates>
 								</TestAssertion>
 
