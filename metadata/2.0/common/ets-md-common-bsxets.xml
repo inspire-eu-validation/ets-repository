@@ -478,15 +478,15 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $keywords := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*
+	 let $keywords := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
+	 let $thesaurusNameTitle := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
 	 return
-	 (if (not($keywords)) then
-		local:addMessage('TR.noKeywords', map { 'filename': local:filename($record), 'id': $rid })
-	 else if ($keywords[string-length(normalize-space(text())) = 0]) then ('PASSED')
-	 else local:addMessage('TR.emptyKeywords', map { 'filename': local:filename($record), 'id': $rid }))
+	 if (count($keywords) != count(distinct-values($thesaurusNameTitle))) then
+	   local:addMessage('TR.keywordsNotGroupedByVocabulary', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
 	)[position() le $limitErrors]
 return
-(if ($messages) then 'FAILED' else 'PASSED MANUAL',
+(if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
