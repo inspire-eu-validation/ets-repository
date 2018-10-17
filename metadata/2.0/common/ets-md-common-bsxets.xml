@@ -535,39 +535,21 @@ return
 									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $iso19115_MD_ClassificationCode := ('unclassified','restricted','confidential','secret','topSecret')
-let $iso19115_MD_RestrictionCode_without_otherRestrictions := ('copyright','patent','patentPending','trademark','license','intellectualPropertyRights','restricted')
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $resourceConstraints := $record/gmd:identificationInfo/*/gmd:resourceConstraints/*
-	 let $validConstraints := 
-		for $resCon in $resourceConstraints
-    
-			let $oneValidAccessConstraint := 
-				if ($resCon[gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue ='otherRestrictions' and string-length(normalize-space(fn:string-join(gmd:otherConstraints/*/text(),', '))) &gt; 0]) then 						true()
-				else if($resCon/gmd:accessConstraints/gmd:MD_RestrictionCode[@codeListValue = $iso19115_MD_RestrictionCode_without_otherRestrictions]) then true()
-				else false()
-			
-      let $oneValidUseConstraint := 
-				if ($resCon[gmd:useConstraints/gmd:MD_RestrictionCode/@codeListValue ='otherRestrictions' and string-length(normalize-space(fn:string-join(gmd:otherConstraints/*/text(),', '))) &gt; 0]) then 						true()
-				else if($resCon/gmd:useConstraints/gmd:MD_RestrictionCode[@codeListValue = $iso19115_MD_RestrictionCode_without_otherRestrictions]) then true()
-				else false()
-      
-      let $oneValidConstraint := 
-      if (not($oneValidUseConstraint) and not($oneValidAccessConstraint)) then
-        if($resCon[./gmd:otherConstraints/*/text()='noConditionsApply' or ./gmd:otherConstraints/*/text()='conditionsUnknown']) then 
-          true()
-       	else false()
-      else false()
-      
-      let $oneValidClassification := boolean($resCon/gmd:classification/gmd:MD_ClassificationCode[@codeListValue = $iso19115_MD_ClassificationCode])
-			return
-      
-			if (($oneValidAccessConstraint or $oneValidUseConstraint) and $oneValidConstraint and $oneValidClassification) then $resCon else ()
+	 let $resourceConstraints := 
+	   for $x in $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints
+	   where contains($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'ConditionsApplyingToAccessAndUse') or $x/gmd:otherConstraints/gco:CharacterString
+	   return $x
+	 let $valid := 
+	   for $x in $resourceConstraints
+	   where ($x/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' or $x/gmd:useConstraints/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions') and (starts-with($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply') or starts-with($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown') or $x/gmd:otherConstraints/gco:CharacterString/node())
+	   return $x
 	 return
-	 if ($validConstraints) then ()
-	 else local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+	 if (count($resourceConstraints) != 1 or count($valid) = 0) then
+	    local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+	 else()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
