@@ -506,17 +506,16 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $resourceConstraints := $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
-	 let $validConstraints := 
-		for $resCon in $resourceConstraints
-			let $oneValidAccessConstraint := 
-				if ($resCon[/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue ='otherRestrictions'] and $resCon[./gmd:otherConstraints/gmx:Anchor/@xlink:href='http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a']) then true()
-       	else false()
-			return 
-			if ($oneValidAccessConstraint) then $resCon else ()
+	 let $resourceConstraints := 
+	   for $x in $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints
+	   where contains($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'LimitationsOnPublicAccess')
+	   return $x
 	 return
-	 if ($validConstraints) then ()
-	 else local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+	 if (count($resourceConstraints) != 1) then
+	    local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+	 else if (not($resourceConstraints/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and starts-with($resourceConstraints/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/'))) then
+	    local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
