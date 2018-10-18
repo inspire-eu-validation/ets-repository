@@ -80,22 +80,20 @@ Pre-requisite conformance classes: Conformance Class 4]]></description>
 							
 								<TestAssertion id="EIDEID6a383435-fe64-46b8-9b67-a5ba2494879e">
 									<label>md sds-invocable 5.1: Spatial Data Service Type</label>
-									<description><![CDATA[<p>Exactly one name describing the type of service must be given.</p>
-									<p>First, a check is performed to establish whether the serviceType element occurs exactly once in the document.</p>
-									<p>The test then checks if the element gco:LocalName contains text text that shall be "other"<p></p>
-									<p>Requirement involved:</p><ul><li><a href=""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"" 
-									target=""_blank"">TG MD 4.3.1.1 - Req 5.1</a></li></ul><p>Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable/sds-type" 
-									target="_blank"> Abstract Test Case ' Spatial Data Service Type'</a>]]></description>
+									<description>
+									<![CDATA[<p>Test that a valid service type value for invocable spatial data services is provided.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable/sds-type" target="_blank">SDS Type</a></p>]]>									
+									</description>
 									<parent ref="EID1caa9aef-495c-4578-8f7a-3f94c01e902a"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- DONE -->									
+<!-- DONE -->
 let $messages :=
 		let $spatialDataServiceTypeCodeListURL := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType'
 		return
 		(for $record in $records
 		 	let $rid := $record/gmd:fileIdentifier/*/text()
-		 	let $type := $record/gmd:identificationInfo[1]/*/srv:serviceType/gco:LocalName/text()
+		 	let $type := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/text()
 		 	return
 			if (not(count($type) = 1)) then
 				local:addMessage('TR.exactlyOneServiceType', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($type)) })
@@ -104,9 +102,9 @@ let $messages :=
 			else ()
 		)[position() le $limitErrors]
 return
- (if ($messages//@ref = ('TR.isNotService','TR.exactlyOneServiceType','TR.noTypeFromSpatialDataServiceType','TR.systemError')) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
+(if ($messages) then 'FAILED' else 'PASSED',
+	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -138,20 +136,19 @@ return
 							
 								<TestAssertion id="EIDEID1578f1a6-aa1b-4375-89d7-8f2a5fb158ce">
 									<label>md sds-invocable 5.2: Resource Locator</label>
-									<description><![CDATA[<p>Check that access point of the Invocable Spatial Data Service is 
-									described in the using a gmd:CI_OnlineResource element</p><p>Requirement involved:</p><ul><li>
-									<a href=""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"" target=""_blank"">
-									TG MD 4.3.2.1 - Req 5.2</a></li></ul><p>Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable/access-point" target="_blank">
-									Abstract Test Case 'Resource Locator Access Point'</a>]]></description>
+									<description>
+									<![CDATA[<p>Test that is provided the access point of the service.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable/access-point" target="_blank">Access Point</a></p>]]>									
+									</description>
 									<parent ref="EIDaf111459-afad-4d26-8de4-b9207bc44098"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- DONE --> 					
+<!-- DONE -->
 let $messages :=
 	(for $record in $records
-		let $onlineResource := $record/gmd:distributionInfo/*/gmd:transferOptions/gmd:MD_DigitalTransferOptions/*/gmd:CI_OnlineResource[1]
-		let $accessUrl := $record/gmd:distributionInfo/*/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/*/gmd:linkage/gmd:URL
-		let $accessText := $record/gmd:distributionInfo/*/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/*/gmd:description/gmx:Anchor/@xlink:href='http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint'
+		let $onlineResource := $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[1]
+		let $accessUrl := $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
+		let $accessText := $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:description/gmx:Anchor/@xlink:href='http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint'
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
 		if (count($onlineResource) = 0) then
@@ -212,11 +209,12 @@ return
 									<parent ref="EID81f60686-9bc6-4073-8081-cb52eeaa7701"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- DONE -->
+
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $confResults := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/gmd:DQ_ConformanceResult
+		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+		
 		let $booleanValues := true
 		let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/gmd:DQ_ConformanceResult/gmd:specification
 		let $oneSpecification := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult[count(gmd:specification)=1]
@@ -280,7 +278,7 @@ return
 									<parent ref="EID81f60686-9bc6-4073-8081-cb52eeaa7701"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- DONE -->
+
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
@@ -352,6 +350,7 @@ return
 									<parent ref="EID81f60686-9bc6-4073-8081-cb52eeaa7701"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
