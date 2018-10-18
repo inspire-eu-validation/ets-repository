@@ -115,7 +115,7 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.hierarchyLevel"/>
+										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.wrongHierarchyLevelMultiplicity"/>
 										<translationTemplate ref="TR.wrongHierarchyLevelNameMultiplicity"/>
 										<translationTemplate ref="TR.emptyHierarchyLevelName"/>
@@ -150,21 +150,17 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
  <!-- DONE -->
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
 let $messages :=
-	if (not($recordsToInspect)) then 
-		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
-	else
-		(for $record in $recordsToInspect
-			let $srvIdElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification
-			let $rid := $record/gmd:fileIdentifier/*/text()
-			return
-			if (not($srvIdElements)) then
-				local:addMessage('TR.serviceIdentificationNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
-			else if (count($srvIdElements) != 1) then
-				local:addMessage('TR.wrongServiceIdentificationMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
-			else()
-		)[position() le $limitErrors]
+	(for $record in $records
+		let $srvIdElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		return
+		if (not($srvIdElements)) then
+			local:addMessage('TR.serviceIdentificationNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
+		else if (count($srvIdElements) != 1) then
+			local:addMessage('TR.wrongServiceIdentificationMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($srvIdElements)) })
+		else()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -173,7 +169,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.serviceIdentificationNotFound"/>
 										<translationTemplate ref="TR.wrongServiceIdentificationMultiplicity"/>
 									</translationTemplates>
@@ -189,34 +184,30 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 <!-- DONE -->
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
 let $validCategories := ('humanInteractionService','humanCatalogueViewer','humanGeographicViewer','humanGeographicSpreadsheetViewer','humanServiceEditor','humanChainDefinitionEditor','humanWorkflowEnactmentManager','humanGeographicFeatureEditor','humanGeographicSymbolEditor','humanFeatureGeneralizationEditor','humanGeographicDataStructureViewer')
 let $messages :=
-	if (not($recordsToInspect)) then
-		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
-	else
-		(for $record in $recordsToInspect
-			let $keywordElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString
-			let $rid := $record/gmd:fileIdentifier/*/text()
+	(for $record in $records
+		let $keywordElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		return
+		if (not($keywordElements)) then
+			local:addMessage('TR.keywordElementNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
+		else
+
+			let $valid :=
+				(for $keyword in $keywordElements
+					return
+					if ( $keyword/text() = $validCategories ) then
+						true()
+					else()
+				)[position() le $limitErrors]
+
 			return
-			if (not($keywordElements)) then
-				local:addMessage('TR.keywordElementNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
-			else
+			if ( not($valid = true())  ) then
+				local:addMessage('TR.missingValidKeywordElement', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
+			else()
 
-				let $valid :=
-					(for $keyword in $keywordElements
-						return
-						if ( $keyword/text() = $validCategories ) then
-							true()
-						else()
-					)[position() le $limitErrors]
-
-				return
-				if ( not($valid = true())  ) then
-					local:addMessage('TR.missingValidKeywordElement', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
-				else()
-
-		)[position() le $limitErrors]
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -225,7 +216,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.keywordElementNotFound"/>
 										<translationTemplate ref="TR.missingValidKeywordElement"/>
 									</translationTemplates>
@@ -241,24 +231,20 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 <!-- DONE -->
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
 let $messages :=
-	if (not($recordsToInspect)) then
-		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
-	else
-		let $spatialDataServiceTypeCodeListURL := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType'
-		let $codes := ('discovery','view','download','transformation','invoke','other')
+	let $spatialDataServiceTypeCodeListURL := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType'
+	let $codes := ('discovery','view','download','transformation','invoke','other')
+	return
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $type := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/text()
 		return
-		(for $record in $recordsToInspect
-		 	let $rid := $record/gmd:fileIdentifier/*/text()
-		 	let $type := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/text()
-		 	return
-			if (not(count($type) = 1)) then
-				local:addMessage('TR.exactlyOneServiceType', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($type)) })
-			else if(not($type = $codes)) then
-				local:addMessage('TR.noTypeFromSpatialDataServiceType',  map { 'filename': local:filename($record), 'id': $rid, 'url': $spatialDataServiceTypeCodeListURL, 'type': $type })
-			else ()
-		)[position() le $limitErrors]
+		if (not(count($type) = 1)) then
+			local:addMessage('TR.exactlyOneServiceType', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($type)) })
+		else if(not($type = $codes)) then
+			local:addMessage('TR.noTypeFromSpatialDataServiceType',  map { 'filename': local:filename($record), 'id': $rid, 'url': $spatialDataServiceTypeCodeListURL, 'type': $type })
+		else ()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -267,7 +253,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.exactlyOneServiceType"/>
 										<translationTemplate ref="TR.noTypeFromSpatialDataServiceType"/>
 									</translationTemplates>
@@ -283,47 +268,43 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 <!-- DONE -->
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
-let $urls := $recordsToInspect/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
+let $urls := $records/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
 let $map := local:check-resource-uris($urls, 30, false())
 
 let $messages :=
-	if (not($recordsToInspect)) then
-		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
-	else
-		(for $record in $recordsToInspect
-			let $rid := $record/gmd:fileIdentifier/*/text()
-			let $urls := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
-			return  
-			if (not($urls)) then
-				local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
-			else
-				for $href in $urls
-					let $url := string($href)
-					let $validuri := map:get($map, $url)
-					return
-					if ($validuri = 'notHTTP') then
-						local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
-					else if ($validuri = 'idNotFound') then
-						local:addMessage('TR.idNotFound', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
-					else if (starts-with($validuri, 'EXCEPTION')) then
-						local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
-					else if (matches($validuri,'^\d{3}$')) then
-						local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
-					else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
-						try { 
-							let $root := fn:doc($url)/element()
-							let $validCodes := ('dataset','series')
-							return
-							if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
-								local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) }) 
-							else ()
-						} catch * { 
-							local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
-						}
-					else
-						local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri })
-		)[position() le $limitErrors]
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $urls := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
+		return  
+		if (not($urls)) then
+			local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
+		else
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+				if ($validuri = 'notHTTP') then
+					local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+				else if ($validuri = 'idNotFound') then
+					local:addMessage('TR.idNotFound', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+				else if (starts-with($validuri, 'EXCEPTION')) then
+					local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
+				else if (matches($validuri,'^\d{3}$')) then
+					local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
+				else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
+					try { 
+						let $root := fn:doc($url)/element()
+						let $validCodes := ('dataset','series')
+						return
+						if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
+							local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) }) 
+						else ()
+					} catch * { 
+						local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
+					}
+				else
+					local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri })
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -332,7 +313,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.operatesOnWithoutXlink"/>
 										<translationTemplate ref="TR.urlNotHttp"/>
 										<translationTemplate ref="TR.idNotFound"/>
@@ -371,23 +351,19 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 <!-- DONE -->								
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
 let $messages := 	
-	if (not($recordsToInspect)) then
-		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
-	else
-		(for $record in $recordsToInspect
-			let $rid := $record/gmd:fileIdentifier/*/text()
-			let $distributionInfoElements := $record/gmd:distributionInfo/gmd:MD_Distribution
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $distributionInfoElements := $record/gmd:distributionInfo/gmd:MD_Distribution
+		return
+		(for $distribution in $distributionInfoElements
+			let $urls := $distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()
 			return
-			(for $distribution in $distributionInfoElements
-				let $urls := $distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()
-				return
-				if (not($urls)) then
-					local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
-				else ()
-			)[position() le $limitErrors]
+			if (not($urls)) then
+				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
 		)[position() le $limitErrors]
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -396,7 +372,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.linkageWithoutURL"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -428,25 +403,21 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 <!-- DONE -->
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
 let $messages := 	
-	if (not($recordsToInspect)) then
-		local:addMessage('TR.isNotService', map { 'filename': local:filename($recordsToInspect), 'count': string(count($recordsToInspect)) })
-	else
-		(for $record in $recordsToInspect
-			let $rid := $record/gmd:fileIdentifier/*/text()
-			let $dataQuality := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality
-			let $codeList := $record[gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = 'service']
-			let $scopeDescription := $record/gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:levelDescription/gmd:MD_ScopeDescription/gmd:other/gco:CharacterString/node()
-			return
-			if ( count($dataQuality) != 1 ) then
-				local:addMessage('TR.oneDataQuality', map { 'filename': local:filename($record), 'id': $rid })
-			else if ( not($codeList) ) then
-				local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
-			else if ( not($scopeDescription) ) then
-				local:addMessage('TR.missingScopeDescription', map { 'filename': local:filename($record), 'id': $rid })
-			else()
-		)[position() le $limitErrors]
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $dataQuality := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality
+		let $codeList := $record[gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = 'service']
+		let $scopeDescription := $record/gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:levelDescription/gmd:MD_ScopeDescription/gmd:other/gco:CharacterString/node()
+		return
+		if ( count($dataQuality) != 1 ) then
+			local:addMessage('TR.oneDataQuality', map { 'filename': local:filename($record), 'id': $rid })
+		else if ( not($codeList) ) then
+			local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
+		else if ( not($scopeDescription) ) then
+			local:addMessage('TR.missingScopeDescription', map { 'filename': local:filename($record), 'id': $rid })
+		else()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -455,7 +426,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.oneDataQuality"/>
 										<translationTemplate ref="TR.invalidCodeList"/>
 										<translationTemplate ref="TR.missingScopeDescription"/>
