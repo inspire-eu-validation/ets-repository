@@ -116,17 +116,18 @@ return
 									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $recordsWithErrors := $records[count(gmd:identificationInfo/gmd:MD_DataIdentification)>1][position() le $limitErrors]
+let $messages := (
+	for $record in $records
+	let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+	return
+	if(count($record/gmd:identificationInfo[1]/gmd:MD_DataIdentification) != 1) then
+		local:addMessage('TR.identificationInfo', map { 'filename': local:filename($record), 'id': $rid, 'identificationInfo': fn:string-join($record/gmd:identificationInfo[1]/gmd:MD_DataIdentification,', ') })
+	else ()
+)[position() le $limitErrors]
 return
-(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count($recordsWithErrors)),
- for $record in $recordsWithErrors
-   let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
-   order by $rid
-   let $dataIdentification := $record/gmd:identificationInfo/gmd:MD_DataIdentification
-   return
-     local:addMessage('TR.identificationInfo', map { 'filename': local:filename($record), 'id': $rid, 'identificationInfo': fn:string-join($dataIdentification,', ') })
-)
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
