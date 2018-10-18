@@ -715,23 +715,30 @@ return
 									<parent ref="EID61e80a06-c181-11e8-a355-529269fb1459"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $levels := ('dataset', 'series', 'service')
-let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
-	(for $record in $recordsToInspect
+	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $confResPasses := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:pass
+	 let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result
 	 return 
-	 if (not($confResPasses)) then
+	 if (not($result)) then
 		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
 	 else
-		for $confResPass in $confResPasses
+	 	(for $res in $result
+		let $pass := $res/gmd:DQ_ConformanceResult/gmd:pass
 		return
-		if (not($confResPass/*) and not($confResPass/@gco:nilReason = 'unknown') and not($confResPass/gco:Boolean)) then
+		if ($pass) then
+			if($pass/gco:Boolean) then
+				if (not($pass/gco:Boolean/text() = 'true' or $pass/gco:Boolean/text() = 'false')) then
+					local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+				else ()
+			else if (not($pass/@gco:nilReason)) then
+				local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($pass/@gco:nilReason = 'unknown')) then
+				local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
+		else 
 			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
-   else if (($confResPass/gco:Boolean) and not($confResPass/gco:Boolean/text()='true' or $confResPass/gco:Boolean/text()='false')) then
-			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
-		else () (: Schema validation will ensure that the content of $confResPass is a gco:Boolean with boolean value :)
+		)
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
