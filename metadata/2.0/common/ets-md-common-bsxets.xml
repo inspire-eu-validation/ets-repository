@@ -192,7 +192,11 @@ return
 								<expectedResult>NOT_APPLICABLE</expectedResult>
 								<expression>
 let $messages :=
-	(let $title := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title
+	(let $title := 
+		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$records/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:title
+		else
+			$records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title
 	let $rid := $records/gmd:fileIdentifier/*/text()
 	return
 	if (not($title)) then
