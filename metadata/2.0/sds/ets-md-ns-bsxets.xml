@@ -40,7 +40,7 @@ Pre-requisite conformance classes: Conformance Class 3]]></description>
 		</parameter>
 		<parameter name="tests_to_execute" required="false">
 			<defaultValue>.*</defaultValue>
-			<description ref="TR.testsToExecute" />
+			<description ref="TR.testsToExecute"/>
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
@@ -59,11 +59,9 @@ Pre-requisite conformance classes: Conformance Class 3]]></description>
 			<testCases>
 				<TestCase id="EIDce502e54-bfd6-491c-b907-500726487443">
 					<label>Identification</label>
-					<description>Execute tests that apply for network metadata records
-						on elements that are child elements of the
-						section of the XML document: Identification Info (property of the
-						gmd:MD_Metadata element).
-						This section contains information specific to the network services.</description>
+					<description>Execute tests that apply for network metadata records on elements that are child elements of the section of the XML document: Identification Info (property of the
+						gmd:MD_Metadata element). This section contains information specific to the network services.
+					</description>
 					<parent ref="EIDd44b5dd9-af99-4cca-838b-6f0dc5c00337" />
 					<testSteps>
 						<TestStep id="EIDbfdca37e-eb58-4484-9511-a1f14ac1c414">
@@ -76,47 +74,37 @@ Pre-requisite conformance classes: Conformance Class 3]]></description>
 								<TestAssertion id="EID6836c014-202c-451f-a111-dc98b1fdad02">
 									<label>md ns 4.1: Spatial Data Service Type</label>
 									<description>
-<![CDATA[<p>Exactly one name describing the type of service must be given.</p><p>First, a check is performed to establish whether the serviceType element occurs exactly once in the document.</p><p>The test then checks if the element gco:LocalName contains text text that shall be ""view"", ""download"", ""discovery"" or ""transformation"" depending on the kind of the described Network Service.</p><p></p><p>Requirement involved:</p>
-<ul>
-<li><a href=""""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"""" target=""""_blank"""">TG MD 4.2.1.1 - Req 4.1</a></li>
-</ul><p>Source: <a href=""http://inspire.ec.europa.eu/id/ats/metadata/2.0/ns/sds-type"" target=""_blank""> Abstract Test Case ' Spatial Data Service Type '</a>]]></description>
+									<![CDATA[<p>Test that exactly one valid service type value is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ns/sds-type" target="_blank">SDS Type</a></p>]]>	
+									</description>								
 									<parent ref="EIDbfdca37e-eb58-4484-9511-a1f14ac1c414" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-										<!-- DONE -->
-										let $messages :=
-										let $spatialDataServiceTypeCodeListURL :=
-										'http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType'
-										return
-										(for $record in $records
-										let $rid := $record/gmd:fileIdentifier/*/text()
-										let $type :=
-										$record/gmd:identificationInfo[1]/*/srv:serviceType/gco:LocalName/text()
-										return
-										if (not(count($type) = 1)) then
-										local:addMessage('TR.exactlyOneServiceType', map { 'filename':
-										local:filename($record), 'id': $rid, 'count':
-										string(count($type)) })
-										else if(not($type = 'view') and not($type = 'download') and
-										not($type = 'discovery') and not($type = 'transformation'))
-										then
-										local:addMessage('TR.noTypeFromSpatialDataServiceType', map { 'filename': local:filename($record), 'id': $rid, 'url':
-										$spatialDataServiceTypeCodeListURL, 'type': $type })
-										else ()
-										)[position() le $limitErrors]
-										return
-										(if ($messages//@ref =
-										('TR.isNotService','TR.exactlyOneServiceType','TR.noTypeFromSpatialDataServiceType','TR.systemError'))
-										then 'FAILED' else 'PASSED',
-										local:error-statistics('TR.recordsWithErrors',
-										count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-										$messages)
+<!-- DONE -->
+let $messages :=
+	let $spatialDataServiceTypeCodeListURL := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType'
+	let $validtypes := ('view','download','discovery','transformation')
+	return
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $type := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/text()
+		return
+		if (not(count($type) = 1)) then
+			local:addMessage('TR.exactlyOneServiceType', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($type)) })
+		else if( not($type = $validtypes) ) then
+			local:addMessage('TR.noTypeFromSpatialDataServiceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $spatialDataServiceTypeCodeListURL, 'type': $type })
+		else ()
+	)[position() le $limitErrors]
+	return
+(if ($messages) then 'FAILED' else 'PASSED',
+	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
 									<translationTemplates>
-										<translationTemplate ref="TR.noTitle" />
-										<translationTemplate ref="TR.emptyTitle" />
 										<translationTemplate ref="TR.recordsWithErrors" />
+										<translationTemplate ref="TR.exactlyOneServiceType" />
+										<translationTemplate ref="TR.noTypeFromSpatialDataServiceType" />
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
