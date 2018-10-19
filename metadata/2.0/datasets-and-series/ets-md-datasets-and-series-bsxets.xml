@@ -481,16 +481,14 @@ return
 									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $levels := ('dataset', 'series')
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $messages :=    
-    (for $record in $recordsToInspect
+    (for $record in $records
         let $rid := $record/gmd:fileIdentifier/*/text()
-        let $lineageStatement := $record/gmd:dataQualityInfo/*/gmd:lineage/gmd:LI_Lineage/gmd:statement/*[1]
+		let $lineageStatement := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:statement
         return   
-        if (count($lineageStatement) ne 1) then
+        if (count($lineageStatement) != 1) then
             local:addMessage('TR.wrongNumberOfLineageStatements',  map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($lineageStatement)) })
-        else if (string-length(normalize-space($lineageStatement/text())) = 0) then
+        else if (not($lineageStatement) or not($lineageStatement/gco:CharacterString/node() or $lineageStatement/gmx:Anchor/node())) then
             local:addMessage('TR.emptyLineageStatement',  map { 'filename': local:filename($record), 'id': $rid })
         else ()         
     )[position() le $limitErrors] 
