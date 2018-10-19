@@ -152,19 +152,17 @@ let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($
 let $messages :=    
     (for $record in $recordsToInspect
         let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
-        let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*
+        let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code
         return
         if (not($identifiers)) then
             local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($distinctRecordIdentifiers) != count($identifiers)) then
+            local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': $identifiers/*/text() })
         else
             for $identifier in $identifiers
             return
-            if (not($identifier)) then
+			if (not($identifier) or not($identifier/gco:CharacterString/node() or $identifier/gmx:Anchor/node())) then
                 local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-            else if (not($identifier/@xlink:href) or not(fn:string-length(normalize-space($identifier/@xlink:href)) &gt; 0)) then
-                local:addMessage('TR.emptyXlinkHrefIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-            else if ($identifier = $duplicateDistinctRecordIdentifiers) then
-                local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': $identifier })
             else ()
     )[position() le $limitErrors]
 return
