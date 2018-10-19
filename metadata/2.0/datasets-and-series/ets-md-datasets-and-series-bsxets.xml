@@ -189,7 +189,12 @@ let $levels := ('dataset', 'series')
 let $THEMES_TITLE := 'GEMET - INSPIRE themes, version 1.0'
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels and gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]
 let $messages :=
-	if (not($recordsToInspect)) then ()
+	if (not($recordsToInspect)) then
+		for $record in $records
+		return
+		if (count($record[gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]) = 0) then
+			local:addMessage('TR.missingElement', map { 'element': local:filename($record) || ' gmd:descriptiveKeywords', 'xpath': '/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text() = GEMET - INSPIRE themes, version 1.0' })
+		else()
 	else
 		try {    			
 			let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
@@ -201,7 +206,7 @@ let $messages :=
 				(for $record in $recordsToInspect
 					let $rid := $record/gmd:fileIdentifier/*/text()
 					let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/CI_Citation/gmd:title/*/text() = $THEMES_TITLE]
-					return 			 			 
+					return
 					if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
 						local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
 					else ()
@@ -219,6 +224,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.systemError"/>
+										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.noKeywordFromINSPIREThemes"/>
 									</translationTemplates>
 								</TestAssertion>
