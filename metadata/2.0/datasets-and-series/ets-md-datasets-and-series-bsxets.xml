@@ -235,10 +235,8 @@ return
 									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $levels := ('dataset', 'series')
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $messages := 	
-	(for $record in $recordsToInspect
+	(for $record in $records
 		let $countResolutions := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution)
 		let $countScale := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale)
 		let $countDistance := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance)
@@ -246,9 +244,12 @@ let $messages :=
 		return
 		if (($countResolutions &gt; 0) and ($countScale = 0) and ($countDistance = 0)) then
 			local:addMessage('TR.noResolutions', map { 'filename': local:filename($record), 'id': $rid })
-		else if (($countScale &gt; 0) and ($countDistance &gt; 0)) then
-			local:addMessage('TR.mixedResolutions', map { 'filename': local:filename($record), 'id': $rid })
-		else ()
+		else
+			for $spatialResolution in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution
+			return
+			if (count($spatialResolution/gmd:MD_Resolution/gmd:equivalentScale) > 0 and count($spatialResolution/gmd:MD_Resolution/gmd:distance) > 0) then
+				local:addMessage('TR.mixedResolutions', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
