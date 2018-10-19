@@ -308,13 +308,11 @@ return
 									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $levels := ('dataset', 'series')
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $codes := ('biota','boundaries','climatologyMeteorologyAtmosphere','economy','elevation','environment','farming','geoscientificInformation','health','imageryBaseMapsEarthCover','inlandWaters','intelligenceMilitary','location','oceans','planningCadastre','society','structure','transportation','utilitiesCommunication')
 let $messages :=    
-    (for $record in $recordsToInspect
+    (for $record in $records
         let $rid := $record/gmd:fileIdentifier/*/text()
-        let $topicCategories := $record/gmd:identificationInfo[1]/*/gmd:topicCategory/*
+        let $topicCategories := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:topicCategory/*
         return   
         if (not($topicCategories[self::gmd:MD_TopicCategoryCode])) then
             local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
