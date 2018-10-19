@@ -150,9 +150,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 let $levels := ('dataset', 'series', 'service')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $messages :=
-	(if (count($records/gmd:dateStamp) != 1 or not($records/gmd:dateStamp/gco:DateTime) or not($records/gmd:dateStamp/gco:DateTime/node())) then
-		local:addMessage('TR.oneDateStamp', map { 'filename': local:filename($records), 'id': $records/gmd:fileIdentifier/*/text() })
-	else ()
+	(for $record in $recordsToInspect
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	return
+		if (count($record/gmd:dateStamp) != 1 or not($record/gmd:dateStamp/gco:DateTime) or not($record/gmd:dateStamp/gco:DateTime/node())) then
+			local:addMessage('TR.oneDateStamp', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -192,20 +195,22 @@ return
 								<expectedResult>NOT_APPLICABLE</expectedResult>
 								<expression>
 let $messages :=
-	(let $title := 
-		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
-			$records/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:title
+	(for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $title := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:title
 		else
-			$records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title
-	let $rid := $records/gmd:fileIdentifier/*/text()
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title
+	let $rid := $record/gmd:fileIdentifier/*/text()
 	return
-	if (not($title)) then
-		local:addMessage('TR.noTitle', map { 'filename': local:filename($records), 'id': $rid })
-	else if (count($title) != 1) then
-		local:addMessage('TR.noTitle', map { 'filename': local:filename($records), 'id': $rid })
-	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then
-		local:addMessage('TR.emptyTitle', map { 'filename': local:filename($records), 'id': $rid })
-	else ()
+		if (not($title)) then
+			local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
+		else if (count($title) != 1) then
+			local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then
+			local:addMessage('TR.emptyTitle', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -228,20 +233,20 @@ return
 									<expression>
 let $messages :=
 	(
+	for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
 	let $abstract := 
-		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
-			$records/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:abstract
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:abstract
 		else
-			$records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract
-
-	let $rid := $records/gmd:fileIdentifier/*/text()
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract
 	return
 	if (not($abstract)) then
-		local:addMessage('TR.noAbstract', map { 'filename': local:filename($records), 'id': $rid })
+		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
 	else if (count($abstract) != 1) then
-		local:addMessage('TR.noAbstract', map { 'filename': local:filename($records), 'id': $rid })
+		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
 	else if (not($abstract/gco:CharacterString/node() or $abstract/gmx:Anchor/node())) then
-		local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($records), 'id': $rid })
+		local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($record), 'id': $rid })
 	else ()
 	)[position() le $limitErrors]
 return
@@ -455,11 +460,10 @@ let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $thesauri := 
-		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
 			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName
 		else
 			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName
-
 	 return
 	 if(not($thesauri)) then ()
 	 else for $thesaurus in $thesauri
@@ -498,12 +502,12 @@ let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $keywords := 
-		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
 			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
 		else
 			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
 	 let $thesaurusNameTitle := 
-		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
 			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
 		else
 			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
@@ -596,33 +600,35 @@ return
 									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $extents := 
-    if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
-		$records/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
-    else
-        $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
-let $regex := '^-?\d+\.\d{2,}'
-let $rid := $records/gmd:fileIdentifier/*/text()
 let $messages := 
-	(if (($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'dataset' or $records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'series') and not($extents)) then
-	  local:addMessage('TR.noGeographicBoundingBox', map { 'filename': local:filename($records), 'id': $rid })
-	else
-	(
-	for $extent in $extents
-	 return
-	 let $west := $extent/gmd:westBoundLongitude/gco:Decimal/text()
-	 let $east := $extent/gmd:eastBoundLongitude/gco:Decimal/text()
-	 let $south := $extent/gmd:southBoundLatitude/gco:Decimal/text()
-	 let $north := $extent/gmd:northBoundLatitude/gco:Decimal/text()
-	 return
-	 if (not(($west and matches($west,$regex) and fn:number($west) &gt;= -180 and fn:number($west) &lt;= 180) and
-	 			($east and matches($east,$regex) and fn:number($east) &gt;= -180 and fn:number($east) &lt;= 180) and
-	 			($south and matches($south,$regex) and fn:number($south) &gt;= -90 and fn:number($south) &lt;= 90) and
-	 			($north and matches($north,$regex) and fn:number($north) &gt;= -90 and fn:number($north) &lt;= 90) and
-	 			(fn:number($south) &lt;= fn:number($north)))) then
-	 	local:addMessage('TR.invalidGeographicBoundingBox', map { 'filename': local:filename($records), 'id': $rid, 'west': $west, 'east': $east, 'south': $south, 'north': $north })
-	 else ()
-	 )
+	for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $extents := 
+    if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+		$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+    else
+        $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+	let $regex := '^-?\d+\.\d{2,}'
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	return
+		(if (($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'dataset' or $record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'series') and not($extents)) then
+		local:addMessage('TR.noGeographicBoundingBox', map { 'filename': local:filename($record), 'id': $rid })
+		else
+		(
+		for $extent in $extents
+		let $west := $extent/gmd:westBoundLongitude/gco:Decimal/text()
+		let $east := $extent/gmd:eastBoundLongitude/gco:Decimal/text()
+		let $south := $extent/gmd:southBoundLatitude/gco:Decimal/text()
+		let $north := $extent/gmd:northBoundLatitude/gco:Decimal/text()
+		return
+		if (not(($west and matches($west,$regex) and fn:number($west) &gt;= -180 and fn:number($west) &lt;= 180) and
+					($east and matches($east,$regex) and fn:number($east) &gt;= -180 and fn:number($east) &lt;= 180) and
+					($south and matches($south,$regex) and fn:number($south) &gt;= -90 and fn:number($south) &lt;= 90) and
+					($north and matches($north,$regex) and fn:number($north) &gt;= -90 and fn:number($north) &lt;= 90) and
+					(fn:number($south) &lt;= fn:number($north)))) then
+			local:addMessage('TR.invalidGeographicBoundingBox', map { 'filename': local:filename($record), 'id': $rid, 'west': $west, 'east': $east, 'south': $south, 'north': $north })
+		else ()
+		)
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
