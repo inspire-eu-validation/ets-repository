@@ -227,7 +227,13 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $messages :=
-	(let $abstract := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract
+	(
+	let $abstract := 
+		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$records/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:abstract
+		else
+			$records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract
+
 	let $rid := $records/gmd:fileIdentifier/*/text()
 	return
 	if (not($abstract)) then
@@ -261,7 +267,11 @@ let $iso19115_CIRoleCode := ('resourceProvider','custodian','owner','user','dist
 let $messages := 
 		(for $record in $records
 		 let $rid := $record/gmd:fileIdentifier/*/text()
-		 let $pocs := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+		 let $pocs := 
+			if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+				$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+			else
+				$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
 		 return
 		 if(not($pocs)) then 
 		 	local:addMessage('TR.missingElement', map { 'element': 'CI_ResponsibleParty', 'xpath': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty' })
@@ -444,7 +454,12 @@ let $regex := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $thesauri := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName
+	 let $thesauri := 
+		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName
+
 	 return
 	 if(not($thesauri)) then ()
 	 else for $thesaurus in $thesauri
@@ -482,8 +497,16 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $keywords := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
-	 let $thesaurusNameTitle := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+	 let $keywords := 
+		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
+	 let $thesaurusNameTitle := 
+		if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
 	 return
 	 if (count($keywords) != count(distinct-values($thesaurusNameTitle))) then
 	   local:addMessage('TR.keywordsNotGroupedByVocabulary', map { 'filename': local:filename($record), 'id': $rid })
@@ -511,7 +534,7 @@ let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $resourceConstraints := 
-	   for $x in $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints
+	   for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
 	   where contains($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'LimitationsOnPublicAccess')
 	   return $x
 	 return
@@ -543,7 +566,7 @@ let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $resourceConstraints := 
-	   for $x in $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints
+	   for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
 	   where contains($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'ConditionsApplyingToAccessAndUse') or $x/gmd:otherConstraints/gco:CharacterString
 	   return $x
 	 let $valid := 
@@ -573,7 +596,11 @@ return
 									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $extents := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+let $extents := 
+    if ($records/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+		$records/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+    else
+        $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
 let $regex := '^-?\d+\.\d{2,}'
 let $rid := $records/gmd:fileIdentifier/*/text()
 let $messages := 
