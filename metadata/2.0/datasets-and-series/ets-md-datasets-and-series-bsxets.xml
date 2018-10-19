@@ -356,16 +356,16 @@ $messages)
 									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $levels := ('dataset', 'series')
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $messages := 	
-	(for $record in $recordsToInspect
+	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL/text()
 		return
-		if (not($urls)) then
-			local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
-		else ()
+		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine
+			let $url := $onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
+			return
+			if (not($url/node())) then
+				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
