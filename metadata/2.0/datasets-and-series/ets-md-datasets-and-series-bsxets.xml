@@ -385,15 +385,14 @@ return
 									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $levels := ('dataset', 'series')
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $messages := 	
-	(for $record in $recordsToInspect
+let $messages :=
+	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $dataQuality := $record/gmd:dataQualityInfo[count(gmd:DQ_DataQuality)=1]
+		let $dataQuality := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality
+		let $levels := ('dataset', 'series')
 		let $codelist := $record[gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = $levels]
 		return 	 
-		if (not($dataQuality)) then
+		if (count($dataQuality) != 1) then
 			local:addMessage('TR.wrongNumberOfDataQuality', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($codelist)) then
 			local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
