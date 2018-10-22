@@ -169,18 +169,16 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $crsIdentifiers := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier
-		return 	 				
-		if (count($crsIdentifiers) = 0) then ()
-		else 						
-			for $crs in $crsIdentifiers
-				let $code := $crs/gmd:code/*[1]/text()
-				let $codeSpace := $crs/gmd:codeSpace/*[1]/text()
-	 			return 	 	 								
-				if (not(fn:string-length(normalize-space($code)) &gt; 0)) then
-					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
-				else if (($crs/gmd:codeSpace) and (not(fn:string-length(normalize-space($codeSpace)) &gt; 0))) then
-					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
-				else () 		
+		return
+		for $crs in $crsIdentifiers
+			let $code := $crs/gmd:code
+			let $codeSpace := $crs/gmd:codeSpace
+			return
+			if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
+				local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+			else if (($codeSpace) and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
+				local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+			else ()		
 	)[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
