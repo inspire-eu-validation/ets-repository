@@ -222,7 +222,7 @@ let $codes := ('vector','grid','tin','textTable')
 let $messages :=  	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $spatialRepTypeCodes := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialRepresentationType
+		let $spatialRepTypeCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:spatialRepresentationType
 		return 	 				
 		if (count($spatialRepTypeCodes) = 0)  then
 			local:addMessage('TR.spatialRepTypeCodes', map { 'filename': local:filename($record), 'id': $rid })
@@ -258,7 +258,7 @@ let $codes := ('ucs2','ucs4','utf7','utf8','8859part1','8859part2','8859part3','
 let $messages :=  		
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $characterCodes := $record/gmd:identificationInfo[1]/*/gmd:characterSet/gmd:MD_CharacterSetCode
+		let $characterCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:characterSet/gmd:MD_CharacterSetCode
 		return 	 						
 		if ((count($characterCodes) = 1) and ($characterCodes/@codeListValue) = 'utf8') then
 			local:addMessage('TR.invalidCodeUTF8', map { 'filename': local:filename($record), 'id': $rid })
