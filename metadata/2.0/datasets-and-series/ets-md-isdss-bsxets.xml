@@ -410,35 +410,33 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $titleINSPIRE := 'INSPIRE Data Specifications - Base Models - Generic Network Model'
-let $messages :=  				
+let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $results := $record/gmd:dataQualityInfo[1]/*/gmd:report/gmd:DQ_TopologicalConsistency/gmd:result/gmd:DQ_ConformanceResult
-		return 	 										
-		if (count($results) = 0) then ()
-		else 									
-			for $result in $results
-				let $measureName := $result/../../gmd:nameOfMeasure/*[1]/text()
-				let $title := $result/gmd:specification/gmd:CI_Citation/gmd:title/*[1]/text()
-				let $date := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/*/text()
-				let $dateTypeCode := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue
-				let $pass := $result/gmd:pass
-				let $explanation := $result/gmd:explanation
-				return
-				if (not($title = $titleINSPIRE)) then
-					local:addMessage('TR.invalidTitle', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
-				else if (not($date)) then
-					local:addMessage('TR.noDateElement', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
-				else if (not($dateTypeCode = 'publication')) then
-					local:addMessage('TR.noDateTypeCode', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
-				else if (not($pass = 'false')) then
-					local:addMessage('TR.invalidPass', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
-				else if (not($explanation)) then
-					local:addMessage('TR.noExplanation', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
-				else if (string-length(normalize-space($explanation)) = 0)  then
-					local:addMessage('TR.emptyExplanation', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })			
-				else () 	
-	)[position() le $limitErrors] 
+		let $results := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_TopologicalConsistency/gmd:result/gmd:DQ_ConformanceResult
+		return
+		for $result in $results
+			let $measureName := $result/../../gmd:nameOfMeasure/*[1]/text()
+			let $title := $result/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
+			let $date := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/*/text()
+			let $dateTypeCode := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue
+			let $pass := $result/gmd:pass
+			let $explanation := $result/gmd:explanation
+			return
+			if (not($title = $titleINSPIRE)) then
+				local:addMessage('TR.invalidTitle', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else if (not($date)) then
+				local:addMessage('TR.noDateElement', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else if (not($dateTypeCode = 'publication')) then
+				local:addMessage('TR.noDateTypeCode', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else if (not($pass = 'false')) then
+				local:addMessage('TR.invalidPass', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else if (not($explanation)) then
+				local:addMessage('TR.noExplanation', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else if (not($explanation/gco:CharacterString/node() or $explanation/gmx:Anchor/node())) then
+				local:addMessage('TR.emptyExplanation', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else ()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
