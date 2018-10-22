@@ -374,23 +374,21 @@ return
 let $messages :=  			
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $results := $record/gmd:dataQualityInfo[1]/*/gmd:report/gmd:DQ_TopologicalConsistency/gmd:result/gmd:DQ_QuantitativeResult
-		return 	 								
-		if (count($results) = 0) then ()
-		else 						
-			for $result in $results
-				let $measureName := $result/../../gmd:nameOfMeasure/*[1]/text()
-				let $valueRecord := $result/gmd:value/gco:Record
-				let $type := $result/gmd:value/gco:Record/@xsi:type
-				return
-				if (not($result/gmd:valueUnit)) then
-					local:addMessage('TR.noValueUnit', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
-				else if (not($valueRecord)) then
-					local:addMessage('TR.noValueRecord', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
-				else if (not($type)) then
-					local:addMessage('TR.noTypeRecord', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })							
-				else () 
-	)[position() le $limitErrors] 
+		let $results := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_TopologicalConsistency/gmd:result/gmd:DQ_QuantitativeResult
+		return
+		for $result in $results
+			let $measureName := $result/../../gmd:nameOfMeasure/*[1]/text()
+			let $valueRecord := $result/gmd:value/gco:Record
+			let $type := $result/gmd:value/gco:Record/@xsi:type
+			return
+			if (not($result/gmd:valueUnit)) then
+				local:addMessage('TR.noValueUnit', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else if (not($valueRecord)) then
+				local:addMessage('TR.noValueRecord', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else if (not($type)) then
+				local:addMessage('TR.noTypeRecord', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+			else ()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
