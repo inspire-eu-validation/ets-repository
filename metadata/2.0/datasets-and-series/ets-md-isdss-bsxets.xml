@@ -91,12 +91,12 @@ let $messages :=
 			local:addMessage('TR.noCrsIdentifier', map { 'filename': local:filename($record), 'id': $rid })
 		else 			
 			for $crs in $crsIdentifiers
-				let $code := $crs/gmd:code/*[1]/text()
-				let $codeSpace := $crs/gmd:codeSpace/*[1]/text()
-	 			return 	 	 				
-				if (not(fn:string-length(normalize-space($code)) &gt; 0)) then
+				let $code := $crs/gmd:code
+				let $codeSpace := $crs/gmd:codeSpace
+	 			return
+				if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
 					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
-				else if (($crs/gmd:codeSpace) and (not(fn:string-length(normalize-space($codeSpace)) &gt; 0))) then
+				else if (($codeSpace) and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
 					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
 				else () 	
 	)[position() le $limitErrors] 
