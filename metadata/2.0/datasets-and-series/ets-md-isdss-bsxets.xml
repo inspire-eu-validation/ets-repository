@@ -303,7 +303,7 @@ return
 							<testAssertions>
 								<TestAssertion id="EID67230a54-f9b0-49d9-8928-fc5cf5d3ea8a">
 									<label>md isdss 2.6: Data Encoding</label>
-									<description><![CDATA[<p>Evaluate encoding and the storage or transmission format for data sets and datasets.</p>
+									<description><![CDATA[<p>Evaluate encoding and the storage or transmission format for data sets and series.</p>
 									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/data-encoding" target="_blank">Data Encoding</a></p>]]></description>
 									<parent ref="EIDa349088e-f3bf-4bd3-a0e9-bd3fc61181ee"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
@@ -311,23 +311,25 @@ return
 let $messages :=  			
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $distFormats := $record/gmd:distributionInfo[1]/*/gmd:distributionFormat/gmd:MD_Format
-		return 	 								
+		let $distFormats := $record/gmd:distributionInfo[1]/gmd:MD_Distribution/gmd:distributionFormat
+		return
 		if (count($distFormats) = 0) then
 			local:addMessage('TR.noDistFormat', map { 'filename': local:filename($record), 'id': $rid })
-		else 						
+		else
 			for $format in $distFormats
-				let $name := $format/gmd:name/*[1]/text()
-				let $version := $format/gmd:version/*[1]/text()
-				let $reason := $format/gmd:version/@gco:nilReason
+				let $name := $format/gmd:MD_Format/gmd:name
+				let $version := $format/gmd:MD_Format/gmd:version
 				return
-				if (string-length(normalize-space($name)) = 0)  then
-					local:addMessage('TR.emptyName', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 
-				else if ((string-length(normalize-space($version)) = 0) and not(($reason = 'unknown') or ($reason = 'inapplicable')))  then
-					local:addMessage('TR.emptyVersion', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 	
-				else if ((not(string-length(normalize-space($version)) = 0) and (not(string-length(normalize-space($reason)) = 0))))  then
-					local:addMessage('TR.invalidVersion', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 
-				else () 
+				if (not($name) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
+					local:addMessage('TR.emptyName', map { 'filename': local:filename($record), 'id': $rid, 'name': $name })
+				else if(string-length(normalize-space($version/*/text())) != 0) then
+					if (not($version) or not($version/gco:CharacterString/node() or $version/gmx:Anchor/node())) then
+						local:addMessage('TR.emptyVersion', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 	
+					else ()
+				else
+					if (not($version/@gco:nilReason = 'unknown' or $version/@gco:nilReason = 'inapplicable')) then
+						local:addMessage('TR.invalidVersion', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 
+					else () 
 	)[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
