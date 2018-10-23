@@ -79,29 +79,23 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $operations := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata
-		(:let $operations1 := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata[count(./srv:connectPoint) &gt; 0]:)
-		(:let $operations2 := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata[count(./srv:connectPoint) = 0]:)
-
 		return 	 									
 		if (count($operations) &gt; 0)  then
 			for $ops in $operations
 				let $connPoint := $ops/srv:connectPoint
-
 				return
 				if ($connPoint) then
-					(:Option1:)
 					for $conn in $connPoint
-						let $url := $connPoint/gmd:CI_OnlineResource[1]/*/gmd:URL
-												
+						let $url := $connPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
 						return
 						if (count($url) = 0) then
-							local:addMessage('"TR.noUrlElement"', map { 'filename': local:filename($record), 'id': $rid })
-						else()
-				else
-					(:Option2:)
-					local:addMessage('TR.BORRARERROR', map { 'filename': local:filename($record), 'id': $rid })
-		else 						
-			local:addMessage('TR.BORRARERROR', map { 'filename': local:filename($record), 'id': $rid })
+							local:addMessage('TR.noUrlElement', map { 'filename': local:filename($record), 'id': $rid })
+						else if($url != $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL) then
+							local:addMessage('TR.invalidUrlElement', map { 'filename': local:filename($record), 'id': $rid })
+						else ()
+				else ()
+		else
+			local:addMessage('TR.missingSV_OperationMetadata', map { 'filename': local:filename($record), 'id': $rid })
 	)[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -113,6 +107,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.noUrlElement"/>
+										<translationTemplate ref="TR.invalidUrlElement"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID191ba477-f310-481d-8f4f-2346397f3a0c">
