@@ -210,52 +210,14 @@ return
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		(: Req. 5.3 :)
-		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
-		
-		let $specifications := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification
-		
-		return 	 
-		if (count($confResults) = 0) then
-			local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-		else
-			for $res in $confResults
-				let $oneSpecification := $res[count(gmd:specification)=1]
-				let $booleanValues := ('true', 'false')
-				let $confBoolean := $res/gmd:pass/gco:Boolean/text()
-				let $specifications := $res/gmd:specification
 
-				return
-				if (not($oneSpecification)) then
-					local:addMessage('TR.wrongNumberOfSpecification', map { 'filename': local:filename($record), 'id': $rid })
-				else if ($confBoolean and not($confBoolean = $booleanValues)) then
-					local:addMessage('TR.declareNoConformityBoolean', map { 'filename': local:filename($record), 'id': $rid })
-				else if ( not($confBoolean) and not($res/gmd:pass/@gco:nilReason = 'unknown') ) then
-					local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
-				else
-					for $spec in $specifications
-						let $citations := $spec/gmd:CI_Citation
+		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation[contains(./gmd:title/*/text(),'1089/2010')]
 
-						return
-						if ( not($citations) ) then
-							local:addMessage('TR.noCitationForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-						else
-							for $cita in $citations
-								let $title := $spec/gmd:CI_Citation/gmd:title/text()
-								let $date := $spec/gmd:CI_Citation/*/gmd:CI_Date/gmd:date/*[1]/text()
-								let $dateLength := fn:string-length(normalize-space($date))
-								let $validDatetypes := ('publication')
-								let $datetype := $spec/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode[@codeListValue = $validDatetypes]
-								return
-								if ( not($spec/gmd:CI_Citation/gmd:title/node()) ) then
-									local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-								else if ( not($dateLength &gt; 0) ) then
-									local:addMessage('TR.noDateForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-								else if (not($dateLength = 8) and not($dateLength = 10)) then
-									local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-								else if ( not($datetype) ) then
-									local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-								else ()
+		return
+		if ( not(count($confResults) = 1) ) then			
+			local:addMessage('TR.wrongNumberOfSpecificationForPurpose', map { 'filename': local:filename($record), 'id': $rid })			
+		else()
+
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -265,69 +227,58 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.noConformityStatement"/>
-										<translationTemplate ref="TR.wrongNumberOfSpecification"/>
-										<translationTemplate ref="TR.declareNoConformityBoolean"/>
-										<translationTemplate ref="TR.declareNoConformityEvaluationAsUnknown"/>
-										<translationTemplate ref="TR.noTitleForSpecification"/>
-										<translationTemplate ref="TR.noDateForSpecification"/>
-										<translationTemplate ref="TR.invalidDateFormat"/>
-										<translationTemplate ref="TR.noDateTypeForSpecification"/>
+										<translationTemplate ref="TR.wrongNumberOfSpecificationForPurpose"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID9798cfcb-71b8-4a7d-8cf6-03a801a2099f">
 									<label>md sds-invocable 5.4: Spatial Data Service Category</label>
-									<description><![CDATA[<p>Check that there is at least one DQ_ConformanceResult returned from query classification 
-									result invocable.</p><p>The multiplicity of the element is one.</p><p>Requirement involved:</p><ul><li>
-									<a href=""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf""
-									target=""_blank"">TG MD, 4.3.3.2 - Req 5.4</a></li></ul><p>Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable/sds-category" 
-									target="_blank"> Abstract Test Case 'Spatial Data Service Category'</a>]]></description>
+									<description><![CDATA[<p>Test that the service category is given implementing rules for interoperability of spatial data sets and services.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable/sds-category" target="_blank">SDS Category Keywords</a></p>
+									<p>To fulfill this requirement, the evaluated metadata dataset shall be compliant with the following common requirements of the Technical Guide:</p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity" target="_blank"> Common ATS (C.20): 'Dataset conformity'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-specification" target="_blank"> Common ATS (C.21): 'Dataset conformity'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-degree" target="_blank"> Common ATS (C.22): 'Conformity degree '</a></p>						
+									]]>
+									</description>
 									<parent ref="EID81f60686-9bc6-4073-8081-cb52eeaa7701"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-
+<!-- DONE -->
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $confResults := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/gmd:DQ_ConformanceResult
 
-		let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/gmd:DQ_ConformanceResult/gmd:specification
-		let $oneSpecification := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult[count(gmd:specification)=1]
+		let $validCC := ('http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable','http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-interoperable','http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-harmonised')
+		let $validCategories := ('invocable','interoperable','harmonished')
 
-		let $specCategory := $confResults[(./gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable') and (./gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor/text() = 'invocable') and (./gmd:pass/gco:Boolean/text() = 'true')]
+		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+
+		let $titleElement := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor[@xlink:href = $validCC]
 		
-		let $confBoolean := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult[gmd:pass/gco:Boolean/text() = 'true']
 
 		return 	 
 		if (count($confResults) = 0) then
 			local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($oneSpecification)) then
-			local:addMessage('TR.wrongNumberOfSpecification', map { 'filename': local:filename($record), 'id': $rid })
-
-		else if (not(count($specCategory) = 1)) then
-			local:addMessage('TR.wrongSpecCategoryMultiplicity', map { 'filename': local:filename($record), 'id': $rid })
-
-		else if (not($confBoolean)) then
-			local:addMessage('TR.declareNoConformityBoolean', map { 'filename': local:filename($record), 'id': $rid })
-
-									(: else if (not($confResults/gmd:pass/*) and not($confResults/gmd:pass/@gco:nilReason = 'unknown')) then :)
-									(:	local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid }) :)
+		else if ( not( count($titleElement) = 1) ) then
+			local:addMessage('TR.wrongMultiplicityForPurpose', map { 'filename': local:filename($record), 'id': $rid, 'count': count($titleElement) })
 		else
-			for $spec in $specifications
-				let $title := $spec/gmd:CI_Citation/gmd:title/text()
-				let $date := $spec/gmd:CI_Citation/*/gmd:CI_Date/gmd:date/*[1]/text()
-				let $dateLength := fn:string-length(normalize-space($date))
+			(for $res in $confResults
+				let $titleElem := $res/gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor
+				let $booleanValue := ('true')
+				let $confBoolean := $res/gmd:pass/gco:Boolean/text()
 
 				return
-				if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
-					local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($dateLength &gt; 0)) then
-					local:addMessage('TR.noDateForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($dateLength = 8) and not($dateLength = 10)) then
-					local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
-					local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else ()
+				if ( $titleElem/@xlink:href = $validCC ) then
+
+					if ( not($titleElem/text() = $validCategories) ) then
+						local:addMessage('TR.ivalidCCCategory', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $titleElem })				
+					else if ($confBoolean and not($confBoolean = $booleanValue)) then		
+						local:addMessage('TR.invalidConformityBoolean', map { 'filename': local:filename($record), 'id': $rid })
+					else()
+
+				else()
+			)[position() le $limitErrors]
+
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -337,69 +288,47 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.wrongMultiplicityForPurpose"/>
 										<translationTemplate ref="TR.noConformityStatement"/>
-										<translationTemplate ref="TR.wrongNumberOfSpecification"/>
-										<translationTemplate ref="TR.wrongSpecCategoryMultiplicity"/>
-										<translationTemplate ref="TR.declareNoConformityBoolean"/>
-										<translationTemplate ref="TR.noTitleForSpecification"/>
-										<translationTemplate ref="TR.noDateForSpecification"/>
-										<translationTemplate ref="TR.invalidDateFormat"/>
-										<translationTemplate ref="TR.noDateTypeForSpecification"/>
+										<translationTemplate ref="TR.ivalidCCCategory"/>
+										<translationTemplate ref="TR.invalidConformityBoolean"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID98cd0b1b-5117-49e7-bf13-3f682bbb4ed9">
 									<label>md sds-invocable 5.5: Conformity to Technical Specifications</label>
-									<description><![CDATA[<p>Verify that the service fully complies with at least one technical specification that provides all 
-									the technical elements necessary to invoke the service and allow its use</p><p>Requirement involved:</p><ul><li>
-									<a href=""https://inspire.ec.europa.eu/sites/default/files/documents/metadata/inspire-tg-metadata-iso19139-2.0.1.pdf"" 
-									target=""_blank"">TG MD 4.3.3.3 - Req 5.5</a></li></ul><p>Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable/conformity-to-technical-specifications" 
-									target="_blank"> Abstract Test Case ' Conformity to Technical Specifications'</a>]]></description>
+									<description><![CDATA[<p>Test that is given the conformity degree with at least one technical specifications providing all the necessary technical elements to actually invoke the service and enable its usage.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable/conformity-to-technical-specifications" target="_blank">Conformity to Technical Specifications</a></p>
+									<p>To fulfill this requirement, the evaluated metadata dataset shall be compliant with the following common requirements of the Technical Guide:></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity" target="_blank"> Common ATS (C.20): 'Dataset conformity'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-specification" target="_blank"> Common ATS (C.21): 'Dataset conformity'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-degree" target="_blank"> Common ATS (C.22): 'Conformity degree '</a></p>						
+									]]>
+									</description>
 									<parent ref="EID81f60686-9bc6-4073-8081-cb52eeaa7701"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-
+<!-- DONE -->
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $confResults := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/gmd:DQ_ConformanceResult
+		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
 
-		let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/gmd:DQ_ConformanceResult/gmd:specification
-		let $oneSpecification := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult[count(gmd:specification)=1]
-
-		let $specNotCategory := $confResults[(not(./gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-invocable')) and (not(./gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor/text() = 'invocable')) and (./gmd:pass/gco:Boolean/text() = 'true')]		
-		
-		let $confBoolean := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult[gmd:pass/gco:Boolean/text() = 'true']
-
-		return 	 
-		if (count($confResults) = 0) then
-			local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($oneSpecification)) then
-			local:addMessage('TR.wrongNumberOfSpecification', map { 'filename': local:filename($record), 'id': $rid })
-
-		else if ( count($specNotCategory) = 0 ) then
-			local:addMessage('TR.wrongTechSpecMultiplicity', map { 'filename': local:filename($record), 'id': $rid })
-
-		else if (not($confBoolean)) then
-			local:addMessage('TR.declareNoConformityBoolean', map { 'filename': local:filename($record), 'id': $rid })
-
-									(: else if (not($confResults/gmd:pass/*) and not($confResults/gmd:pass/@gco:nilReason = 'unknown')) then :)
-									(:	local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid }) :)
+		return
+		if ( not(count($confResults) >= 3) ) then
+			(: Checking that there are at least 3 gmd:DQ_ConformanceResult is the only way to check that is provided 1 element for this purpose :)		
+			local:addMessage('TR.wrongConfStatementMulti', map { 'filename': local:filename($record), 'id': $rid })
 		else
-			for $spec in $specifications
-				let $title := $spec/gmd:CI_Citation/gmd:title/text()
-				let $date := $spec/gmd:CI_Citation/*/gmd:CI_Date/gmd:date/*[1]/text()
-				let $dateLength := fn:string-length(normalize-space($date))
+			(for $res in $confResults 
+
+				let $citation := $res/gmd:specification/gmd:CI_Citation
 
 				return
-				if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
-					local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($dateLength &gt; 0)) then
-					local:addMessage('TR.noDateForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($dateLength = 8) and not($dateLength = 10)) then
-					local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
-					local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else ()
+				if ( not($citation) ) then
+					local:addMessage('TR.noCitationForTechnicalSpec', map { 'filename': local:filename($record), 'id': $rid })
+				else()
+
+			)[position() le $limitErrors]
+
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -409,14 +338,8 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.noConformityStatement"/>
-										<translationTemplate ref="TR.wrongNumberOfSpecification"/>
-										<translationTemplate ref="TR.wrongTechSpecMultiplicity"/>
-										<translationTemplate ref="TR.declareNoConformityBoolean"/>
-										<translationTemplate ref="TR.noTitleForSpecification"/>
-										<translationTemplate ref="TR.noDateForSpecification"/>
-										<translationTemplate ref="TR.invalidDateFormat"/>
-										<translationTemplate ref="TR.noDateTypeForSpecification"/>
+										<translationTemplate ref="TR.wrongConfStatementMulti"/>
+										<translationTemplate ref="TR.noCitationForTechnicalSpec"/>
 									</translationTemplates>
 								</TestAssertion>
 																					
