@@ -90,7 +90,7 @@ let $messages :=
 						return
 						if (count($url) = 0) then
 							local:addMessage('TR.noUrlElement', map { 'filename': local:filename($record), 'id': $rid })
-						else if($url != $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL) then
+						else if(fn:starts-with($url, $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL)) then
 							local:addMessage('TR.invalidUrlElement', map { 'filename': local:filename($record), 'id': $rid })
 						else ()
 				else ()
@@ -118,27 +118,27 @@ return
 									<parent ref="EID53fc455a-3cc2-471a-ba6c-3c3bba442823"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>									
-let $messages :=  	
+let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $operations := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata
-		return 	 						
+		return
 		if (count($operations) = 0)  then
 			local:addMessage('TR.missingSV_OperationMetadata', map { 'filename': local:filename($record), 'id': $rid })
-		else 									
+		else
 			for $ops in $operations
 				let $name := $ops/srv:operationName
 				let $dcpList := $ops/srv:DCP/srv:DCPList
 				let $url := $ops/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
-	 			return 	 	 												 
+	 			return
 				if (not(count($name) = 1) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
 					local:addMessage('TR.noOperationName',  map { 'filename': local:filename($record), 'id': $rid, 'name': $name/*/text() })
 				else if (not($dcpList)) then
 					local:addMessage('TR.noDcpList',  map { 'filename': local:filename($record), 'id': $rid, 'name': $name/*/text() })
 				else if (not($url)) then
 					local:addMessage('TR.noUrlElement', map { 'filename': local:filename($record), 'id': $rid, 'name': $name/*/text() })
-				else () 					
-	)[position() le $limitErrors] 
+				else ()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -160,32 +160,30 @@ return
 									<parent ref="EID53fc455a-3cc2-471a-ba6c-3c3bba442823"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $booleanValues := ('true','false')									
-let $messages :=  	
+let $booleanValues := ('true','false')
+let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $parameters := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:parameters/srv:SV_Parameter
-		return 	 						
-		if (count($parameters) = 0) then 
-			local:addMessage('TR.BORRARERROR', map { 'filename': local:filename($record), 'id': $rid })
-		else 									
+		return
+		if (count($parameters) = 0) then ()
+		else
 			for $param in $parameters
-				let $name := $param/srv:name/gco:aName[1]
-				let $attributeType := $param/srv:name/gco:attributeType[1]
-				let $optionality := $param/srv:optionality[1]
-				let $repeat := $param/srv:repeatability/gco:Boolean[1]
-				let $paramType := $param/srv:valueType/gco:TypeName/gco:Name[1]
-
+				let $name := $param/srv:name/gco:aName
+				let $attributeType := $param/srv:name/gco:attributeType
+				let $optionality := $param/srv:optionality
+				let $repeat := $param/srv:repeatability/gco:Boolean
+				let $paramType := $param/srv:valueType/gco:TypeName/gco:Name
 	 			return 	 	 												 
-				if (not(fn:string-length(normalize-space($name//text())) &gt; 0)) then
+				if (count($name) != 1 or not($name) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
 					local:addMessage('TR.noNameElement',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else if (not(fn:string-length(normalize-space($attributeType//text())) &gt; 0)) then
+				else if (count($attributeType) != 1 or not(fn:string-length(normalize-space($attributeType//text())) &gt; 0)) then
 					local:addMessage('TR.noAttributeType',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else if (not(fn:string-length(normalize-space($optionality//text())) &gt; 0)) then
+				else if (count($optionality) != 1 or not($optionality) or not($optionality/gco:CharacterString/node() or $optionality/gmx:Anchor/node())) then
 					local:addMessage('TR.noOptionality',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else if (not($repeat//text() = $booleanValues)) then
+				else if (count($repeat) != 1 or not($repeat/text() = $booleanValues)) then
 					local:addMessage('TR.noRepeatability',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else if (not(fn:string-length(normalize-space($paramType//text())) &gt; 0)) then
+				else if (count($paramType) != 1 or not($paramType)) then
 					local:addMessage('TR.noParamType',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
 				else () 					
 	)[position() le $limitErrors] 
