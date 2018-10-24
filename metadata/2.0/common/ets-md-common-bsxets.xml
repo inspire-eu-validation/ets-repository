@@ -77,17 +77,18 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 										if (not($recordsToInspect)) then ()
 										else
 										(for $record in $recordsToInspect    
-										 let $rid := $record/gmd:fileIdentifier/*/text()
-										 let $languageCodes := $record/gmd:language/gmd:LanguageCode	 
-										 return
-										 if (not($languageCodes)) then
+										let $rid := $record/gmd:fileIdentifier/*/text()
+										let $languageCodes := $record/gmd:language/gmd:LanguageCode	 
+										return
+										if (not($languageCodes)) then
 											local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
-										 else 
-											let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
-											return
-											if ($wrongCodeValues) then
-											local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-											else ()     
+										else if (count($languageCodes) != 1) then
+											local:addMessage('TR.wrongLanguageCodeNumber',  map { 'filename': local:filename($record), 'id': $rid })
+										else if ($languageCodes/@codeList != 'http://www.loc.gov/standards/iso639-2/') then
+											local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($languageCodes/text(),', ') })
+										else if ($languageCodes/@codeListValue[not(. = $codes)]) then
+											local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($languageCodes/text(),', ') })
+										else ()
 										)[position() le $limitErrors]
 									return
 									(if ($messages) then 'FAILED' else 'PASSED',
@@ -97,7 +98,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noLanguageCode"/>
+										<translationTemplate ref="TR.wrongLanguageCodeNumber"/>
 										<translationTemplate ref="TR.invalidLanguageCode"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -149,12 +152,15 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 									<expression>
 let $levels := ('dataset', 'series', 'service')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
+let $regex := '^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?$'
 let $messages :=
 	(for $record in $recordsToInspect
 	let $rid := $record/gmd:fileIdentifier/*/text()
 	return
 		if (count($record/gmd:dateStamp) != 1 or not($record/gmd:dateStamp/gco:DateTime) or not($record/gmd:dateStamp/gco:DateTime/node())) then
 			local:addMessage('TR.oneDateStamp', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not(matches($record/gmd:dateStamp/gco:DateTime, $regex))) then
+			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
 		else ()
 	)[position() le $limitErrors]
 return
@@ -166,6 +172,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.oneDateStamp"/>
+										<translationTemplate ref="TR.wrongDateFormat"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -475,6 +482,7 @@ let $messages :=
 	 	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($dateTypeCode) or $dateTypeCode/@codeList != 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode') then local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
 		else ()
 	)[position() le $limitErrors]
 return
@@ -487,7 +495,8 @@ return
 										<translationTemplate ref="TR.noTitleForThesaurus"/>
 										<translationTemplate ref="TR.emptyTitleForThesaurus"/>
 										<translationTemplate ref="TR.invalidDateForThesaurus"/>
-                    <translationTemplate ref="TR.invalidDateFormat"/>
+                    					<translationTemplate ref="TR.invalidDateFormat"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -544,9 +553,15 @@ let $messages :=
 	 return
 	 if (count($resourceConstraints) != 1) then
 	    local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
-	 else if (not($resourceConstraints/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and starts-with($resourceConstraints/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/'))) then
-	    local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
-	 else ()
+	 else
+	 	for $resourceConstraint in $resourceConstraints
+		return
+		if (not($resourceConstraint/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
+			starts-with($resourceConstraint/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/'))) then
+			local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+		else if ($resourceConstraint/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeList != 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml') then
+			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -556,6 +571,7 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noValidResourceConstraint"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -568,19 +584,38 @@ return
 									<expression>
 let $messages := 
 	(for $record in $records
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $resourceConstraints := 
-	   for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
-	   where contains($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'ConditionsApplyingToAccessAndUse') or $x/gmd:otherConstraints/gco:CharacterString
-	   return $x
-	 let $valid := 
-	   for $x in $resourceConstraints
-	   where ($x/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' or $x/gmd:useConstraints/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions') and (starts-with($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply') or starts-with($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown') or $x/gmd:otherConstraints/gco:CharacterString/node())
-	   return $x
-	 return
-	 if (count($resourceConstraints) != 1 or count($valid) = 0) then
-	    local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
-	 else()
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $resourceConstraints := 
+		for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
+		where contains($x/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'ConditionsApplyingToAccessAndUse') or $x/gmd:otherConstraints/gco:CharacterString
+		return $x
+	return
+		for $x in $resourceConstraints
+		let $invalidAccessConstraints :=
+			for $ac in $x/gmd:accessConstraints
+			where (not($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
+				$ac/gmd:MD_RestrictionCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml'))
+			return $ac
+		let $invalidUseConstraints :=
+			for $uc in $x/gmd:useConstraints
+			where (not($uc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
+				$uc/gmd:MD_RestrictionCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml'))
+			return $uc
+		let $invalidOtherConstraints :=
+			for $oc in $x/gmd:otherConstraints
+			return
+			if ($oc/gmx:Anchor) then
+				if (not(starts-with($oc/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply') or
+				starts-with($oc/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown'))) then $oc
+				else ()
+			else if (not($oc/gco:CharacterString/node())) then $oc
+			else ()
+		return
+		if((count($x/gmd:accessConstraints) + count($x/gmd:useConstraints)) = 0 or
+		count($x/gmd:otherConstraints) = 0 or
+		$invalidAccessConstraints or $invalidUseConstraints or $invalidOtherConstraints) then
+			local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
