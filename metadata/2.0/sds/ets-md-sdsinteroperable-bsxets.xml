@@ -194,10 +194,10 @@ return
 let $messages := 
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $legalConstraints := $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
+		let $legalConstraints := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints
 
 		return
-		if ( not(count($legalConstraints) = 1) ) then
+		if ( count($legalConstraints) = 0 ) then
 			local:addMessage('TR.noLegalConstraints', map { 'filename': local:filename($record), 'id': $rid })
 		else()
 
@@ -227,7 +227,10 @@ return
 let $messages :=  	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $party := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+		let $party := 
+			for $x in $record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+			where $x/gmd:role/gmd:CI_RoleCode/@codeListValue = 'custodian'
+			return $x
 		return 	 						
 		if (count($party) = 0)  then
 			local:addMessage('TR.noParty', map { 'filename': local:filename($record), 'id': $rid })
@@ -295,11 +298,10 @@ let $messages :=
 
 		return 	 
 		if (count($results) &lt; 3) then
-(: NEW :)
-			local:addMessage('TR.', map { 'filename': local:filename($record), 'id': $rid })
+			local:addMessage('TR.wrongQualityCriteriaMultiplicity', map { 'filename': local:filename($record), 'id': $rid,  'count': count($results)})
 		else 	
 			for $result in $results
-				let $measureName := $result/gmd:nameOfMeasure/text()
+				let $measureName := $result/gmd:nameOfMeasure
 				let $measureNameAnchor := $result/gmd:nameOfMeasure/gmx:Anchor/@xlink:href
 				let $validation1 := $result[(./gmd:nameOfMeasure/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/QualityOfServiceCriteriaCode/availability') and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/@xsi:type = ('xs:double','xsi:double')) and (data(./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record) &gt;= 0) and (data(./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record) &lt;= 100) and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/@xlink:href = 'urn:ogc:def:uom:OGC::percent')]
 				let $validation2 := $result[(./gmd:nameOfMeasure/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/QualityOfServiceCriteriaCode/performance') and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/@xsi:type = ('xs:double','xsi:double')) and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/@xlink:href = 'http://www.opengis.net/def/uom/SI/second')]
