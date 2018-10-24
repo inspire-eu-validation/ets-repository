@@ -739,13 +739,15 @@ let $levels := ('dataset', 'series', 'service')
 let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
 	(for $record in $recordsToInspect
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result
-	 return 
-	 if (not($result)) then
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+	return 
+	if (not($result)) then
 		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-	 else
-	 	(for $citation in $result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation
+	else if (not($result/gmd:specification/gmd:CI_Citation)) then
+		local:addMessage('TR.missingCitationSection', map { 'filename': local:filename($record), 'id': $rid })
+	else
+	 	(for $citation in $result/gmd:specification/gmd:CI_Citation
 		let $title := $citation/gmd:title
 		let $date := $citation/gmd:date
 		let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
@@ -769,9 +771,9 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.noDQDomainConsistencyParent"/>
-										<translationTemplate ref="TR.noDateTypeForSpecification"/>
+										<translationTemplate ref="TR.noConformityStatement"/>
 										<translationTemplate ref="TR.noTitleForSpecification"/>
+										<translationTemplate ref="TR.noDateTypeForSpecification"/>
 										<translationTemplate ref="TR.invalidDateFormat"/>            
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
@@ -786,13 +788,13 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result
+	 let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
 	 return 
 	 if (not($result)) then
 		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
 	 else
 	 	(for $res in $result
-		let $pass := $res/gmd:DQ_ConformanceResult/gmd:pass
+		let $pass := $res/gmd:pass
 		return
 		if ($pass) then
 			if($pass/gco:Boolean) then
