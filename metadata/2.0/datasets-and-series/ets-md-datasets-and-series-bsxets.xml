@@ -413,49 +413,26 @@ return
 								<TestAssertion id="EID8f663265-32b8-4c99-8997-2d40f6ce5b93">
 									<label>md datasets-and-series 1.10: Dataset Conformity</label>
 									<description><![CDATA[<p>Test that the metadata includes information on the degree of conformity with the implementing rules on interoperability of spatial data sets.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/conformity" target="_blank">Dataset Conformity</a></p>]]></description>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/conformity" target="_blank">Dataset Conformity</a></p>
+									<p>To fulfill this requirement, the evaluated metadata dataset shall be compliant with the following common requirements of the Technical Guide:></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity" target="_blank"> Common ATS (C.20): 'Dataset conformity'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-specification" target="_blank"> Common ATS (C.21): 'Dataset conformity'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-degree" target="_blank"> Common ATS (C.22): 'Conformity degree '</a></p>						
+									]]></description>
 									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $levels := ('dataset', 'series')
-let $booleanValues := ('true', 'false')
-let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 	
-	(for $record in $recordsToInspect
+	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $confResults := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
-		let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification
-		let $oneSpecification := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult[count(gmd:specification)=1]
-		let $confBoolean := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult[gmd:pass/gco:Boolean/text() = $booleanValues]
-		return 	 
-		if (count($confResults) = 0) then
-			local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($oneSpecification)) then
-			local:addMessage('TR.wrongNumberOfSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($confBoolean)) then
-			local:addMessage('TR.declareNoConformityBoolean', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($confResults/gmd:pass/*) and not($confResults/gmd:pass/@gco:nilReason = 'unknown')) then
-			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
-		else
-			for $spec in $specifications
-				(:let $citation := $spec/gmd:CI_Citation:)
-				let $title := $spec/gmd:CI_Citation/gmd:title/text()
-				let $date := $spec/gmd:CI_Citation/*/gmd:CI_Date/gmd:date/*[1]/text()
-				let $dateLength := fn:string-length(normalize-space($date))
-				(:let $datetype := $spec/gmd:CI_Citation/*/gmd:CI_Date/*/gmd:CI_DateTypeCode/gmd:CI_DateTypeCode/@codeListValue:)
-				return
-				if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
-					local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($dateLength &gt; 0)) then
-					local:addMessage('TR.noDateForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($dateLength = 8) and not($dateLength = 10)) then
-					local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication')])) then
-					local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title })
-				(:else if (not($spec/ancestor::gmd:DQ_DomainConsistency)) then:)
-					(:local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $title }):)
-					(:Requirement for 1.3 version:)
-				else ()
+
+		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation[contains(./gmd:title/*/text(),'1089/2010')]
+
+		return
+		if ( not(count($confResults) = 1) ) then			
+			local:addMessage('TR.wrongNumberOfSpecificationForPurpose', map { 'filename': local:filename($record), 'id': $rid })			
+		else()
+
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
