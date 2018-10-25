@@ -270,7 +270,7 @@ let $messages :=
 				if ( $titleElem/@xlink:href = $validCC ) then
 
 					if ( not($titleElem/text() = $validCategories) ) then
-						local:addMessage('TR.ivalidCCCategory', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $titleElem })				
+						local:addMessage('TR.ivalidCCCategory', map { 'filename': local:filename($record), 'id': $rid })				
 					else if ($confBoolean and not($confBoolean = $booleanValue)) then		
 						local:addMessage('TR.invalidConformityBoolean', map { 'filename': local:filename($record), 'id': $rid })
 					else()
@@ -321,9 +321,14 @@ let $messages :=
 
 				let $citation := $res/gmd:specification/gmd:CI_Citation
 
+				let $booleanValue := ('true')
+				let $confBoolean := $res/gmd:pass/gco:Boolean/text()
+
 				return
 				if ( not($citation) ) then
 					local:addMessage('TR.noCitationForTechnicalSpec', map { 'filename': local:filename($record), 'id': $rid })
+				else if ($confBoolean and not($confBoolean = $booleanValue)) then		
+						local:addMessage('TR.invalidConformityBoolean', map { 'filename': local:filename($record), 'id': $rid })
 				else()
 
 			)[position() le $limitErrors]
