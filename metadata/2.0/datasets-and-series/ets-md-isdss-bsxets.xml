@@ -170,7 +170,10 @@ let $messages :=
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $crsIdentifiers := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier
 		return
-		for $crs in $crsIdentifiers
+		if (not($crsIdentifiers)) then
+				local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+		else
+			for $crs in $crsIdentifiers
 			let $code := $crs/gmd:code
 			let $codeSpace := $crs/gmd:codeSpace
 			return
@@ -222,17 +225,17 @@ let $codes := ('vector','grid','tin','textTable')
 let $messages :=  	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $spatialRepTypeCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:spatialRepresentationType
+		let $spatialRepTypeCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode
 		return 	 				
 		if (count($spatialRepTypeCodes) = 0)  then
 			local:addMessage('TR.spatialRepTypeCodes', map { 'filename': local:filename($record), 'id': $rid })
 		else 
 			for $typeCode in $spatialRepTypeCodes
-				let $codeListValue := $typeCode/gmd:MD_SpatialRepresentationTypeCode/@codeListValue
+				let $codeListValue := $typeCode/@codeListValue
 				let $invalidCodeValues := $codeListValue[not(. = $codes)]
 				return
 				if ($invalidCodeValues)  then
-					local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid, 'codeListValue': $codeListValue })				
+					local:addMessage('TR.invalidSpatialRepresentationCode', map { 'filename': local:filename($record), 'id': $rid })				
 				else () 		
 	)[position() le $limitErrors] 
 return
@@ -244,7 +247,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.spatialRepTypeCodes"/>
-										<translationTemplate ref="TR.invalidCodeList"/>
+										<translationTemplate ref="TR.invalidSpatialRepresentationCode"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID83d11da2-265d-4080-bdc3-c25a325b824d">
@@ -268,7 +271,7 @@ let $messages :=
 				let $invalidCodeValues := $codeListValue[not(. = $codes)]
 				return
 				if ($invalidCodeValues)  then
-					local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid, 'codeListValue': $codeListValue })	
+					local:addMessage('TR.invalidEncodingCode', map { 'filename': local:filename($record), 'id': $rid})	
 				else () 			
 	)[position() le $limitErrors] 
 return
@@ -280,7 +283,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.invalidCodeUTF8"/>
-										<translationTemplate ref="TR.invalidCodeList"/>
+										<translationTemplate ref="TR.invalidEncodingCode"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -308,7 +311,7 @@ return
 									<parent ref="EIDa349088e-f3bf-4bd3-a0e9-bd3fc61181ee"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages :=  			
+let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $distFormats := $record/gmd:distributionInfo[1]/gmd:MD_Distribution/gmd:distributionFormat
@@ -428,7 +431,7 @@ let $messages :=
 			else if (not($date)) then
 				local:addMessage('TR.noDateElement', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
 			else if (not($dateTypeCode = 'publication')) then
-				local:addMessage('TR.noDateTypeCode', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
+				local:addMessage('TR.noDateCodeList', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
 			else if (not($pass = 'false')) then
 				local:addMessage('TR.invalidPass', map { 'filename': local:filename($record), 'id': $rid, 'measureName': $measureName })
 			else if (not($explanation)) then

@@ -285,7 +285,7 @@ let $messages :=
 			else
 				$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
 		 return
-		 if(not($pocs)) then 
+		 if(not($pocs)) then
 		 	local:addMessage('TR.missingResponsibleParty', map { 'filename': local:filename($record), 'id': $rid })
 		 else
 		 for $poc in $pocs
@@ -296,6 +296,8 @@ let $messages :=
 				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
 		 	else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
 				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
+		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode')) then
+				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
 				local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid })
 		 	else ()
@@ -307,9 +309,11 @@ let $messages :=
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingResponsibleParty"/>
 										<translationTemplate ref="TR.noMetadataContactOrganisationName"/>
-										<translationTemplate ref="TR.invalidMetadataContactEmailAddress"/>
+										<translationTemplate ref="TR.noMetadataContactEmailAddress"/>
                     					<translationTemplate ref="TR.noPointOfContactRole"/>                   
+                    					<translationTemplate ref="TR.wrongCodeList"/>                   
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -320,21 +324,26 @@ let $messages :=
 									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $regex := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0[1,3-9]|1[0-2])(-)(29|30))))$|^(?:(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(-)02(-)29)$|^(?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:0[1-9])|(?:1[0-2]))(-)(?:0[1-9]|1\d|2[0-8])$'
-
+let $regexDate := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0[1,3-9]|1[0-2])(-)(29|30))))$|^(?:(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(-)02(-)29)$|^(?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:0[1-9])|(?:1[0-2]))(-)(?:0[1-9]|1\d|2[0-8])$'
+let $regexDateTime := '^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?$'
 let $messages := 
 	(for $record in $records
-	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/*
-	 let $relevantTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('publication','revision','creation')]
-	 return
-	 (if(not($relevantTempRefs)) then
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date
+	(: let $relevantTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('publication','revision','creation')] :)
+	return
+	(if(not($temporalReferences)) then
 		local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
-	 else (for $date in $relevantTempRefs
-   return 
-   if (not(matches($date/gmd:date/gco:Date/text(),$regex))) then
-        local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $date }) 
-   else()))
+	else 
+		for $date in $temporalReferences
+		return
+		if (not($date/gco:Date or $date/gco:DateTime)) then
+			local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
+		else if ($date/gco:Date and not(matches($date/gco:Date/text(),$regexDate))) then
+			local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $date }) 
+		else if ($date/gco:DateTime and not(matches($date/gco:DateTime/text(),$regexDateTime))) then
+			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $date }) 
+		else())
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -343,9 +352,9 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.timePeriodWithoutInlineTimeInstant"/>
 										<translationTemplate ref="TR.noRelevantDate"/>
-                    <translationTemplate ref="TR.invalidDateFormat"/>
+                    					<translationTemplate ref="TR.invalidDateFormat"/>
+										<translationTemplate ref="TR.wrongDateFormat"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -758,6 +767,8 @@ let $messages :=
 			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $title/text() })
 		else if (not($dateTypeCode)) then
 			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $title/text() })
+		else if (not($dateTypeCode/@codeList = ('http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode'))) then
+			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid, 'specification': $title/text() })
 		else if (not($dateTypeCode/@codeListValue = ('publication'))) then
 			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $title/text() })
 		else if (not(matches($date/gmd:CI_Date/gmd:date/gco:Date/text(), $regex))) then
@@ -776,6 +787,7 @@ return
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
 										<translationTemplate ref="TR.invalidDateFormat"/>            
 										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 									</translationTemplates>
 								</TestAssertion>
 							<TestAssertion id="EID614cd750-a8a2-4256-908c-e452c2b4e506">
