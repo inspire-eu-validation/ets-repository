@@ -383,12 +383,14 @@ let $messages :=
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $dataQuality := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality
 		let $levels := ('dataset', 'series')
-		let $codelist := $record[gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = $levels]
+		let $MD_ScopeCode := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode
 		return 	 
 		if (count($dataQuality) != 1) then
 			local:addMessage('TR.wrongNumberOfDataQuality', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($codelist)) then
+		else if (not($MD_ScopeCode/@codeListValue = $levels)) then
 			local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($MD_ScopeCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode')) then
+			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 		else ()
 	)[position() le $limitErrors]
 return
@@ -401,6 +403,7 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.wrongNumberOfDataQuality"/>
 										<translationTemplate ref="TR.invalidCodeList"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID8f663265-32b8-4c99-8997-2d40f6ce5b93">
