@@ -441,16 +441,25 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $timePeriods := $record/gmd:identificationInfo[1]/*/*[self::gmd:extent or self::srv:extent]/*/gmd:temporalElement/*/gmd:extent/*[self::gml:TimePeriod or self::gml31:TimePeriod]
-	 let $invalidTimePeriods := 
-		for $timePeriod in $timePeriods
-		return
-		if (not($timePeriod[(not(*:begin) or *:begin/*:TimeInstant) and (not(*:end) or *:end/*:TimeInstant)])) then $timePeriod
-		else ()
+	 let $regex := '^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?$'
+	 let $temporalExtentextents := $record/gmd:identificationInfo[1]/*/gmd:extent/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent
 	 return
-	 if ($invalidTimePeriods) then
-		local:addMessage('TR.timePeriodWithoutInlineTimeInstant', map { 'filename': local:filename($record), 'id': $rid })
-	 else ()
+	 	for $extent in $temporalExtentextents
+		let $timePosition := $extent/*:TimeInstant/*:timePosition
+		let $timePeriod := $extent/*:TimePeriod
+		let $beginPosition := $extent/*:TimePeriod/*:beginPosition
+		let $endPosition := $extent/*:TimePeriod/*:endPosition
+		return
+		if ($timePosition) then
+			if (not(matches($timePosition/text(), $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
+		else if($timePeriod) then
+			if (not(matches($beginPosition/text(), $regex)) or not(matches($endPosition/text(), $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
+		else
+			local:addMessage('TR.noTimePositionOrPeriod', map { 'filename': local:filename($record), 'id': $rid })
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -459,7 +468,8 @@ return
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.timePeriodWithoutInlineTimeInstant"/>
+										<translationTemplate ref="TR.noTimePositionOrPeriod"/>
+										<translationTemplate ref="TR.wrongDateFormat"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
