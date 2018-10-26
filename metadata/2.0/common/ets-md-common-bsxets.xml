@@ -117,16 +117,16 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 		 let $pocs := $record/gmd:contact/gmd:CI_ResponsibleParty
 		 return
 		 if(not($pocs)) then 
-		 	local:addMessage('TR.missingElement', map { 'element': 'CI_ResponsibleParty', 'xpath': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty' })
+			local:addMessage('TR.noMetadataContact', map { 'filename': local:filename($record), 'id': $rid })
 		 else
 		 for $poc in $pocs
 		 let $orgName := $poc/gmd:organisationName
 		 let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
 		 return
 		 	if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
-				local:addMessage('TR.missingElement', map { 'element': 'organisationName', 'xpath': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:organisationName' })
+				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
 		 	else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
-				local:addMessage('TR.missingElement', map { 'element': 'electronicMailAddress', 'xpath': '/gmd:MD_Metadata/gmd:contact/gmd:CI_ResponsibleParty/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress' })
+				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = 'pointOfContact')) then
 				local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'pocs': fn:string-join($pocs/gmd:role/*/@codeListValue) })
 		 	else ()
