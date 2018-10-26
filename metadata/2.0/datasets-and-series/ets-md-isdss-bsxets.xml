@@ -95,9 +95,9 @@ let $messages :=
 				let $codeSpace := $crs/gmd:codeSpace
 	 			return
 				if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
-					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid})
 				else if (($codeSpace) and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
-					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid})
 				else () 	
 	)[position() le $limitErrors] 
 return
@@ -139,9 +139,9 @@ let $messages :=
 	 			return
 				if ($codeNumberOpt1 = $epsgCodes or $codeNumberOpt2 = $epsgCodes) then
 					if (not($code[gco:CharacterString = $httpURIIdentifier] or $code[gmx:Anchor/@xlink:href = $httpURIIdentifier])) then
-						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code/*/text() })
+						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
 					else if($codeSpace) then
-						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code/*/text() })
+						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
 					else ()
 				else ()
 	)[position() le $limitErrors] 
@@ -171,16 +171,16 @@ let $messages :=
 		let $crsIdentifiers := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier
 		return
 		if (not($crsIdentifiers)) then
-				local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+				local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
 		else
 			for $crs in $crsIdentifiers
 			let $code := $crs/gmd:code
 			let $codeSpace := $crs/gmd:codeSpace
 			return
 			if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
-				local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+				local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
 			else if (($codeSpace) and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
-				local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+				local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid })
 			else ()		
 	)[position() le $limitErrors] 
 return
