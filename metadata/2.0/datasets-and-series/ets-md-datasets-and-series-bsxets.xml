@@ -276,6 +276,8 @@ let $messages :=
 			return
 			if ($wrongCodeValues) then
 				local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
+			else if(not($languageCodes/@codeList = 'http://www.loc.gov/standards/iso639-2/')) then
+				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 			else ()     	
 	)[position() le $limitErrors]
 return
