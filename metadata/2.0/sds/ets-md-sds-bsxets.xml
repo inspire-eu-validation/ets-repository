@@ -190,14 +190,14 @@ let $messages :=
 		let $keywordElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
-		if (not($keywordElements) or not($keywordElements/gco:CharacterString/node() or $keywordElements/gmx:Anchor/node()) ) then
+		if ( not($keywordElements) ) then
 			local:addMessage('TR.keywordElementNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
 		else
 
 			let $valid :=
 				(for $keyword in $keywordElements
 					return
-					if ( $keyword/text() = $validCategories ) then
+					if ( $keyword/gco:CharacterString/text() = $validCategories or $keyword/gmx:Anchor/text() = $validCategories ) then
 						true()
 					else()
 				)[position() le $limitErrors]
