@@ -98,13 +98,13 @@ let $messages :=
 		for $record in $recordsToInspect
 			let $level := $record/gmd:hierarchyLevel/gmd:MD_ScopeCode
 			let $rid := $record/gmd:fileIdentifier/*/text()
-			let $levelname := $record/gmd:hierarchyLevelName/gco:CharacterString
+			let $levelname := $record/gmd:hierarchyLevelName
 			return
 			if (count($level) != 1) then
 				local:addMessage('TR.wrongHierarchyLevelMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($level)) })
 			else if(count($levelname) != 1) then
 				local:addMessage('TR.wrongHierarchyLevelNameMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($levelname)) })
-			else if (not($levelname/node())) then
+			else if ( not($levelname/gco:CharacterString/node() or $levelname/gmx:Anchor/node()) ) then
 				local:addMessage('TR.emptyHierarchyLevelName', map { 'filename': local:filename($record), 'id': $rid })
 			else()
 return
@@ -190,7 +190,7 @@ let $messages :=
 		let $keywordElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
-		if (not($keywordElements)) then
+		if (not($keywordElements) or not($keywordElements/gco:CharacterString/node() or $keywordElements/gmx:Anchor/node()) ) then
 			local:addMessage('TR.keywordElementNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
 		else
 
@@ -407,14 +407,17 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $dataQuality := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality
-		let $codeList := $record[gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = 'service']
-		let $scopeDescription := $record/gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:levelDescription/gmd:MD_ScopeDescription/gmd:other/gco:CharacterString/node()
+		let $codeList := $record[gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode']
+		let $codeListValue := $record[gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = 'service']
+		let $scopeDescription := $record/gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:levelDescription/gmd:MD_ScopeDescription/gmd:other
 		return
 		if ( count($dataQuality) != 1 ) then
 			local:addMessage('TR.oneDataQuality', map { 'filename': local:filename($record), 'id': $rid })
 		else if ( not($codeList) ) then
-			local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
-		else if ( not($scopeDescription) ) then
+			local:addMessage('TR.invalidCodeListSDS', map { 'filename': local:filename($record), 'id': $rid })
+		else if ( not($codeListValue) ) then
+			local:addMessage('TR.invalidCodeListValueSDS', map { 'filename': local:filename($record), 'id': $rid })
+		else if ( not($scopeDescription) or not($scopeDescription/gco:CharacterString/node() or $scopeDescription/gmx:Anchor/node()) ) then
 			local:addMessage('TR.missingScopeDescription', map { 'filename': local:filename($record), 'id': $rid })
 		else()
 	)[position() le $limitErrors]
@@ -427,7 +430,8 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.oneDataQuality"/>
-										<translationTemplate ref="TR.invalidCodeList"/>
+										<translationTemplate ref="TR.invalidCodeListSDS"/>
+										<translationTemplate ref="TR.invalidCodeListValueSDS"/>
 										<translationTemplate ref="TR.missingScopeDescription"/>
 									</translationTemplates>
 								</TestAssertion>
