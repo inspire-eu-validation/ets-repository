@@ -143,14 +143,13 @@ $messages)
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $levels := ('dataset', 'series')
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
 let $distinctRecordIdentifiers :=   
     for $rec in $records
     return
     distinct-values($rec/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*/text())
 let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($distinctRecordIdentifiers,.)[2]]
 let $messages :=    
-    (for $record in $recordsToInspect
+    (for $record in $records
         let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
         let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code
         return
@@ -187,33 +186,27 @@ $messages)
 									<expression>
 let $levels := ('dataset', 'series')
 let $THEMES_TITLE := 'GEMET - INSPIRE themes, version 1.0'
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels and gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]
 let $messages :=
-	if (not($recordsToInspect)) then
+	(try{
+		let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
+		let $inspireThemesCodeListURL := 'http://inspire.ec.europa.eu/theme'
+		let $codeTitles := local:get-code-titles($inspireThemesCodeListURL,$officialLanguages)
+		let $codeValues := local:get-code-list-values($inspireThemesCodeListURL)
+		let $codes := ($codeTitles,$codeValues)
 		for $record in $records
-		return
-		if (count($record[gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]) = 0) then
-			local:addMessage('TR.missingElement', map { 'element': local:filename($record) || ' gmd:descriptiveKeywords', 'xpath': '/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text() = GEMET - INSPIRE themes, version 1.0' })
-		else()
-	else
-		try {    			
-			let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
-			let $inspireThemesCodeListURL := 'http://inspire.ec.europa.eu/theme'
-			let $codeTitles := local:get-code-titles($inspireThemesCodeListURL,$officialLanguages)
-			let $codeValues := local:get-code-list-values($inspireThemesCodeListURL)
-			let $codes := ($codeTitles,$codeValues)
+			let $rid := $record/gmd:fileIdentifier/*/text()
+			let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords[gmd:thesaurusName/gmd:CI_Citation/gmd:title/*/text() = $THEMES_TITLE]
 			return
-				(for $record in $recordsToInspect
-					let $rid := $record/gmd:fileIdentifier/*/text()
-					let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/CI_Citation/gmd:title/*/text() = $THEMES_TITLE]
-					return
-					if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
-						local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
-					else ()
-				)[position() le $limitErrors]
-		} catch * {       						
-			local:addMessage('TR.systemError',  map { 'text': $err:description }) 				
-		}
+			if (count($relevantDescriptiveKeywordsBlocks) = 0) then
+				local:addMessage('TR.wrongKeywordFromINSPIREThemesTitle', map { 'filename': local:filename($record), 'id': $rid })
+			else
+				if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
+					local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
+				else ()
+	} catch * {       						
+		local:addMessage('TR.systemError',  map { 'text': $err:description }) 				
+	}
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -224,7 +217,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.systemError"/>
-										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.wrongKeywordFromINSPIREThemesTitle"/>
 										<translationTemplate ref="TR.noKeywordFromINSPIREThemes"/>
 									</translationTemplates>
 								</TestAssertion>
