@@ -329,20 +329,23 @@ let $regexDateTime := '^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-
 let $messages := 
 	(for $record in $records
 	let $rid := $record/gmd:fileIdentifier/*/text()
-	let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date
+	let $ci_dates := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
 	(: let $relevantTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('publication','revision','creation')] :)
 	return
-	(if(not($temporalReferences)) then
+	(if(not($ci_dates/gmd:date)) then
 		local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
 	else 
-		for $date in $temporalReferences
+		for $ci_date in $ci_dates
+		let $dateType := $ci_date/gmd:dateType/gmd:CI_DateTypeCode
 		return
-		if (not($date/gco:Date or $date/gco:DateTime)) then
+		if (not($ci_date/gmd:date/gco:Date or $ci_date/gmd:date/gco:DateTime)) then
 			local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
-		else if ($date/gco:Date and not(matches($date/gco:Date/text(),$regexDate))) then
-			local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $date }) 
-		else if ($date/gco:DateTime and not(matches($date/gco:DateTime/text(),$regexDateTime))) then
-			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $date }) 
+		else if ($ci_date/gmd:date/gco:Date and not(matches($ci_date/gmd:date/gco:Date/text(),$regexDate))) then
+			local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $ci_date/gmd:date }) 
+		else if ($ci_date/gmd:date/gco:DateTime and not(matches($ci_date/gmd:date/gco:DateTime/text(),$regexDateTime))) then
+			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $ci_date/gmd:date })
+		else if (not($dateType) or not($dateType/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode') or not($dateType/@codeListValue = ('publication','revision','creation'))) then
+			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
 		else())
 	)[position() le $limitErrors]
 return
@@ -355,6 +358,7 @@ return
 										<translationTemplate ref="TR.noRelevantDate"/>
                     					<translationTemplate ref="TR.invalidDateFormat"/>
 										<translationTemplate ref="TR.wrongDateFormat"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
