@@ -355,11 +355,14 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
-		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine
-			let $url := $onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
+		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource
+			let $url := $onLine/gmd:linkage/gmd:URL
+			let $valid_url := try { local:check-resource-uri($url, 30, false()) } catch * { false() }
 			return
 			if (not($url/node())) then
 				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
+			else if ($valid_url = 'notHTTP' or contains($valid_url, 'EXCEPTION')) then
+					local:addMessage('TR.invalidURL', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 	)[position() le $limitErrors]
 return
@@ -371,6 +374,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.linkageWithoutURL"/>
+										<translationTemplate ref="TR.invalidURL"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDc7ef6d4f-a03b-4797-85e2-3b4a49e0c5ff">
