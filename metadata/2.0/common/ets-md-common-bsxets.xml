@@ -66,7 +66,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 							<testAssertions>
 								<TestAssertion id="EID7c93c4d2-3942-4eb4-b5d3-4735d40262d8">
 									<label>md common req C.1: XML Schema</label>
-									<description><![CDATA[<p> Performs a schema validation of the document.</p>
+									<description><![CDATA[<p>Performs a schema validation of the document.</p>
 									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/xml-schema" target="_blank">XML Schema</a></p>]]></description>
 									<parent ref="EID61e80506-c181-11e8-a355-529269fb1459"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
@@ -93,6 +93,34 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
+
+								<TestAssertion id="EIDba885e87-dfec-4206-9a94-5620af734d44">
+									<label>md common req C.2: Root Element</label>
+									<description><![CDATA[<p>Test that the specification of a metadata is encoded through a root element MD_Metadata.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/root-element" target="_blank">Root Element</a></p>]]></description>
+									<parent ref="EID61e80506-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+									let $messages :=
+										(for $record in $records
+										let $rid := $record/gmd:fileIdentifier/*/text()
+										return
+										if(not($record/node-name() = 'gmd:MD_Metadata')) then
+											local:addMessage('TR.invalidRootElement',  map { 'filename': local:filename($record), 'id': $rid, 'description': $record/node-name() })
+										else ()
+										)[position() le $limitErrors]
+									return
+									(if ($messages) then 'FAILED' else 'PASSED',
+									 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+									 $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.invalidRootElement"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+
 								<TestAssertion id="EIDebdda4b4-0bb4-4255-a36a-db4fe540065c">
 									<label>md common req C.5: Language Code</label>
 									<description><![CDATA[<p>Test that a resource language is given pointing to one of the official languages of the Community expressed in conformity with ISO 639-2</p>
