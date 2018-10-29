@@ -303,18 +303,18 @@ let $codes := ('biota','boundaries','climatologyMeteorologyAtmosphere','economy'
 let $messages :=    
     (for $record in $records
         let $rid := $record/gmd:fileIdentifier/*/text()
-        let $topicCategories := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:topicCategory/*
-        return   
-        if (not($topicCategories[self::gmd:MD_TopicCategoryCode])) then
+		let $topicCategories := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:topicCategory
+        return
+		if (count($topicCategories) = 0) then
             local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
-        else 
-            let $topics := $record/gmd:identificationInfo[1]/*/gmd:topicCategory/gmd:MD_TopicCategoryCode/text()
-            let $wrongCodeValues := $topics[not(. = $codes)]
-            return
-            if ($wrongCodeValues) then
-                local:addMessage('TR.invalidTopicCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-            else ()
-
+        else
+			for $topicCategory in $topicCategories
+			return
+			if(not($topicCategory/gmd:MD_TopicCategoryCode)) then
+            	local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
+			else if (not($topicCategory/gmd:MD_TopicCategoryCode = $codes)) then
+                local:addMessage('TR.invalidTopicCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : $topicCategory/gmd:MD_TopicCategoryCode/text() })
+			else()
     )[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
