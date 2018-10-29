@@ -64,6 +64,35 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 							<statementForExecution>not applicable</statementForExecution>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
+								<TestAssertion id="EID7c93c4d2-3942-4eb4-b5d3-4735d40262d8">
+									<label>md common req C.1: XML Schema</label>
+									<description><![CDATA[<p> Performs a schema validation of the document.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/xml-schema" target="_blank">XML Schema</a></p>]]></description>
+									<parent ref="EID61e80506-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+									let $messages :=    
+										(for $record in $records
+										let $rid := $record/gmd:fileIdentifier/*/text()
+										let $result_0 := try{ validate:xsd($record, 'http://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
+										let $result_1 := try{ validate:xsd($record, 'http://www.isotc211.org/2005/gmd/gmd.xsd') } catch * {  $err:description }
+										let $result_2 := try{ validate:xsd($record, 'http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd') } catch * { $err:description }
+										return
+										if(not(string-length($result_0) = 0 or string-length($result_1) = 0 or string-length($result_2) = 0)) then
+											local:addMessage('TR.errorValidatingSchema',  map { 'filename': local:filename($record), 'id': $rid, 'description': concat($result_0, $result_1, $result_2) })
+										else ()
+										)[position() le $limitErrors]
+									return
+									(if ($messages) then 'FAILED' else 'PASSED',
+									 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+									 $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.errorValidatingSchema"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
 								<TestAssertion id="EIDebdda4b4-0bb4-4255-a36a-db4fe540065c">
 									<label>md common req C.5: Language Code</label>
 									<description><![CDATA[<p>Test that a resource language is given pointing to one of the official languages of the Community expressed in conformity with ISO 639-2</p>
