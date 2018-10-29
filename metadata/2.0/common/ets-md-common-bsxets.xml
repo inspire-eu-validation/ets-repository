@@ -105,8 +105,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 										(for $record in $records
 										let $rid := $record/gmd:fileIdentifier/*/text()
 										return
-										if(not($record/node-name() = 'gmd:MD_Metadata')) then
-											local:addMessage('TR.invalidRootElement',  map { 'filename': local:filename($record), 'id': $rid })
+										if(not($record/node-name() = QName('http://www.isotc211.org/2005/gmd','gmd:MD_Metadata'))) then
+											local:addMessage('TR.invalidRootElement',  map { 'filename': local:filename($record), 'id': namespace-uri($record) })
 										else ()
 										)[position() le $limitErrors]
 									return
