@@ -302,7 +302,7 @@ let $messages :=
 				let $validation2 := $result[(./gmd:nameOfMeasure/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/QualityOfServiceCriteriaCode/performance') and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/@xsi:type = ('xs:double','xsi:double')) and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/@xlink:href = 'http://www.opengis.net/def/uom/SI/second')]
 				let $validation3 := $result[(./gmd:nameOfMeasure/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/QualityOfServiceCriteriaCode/capacity') and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/@xsi:type = ('xs:integer','xsi:integer')) and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/@xlink:href = 'http://www.opengis.net/def/uom/OGC/1.0/unity')]
 
-				let $description := $result/gmd:measureDescription/text()
+				let $measureDescription := $result/gmd:measureDescription
 
 				let $quantitativeResult := $result/gmd:result/gmd:DQ_QuantitativeResult
 
@@ -316,7 +316,7 @@ let $messages :=
 					local:addMessage('TR.noMeasureNameAnchor', map { 'filename': local:filename($record), 'id': $rid })
 				else if (not(($validation1) or ($validation2) or ($validation3))) then
 					local:addMessage('TR.invalidQualityCriteria', map { 'filename': local:filename($record), 'id': $rid })		
-				else if (not($description)) then
+				else if (not($measureDescription) or not($measureDescription/gco:CharacterString/node() or $measureDescription/gmx:Anchor/node())) then
 					local:addMessage('TR.noMeasureDescription', map { 'filename': local:filename($record), 'id': $rid })
 				else if (not($quantitativeResult)) then
 					local:addMessage('TR.noQuantitativeResult', map { 'filename': local:filename($record), 'id': $rid })
