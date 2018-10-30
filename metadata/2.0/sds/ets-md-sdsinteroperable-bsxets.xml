@@ -76,7 +76,6 @@ Pre-requisite conformance classes: Conformance Class 5]]>
 									<parent ref="EID1caa9aef-495c-4578-8f7a-3f94c01e902a"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- DONE -->
 let $messages :=  	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
@@ -93,7 +92,7 @@ let $messages :=
 				if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
 					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
 				else if ($codeSpace and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
-					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code/*/text() })
 				else () 		
 			
 	)[position() le $limitErrors] 
@@ -119,34 +118,30 @@ return
 									<parent ref="EID1caa9aef-495c-4578-8f7a-3f94c01e902a"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- DONE -->
 let $urlOpengis := 'http://www.opengis.net/def/crs/EPSG/0/'
-let $urlCodes := ('http://codes.wmo.int/grib2/codeflag/4.2/_0-3-3')
 let $epsgCodes := ('4936','4937','4258','3035','3034','3038','3039','3040','3041','3042','3043','3044','3045','3046','3047','3048','3049','3050','3051','5730','5861','5715','7409')
-let $messages :=  		
+let $httpURIIdentifier :=
+	for $x in $epsgCodes
+	return
+	concat($urlOpengis, $x)
+let $messages :=  	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $crsIdentifiers := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier
-		return 	 						
-		if (count($crsIdentifiers) = 0)  then
-			local:addMessage('TR.noCrsIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-		else 									
+		return
 			for $crs in $crsIdentifiers
-				let $code := $crs/gmd:code/text()
-				let $codeSpace := $crs/gmd:codeSpace/text()
-
-				let $codeNumber := fn:substring($code,fn:string-length($urlOpengis)+1,4)
-				let $invalidCodeValues := $codeNumber[not(. = $epsgCodes)]
-				let $invalidCodeValues2 := $code[not(. = $urlCodes)]
-
-	 			return 	 	 												
-				if (not(fn:string-length(normalize-space($code)) &gt; 0)) then
-					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
-				else if (($invalidCodeValues) and ($invalidCodeValues2)) then
-					local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
-				else if ($codeSpace) then
-					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
-				else () 			
+				let $code := $crs/gmd:code
+				let $codeSpace := $crs/gmd:codeSpace
+				let $codeNumberOpt1 := fn:substring($code/gco:CharacterString, fn:string-length($code/gco:CharacterString)-4+1)
+				let $codeNumberOpt2 := fn:substring($code/gmx:Anchor/@xlink:href, fn:string-length($code/gmx:Anchor/@xlink:href)-4+1)
+	 			return
+				if ($codeNumberOpt1 = $epsgCodes or $codeNumberOpt2 = $epsgCodes) then
+					if (not($code[gco:CharacterString = $httpURIIdentifier] or $code[gmx:Anchor/@xlink:href = $httpURIIdentifier])) then
+						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
+					else if($codeSpace) then
+						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
+					else ()
+				else ()
 	)[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
