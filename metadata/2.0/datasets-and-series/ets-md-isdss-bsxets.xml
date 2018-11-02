@@ -270,8 +270,10 @@ let $messages :=
 				let $codeListValue := $characterCode/@codeListValue
 				let $invalidCodeValues := $codeListValue[not(. = $codes)]
 				return
-				if ($invalidCodeValues)  then
-					local:addMessage('TR.invalidEncodingCode', map { 'filename': local:filename($record), 'id': $rid})	
+				if ($invalidCodeValues) then
+					local:addMessage('TR.invalidEncodingCode', map { 'filename': local:filename($record), 'id': $rid})
+				else if (not($characterCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode')) then
+					local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 				else () 			
 	)[position() le $limitErrors] 
 return
