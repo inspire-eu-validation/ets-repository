@@ -405,11 +405,11 @@ let $messages :=
 		else if ($ci_date/gmd:date/gco:DateTime and not(matches($ci_date/gmd:date/gco:DateTime/text(),$regexDateTime))) then
 			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType)) then
-			local:addMessage('TR.noDateType', map { 'filename': local:filename($record), 'id': $rid})
+			local:addMessage('TR.noDateType', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')) then
-			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
+			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType/@codeListValue = ('publication','revision','creation'))) then
-			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid})
+			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 		else())
 	)[position() le $limitErrors]
 return
@@ -449,7 +449,7 @@ let $messages :=
 	 else (for $date in $creationTempRefs
    return 
    if (not(matches($date/gmd:date/gco:Date/text(),$regex))) then
-        local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $date }) 
+        local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid }) 
    else())
 	)[position() le $limitErrors]
 return
@@ -461,7 +461,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.moreThanOneCreationDate"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-                    <translationTemplate ref="TR.invalidDateFormat"/>
+                    					<translationTemplate ref="TR.invalidDateFormat"/>
 									</translationTemplates>
 								</TestAssertion>
 							
@@ -486,7 +486,7 @@ let $messages :=
 	 else (for $date in $revisionTempRefs
    return 
    if (not(matches($date/gmd:date/gco:Date/text(),$regex))) then
-        local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $date }) 
+        local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid }) 
    else())
 	)[position() le $limitErrors]
 return
