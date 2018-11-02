@@ -391,7 +391,6 @@ let $messages :=
 	(for $record in $records
 	let $rid := $record/gmd:fileIdentifier/*/text()
 	let $ci_dates := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
-	(: let $relevantTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('publication','revision','creation')] :)
 	return
 	(if(not($ci_dates/gmd:date)) then
 		local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
@@ -402,11 +401,15 @@ let $messages :=
 		if (not($ci_date/gmd:date/gco:Date or $ci_date/gmd:date/gco:DateTime)) then
 			local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
 		else if ($ci_date/gmd:date/gco:Date and not(matches($ci_date/gmd:date/gco:Date/text(),$regexDate))) then
-			local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $ci_date/gmd:date }) 
+			local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid }) 
 		else if ($ci_date/gmd:date/gco:DateTime and not(matches($ci_date/gmd:date/gco:DateTime/text(),$regexDateTime))) then
-			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid , 'date': $ci_date/gmd:date })
-		else if (not($dateType) or not($dateType/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode') or not($dateType/@codeListValue = ('publication','revision','creation'))) then
+			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($dateType)) then
+			local:addMessage('TR.noDateType', map { 'filename': local:filename($record), 'id': $rid})
+		else if (not($dateType/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')) then
 			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
+		else if (not($dateType/@codeListValue = ('publication','revision','creation'))) then
+			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid})
 		else())
 	)[position() le $limitErrors]
 return
@@ -419,7 +422,9 @@ return
 										<translationTemplate ref="TR.noRelevantDate"/>
                     					<translationTemplate ref="TR.invalidDateFormat"/>
 										<translationTemplate ref="TR.wrongDateFormat"/>
+										<translationTemplate ref="TR.noDateType"/>
 										<translationTemplate ref="TR.wrongCodeList"/>
+										<translationTemplate ref="TR.noDateTypeForSpecification"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
