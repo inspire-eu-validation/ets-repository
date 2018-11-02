@@ -168,8 +168,7 @@ let $messages :=
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $parameters := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:parameters/srv:SV_Parameter
 		return
-		if (count($parameters) = 0) then ()
-		else
+		if (count($parameters) &gt; 0) then 
 			for $param in $parameters
 				let $name := $param/srv:name/gco:aName
 				let $attributeType := $param/srv:name/gco:attributeType
@@ -187,7 +186,8 @@ let $messages :=
 					local:addMessage('TR.noRepeatability',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
 				else if (count($paramType) != 1 or not($paramType)) then
 					local:addMessage('TR.noParamType',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else () 					
+				else () 
+			else()					
 	)[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
