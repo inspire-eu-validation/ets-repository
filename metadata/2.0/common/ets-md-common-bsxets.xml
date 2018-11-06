@@ -842,24 +842,30 @@ let $messages :=
 	else if (not($result/gmd:specification/gmd:CI_Citation)) then
 		local:addMessage('TR.missingCitationSection', map { 'filename': local:filename($record), 'id': $rid })
 	else
-	 	(for $citation in $result/gmd:specification/gmd:CI_Citation
-		let $title := $citation/gmd:title
-		let $date := $citation/gmd:date
-		let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+	 	(for $res in $result
 		return
-		if (not($title)) then
-			local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($date)) then
-			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($dateTypeCode)) then
-			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($dateTypeCode/@codeList = ('http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode'))) then
-			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($dateTypeCode/@codeListValue = ('publication'))) then
-			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not(matches($date/gmd:CI_Date/gmd:date/gco:Date/text(), $regex))) then
-			local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid})
-		else ())
+		if(not($res/gmd:specification/gmd:CI_Citation)) then
+			local:addMessage('TR.noCitationForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+		else
+		for $citation in $res/gmd:specification/gmd:CI_Citation
+			let $citation := $res/gmd:specification/gmd:CI_Citation
+			let $title := $citation/gmd:title
+			let $date := $citation/gmd:date
+			let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+			return
+			if (not($title)) then
+				local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($date)) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($dateTypeCode)) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($dateTypeCode/@codeList = ('http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode'))) then
+				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($dateTypeCode/@codeListValue = ('publication'))) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not(matches($date/gmd:CI_Date/gmd:date/gco:Date/text(), $regex))) then
+				local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid})
+			else ())
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -869,6 +875,7 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noConformityStatement"/>
+										<translationTemplate ref="TR.noCitationForSpecification"/>
 										<translationTemplate ref="TR.missingCitationSection"/>
 										<translationTemplate ref="TR.noTitleForSpecification"/>
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
