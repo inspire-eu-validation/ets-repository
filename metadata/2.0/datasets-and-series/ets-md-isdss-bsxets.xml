@@ -425,6 +425,7 @@ let $messages :=
 			let $title := $result/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
 			let $date := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/*/text()
 			let $dateTypeCode := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue
+			let $dateTypeCodeList := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList
 			let $pass := $result/gmd:pass
 			let $explanation := $result/gmd:explanation
 			return
@@ -432,6 +433,8 @@ let $messages :=
 				local:addMessage('TR.invalidTitle', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($date)) then
 				local:addMessage('TR.noDateElement', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($dateTypeCodeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')) then
+				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($dateTypeCode = 'publication')) then
 				local:addMessage('TR.noDateCodeList', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($pass = 'false')) then
@@ -455,6 +458,7 @@ return
 										<translationTemplate ref="TR.invalidPass"/>
 										<translationTemplate ref="TR.noExplanation"/>
 										<translationTemplate ref="TR.emptyExplanation"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
