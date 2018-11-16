@@ -848,7 +848,6 @@ let $messages :=
 			local:addMessage('TR.noCitationForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 		else
 		for $citation in $res/gmd:specification/gmd:CI_Citation
-			let $citation := $res/gmd:specification/gmd:CI_Citation
 			let $title := $citation/gmd:title
 			let $date := $citation/gmd:date
 			let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
@@ -863,6 +862,8 @@ let $messages :=
 				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($dateTypeCode/@codeListValue = ('publication'))) then
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($dateTypeCode/node())) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $dateTypeCode/node() })
 			else if (not(matches($date/gmd:CI_Date/gmd:date/gco:Date/text(), $regex))) then
 				local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid})
 			else ())
