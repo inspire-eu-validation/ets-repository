@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="550ceacf-b3cb-47a0-b2dd-d3edb18344a9" activeEnvironment="Default" name="Conformance Class: View Service - WMTS" resourceRoot="" soapui-version="5.4.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:testSuite id="8cad2b02-acdd-48b8-a8b5-275e696cb4a8" name="GetCapabilities_Operation"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="b0aac23d-e9b7-4ee8-a8a0-b27f2a490726" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="initial-testcase" searchProperties="true"><con:settings/><con:testStep type="groovy" name="reset-properties" id="08bb344d-c503-4376-993b-de83e3577baf"><con:settings/><con:config><script>testRunner.testCase.testSuite.project.setPropertyValue( 'lastServiceEndpoint', '');</script></con:config></con:testStep><con:testStep type="httprequest" name="http-request" id="285c7073-068f-47d0-af36-e0b52acca7d6"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="eb7dba38-3628-4ca3-9dde-31be17e0c64d" name="http-request" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="8ec354a7-f2b7-4392-a662-bcd7a44fab88" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter required="false" disableUrlEncoding="false"><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default>GetCapabilities</con:default><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#serviceEndpoint}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="set-lastserviceendpoint" id="0dbfca15-1cb6-4362-be43-94a009e8c291"><con:settings/><con:config><script>def lastServiceEndpoint = context.expand('${http-request#EndPoint}');
+testRunner.testCase.testSuite.project.setPropertyValue( 'lastServiceEndpoint', lastServiceEndpoint);</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="12c49af9-925c-4121-bb67-15bc355499f5" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="check-initial-testcase" searchProperties="true"><con:settings/><con:testStep type="groovy" name="run-initial-testcase-if-needed" id="340df266-8b4a-4ab7-8615-0579874560b6"><con:settings/><con:config><script>def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def serviceEndPoint = testRunner.testCase.testSuite.project.getPropertyValue( 'serviceEndpoint');
+def lastServiceEndPoint = testRunner.testCase.testSuite.project.getPropertyValue( 'lastServiceEndpoint');
+def makeInitialRequest = false;
+if (tc.getTestStepByName("http-request").getPropertyValue("Response") == null){
+	makeInitialRequest = true;
+}
+else if(serviceEndPoint != lastServiceEndPoint){
+	makeInitialRequest = true;
+}
+if(makeInitialRequest){
+	runner = tc.run(new com.eviware.soapui.support.types.StringToObjectMap(), false);
+}</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="d53fc286-e2bd-483e-9623-f7957d0e949d" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at74-wmts-schema-validation" searchProperties="true" disabled="true"><con:settings/><con:testStep type="httprequest" name="HTTP Request" id="8689c935-9247-4bb3-9b07-5a4640475e72"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="5c95f3fb-68ff-499b-a215-ef98a2f2303f" name="HTTP Request" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="2c0b4af8-2742-4242-b8f0-014af26638e1" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Simple Schema Validator" id="f01d5252-5a06-4625-804d-fcfc202b57fa" name="Simple Schema Validator"><con:configuration><pathToXSD>http://schemas.opengis.net/wmts/1.0/</pathToXSD></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter required="false" disableUrlEncoding="false"><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>TEMPLATE</con:style><con:default>#Project#endpoint</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="dcd836f8-e3e2-41d0-b3e6-a7e126eb2010" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at75-implemented-operations" searchProperties="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="533acd5e-108f-46e4-9c3b-a08fab2ab1e1"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-getCapabilities-implementation" id="38a2c727-a75e-4f52-8f47-0ae179674584"><con:settings/><con:config><script>//Check that the GetCapabilities response is a non-empty free text
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+if(response.size() == 0){
+	throw new TranslatableAssertionError("TR.emptyOperationResponse");
+	//Msg: The operation response is empty. The response must be a non-empty free text.
+}
+
+//Get the GetTile parameter values from the capabilities document
+//    * SERVICE=WMTS
+//    * REQUEST=GetTile
+//    * VERSION=1.0.0
+//    * LAYER
+//    * STYLE
+//    * FORMAT
+//    * TILEMATRIXSET
+//    * TILEMATRIX
+//    * TILECOL
+//    * TILEROW
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def layerObj = capabilities.Contents.Layer[0];
+def layerId = layerObj.Identifier;
+def styleId = layerObj.Style.Identifier;
+def format = layerObj.Format[0];
+def tilematrixset = layerObj.TileMatrixSetLink[0].TileMatrixSet;
+
+def matrixSets = capabilities.Contents.TileMatrixSet;
+
+def matrixSet;
+for(i=0; i&lt;matrixSets.size(); i++){
+	if(matrixSets[i].Identifier == tilematrixset){
+		matrixSet= matrixSets[i];
+	}
+}
+
+def tileMatrix = matrixSet.TileMatrix[0].Identifier;
+
+
+
+return layerId;
+
+</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="a435a2b5-f4c0-4ae8-a170-dd0ada625166" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at77-common-request-parameters" searchProperties="true"><con:settings/><con:properties/></con:testCase><con:testCase id="99824fa3-9b85-4365-9943-d2bacc2d8323" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at78-getcapabilities-get-view-service-metadata" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="15fd7ee7-090c-429d-adcf-41090399e38e"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-capabilities-document-sections" id="897ac196-6b91-43be-9a46-b2b8ad9c3cd1"><con:settings/><con:config><script>//Test that the View Service metadata, Operations Metadata, Layers Metadata and Languages 
+//response parameters are contained in the Get View Service operation response.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def serviceIdentification = capabilities.ServiceIdentification;
+def serviceProvider = capabilities.ServiceProvider;
+def operationsMetadata = capabilities.OperationsMetadata;
+def contents = capabilities.Contents;
+def supportedLanguages = operationsMetadata.ExtendedCapabilities.SupportedLanguages;
+def responseLanguage = operationsMetadata.ExtendedCapabilities.ResponseLanguage;
+
+if(serviceIdentification.size() != 1 || serviceProvider.size() != 1){
+	throw new TranslatableAssertionError("TR.missingViewServiceMetadata");
+	//Msg: The multiplicity of ServiceIdentification or ServiceProvider element is wrong. View Service Metadata must be provided within those elements.
+}else if(operationsMetadata.size() != 1){
+	throw new TranslatableAssertionError("TR.missingOperationsMetadata");
+	//Msg: The multiplicity of OperationsMetadata element is wrong. Operations Metadata must be provided within this element.
+}else if(contents.size() != 1){
+	throw new TranslatableAssertionError("TR.missingLayersMetadata");
+	//Msg: The multiplicity of Contents element is wrong. Layers Metadata must be provided within this element.
+}else if(supportedLanguages.size() != 1 || responseLanguage.size() != 1){
+	throw new TranslatableAssertionError("TR.missingLanguagesMetadata");
+	//Msg: The multiplicity of Contents element is wrong. Layers Metadata must be provided within this element.
+}
+</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="8e8eb6c5-c0fa-4c6e-82fa-d74047b38531" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at79-getcapabilities-layer-metadata" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="e8179c08-2998-4c54-914b-60df7bc45187"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-metadata" id="8c1e1ec8-5ee5-43ee-805d-75a5d37aebce"><con:settings/><con:config><script>//Test that a Metadata element is provided for each Layer pointing to the metadata document.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def layers = capabilities.Contents.Layer;
+
+layers.each{layer->
+
+	def metadata = layer.Metadata.@"xlink:href";
+
+	if(metadata.size() == 0){
+		throw new TranslatableAssertionError("TR.missingMetadata");
+		//Msg: A Metadata element must be provided for each Layer. The Metadata element is missing.
+	}else if(metadata.size() > 1){
+		throw new TranslatableAssertionError("TR.wrongMetadataMultiplicity");
+		//Msg: One Metadata element must be provided for each style element. The Metadata multiplicity is wrong.
+	}else if(metadata.toString().length() == 0){
+		throw new TranslatableAssertionError("TR.emptyMetadataLink");
+		//Msg: The Metadata element must be populated with an URL allowing access to the metadata record. The URL value is empty.
+	}
+
+	//Run a request to the href value
+	def ts = testRunner.testCase.getTestStepByName("http-request-metadata");
+	ts.setPropertyValue("Endpoint", metadata.toString());
+	testRunner.runTestStepByName("http-request-metadata");
+
+	def responseMetadata = ts.getPropertyValue("Response");
+
+	//Check that a valid metadata docuement response is returned
+
+	def metadataDocument = new XmlSlurper(false, true).parseText(responseMetadata);
+
+	def rootMetadata = metadataDocument.MD_Metadata;
+
+	if(rootMetadata.size() == 0){
+		throw new TranslatableAssertionError("TR.invalidMetadataDocument");
+		//Msg: The URL referenced in the Metadata element must redirect to a valid layer metadata document. The document returned by the URL it is not a valid metadata document.
+	}
+
+}
+</script></con:config></con:testStep><con:testStep type="httprequest" name="http-request-metadata" id="056534dd-0c73-49a8-a240-cfde24ab1493" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="01920d52-e4ae-4215-b6e4-f4b77a21d513" name="http-request-metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://www.ign.es/csw-inspire/srv/spa/csw?SERVICE=CSW&amp;VERSION=2.0.2&amp;REQUEST=GetRecordById&amp;outputSchema=http://www.isotc211.org/2005/gmd&amp;ElementSetName=full&amp;ID=spaignsiose2011</con:endpoint><con:request/><con:assertion type="OwsExceptionReportAssertion" id="699044a5-5264-4b0a-86c3-5dcb6d15e78d" name="Fail if service returns OWS Exception Report"/><con:assertion type="Valid HTTP Status Codes" id="81e88b2e-5717-4c20-a133-1b886bc1931e" name="Valid HTTP Status Codes"><con:configuration><codes>200
+</codes></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="f7ec6fbb-0750-4d5f-a5f5-5d369c8d23c0" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at81-getcapabilities-operation-getcapabilities" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="21d0dcf8-33ad-4a88-af4b-037aff433f8e"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-operation-getcapabilities" id="1ef1f4ec-4612-40f9-9800-727dcd90e1f0"><con:settings/><con:config><script>//Test that an Operation element is provided to map the GetCapabilities operation.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def operations = capabilities.OperationsMetadata.Operation;
+
+def multi = 0;
+operations.each{op->
+	if(op.@name == "GetCapabilities"){
+		multi ++;
+	}
+}
+
+if(multi == 0){
+	throw new TranslatableAssertionError("TR.missingGetCapabilitiesOperationMetadata");
+	//Msg: There is not any Operation element with the GetCapabilities operation metadata.
+}else if(multi > 1){
+	throw new TranslatableAssertionError("TR.wrongMultiplicityGetCapabilitiesOperationMetadata");
+	//Msg: The multiplicity of the Operation element with the GetCapabilities operation metadata is wrong.
+}</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="4e6e5b38-0543-4979-b871-b4d28368ec4f" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at82-getcapabilities-operation-gettile" searchProperties="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="5bdd2251-6876-4e3f-b480-f0be6c301309"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-operation-gettitle" id="95473e29-5f14-4fdf-8fbb-9eeb71b9137b"><con:settings/><con:config><script>//Test that a element is provided to map the GetTile operation.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+// Check that the multiplicity is correct
+def operations = capabilities.OperationsMetadata.Operation;
+
+def multi = 0;
+operations.each{op->
+	if(op.@name == "GetTile"){
+		multi ++;
+	}
+}
+
+if(multi == 0){
+	throw new TranslatableAssertionError("TR.missingGetTileOperationMetadata");
+	//Msg: There is not any Operation element with the GetTile operation metadata.
+}else if(multi > 1){
+	throw new TranslatableAssertionError("TR.wrongMultiplicityGetTileOperationMetadata");
+	//Msg: The multiplicity of the Operation element with the GetTile operation metadata is wrong.
+}
+
+//Check that the image formats are supported
+
+def layers = capabilities.Contents.depthFirst().findAll{ it.name() == 'Layer' };
+
+def mandatoryFormats = ['image/png','image/jpg'];
+
+layers.each{layer->
+	def formats = layer.Format;
+	def valid = 0;
+	formats.each{format->
+		if(format in mandatoryFormats){
+			valid++;
+		}
+	}
+
+	if( valid == 0 ){
+		throw new TranslatableAssertionError("TR.missingMandatoryFormat");
+		//Msg: At least one Format must be provided with value 'image/png' or 'image/jpg'.
+	}
+
+	//PARA CADA IMAGEFORMAT HACER UNA REQUEST GETTILE Y COMPROBAR QUE LA RESPUESTA ES DEL FORMATO SOLICITADO
+}
+
+
+</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="42e4b1f6-1538-4b51-b980-867e37ba6b35" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at84-getcapabilities-layer-metadata" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="63fc41e1-cd30-40af-a40a-efee78a3b863"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request" id="335406a9-89b7-4297-9d7d-9581b3d22b22"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="406a9717-d9ef-4e25-958f-91a30f0b4eee" name="http-request" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://inspire.ec.europa.eu/layer/layer.en.xml</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="3ce80369-49a4-4b34-8c83-8c04b8f15ef0" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="groovy" name="check-layer-identifier" id="5996db53-c7dd-407a-a6c2-3f3630353861"><con:settings/><con:config><script>//Test that each layer is uniquely identified by a harmonished name.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def layers = capabilities.Contents.depthFirst().findAll{ it.name() == "Layer" };
+
+def idList = capabilities.Contents.depthFirst().findAll{ it.name() == "Identifier" &amp;&amp; it.parent().name() == "Layer"};
+
+
+//Get Harmonised Layer Names valid values (http://inspire.ec.europa.eu/layer/layer.en.xml)
+def ts = testRunner.testCase.getTestStepByName("http-request");
+def harmonisedNamesResponse = ts.getPropertyValue("Response");
+
+def register = new XmlSlurper(false, true).parseText(harmonisedNamesResponse);
+
+def validHarmonisedNames = register.containeditems.depthFirst().findAll{ it.name() == "layerName" };
+
+layers.each{layer->
+
+	def id = layer.Identifier;
+	
+	if(id.size() == 0){
+		throw new TranslatableAssertionError("TR.missingIdentifier");
+		//Msg: Each layer must have a Identifier element. The layer identifier element is missing.
+	}else if(id.toString().length() == 0){
+		throw new TranslatableAssertionError("TR.emptyIdentifier");
+		//Msg: There layer identifier is empty.
+	}else if(!(id in validHarmonisedNames)){
+		throw new TranslatableAssertionError("TR.notHarmonishedValue");
+		//Msg: There layer identifier must be a harmonised layer name given in the INSPIRE collection.
+	}
+}
+
+//Check that the Identifier values are unique
+
+if(idList.size() != idList.unique().size()){
+	throw new TranslatableAssertionError("TR.identifiersNotUnique");
+	//Msg: There are layer identifiers that are not unique in the service.
+}
+</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="b652b6c2-d4b7-403d-b929-09ec3c061e9d" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at85-getcapabilities-layer-title" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="4f90e73e-d6fb-4463-a230-d791c8736a91"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-title" id="772e0024-f199-4e9d-9256-b6c4c681ec38"><con:settings/><con:config><script>//Test that a Title element is provided for each layer with the harmonished title.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def layers = capabilities.Contents.depthFirst().findAll{ it.name() == "Layer" };
+
+layers.each{layer->
+
+	def title = layer.Title;
+
+	if(title.size() == 0){
+		throw new TranslatableAssertionError("TR.missingTitle");
+		//Msg: Each layer must have a Title element. The layer Title element is missing.
+	}else if(title.size() > 1){
+		throw new TranslatableAssertionError("TR.wrongTitleMultiplicity");
+		//Msg: Each layer must have only one Title element. The layer Title element multiplicity is wrong.
+	}else if(title.toString().length() == 0){
+		throw new TranslatableAssertionError("TR.emptyTitle");
+		//Msg: There layer Title is empty.
+	}
+}</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="014232e3-18f4-4314-93b3-f9f1d810d26a" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at86-getcapabilities-layer-abstract" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="fd900ea7-9bbd-403e-9dcd-154263794efc"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-abstract" id="f4002a39-c373-4e8a-a568-4aa1f64847e7"><con:settings/><con:config><script>//Test that an Abstract element is provided for each layer describing it.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def layers = capabilities.Contents.depthFirst().findAll{ it.name() == "Layer" };
+
+layers.each{layer->
+
+	def abst = layer.Abstract;
+
+	if(abst.size() == 0){
+		throw new TranslatableAssertionError("TR.missingAbstract");
+		//Msg: Each layer must have an Abstract element. The layer Abstract element is missing.
+	}else if(abst.size() > 1){
+		throw new TranslatableAssertionError("TR.wrongAbstractMultiplicity");
+		//Msg: Each layer must have only one Abstract element. The layer Abstract element multiplicity is wrong.
+	}else if(abst.toString().length() == 0){
+		throw new TranslatableAssertionError("TR.emptyAbstract");
+		//Msg: There layer Abstract is empty.
+	}
+}</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="f5395b10-0578-4a80-9299-e055110cbc77" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at87-getcapabilities-layer-keyword" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="a11d1c84-89ac-4760-ae93-72eeff0848e4"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-keywords" id="2f6cb64c-69f9-4a04-b4d8-72d4c95d3344"><con:settings/><con:config><script>//Test that a list of keywords is provided into a Keywords element in each layer.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def layers = capabilities.Contents.depthFirst().findAll{ it.name() == "Layer" };
+
+layers.each{layer->
+
+	def keywords = layer.Keywords;
+	def keys = keywords.depthFirst().findAll{ it.name() == "Keyword" };
+
+	if(keywords.size() == 0){
+		throw new TranslatableAssertionError("TR.missingKeywords");
+		//Msg: Each layer must have a Keywords element. The layer Keywords element is missing.
+	}else if(keywords.size() > 1){
+		throw new TranslatableAssertionError("TR.wrongKeywordsMultiplicity");
+		//Msg: Each layer must have only one Keywords element. The layer Keywords element multiplicity is wrong.
+	}else if(keys.size() > 0){
+		throw new TranslatableAssertionError("TR.wrongKeywordMultiplicity");
+		//Msg: Each layer must have at least one Keyword element into the Keywords list. The layer Keyword element multiplicity is wrong.
+	}
+	
+	keys.each{key->
+		if(key.toString().length() == 0){
+			throw new TranslatableAssertionError("TR.emptyKeyword");
+			//Msg: There Keyword element is empty.
+		}
+	}
+}</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="ecdc9d9f-1684-47e3-a7e8-7d423f12251c" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at88-getcapabilities-layer-geographic-bounding-box" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="6ccf8b5b-339b-463f-8aeb-d7775623bfad"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-wgs84boundingbox" id="0a262828-fab0-4e9a-9444-a4fb84446e66"><con:settings/><con:config><script>//Test that a WGS84BoundingBox element is provided defining the minimum  rectagle bounding the service data.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def layers = capabilities.Contents.depthFirst().findAll{ it.name() == "Layer" };
+
+layers.each{layer->
+	def bbox = layer.WGS84BoundingBox;
+
+	if(bbox.size() == 0){
+		throw new TranslatableAssertionError("TR.missingWGS84BoundingBox");
+		//Msg: Each layer must have a WGS84BoundingBox element. The layer WGS84BoundingBox element is missing.
+	}else if(bbox.size() > 1){
+		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxMultiplicity");
+		//Msg: Each layer must have only one WGS84BoundingBox element. The layer WGS84BoundingBox element multiplicity is wrong.
+	}
+	
+	def lc = bbox.LowerCorner;
+
+	String[] lc_coords = lc.toString().split(' ');
+
+	if(lc.size() == 0){
+		throw new TranslatableAssertionError("TR.missingWGS84BoundingBoxLowerCorner");
+		//Msg: Each layer must have a LowerCorner element within a WGS84BoundingBox element. The WGS84BoundingBox LowerCorner element is missing.
+	}else if(lc.size() > 1){
+		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxLowerCornerMultiplicity");
+		//Msg: Each layer must have only one WGS84BoundingBox LowerCorner element. The layer WGS84BoundingBox LowerCorner element multiplicity is wrong.
+	}
+
+	if( (Float.parseFloat(lc_coords[0]) &lt; -180 || Float.parseFloat(lc_coords[0]) > 180) || (Float.parseFloat(lc_coords[1]) &lt; -90 || Float.parseFloat(lc_coords[1]) > 90) ){
+		throw new TranslatableAssertionError("TR.invalidLowerCornerValue");
+		//Msg: LowerCorner numeric values must be, the first between -180 and 180, and the second between -90 and 90. The LowerCorner value is invalid.
+	}
+
+	def uc = bbox.UpperCorner;
+
+	String[] uc_coords = uc.toString().split(' ');
+	
+	if(uc.size() == 0){
+		throw new TranslatableAssertionError("TR.missingWGS84BoundingBoxUpperCorner");
+		//Msg: Each layer must have a UpperCorner element within a WGS84BoundingBox element. The WGS84BoundingBox Uppercorner element is missing.
+	}else if(uc.size() > 1){
+		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxUpperCornerMultiplicity");
+		//Msg: Each layer must have only one WGS84BoundingBox UpperCorner element. The layer WGS84BoundingBox UpperCorner element multiplicity is wrong.
+	}else if( (Float.parseFloat(uc_coords[0]) &lt; -180 || Float.parseFloat(uc_coords[0]) > 180) || (Float.parseFloat(uc_coords[1]) &lt; -90 || Float.parseFloat(uc_coords[1]) > 90) ){
+		throw new TranslatableAssertionError("TR.invalidUpperCornerValue");
+		//Msg: UpperCorner numeric values must be, the first between -180 and 180, and the second between -90 and 90. The UpperCorner value is invalid.
+	}
+
+}
+</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="5b8e83d3-2936-4a5b-96c6-1a1dd605a7a3" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at89-getcapabilities-etrs89-itrs-crs" searchProperties="true"><con:settings/><con:properties/></con:testCase><con:testCase id="d6d99be7-7db3-400b-baff-9ab3a55850bf" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at90-getcapabilities-layer-style" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="ed6a65a6-8f2d-4ff7-82f1-65ab46cc7e52"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-style" id="b8b0ab8d-def0-4976-b4d3-9a269c0ea8d3"><con:settings/><con:config><script>//Test that each style has a human-readable name mapped to Title element and a unique identifier mapped to Identifier element.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def layers = capabilities.Contents.depthFirst().findAll{ it.name() == "Layer" };
+
+layers.each{layer->
+	def styles = layer.Style;
+
+	def ids = styles.depthFirst().findAll{ it.name() == "Identifier" };
+
+	log.info(ids);
+
+	if(styles.size() == 0){
+		
+		throw new TranslatableAssertionError("TR.wrongStyleMultiplicity");
+		//Msg: Each layer must have at least one Style element. The Style element multiplicity is wrong.
+	}
+
+	styles.each{style->
+
+		def title = style.Title;
+		def id = style.Identifier;
+
+		if(title.size() == 0){
+			throw new TranslatableAssertionError("TR.missingStyleTitle");
+			//Msg: A Title element must be provided for each style element. The Title element is missing.
+		}else if(title.size() > 1){
+			throw new TranslatableAssertionError("TR.wrongStyleTitleMultiplicity");
+			//Msg: A Title element must be provided for each style element. The Title multiplicity is wrong.
+		}else if(title.toString().length() == 0){
+			throw new TranslatableAssertionError("TR.emptyStyleTitle");
+			//Msg: The style title must be a non-empty value. The style title value is empty.
+		}
+
+		if(id.size() == 0){
+			throw new TranslatableAssertionError("TR.missingStyleIdentifier");
+			//Msg: A unique identifier must be provided for each style element. The Identifier element is missing.
+		}else if(id.size() > 1){
+			throw new TranslatableAssertionError("TR.wrongStyleIdentifierMultiplicity");
+			//Msg: A unique identifier must be provided for each style element. The Identifier multiplicity is wrong.
+		}else if(id.toString().length() == 0){
+			throw new TranslatableAssertionError("TR.emptyStyleIdentifier");
+			//Msg: The style identifier must be a non-empty value. The style identifier value is empty.
+		}
+	}
+
+	//Check that the style Identifier value is unique within the Layer
+	if(ids.size() != ids.unique().size()){
+		throw new TranslatableAssertionError("TR.duplicateStyleIdentifiers");
+		//Msg: The style identifier value must be unique within the same layer. The Identifier value is not unique.
+	}
+}</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="eb5e9830-7560-4bf5-921c-ba762225e9fa" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at91-getcapabilities-layer-legend-url" searchProperties="true" disabled="true"><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="46bd60b1-929b-4a6e-8164-1d71c793cca6"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-style-legendurl" id="d1d9f721-5f0b-4d9c-bbb6-1599d6d97532"><con:settings/><con:config><script>//Test that a legend is provided into LegendURL element for each style and supported language.
+
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+
+def capabilities = new XmlSlurper(false, true).parseText(response);
+
+def supportedLangs = capabilities.OperationsMetadata.ExtendedCapabilities.SupportedLanguages;
+
+log.info(supportedLangs);
+
+supportedLangs.each{lang->
+
+	//Lanzar request por cada idioma
+	def ts = testRunner.testCase.getTestStepByName("http-request-getcapabilities");
+	ts.setPropertyValue("language", lang.toString());
+	testRunner.runTestStepByName("http-request-getcapabilities");
+
+	def responseLayers = ts.getPropertyValue("Response");
+
+	def capabilitiesLang = new XmlSlurper(false, true).parseText(responseLayers);
+
+	def layersLang = capabilitiesLang.Contents.depthFirst().findAll{ it.name() == "Layer" };
+
+	layersLang.each{layer->
+
+		def styles = layer.Style;
+
+		styles.each{style->
+
+			def legend = style.LegendURL;
+
+			if(legend.size() == 0){
+				throw new TranslatableAssertionError("TR.missingLegendURL");
+				//Msg: A LegendURL element must be provided for each style element. The LegendURL element is missing.
+			}else if(legend.size() > 1){
+				throw new TranslatableAssertionError("TR.wrongLegendURLMultiplicity");
+				//Msg: A LegendURL element must be provided for each style element. The LegendURL multiplicity is wrong.
+			}
+			
+			/*
+			def legend = style.LegendURL.@"xlink:href";
+
+			def tsLegend = testRunner.testCase.getTestStepByName("http-request-legend");
+			tsLegend.setPropertyValue("Endpoint", legend.toString());
+			testRunner.runTestStepByName("http-request-legend");
+
+			def responseLegend = tsLegend.getPropertyValue("Response");
+
+			def httpResponseHeaders = context.testCase.testSteps["http-request-legend"].testRequest.response.responseHeaders;
+
+			def validContentTypes = ["image/png","image/jpg"];
+
+			log.info(httpResponseHeaders["Content-Type"][0]);
+			log.info(httpResponseHeaders["Content-Type"][0]);
+
+			if(!httpResponseHeaders["Content-Type"][0] in validContentTypes){
+				log.info("error");
+			}
+			*/
+		}
+	}
+}
+
+
+</script></con:config></con:testStep><con:testStep type="httprequest" name="http-request-getcapabilities" id="aff72a48-d454-426c-89c2-4929caf3cf81" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="cda97b5b-6838-4f20-bd4a-a0f51440353f" name="http-request-getcapabilities" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter required="false" disableUrlEncoding="false"><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>language</con:name><con:value>spa</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="httprequest" name="http-request-legend" id="11f8c0e6-ff04-4b2b-820c-c4ee20c91974" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="5b14c7df-1a19-431b-8516-800eb1a92a26" name="http-request-legend" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://servicios.idee.es/wms-inspire/ocupacion-suelo/leyendas/lu.existinglanduse.default.png</con:endpoint><con:request/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite id="fe136de2-1413-490b-a378-ecbcced39d6b" name="GetTile_Operation"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="bfa2e575-61a0-48fe-b334-e2d047f23f07" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at92-gettile-gettile-operation" searchProperties="true"><con:settings/><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>http://servicios.idee.es/wmts/ocupacion-suelo</con:value></con:property><con:property><con:name>service</con:name><con:value>WMTS</con:value></con:property><con:property><con:name>version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>extended_capabilities_scenario</con:name><con:value/></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value>http://servicios.idee.es/wmts/ocupacion-suelo</con:value></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, extended_capabilities_scenario, lastServiceEndpoint, authUser, authPwd</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EID7c15a770-986a-4aa0-b4cd-7facbca96a1d</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EIDfa68eb83-a25a-4009-84dd-036de4539c93</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EID9b6ef734-981e-4d60-aa81-d6730a1c6389</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-11-07T00:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2018-11-07T00:00:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.0.1</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/ets-repository/tree/master/service/vs-wms-soapui-project.xml</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
