@@ -1243,7 +1243,7 @@ let $messages :=
 			(for $record in $recordsToInspect
 			 let $rid := $record/gmd:fileIdentifier/*/text()
 			 let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]
-			 let $hasExpectedDate := boolean($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*[gmd:date/*/text() = '2008-06-01' and gmd:dateType/*/@codeListValue = 'publication' and gmd:dateType/*/text() = 'publication'])
+			 let $hasExpectedDate := boolean($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*[gmd:date/*/text() = '2008-06-01' and gmd:dateType/*/@codeListValue = 'publication'])
 			 return 
 			 if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
 				local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
