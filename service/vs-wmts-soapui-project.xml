@@ -588,14 +588,17 @@ layers.each{layer->
 	def abst = layer.Abstract;
 
 	if(abst.size() == 0){
-		throw new TranslatableAssertionError("TR.missingAbstract");
-		//Msg: Each layer must have an Abstract element. The layer Abstract element is missing.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.missingAbstract", assertParams);
+		//Msg: Each layer must have an Abstract element. The '{layerid}' layer Abstract element is missing.
 	}else if(abst.size() > 1){
-		throw new TranslatableAssertionError("TR.wrongAbstractMultiplicity");
-		//Msg: Each layer must have only one Abstract element. The layer Abstract element multiplicity is wrong.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongAbstractMultiplicity", assertParams);
+		//Msg: Each layer must have only one Abstract element. The '{layerid}' layer Abstract element multiplicity is wrong.
 	}else if(abst.toString().length() == 0){
-		throw new TranslatableAssertionError("TR.emptyAbstract");
-		//Msg: There layer Abstract is empty.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.emptyAbstract", assertParams);
+		//Msg: The '{layerid}' layer Abstract is empty.
 	}
 }</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="f5395b10-0578-4a80-9299-e055110cbc77" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at87-getcapabilities-layer-keyword" searchProperties="true"><con:description><![CDATA[<p>Test that a list of keywords is provided into a Keywords element in each layer.</p>
 <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/wmts-1.0.0/at87-getcapabilities-layer-keyword" target="_blank">Layer Keywords</a></p>]]></con:description><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="a11d1c84-89ac-4760-ae93-72eeff0848e4"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-keywords" id="2f6cb64c-69f9-4a04-b4d8-72d4c95d3344"><con:settings/><con:config><script>//Test that a list of keywords is provided into a Keywords element in each layer.
@@ -614,20 +617,24 @@ layers.each{layer->
 	def keys = keywords.depthFirst().findAll{ it.name() == "Keyword" };
 
 	if(keywords.size() == 0){
-		throw new TranslatableAssertionError("TR.missingKeywords");
-		//Msg: Each layer must have a Keywords element. The layer Keywords element is missing.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.missingKeywords", assertParams);
+		//Msg: Each layer must have a Keywords element. The '{layerid}' layer Keywords element is missing.
 	}else if(keywords.size() > 1){
-		throw new TranslatableAssertionError("TR.wrongKeywordsMultiplicity");
-		//Msg: Each layer must have only one Keywords element. The layer Keywords element multiplicity is wrong.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongKeywordsMultiplicity", assertParams);
+		//Msg: Each layer must have only one Keywords element. The '{layerid}' layer Keywords element multiplicity is wrong.
 	}else if(keys.size() == 0){
-		throw new TranslatableAssertionError("TR.wrongKeywordMultiplicity");
-		//Msg: Each layer must have at least one Keyword element into the Keywords list. The layer Keyword element multiplicity is wrong.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongKeywordMultiplicity", assertParams);
+		//Msg: Each layer must have at least one Keyword element into the Keywords list. The '{layerid}' layer Keyword element multiplicity is wrong.
 	}
 	
 	keys.each{key->
 		if(key.toString().length() == 0){
-			throw new TranslatableAssertionError("TR.emptyKeyword");
-			//Msg: There Keyword element is empty.
+			String[] assertParams = ["layerid", layer.Identifier.toString()];
+			throw new TranslatableAssertionError("TR.emptyKeyword", assertParams);
+			//Msg: The Keyword element is empty in layer '{layerid}'.
 		}
 	}
 }</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="ecdc9d9f-1684-47e3-a7e8-7d423f12251c" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at88-getcapabilities-layer-geographic-bounding-box" searchProperties="true"><con:description><![CDATA[<p>Test that a WGS84BoundingBox element is provided defining the minimum  rectagle bounding the service data.</p>
@@ -645,11 +652,13 @@ layers.each{layer->
 	def bbox = layer.WGS84BoundingBox;
 
 	if(bbox.size() == 0){
-		throw new TranslatableAssertionError("TR.missingWGS84BoundingBox");
-		//Msg: Each layer must have a WGS84BoundingBox element. The layer WGS84BoundingBox element is missing.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.missingWGS84BoundingBox", assertParams);
+		//Msg: Each layer must have a WGS84BoundingBox element. The '{layerid}' layer WGS84BoundingBox element is missing.
 	}else if(bbox.size() > 1){
-		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxMultiplicity");
-		//Msg: Each layer must have only one WGS84BoundingBox element. The layer WGS84BoundingBox element multiplicity is wrong.
+		String[] assertParams = ["layeridtrixset", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxMultiplicity", assertParams);
+		//Msg: Each layer must have only one WGS84BoundingBox element. The '{layerid}' layer WGS84BoundingBox element multiplicity is wrong.
 	}
 	
 	def lc = bbox.LowerCorner;
@@ -657,16 +666,19 @@ layers.each{layer->
 	String[] lc_coords = lc.toString().split(' ');
 
 	if(lc.size() == 0){
-		throw new TranslatableAssertionError("TR.missingWGS84BoundingBoxLowerCorner");
-		//Msg: Each layer must have a LowerCorner element within a WGS84BoundingBox element. The WGS84BoundingBox LowerCorner element is missing.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.missingWGS84BoundingBoxLowerCorner", assertParams);
+		//Msg: Each layer must have a LowerCorner element within a WGS84BoundingBox element. The WGS84BoundingBox LowerCorner element is missing in layer '{layerid}'.
 	}else if(lc.size() > 1){
-		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxLowerCornerMultiplicity");
-		//Msg: Each layer must have only one WGS84BoundingBox LowerCorner element. The layer WGS84BoundingBox LowerCorner element multiplicity is wrong.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxLowerCornerMultiplicity", assertParams);
+		//Msg: Each layer must have only one WGS84BoundingBox LowerCorner element. The '{layerid}' layer WGS84BoundingBox LowerCorner element multiplicity is wrong.
 	}
 
 	if( (Float.parseFloat(lc_coords[0]) &lt; -180 || Float.parseFloat(lc_coords[0]) > 180) || (Float.parseFloat(lc_coords[1]) &lt; -90 || Float.parseFloat(lc_coords[1]) > 90) ){
-		throw new TranslatableAssertionError("TR.invalidLowerCornerValue");
-		//Msg: LowerCorner numeric values must be, the first between -180 and 180, and the second between -90 and 90. The LowerCorner value is invalid.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.invalidLowerCornerValue", assertParams);
+		//Msg: LowerCorner numeric values must be, the first between -180 and 180, and the second between -90 and 90. The LowerCorner value is invalid in layer '{layerid}'.
 	}
 
 	def uc = bbox.UpperCorner;
@@ -674,14 +686,17 @@ layers.each{layer->
 	String[] uc_coords = uc.toString().split(' ');
 	
 	if(uc.size() == 0){
-		throw new TranslatableAssertionError("TR.missingWGS84BoundingBoxUpperCorner");
-		//Msg: Each layer must have a UpperCorner element within a WGS84BoundingBox element. The WGS84BoundingBox Uppercorner element is missing.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.missingWGS84BoundingBoxUpperCorner", assertParams);
+		//Msg: Each layer must have a UpperCorner element within a WGS84BoundingBox element. The WGS84BoundingBox Uppercorner element is missing in layer '{layerid}'.
 	}else if(uc.size() > 1){
-		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxUpperCornerMultiplicity");
-		//Msg: Each layer must have only one WGS84BoundingBox UpperCorner element. The layer WGS84BoundingBox UpperCorner element multiplicity is wrong.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongWGS84BoundingBoxUpperCornerMultiplicity", assertParams);
+		//Msg: Each layer must have only one WGS84BoundingBox UpperCorner element. The '{layerid}' layer WGS84BoundingBox UpperCorner element multiplicity is wrong.
 	}else if( (Float.parseFloat(uc_coords[0]) &lt; -180 || Float.parseFloat(uc_coords[0]) > 180) || (Float.parseFloat(uc_coords[1]) &lt; -90 || Float.parseFloat(uc_coords[1]) > 90) ){
-		throw new TranslatableAssertionError("TR.invalidUpperCornerValue");
-		//Msg: UpperCorner numeric values must be, the first between -180 and 180, and the second between -90 and 90. The UpperCorner value is invalid.
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.invalidUpperCornerValue", assertParams);
+		//Msg: UpperCorner numeric values must be, the first between -180 and 180, and the second between -90 and 90. The UpperCorner value is invalid in layer '{layerid}'.
 	}
 
 }
@@ -708,8 +723,9 @@ layers.each{layer->
 
 	tileMatrixSetLinks.each{tileMatrixSetLink->
 		if(!(tileMatrixSetLink.TileMatrixSet.toString() in tileMatrixSetIds)){
-			throw new TranslatableAssertionError("TR.tileMatrixSetNotDefined");
-			//Msg: The TileMatrixSet referenced into the TileMatrixSetLinks of the layer must be defined into a TileMatrixSet object into Contents section. The TileMatrixSet is not defined.
+			String[] assertParams = ["tilematrixset", tileMatrixSetLink.TileMatrixSet.toString()];
+			throw new TranslatableAssertionError("TR.tileMatrixSetNotDefined", assertParams);
+			//Msg: The TileMatrixSet referenced into the TileMatrixSetLinks of the layer must be defined into a TileMatrixSet object into Contents section. The TileMatrixSet '{tilematrixset}' is not defined.
 		}
 	}
 }</script></con:config></con:testStep><con:testStep type="manualTestStep" name="Manual TestStep" id="8cf1cd4c-3e9b-4105-8125-cce0675a7f3a"><con:description>* Check that the data is provided using at least one geographical coordinate system based on ETRS89 in continental Europe and ITRS outside continental Europe.
@@ -729,12 +745,10 @@ layers.each{layer->
 
 	def ids = styles.depthFirst().findAll{ it.name() == "Identifier" };
 
-	log.info(ids);
-
 	if(styles.size() == 0){
-		
-		throw new TranslatableAssertionError("TR.wrongStyleMultiplicity");
-		//Msg: Each layer must have at least one Style element. The Style element multiplicity is wrong.
+		String[] assertParams = ["stylename", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongStyleMultiplicity", assertParams);
+		//Msg: Each layer must have at least one Style element. The Style element multiplicity is wrong for the layer '{layerid}'.
 	}
 
 	styles.each{style->
@@ -743,35 +757,43 @@ layers.each{layer->
 		def id = style.Identifier;
 
 		if(title.size() == 0){
-			throw new TranslatableAssertionError("TR.missingStyleTitle");
-			//Msg: A Title element must be provided for each style element. The Title element is missing.
+			String[] assertParams = ["styleid", id.toString(), "layerid", layer.Identifier.toString()];
+			throw new TranslatableAssertionError("TR.missingStyleTitle", assertParams);
+			//Msg: A Title element must be provided for each style element. The Title element is missing for the style '{styleid}' in layer '{layerid}'.
 		}else if(title.size() > 1){
-			throw new TranslatableAssertionError("TR.wrongStyleTitleMultiplicity");
-			//Msg: A Title element must be provided for each style element. The Title multiplicity is wrong.
+			String[] assertParams = ["styleid", id.toString(), "layerid", layer.Identifier.toString()];
+			throw new TranslatableAssertionError("TR.wrongStyleTitleMultiplicity", assertParams);
+			//Msg: A Title element must be provided for each style element. The Title multiplicity is wrong for the style '{styleid}' in layer '{layerid}'.
 		}else if(title.toString().length() == 0){
-			throw new TranslatableAssertionError("TR.emptyStyleTitle");
-			//Msg: The style title must be a non-empty value. The style title value is empty.
+			String[] assertParams = ["styleid", id.toString(), "layerid", layer.Identifier.toString()];
+			throw new TranslatableAssertionError("TR.emptyStyleTitle", assertParams);
+			//Msg: The style title must be a non-empty value. The '{styleid}' style title value is empty in layer '{layerid}'.
 		}
 
 		if(id.size() == 0){
-			throw new TranslatableAssertionError("TR.missingStyleIdentifier");
-			//Msg: A unique identifier must be provided for each style element. The Identifier element is missing.
+			String[] assertParams = ["styletitle", title.toString(), "layerid", layer.Identifier.toString()];
+			throw new TranslatableAssertionError("TR.missingStyleIdentifier", assertParams);
+			//Msg: A unique identifier must be provided for each style element. The Identifier element of the '{styletitle}' style is missing in layer '{layerid}'.
 		}else if(id.size() > 1){
-			throw new TranslatableAssertionError("TR.wrongStyleIdentifierMultiplicity");
-			//Msg: A unique identifier must be provided for each style element. The Identifier multiplicity is wrong.
+			String[] assertParams = ["styletitle", title.toString(), "layerid", layer.Identifier.toString()];
+			throw new TranslatableAssertionError("TR.wrongStyleIdentifierMultiplicity", assertParams);
+			//Msg: A unique identifier must be provided for each style element. The Identifier multiplicity of the '{styletitle}' style is wrong in layer '{layerid}'.
 		}else if(id.toString().length() == 0){
-			throw new TranslatableAssertionError("TR.emptyStyleIdentifier");
-			//Msg: The style identifier must be a non-empty value. The style identifier value is empty.
+			String[] assertParams = ["styletitle", title.toString(), "layerid", layer.Identifier.toString()];
+			throw new TranslatableAssertionError("TR.emptyStyleIdentifier", assertParams);
+			//Msg: The style identifier must be a non-empty value. The '{styletitle}' style identifier value is empty in layer '{layerid}'.
 		}
 	}
 
 	//Check that the style Identifier value is unique within the Layer
 	if(ids.size() != ids.unique().size()){
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
 		throw new TranslatableAssertionError("TR.duplicateStyleIdentifiers");
-		//Msg: The style identifier value must be unique within the same layer. The Identifier value is not unique.
+		//Msg: The style identifier value must be unique within the same layer. The Identifier value is not unique in layer '{layerid}'.
 	}
 }</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="eb5e9830-7560-4bf5-921c-ba762225e9fa" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at91-getcapabilities-layer-legend-url" searchProperties="true"><con:description><![CDATA[<p>Test that a legend is provided into LegendURL element for each style and supported language.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/wmts-1.0.0/at91-getcapabilities-layer-legend-url" target="_blank">Layer Style Legend URL</a></p>]]></con:description><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="46bd60b1-929b-4a6e-8164-1d71c793cca6"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-getcapabilities" id="aff72a48-d454-426c-89c2-4929caf3cf81" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="cda97b5b-6838-4f20-bd4a-a0f51440353f" name="http-request-getcapabilities" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter required="false" disableUrlEncoding="false"><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>language</con:name><con:value>spa</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="httprequest" name="http-request-legend" id="11f8c0e6-ff04-4b2b-820c-c4ee20c91974" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="5b14c7df-1a19-431b-8516-800eb1a92a26" name="http-request-legend" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://servicios.idee.es/wms-inspire/ocupacion-suelo/leyendas/lu.existinglanduse.default.png</con:endpoint><con:request/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="groovy" name="check-layer-style-legendurl" id="d1d9f721-5f0b-4d9c-bbb6-1599d6d97532"><con:settings/><con:config><script>//Test that a legend is provided into LegendURL element for each style and supported language.
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/wmts-1.0.0/at91-getcapabilities-layer-legend-url" target="_blank">Layer Style Legend URL</a></p>]]></con:description><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="46bd60b1-929b-4a6e-8164-1d71c793cca6"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-getcapabilities" id="aff72a48-d454-426c-89c2-4929caf3cf81" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="cda97b5b-6838-4f20-bd4a-a0f51440353f" name="http-request-getcapabilities" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="54e896d0-7a7c-40b6-af22-b45b03e3fd10" name="Valid HTTP Status Codes"><con:configuration><codes>200
+</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="befd18dc-2d33-4625-bc3c-33b1c327576e" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter required="false" disableUrlEncoding="false"><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>language</con:name><con:value>spa</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="httprequest" name="http-request-legend" id="11f8c0e6-ff04-4b2b-820c-c4ee20c91974" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="5b14c7df-1a19-431b-8516-800eb1a92a26" name="http-request-legend" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://servicios.idee.es/wms-inspire/ocupacion-suelo/leyendas/lu.existinglanduse.default.png</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="28006fc2-2a83-4b2d-96e3-e6bda342a822" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="c4490ed9-dccb-4d93-9536-6ed26cbabc98" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:testStep type="groovy" name="check-layer-style-legendurl" id="d1d9f721-5f0b-4d9c-bbb6-1599d6d97532"><con:settings/><con:config><script>//Test that a legend is provided into LegendURL element for each style and supported language.
 
 import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
@@ -785,7 +807,7 @@ log.info(supportedLangs);
 
 supportedLangs.each{lang->
 
-	//Lanzar request por cada idioma
+	//Run request per each language
 	def ts = testRunner.testCase.getTestStepByName("http-request-getcapabilities");
 	ts.setPropertyValue("language", lang.toString());
 	testRunner.runTestStepByName("http-request-getcapabilities");
@@ -805,11 +827,13 @@ supportedLangs.each{lang->
 			def legend = style.LegendURL;
 
 			if(legend.size() == 0){
-				throw new TranslatableAssertionError("TR.missingLegendURL");
-				//Msg: A LegendURL element must be provided for each style element. The LegendURL element is missing.
+				String[] assertParams = ["stylename", style.Identifier.toString()];
+				throw new TranslatableAssertionError("TR.missingLegendURL", assertParams);
+				//Msg: A LegendURL element must be provided for each style element. The LegendURL element is missing for the style '{stylename}'.
 			}else if(legend.size() > 1){
-				throw new TranslatableAssertionError("TR.wrongLegendURLMultiplicity");
-				//Msg: A LegendURL element must be provided for each style element. The LegendURL multiplicity is wrong.
+				String[] assertParams = ["stylename", style.Identifier.toString()];
+				throw new TranslatableAssertionError("TR.wrongLegendURLMultiplicity", assertParams);
+				//Msg: A LegendURL element must be provided for each style element. The LegendURL multiplicity is wrong in the style '{stylename}'.
 			}
 			
 			/*
@@ -838,7 +862,7 @@ supportedLangs.each{lang->
 
 
 </script></con:config></con:testStep><con:properties/></con:testCase><con:properties><con:property><con:name>defaultGetTile_Request</con:name><con:value>GetTile</con:value></con:property><con:property><con:name>defaultGetTile_Layer</con:name><con:value>OI.OrthoimageCoverage</con:value></con:property><con:property><con:name>defaultGetTile_Style</con:name><con:value>default</con:value></con:property><con:property><con:name>defaultGetTile_Format</con:name><con:value>image/jpeg</con:value></con:property><con:property><con:name>defaultGetTile_TileMatrixSet</con:name><con:value>InspireCRS84Quad</con:value></con:property><con:property><con:name>defaultGetTile_TileMatrix</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_TileCol</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_TileRow</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_Language</con:name><con:value>spa</con:value></con:property></con:properties></con:testSuite><con:testSuite id="fe136de2-1413-490b-a378-ecbcced39d6b" name="GetTile_Operation"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="bfa2e575-61a0-48fe-b334-e2d047f23f07" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at92-gettile-gettile-operation" searchProperties="true"><con:description><![CDATA[<p>Test that the WMTS GetTile operation implements all the parameters according to the Commission Regulation (EC) No 976/2009.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/wmts-1.0.0/at92-gettile-gettile-operation" target="_blank">GetTile Operation</a></p>]]></con:description><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="a78b7b00-ae9f-43f1-a910-5640635935fa"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-gettile" id="741b8cee-eaf3-4ba7-a706-f56714877c2b" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="753aebd4-b461-48c7-911a-b85fcbb1ee76" name="http-request-gettile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b9699538-ddcc-4c03-91ae-7a93ae8814ac" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value/><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetTile</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>version</con:name><con:value>1.0.0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>layer</con:name><con:value>OI.OrthoimageCoverage</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>style</con:name><con:value>default</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>format</con:name><con:value>image/jpeg</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilematrixset</con:name><con:value>InspireCRS84Quad</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilematrix</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilecol</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilerow</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="check-gettile-parameters-implementation" id="f2ef1c82-f020-4445-bdea-d6358f70ffbb"><con:settings/><con:config><script>//For each GetTile param:
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/wmts-1.0.0/at92-gettile-gettile-operation" target="_blank">GetTile Operation</a></p>]]></con:description><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="a78b7b00-ae9f-43f1-a910-5640635935fa"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-gettile" id="741b8cee-eaf3-4ba7-a706-f56714877c2b" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="753aebd4-b461-48c7-911a-b85fcbb1ee76" name="http-request-gettile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b9699538-ddcc-4c03-91ae-7a93ae8814ac" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="8a943178-afe3-45d2-9fb2-55e19665052f" name="response-timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value/><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetTile</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>version</con:name><con:value>1.0.0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>layer</con:name><con:value>OI.OrthoimageCoverage</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>style</con:name><con:value>default</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>format</con:name><con:value>image/jpeg</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilematrixset</con:name><con:value>InspireCRS84Quad</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilematrix</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilecol</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilerow</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="check-gettile-parameters-implementation" id="f2ef1c82-f020-4445-bdea-d6358f70ffbb"><con:settings/><con:config><script>//For each GetTile param:
 //	Run request with all the parameters except the one that is being tested
 //	Run request with valid values for all the parameters except the one that is being tested
 
@@ -868,7 +892,7 @@ mandatoryParameters.each{param->
 			//Msg: The paremeter must be mandatory.
 		}
 	}else{
-		String[] assertParams = ["parameter",param.toString()];
+		String[] assertParams = ["parameter", param.toString()];
 		throw new TranslatableAssertionError("TR.paramNotMandatory", assertParams);
 		//Msg: The paremeter must be mandatory.
 	}
@@ -888,11 +912,13 @@ mandatoryParameters.each{param->
 	if(httpResponseHeaders['Content-Type'][0].contains('text/xml')){
 		def xml_root = new XmlSlurper().parseText(tileResponse);
 		if (!(xml_root.ServiceException.size() == 1 || xml_root.Exception.size() == 1)){
-			throw new TranslatableAssertionError("TR.paramValueMustNotBeAccepted");
+			String[] assertParams = ["parameter",param.toString()];
+			throw new TranslatableAssertionError("TR.paramValueMustNotBeAccepted", assertParams);
 			//Msg: The paremeter value must not be accepted.
 		}
 	}else{
-		throw new TranslatableAssertionError("TR.paramValueMustNotBeAccepted");
+		String[] assertParams = ["parameter",param.toString()];
+		throw new TranslatableAssertionError("TR.paramValueMustNotBeAccepted", assertParams);
 		//Msg: The paremeter value must not be accepted.
 	}
 
