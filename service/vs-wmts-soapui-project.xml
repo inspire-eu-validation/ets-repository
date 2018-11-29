@@ -570,6 +570,12 @@ layers.each{layer->
 
 	def titles = layer.Title;
 
+	if(titles.size() > 1){
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongTitleMultiplicity", assertParams);
+		//Msg: Each layer must have only one Title element. The '{layerid}' layer Title element multiplicity is wrong.
+	}
+	
 	titles.each{title->
 		if(title.toString().length() == 0){
 			String[] assertParams = ["layerid", layer.Identifier.toString()];
@@ -591,6 +597,12 @@ def layers = capabilities.Contents.depthFirst().findAll{ it.name() == "Layer" };
 layers.each{layer->
 
 	def abstracts = layer.Abstract;
+
+	if(abstracts.size() > 1){
+		String[] assertParams = ["layerid", layer.Identifier.toString()];
+		throw new TranslatableAssertionError("TR.wrongAbstractMultiplicity", assertParams);
+		//Msg: Each layer must have zero or one Abstract element. The '{layerid}' layer Abstract element multiplicity is wrong.
+	}
 
 	abstracts.each{abst->
 		if(abst.toString().length() == 0){
@@ -620,27 +632,24 @@ def layers = capabilities.Contents.depthFirst().findAll{ it.name() == "Layer" };
 layers.each{layer->
 
 	def keywords = layer.Keywords;
-	def keys = keywords.depthFirst().findAll{ it.name() == "Keyword" };
 
-	if(keywords.size() == 0){
-		String[] assertParams = ["layerid", layer.Identifier.toString()];
-		throw new TranslatableAssertionError("TR.missingKeywords", assertParams);
-		//Msg: Each layer must have a Keywords element. The '{layerid}' layer Keywords element is missing.
-	}else if(keywords.size() > 1){
-		String[] assertParams = ["layerid", layer.Identifier.toString()];
-		throw new TranslatableAssertionError("TR.wrongKeywordsMultiplicity", assertParams);
-		//Msg: Each layer must have only one Keywords element. The '{layerid}' layer Keywords element multiplicity is wrong.
-	}else if(keys.size() == 0){
-		String[] assertParams = ["layerid", layer.Identifier.toString()];
-		throw new TranslatableAssertionError("TR.wrongKeywordMultiplicity", assertParams);
-		//Msg: Each layer must have at least one Keyword element into the Keywords list. The '{layerid}' layer Keyword element multiplicity is wrong.
-	}
-	
-	keys.each{key->
-		if(key.toString().length() == 0){
+	log.info(keywords);
+
+	keywords.each{list->
+		keys = list.Keyword;
+
+		if(keywords.size() == 0){
 			String[] assertParams = ["layerid", layer.Identifier.toString()];
-			throw new TranslatableAssertionError("TR.emptyKeyword", assertParams);
-			//Msg: The Keyword element is empty in layer '{layerid}'.
+			throw new TranslatableAssertionError("TR.missingKeyword", assertParams);
+			//Msg: Each Keywords element must have at least one Keyword element. The '{layerid}' layer Keywords element must have at least one Keyword element.
+		}
+	
+		keys.each{key->
+			if(key.toString().length() == 0){
+				String[] assertParams = ["layerid", layer.Identifier.toString()];
+				throw new TranslatableAssertionError("TR.emptyKeyword", assertParams);
+				//Msg: The Keyword element is empty in layer '{layerid}'.
+			}
 		}
 	}
 }</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="ecdc9d9f-1684-47e3-a7e8-7d423f12251c" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at88-getcapabilities-layer-geographic-bounding-box" searchProperties="true"><con:description><![CDATA[<p>Test that a WGS84BoundingBox element is provided defining the minimum  rectagle bounding the service data.</p>
