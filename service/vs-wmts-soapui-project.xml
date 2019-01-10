@@ -905,6 +905,8 @@ def register = new XmlSlurper(false, true).parseText(harmonisedNamesResponse);
 
 def validHarmonisedNames = register.containeditems.depthFirst().findAll{ it.name() == "layerName" };
 
+def invalidLayers = [];
+
 layers.each{layer->
 
 	def id = layer.Identifier;
@@ -916,10 +918,13 @@ layers.each{layer->
 		throw new TranslatableAssertionError("TR.emptyIdentifier");
 		//Msg: The layer identifier is empty.
 	}else if(!(id in validHarmonisedNames)){
-		String[] assertParams = ["layerid", id.toString()];
-		throw new TranslatableAssertionError("TR.notHarmonishedValue", assertParams);
-		//Msg: The  '{layerid}' layer identifier must be a harmonised layer name given in the INSPIRE collection.
+		invalidLayers.add(id.toString());
 	}
+}
+
+if(invalidLayers.size() > 0){
+	String[] assertParams = ["layerid", invalidLayers.join(', ')];
+	throw new TranslatableAssertionError("TR.notHarmonishedValue", assertParams);
 }
 
 //Check that the Identifier values are unique
