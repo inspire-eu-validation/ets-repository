@@ -328,7 +328,7 @@ def setDefaultParametersCalculationInDegrees(){
 	testRunner.testCase.testSuite.setPropertyValue("defaultGetTile_Language", defaultLanguage.toString());
 
 }
-*/]]></script></con:config></con:testStep><con:testStep type="groovy" name="set-gettile-default-parameters2" id="753bb81c-7c67-46db-be2d-c380107b9862"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+*/]]></script></con:config></con:testStep><con:testStep type="groovy" name="set-gettile-default-parameters2" id="753bb81c-7c67-46db-be2d-c380107b9862"><con:settings/><con:config><script><![CDATA[import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase;
 def capabilitiesResponse = tc.getTestStepByName("http-request").getPropertyValue("Response");
 
@@ -363,7 +363,7 @@ if(tileEndpoints.size() > 1){
 
 
 
-def layersTileMatrix = capabilities.Contents.Layer.depthFirst().findAll{it.name() == 'TileMatrixSet' &amp;&amp; it == 'InspireCRS84Quad'};
+def layersTileMatrix = capabilities.Contents.Layer.depthFirst().findAll{it.name() == 'TileMatrixSet' && it == 'InspireCRS84Quad'};
 
 if (layersTileMatrix.size() > 0){
 	
@@ -376,7 +376,7 @@ if (layersTileMatrix.size() > 0){
 	
 	def defaultLanguage = capabilities.OperationsMetadata.ExtendedCapabilities.SupportedLanguages.DefaultLanguage;
 	
-	def matrixSet = capabilities.Contents.depthFirst().findAll{ it.name() == "TileMatrixSet" &amp;&amp; it.Identifier == "InspireCRS84Quad" };
+	def matrixSet = capabilities.Contents.depthFirst().findAll{ it.name() == "TileMatrixSet" && it.Identifier == "InspireCRS84Quad" };
 	
 	if(matrixSet.size() != 0){
 	
@@ -398,23 +398,29 @@ if (layersTileMatrix.size() > 0){
 		cornerLat = Double.parseDouble(topLeftCorner.toString().split(" ")[1]);
 		
 		bbox = layerObj.WGS84BoundingBox;
-		lcBboxLong = Double.parseDouble(bbox.LowerCorner.toString().split(" ")[0]);
-		lcBboxLat = Double.parseDouble(bbox.LowerCorner.toString().split(" ")[1]);
-		
-		ucBboxLong = Double.parseDouble(bbox.UpperCorner.toString().split(" ")[0]);
-		ucBboxLat = Double.parseDouble(bbox.UpperCorner.toString().split(" ")[1]);
-		
-		centerBboxLong = lcBboxLong + ((lcBboxLong - ucBboxLong).abs()/2)
-		centerBboxLat = lcBboxLat + ((lcBboxLat - ucBboxLat).abs()/2)
-		
-		degTileWidth = (Double.parseDouble("360")/matrixWidth.toString().toInteger());
-		degTileHeight = (Double.parseDouble("180")/matrixHeight.toString().toInteger());
+		tileCol = 0;
+		tileRow = 0;
+		if(bbox.size() == 1){
+			if(bbox.LowerCorner.size() == 1 && bbox.UpperCorner.size() == 1){
+				lcBboxLong = Double.parseDouble(bbox.LowerCorner.toString().split(" ")[0]);
+				lcBboxLat = Double.parseDouble(bbox.LowerCorner.toString().split(" ")[1]);
 				
-		tWidth = (cornerLong - centerBboxLong).abs()/degTileWidth;
-		tHeight = (cornerLat - centerBboxLat).abs()/degTileHeight;
-		
-		tileCol = tWidth.toInteger();
-		tileRow = tHeight.toInteger();
+				ucBboxLong = Double.parseDouble(bbox.UpperCorner.toString().split(" ")[0]);
+				ucBboxLat = Double.parseDouble(bbox.UpperCorner.toString().split(" ")[1]);
+				
+				centerBboxLong = lcBboxLong + ((lcBboxLong - ucBboxLong).abs()/2)
+				centerBboxLat = lcBboxLat + ((lcBboxLat - ucBboxLat).abs()/2)
+				
+				degTileWidth = (Double.parseDouble("360")/matrixWidth.toString().toInteger());
+				degTileHeight = (Double.parseDouble("180")/matrixHeight.toString().toInteger());
+						
+				tWidth = (cornerLong - centerBboxLong).abs()/degTileWidth;
+				tHeight = (cornerLat - centerBboxLat).abs()/degTileHeight;
+				
+				tileCol = tWidth.toInteger();
+				tileRow = tHeight.toInteger();
+			}
+		}
 		
 		//Set GetTile request default parameters values
 		testRunner.testCase.testSuite.project.setPropertyValue("defaultGetTile_Endpoint", endpoint.toString());
@@ -428,7 +434,7 @@ if (layersTileMatrix.size() > 0){
 		testRunner.testCase.testSuite.project.setPropertyValue("defaultGetTile_TileRow", tileRow.toString());
 		testRunner.testCase.testSuite.project.setPropertyValue("defaultGetTile_Language", defaultLanguage.toString());
 	}
-}</script></con:config></con:testStep><con:testStep type="httprequest" name="http-request-inspire-registry" id="335406a9-89b7-4297-9d7d-9581b3d22b22"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="406a9717-d9ef-4e25-958f-91a30f0b4eee" name="http-request-inspire-registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#TestSuite#inspireLayerRegister}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="3ce80369-49a4-4b34-8c83-8c04b8f15ef0" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="e3b49cbb-052d-4dee-9668-58ac136d5cea" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties><con:property><con:name>layer</con:name><con:value>LC.LandCoverSurfaces</con:value></con:property></con:properties></con:testCase><con:testCase id="12c49af9-925c-4121-bb67-15bc355499f5" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="check-initial-testcase" searchProperties="true"><con:settings/><con:testStep type="groovy" name="run-initial-testcase-if-needed" id="340df266-8b4a-4ab7-8615-0579874560b6"><con:settings/><con:config><script>def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+}]]></script></con:config></con:testStep><con:testStep type="httprequest" name="http-request-inspire-registry" id="335406a9-89b7-4297-9d7d-9581b3d22b22"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="406a9717-d9ef-4e25-958f-91a30f0b4eee" name="http-request-inspire-registry" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#TestSuite#inspireLayerRegister}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="3ce80369-49a4-4b34-8c83-8c04b8f15ef0" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="e3b49cbb-052d-4dee-9668-58ac136d5cea" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties><con:property><con:name>layer</con:name><con:value>LC.LandCoverSurfaces</con:value></con:property></con:properties></con:testCase><con:testCase id="12c49af9-925c-4121-bb67-15bc355499f5" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="check-initial-testcase" searchProperties="true"><con:settings/><con:testStep type="groovy" name="run-initial-testcase-if-needed" id="340df266-8b4a-4ab7-8615-0579874560b6"><con:settings/><con:config><script>def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
 def serviceEndPoint = testRunner.testCase.testSuite.project.getPropertyValue( 'serviceEndpoint');
 def lastServiceEndPoint = testRunner.testCase.testSuite.project.getPropertyValue( 'lastServiceEndpoint');
 def makeInitialRequest = false;
@@ -443,7 +449,7 @@ else if(serviceEndPoint != lastServiceEndPoint){
 }
 
 gettileDefaultProperties.each{prop->
-	if(testRunner.testCase.testSuite.getPropertyValue(prop).size() == 0){
+	if(testRunner.testCase.testSuite.project.getPropertyValue(prop).size() == 0){
 		makeInitialRequest = true;
 	}
 }
@@ -451,7 +457,7 @@ gettileDefaultProperties.each{prop->
 if(makeInitialRequest){
 	runner = tc.run(new com.eviware.soapui.support.types.StringToObjectMap(), false);
 }</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="dcd836f8-e3e2-41d0-b3e6-a7e126eb2010" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at75-implemented-operations" searchProperties="true"><con:description><![CDATA[<p>Test that GetCapabilities operation and GetTile operation are implemented.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/wmts-1.0.0/at75-implemented-operations" target="_blank">Implemented Operations</a></p>]]></con:description><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="533acd5e-108f-46e4-9c3b-a08fab2ab1e1"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-gettile" id="1cea40f9-835b-47b2-8dd6-d9ecab533b3f" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="b1208589-f791-4859-80aa-916a03d152dc" name="http-request-gettile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#defaultGetTile_Endpoint}</con:endpoint><con:request/><con:assertion type="OwsExceptionReportAssertion" id="ea3842d6-14d5-440c-b589-253d6b6c323c" name="Fail if service returns OWS Exception Report"/><con:assertion type="Valid HTTP Status Codes" id="94d5efb8-3412-4077-9025-7bbc5b940c92" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="0b1242eb-6fb6-4046-9242-771366c05f54" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetTile</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>layer</con:name><con:value>IGNBaseOrto</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>style</con:name><con:value>default</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>format</con:name><con:value>image/png</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilematrixset</con:name><con:value>InspireCRS84Quad</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilematrix</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilecol</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilerow</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="check-operations-implementation" id="38a2c727-a75e-4f52-8f47-0ae179674584"><con:settings/><con:config><script>//Check that the GetCapabilities response is a non-empty free text
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/wmts-1.0.0/at75-implemented-operations" target="_blank">Implemented Operations</a></p>]]></con:description><con:settings/><con:testStep type="calltestcase" name="check-initial-testcase" id="533acd5e-108f-46e4-9c3b-a08fab2ab1e1"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>12c49af9-925c-4121-bb67-15bc355499f5</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-gettile" id="1cea40f9-835b-47b2-8dd6-d9ecab533b3f" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="b1208589-f791-4859-80aa-916a03d152dc" name="http-request-gettile" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#defaultGetTile_Endpoint}</con:endpoint><con:request/><con:assertion type="OwsExceptionReportAssertion" id="ea3842d6-14d5-440c-b589-253d6b6c323c" name="Fail if service returns OWS Exception Report"/><con:assertion type="Valid HTTP Status Codes" id="94d5efb8-3412-4077-9025-7bbc5b940c92" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="0b1242eb-6fb6-4046-9242-771366c05f54" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetTile</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>layer</con:name><con:value>LC.LandCoverSurfacesLC.LandCoverSurfaces</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>style</con:name><con:value>LC.LandCoverSurfaces.Default</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>format</con:name><con:value>image/png</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilematrixset</con:name><con:value>InspireCRS84Quad</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilematrix</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilecol</con:name><con:value>1</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>tilerow</con:name><con:value>0</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="check-operations-implementation" id="38a2c727-a75e-4f52-8f47-0ae179674584"><con:settings/><con:config><script>//Check that the GetCapabilities response is a non-empty free text
 
 import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
@@ -818,7 +824,11 @@ layers.each{layer->
 			}
 
 			if(checkTileMatrixSet.size() == 0){
-				layersToCheckManually.add(layer.Identifier);
+				def identifier_tmp = '';
+				if(layer.Identifier.size() == 1){
+					identifier_tmp = layer.Identifier.toString();
+				}
+				layersToCheckManually.add(identifier_tmp);
 			}else{
 				
 				setDefaultParameters(format);
@@ -835,7 +845,11 @@ layers.each{layer->
 				def httpResponseHeaders = context.testCase.testSteps["http-request-gettile"].testRequest.response.responseHeaders;
 	
 				if(httpResponseHeaders["Content-Type"][0] !=  format.toString()){
-					String[] assertParams = ["responseformat", httpResponseHeaders["Content-Type"][0], "requestedformat", format.toString(), "layerid", layer.Identifier.toString()];
+					def identifier_tmp = '';
+					if(layer.Identifier.size() == 1){
+						identifier_tmp = layer.Identifier.toString();
+					}
+					String[] assertParams = ["responseformat", httpResponseHeaders["Content-Type"][0], "requestedformat", format.toString(), "layerid", identifier_tmp];
 					throw new TranslatableAssertionError("TR.wrongResponseFormat");
 					//Msg: The response format ({responseformat}) is distinct to the requested format ({requestedformat}) for the '{layerid}' layer.
 				}
@@ -1394,4 +1408,4 @@ a.exists(
 );
 //Msg: The GetTile Operation parameters implementation check is automatic only for InspireCRS84Quad TileMatrixSet (that is a INSPIRE recommendation). It has not been found in the service capabilities document.
 //     Check manually that "service", "request", "version", "layer", "style", "format", "tilematrixset", "tilematrix", "tilecol" and "tilerow" parameters are mandatory for the GetTile operation.
-</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>http://www.ign.es/wmts/ign-base?</con:value></con:property><con:property><con:name>service</con:name><con:value>WMTS</con:value></con:property><con:property><con:name>version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value>http://www.ign.es/wmts/ign-base?</con:value></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, extended_capabilities_scenario, lastServiceEndpoint, authUser, authPwd, defaultGetTile_Request, defaultGetTile_Layer, defaultGetTile_Style, defaultGetTile_Format, defaultGetTile_TileMatrixSet, defaultGetTile_TileMatrix, defaultGetTile_TileCol, defaultGetTile_TileRow,defaultGetTile_Language, defaultGetTile_Endpoint</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EID7c15a770-986a-4aa0-b4cd-7facbca96a1d</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EIDb02cc4ae-60e1-47a5-8e5a-7f9769ffd113</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EIDae35f7cd-86d9-475a-aa3a-e0bfbda2bb5f</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-11-07T00:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-01-11T00:00:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.3.0</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/ets-repository/tree/master/service/vs-wms-soapui-project.xml</con:value></con:property><con:property><con:name>testIntensive</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value/></con:property><con:property><con:name>defaultGetTile_Request</con:name><con:value>GetTile</con:value></con:property><con:property><con:name>defaultGetTile_Layer</con:name><con:value>IGNBaseOrto</con:value></con:property><con:property><con:name>defaultGetTile_Style</con:name><con:value>default</con:value></con:property><con:property><con:name>defaultGetTile_Format</con:name><con:value>image/png</con:value></con:property><con:property><con:name>defaultGetTile_TileMatrixSet</con:name><con:value>InspireCRS84Quad</con:value></con:property><con:property><con:name>defaultGetTile_TileMatrix</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_TileCol</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_TileRow</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_Language</con:name><con:value>spa</con:value></con:property><con:property><con:name>defaultGetTile_Endpoint</con:name><con:value>http://www.ign.es/wmts/ign-base?</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
+</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>https://s3.eu-west-3.amazonaws.com/bilbomatica.public/INSPIRE_VALIDATOR/WMTS/at88BoundingBox.xml</con:value></con:property><con:property><con:name>service</con:name><con:value>WMTS</con:value></con:property><con:property><con:name>version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value>https://s3.eu-west-3.amazonaws.com/bilbomatica.public/INSPIRE_VALIDATOR/WMTS/at88BoundingBox.xml</con:value></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, extended_capabilities_scenario, lastServiceEndpoint, authUser, authPwd, defaultGetTile_Request, defaultGetTile_Layer, defaultGetTile_Style, defaultGetTile_Format, defaultGetTile_TileMatrixSet, defaultGetTile_TileMatrix, defaultGetTile_TileCol, defaultGetTile_TileRow,defaultGetTile_Language, defaultGetTile_Endpoint</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EID7c15a770-986a-4aa0-b4cd-7facbca96a1d</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EIDb02cc4ae-60e1-47a5-8e5a-7f9769ffd113</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EIDae35f7cd-86d9-475a-aa3a-e0bfbda2bb5f</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-11-07T00:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-01-11T00:00:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.3.0</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/ets-repository/tree/master/service/vs-wms-soapui-project.xml</con:value></con:property><con:property><con:name>testIntensive</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value/></con:property><con:property><con:name>defaultGetTile_Request</con:name><con:value>GetTile</con:value></con:property><con:property><con:name>defaultGetTile_Layer</con:name><con:value>LC.LandCoverSurfaces</con:value></con:property><con:property><con:name>defaultGetTile_Style</con:name><con:value>LC.LandCoverSurfaces.Default</con:value></con:property><con:property><con:name>defaultGetTile_Format</con:name><con:value>image/png</con:value></con:property><con:property><con:name>defaultGetTile_TileMatrixSet</con:name><con:value>InspireCRS84Quad</con:value></con:property><con:property><con:name>defaultGetTile_TileMatrix</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_TileCol</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_TileRow</con:name><con:value>0</con:value></con:property><con:property><con:name>defaultGetTile_Language</con:name><con:value>spa</con:value></con:property><con:property><con:name>defaultGetTile_Endpoint</con:name><con:value>http://servicios.idee.es/wmts/ocupacion-suelo?</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
