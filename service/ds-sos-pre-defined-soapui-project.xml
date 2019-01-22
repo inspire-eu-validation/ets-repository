@@ -75,8 +75,15 @@ else{
 			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataURL'];
 			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
 		}
+		else{
+			def regEx1 = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&amp;=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&amp;=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&amp;;%@.\w_]*)#?(?:[\w]*))?)/
+			def MetadataURLReplaced = extendedCapabilities.MetadataURL.toString().replaceAll(regEx1, '');
+			if(MetadataURLReplaced.size() != 0){
+				throw new TranslatableAssertionError('TR.metadataURLNotWellFormed');
+			}
+		}
 	}
-	else{
+	else if(extendedCapabilities.MetadataURL.size() == 0){
 		if(extendedCapabilities.ResourceType.size() != 1){
 			String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType'];
 			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
@@ -101,6 +108,10 @@ else{
 			String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages'];
 			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
 		}
+	}
+	else{
+		String[] assertParams = ['element', 'ExtendedCapabilities/MetadataURL'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeZeroOrOne', assertParams);
 	}
 }</script></con:config></con:testStep><con:testStep type="groovy" name="check-other-mandatory-elements" id="63f0457e-b646-4c2b-9b44-ea7ded8a0402"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
@@ -428,4 +439,4 @@ catch (Exception e){
 	String[] assertParams = ['error', e];
 	throw new TranslatableAssertionError('TR.invalidSchema', assertParams);
 }
-</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>http://sensorweb.demo.52north.org/sensorwebtestbed/service</con:value></con:property><con:property><con:name>service</con:name><con:value>SOS</con:value></con:property><con:property><con:name>version</con:name><con:value>2.0.0</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value>http://sensorweb.demo.52north.org/sensorwebtestbed/service</con:value></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, lastServiceEndpoint, authUser, authPwd, authMethod</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EIDe51620af-bcf5-4719-ab0e-ef6226a572fa</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EID67b37079-9ac5-4641-9476-9a646a18b6ce</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EIDf897f313-55f0-4e51-928a-0e9869f5a1d6</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-12-10T16:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2018-12-20T16:00:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.1.0</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/download-service</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
+</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>https://s3.eu-west-3.amazonaws.com/bilbomatica.public/INSPIRE_VALIDATOR/SOS/at4-06MetadataURL2.xml</con:value></con:property><con:property><con:name>service</con:name><con:value>SOS</con:value></con:property><con:property><con:name>version</con:name><con:value>2.0.0</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value>https://s3.eu-west-3.amazonaws.com/bilbomatica.public/INSPIRE_VALIDATOR/SOS/at4-06MetadataURL2.xml</con:value></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, lastServiceEndpoint, authUser, authPwd, authMethod</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EIDe51620af-bcf5-4719-ab0e-ef6226a572fa</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EID67b37079-9ac5-4641-9476-9a646a18b6ce</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EIDf897f313-55f0-4e51-928a-0e9869f5a1d6</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-12-10T16:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-01-22T12:00:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.2.0</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/download-service</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
