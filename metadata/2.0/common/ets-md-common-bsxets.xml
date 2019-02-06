@@ -219,7 +219,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 									<expression>
 let $levels := ('dataset', 'series', 'service')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $regex := '^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?$'
+let $regex := '^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$'
 let $messages :=
 	(for $record in $recordsToInspect
 	let $rid := $record/gmd:fileIdentifier/*/text()
@@ -517,7 +517,7 @@ return
 let $messages := 
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $regex := '^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?$'
+	 let $regex := '^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$'
 	 let $temporalExtentextents := $record/gmd:identificationInfo[1]/*/gmd:extent/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent
 	 return
 	 	for $extent in $temporalExtentextents
@@ -531,8 +531,14 @@ let $messages :=
 				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 		else if($timePeriod) then
-			if (not(matches($beginPosition/text(), $regex)) or not(matches($endPosition/text(), $regex))) then
-				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			if($begionPosition/@indeterminatePosition != 'unknown') then
+				if (not(matches($beginPosition/text(), $regex))) then
+					local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+				else()
+			else if($endPosition/@indeterminatePosition != 'unknown' or $endPosition/@indeterminatePosition != 'now') then
+				if (not(matches($endPosition/text(), $regex))) then
+					local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+				else()
 			else ()
 		else
 			local:addMessage('TR.noTimePositionOrPeriod', map { 'filename': local:filename($record), 'id': $rid })
