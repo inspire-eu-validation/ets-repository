@@ -384,19 +384,21 @@ for(i=0; i<supportedLanguage.size(); i++){
 
 for(i=0; i<languagesToRequest.size(); i++){
 	testRunner.testCase.setPropertyValue('language', languagesToRequest[i].toString());
-
 	tsGetCapabilities.run(testRunner, context);
-
 	def capabilitiesLanguaged = new XmlSlurper(false, true).parseText(tsGetCapabilities.getPropertyValue("Response"));
 	def capabilitiesLanguagedResponseLanguage = capabilitiesLanguaged.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.ResponseLanguage.Language;
 	if(capabilitiesLanguaged.name() != 'Capabilities'){
 		throw new TranslatableAssertionError("TR.invalidResponseToGetCapabilitiesLanguaged");
 	}
-	else if(languagesToRequest[i].size() == 0 && defaultLanguage.toString() != capabilitiesLanguagedResponseLanguage.toString()){
-		throw new TranslatableAssertionError("TR.invalidResponseToGetCapabilitiesLanguagedWithoutParameter");
+	else if(languagesToRequest[i].size() == 0){
+		if(defaultLanguage.toString() != capabilitiesLanguagedResponseLanguage.toString()){
+			throw new TranslatableAssertionError("TR.invalidResponseToGetCapabilitiesLanguagedWithoutParameter");
+		}
 	}
-	else if(languagesToRequest[i].toString() == wrongLanguage && defaultLanguage.toString() != capabilitiesLanguagedResponseLanguage.toString()){
-		throw new TranslatableAssertionError("TR.invalidResponseToGetCapabilitiesLanguagedWithWrongParameter");
+	else if(languagesToRequest[i].toString() == wrongLanguage){
+		if(defaultLanguage.toString() != capabilitiesLanguagedResponseLanguage.toString()){
+			throw new TranslatableAssertionError("TR.invalidResponseToGetCapabilitiesLanguagedWithWrongParameter");
+		}
 	}
 	else if(languagesToRequest[i].toString() != capabilitiesLanguagedResponseLanguage.toString()){
 		String[] assertParams = ['requested', languagesToRequest[i].toString(), 'response', capabilitiesLanguagedResponseLanguage.toString()];
@@ -445,4 +447,4 @@ catch (Exception e){
 	String[] assertParams = ['error', e];
 	throw new TranslatableAssertionError('TR.invalidSchema', assertParams);
 }
-</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>http://geoportal.bafg.de/mudabsos/sos/kvp?service=SOS&amp;version=2.0.0&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>service</con:name><con:value>SOS</con:value></con:property><con:property><con:name>version</con:name><con:value>2.0.0</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value>http://geoportal.bafg.de/mudabsos/sos/kvp?service=SOS&amp;version=2.0.0&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, lastServiceEndpoint, authUser, authPwd, authMethod</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EIDe51620af-bcf5-4719-ab0e-ef6226a572fa</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EID67b37079-9ac5-4641-9476-9a646a18b6ce</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EIDf897f313-55f0-4e51-928a-0e9869f5a1d6</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-12-10T16:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-02-07T11:00:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.2.4</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/download-service</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
+</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>http://geoportal.bafg.de/mudabsos/sos/kvp?service=SOS&amp;version=2.0.0&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>service</con:name><con:value>SOS</con:value></con:property><con:property><con:name>version</con:name><con:value>2.0.0</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value>http://geoportal.bafg.de/mudabsos/sos/kvp?service=SOS&amp;version=2.0.0&amp;request=GetCapabilities</con:value></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, lastServiceEndpoint, authUser, authPwd, authMethod</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EIDe51620af-bcf5-4719-ab0e-ef6226a572fa</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EID67b37079-9ac5-4641-9476-9a646a18b6ce</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EIDf897f313-55f0-4e51-928a-0e9869f5a1d6</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-12-10T16:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-02-07T18:00:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.2.5</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/download-service</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
