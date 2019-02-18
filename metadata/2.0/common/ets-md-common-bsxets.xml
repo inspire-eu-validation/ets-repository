@@ -659,7 +659,7 @@ let $messages :=
 		if (not($resourceConstraint/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
 			starts-with($resourceConstraint/gmd:otherConstraints/gmx:Anchor/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/'))) then
 			local:addMessage('TR.noValidResourceConstraint', map { 'filename': local:filename($record), 'id': $rid })
-		else if ($resourceConstraint/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeList != 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml') then
+		else if(not(starts-with($resourceConstraint/gmd:accessConstraints/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml'))) then
 			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 		else ()
 	)[position() le $limitErrors]
@@ -694,12 +694,12 @@ let $messages :=
 		let $invalidAccessConstraints :=
 			for $ac in $x/gmd:accessConstraints
 			where (not($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
-				$ac/gmd:MD_RestrictionCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml'))
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml')))
 			return $ac
 		let $invalidUseConstraints :=
 			for $uc in $x/gmd:useConstraints
 			where (not($uc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
-				$uc/gmd:MD_RestrictionCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml'))
+				starts-with($uc/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml')))
 			return $uc
 		let $invalidOtherConstraints :=
 			for $oc in $x/gmd:otherConstraints
