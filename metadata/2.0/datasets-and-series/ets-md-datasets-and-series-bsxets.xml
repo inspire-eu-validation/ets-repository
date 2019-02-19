@@ -152,17 +152,20 @@ let $messages :=
     (for $record in $records
         let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
         let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code
+		let $emptyIdentifiers :=
+			for $identifier in $identifiers
+            return
+			if (not($identifier) or not($identifier/gco:CharacterString/node() or $identifier/gmx:Anchor/node())) then
+                $identifier
+            else ()
         return
         if (not($identifiers)) then
             local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($emptyIdentifiers) != 0) then
+			local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
 		else if(count($distinctRecordIdentifiers) != count($identifiers)) then
             local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': fn:string-join($identifiers/*/text(),'; ') })
-        else
-            for $identifier in $identifiers
-            return
-			if (not($identifier) or not($identifier/gco:CharacterString/node() or $identifier/gmx:Anchor/node())) then
-                local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-            else ()
+        else ()
     )[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
