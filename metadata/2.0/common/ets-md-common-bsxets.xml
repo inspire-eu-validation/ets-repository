@@ -224,10 +224,16 @@ let $messages :=
 	(for $record in $recordsToInspect
 	let $rid := $record/gmd:fileIdentifier/*/text()
 	return
-		if (count($record/gmd:dateStamp) != 1 or not($record/gmd:dateStamp/gco:DateTime) or not($record/gmd:dateStamp/gco:DateTime/node())) then
+		if (count($record/gmd:dateStamp) != 1 or not(count($record/gmd:dateStamp/gco:DateTime) + count($record/gmd:dateStamp/gco:Date) = 1)) then
 			local:addMessage('TR.oneDateStamp', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not(matches($record/gmd:dateStamp/gco:DateTime, $regex))) then
-			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($record/gmd:dateStamp/gco:DateTime) = 1) then
+			if (not(matches($record/gmd:dateStamp/gco:DateTime, $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else()
+		else if(count($record/gmd:dateStamp/gco:Date) = 1) then
+			if (not(matches($record/gmd:dateStamp/gco:Date, $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else()
 		else ()
 	)[position() le $limitErrors]
 return
