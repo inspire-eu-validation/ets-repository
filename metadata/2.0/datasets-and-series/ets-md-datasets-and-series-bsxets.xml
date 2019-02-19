@@ -143,10 +143,14 @@ $messages)
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $levels := ('dataset', 'series')
-let $distinctRecordIdentifiers :=   
-    for $rec in $records
-    return
-    distinct-values($rec/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*/text())
+let $allIdent := 
+	for $rec in $records
+		for $x in $rec/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*
+		return
+		if($x/node-name() = QName('http://www.isotc211.org/2005/gco','gco:CharacterString')) then $x/text()
+		else if ($x/node-name() = QName('http://www.isotc211.org/2005/gmx','gmx:Anchor')) then $x/@xlink:href
+		else ()
+let $distinctRecordIdentifiers := distinct-values($allIdent)
 let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($distinctRecordIdentifiers,.)[2]]
 let $messages :=    
     (for $record in $records
@@ -155,7 +159,11 @@ let $messages :=
 		let $emptyIdentifiers :=
 			for $identifier in $identifiers
             return
-			if (not($identifier) or not($identifier/gco:CharacterString/node() or $identifier/gmx:Anchor/node())) then
+			if (not($identifier)) then
+				$identifier
+			else if ($identifier/gco:CharacterString and not($identifier/gco:CharacterString/node())) then
+				$identifier
+			else if ($identifier/gmx:Anchor and string-length($identifier/gmx:Anchor/@xlink:href) = 0) then
                 $identifier
             else ()
         return
@@ -164,7 +172,7 @@ let $messages :=
 		else if(count($emptyIdentifiers) != 0) then
 			local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
 		else if(count($distinctRecordIdentifiers) != count($identifiers)) then
-            local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': fn:string-join($identifiers/*/text(),'; ') })
+            local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': fn:string-join($allIdent,'; ') })
         else ()
     )[position() le $limitErrors]
 return
