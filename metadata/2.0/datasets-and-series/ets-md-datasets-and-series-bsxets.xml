@@ -378,17 +378,17 @@ $messages)
 									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $regex_url := '(http://|https://|ftp://)([a-z0-9]{1})((\.[a-z0-9-])|([a-z0-9-]))*\.([a-z0-9-]{1,4})(/?)'
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
 		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource
 			let $url := $onLine/gmd:linkage/gmd:URL
-			let $valid_url := try { local:check-resource-uri($url, 30, false()) } catch * { false() }
 			return
 			if (not($url/node())) then
 				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
-			else if ($valid_url = 'notHTTP' or contains($valid_url, 'EXCEPTION')) then
+			else if (not(matches($url/text(), $regex_url))) then
 					local:addMessage('TR.invalidURL', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 	)[position() le $limitErrors]
