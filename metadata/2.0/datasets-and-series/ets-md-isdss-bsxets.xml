@@ -290,6 +290,7 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.invalidCodeUTF8"/>
 										<translationTemplate ref="TR.invalidEncodingCode"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -330,14 +331,14 @@ let $messages :=
 				let $version := $format/gmd:MD_Format/gmd:version
 				return
 				if (not($name) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
-					local:addMessage('TR.emptyName', map { 'filename': local:filename($record), 'id': $rid, 'name': $name })
+					local:addMessage('TR.emptyName', map { 'filename': local:filename($record), 'id': $rid })
 				else if(string-length(normalize-space($version/*/text())) != 0) then
 					if (not($version) or not($version/gco:CharacterString/node() or $version/gmx:Anchor/node())) then
-						local:addMessage('TR.emptyVersion', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 	
+						local:addMessage('TR.emptyVersion', map { 'filename': local:filename($record), 'id': $rid }) 	
 					else ()
 				else
 					if (not($version/@gco:nilReason = 'unknown' or $version/@gco:nilReason = 'inapplicable')) then
-						local:addMessage('TR.invalidVersion', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 
+						local:addMessage('TR.invalidVersion', map { 'filename': local:filename($record), 'id': $rid }) 
 					else () 
 	)[position() le $limitErrors] 
 return
