@@ -173,6 +173,32 @@ return
 										<translationTemplate ref="TR.wrongServiceIdentificationMultiplicity"/>
 									</translationTemplates>
 								</TestAssertion>
+								
+								<TestAssertion id="EID2b2b468e-297c-4bb4-81b0-7f63898dfa8c">
+									<label>md sds 3.3: Spatial Resolution</label>
+									<description>
+									<![CDATA[<p>Test that a spatial resolution restriction is provided being mandatory when there is a restriction on the spatial resolution for the service.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/spatial-resolution" target="_blank">Spatial Resolution</a></p>]]>									
+									</description>
+									<parent ref="EIDa389f1a0-803b-4748-ad13-3fc4a3bb9d73"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+		for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		return local:addMessage('TR.manualCheckSpatialResolution', map { 'filename': local:filename($record), 'id': $rid })
+
+return
+(if ($messages) then 'PASSED_MANUAL' else 'PASSED',
+ 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  </expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.manualCheckSpatialResolution"/>
+									</translationTemplates>
+								</TestAssertion>
 
 								<TestAssertion id="EID3dbd5b9f-5bd7-4033-a921-6f51a032e383">
 									<label>md sds 3.4: Spatial Data Service Category</label>
