@@ -185,6 +185,15 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 		 for $poc in $pocs
 		 let $orgName := $poc/gmd:organisationName
 		 let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+		 let $validCodeList :=
+			for $x in $poc/gmd:role/gmd:CI_RoleCode
+			where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode')
+			return $x
 		 return
 		 	if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
 				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
@@ -192,7 +201,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = 'pointOfContact')) then
 				local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'pocs': fn:string-join($pocs/gmd:role/*/@codeListValue) })
-			else if ($poc/gmd:role/gmd:CI_RoleCode/@codeList != 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode') then
+			else if (count($validCodeList) = 0) then
 				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode'})
 		 	else ()
 		)[position() le $limitErrors]
