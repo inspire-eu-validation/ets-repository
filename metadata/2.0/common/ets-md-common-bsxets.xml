@@ -185,6 +185,15 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 		 for $poc in $pocs
 		 let $orgName := $poc/gmd:organisationName
 		 let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+		 let $validCodeList :=
+			for $x in $poc/gmd:role/gmd:CI_RoleCode
+			where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode')
+			return $x
 		 return
 		 	if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
 				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
@@ -192,7 +201,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = 'pointOfContact')) then
 				local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'pocs': fn:string-join($pocs/gmd:role/*/@codeListValue) })
-			else if ($poc/gmd:role/gmd:CI_RoleCode/@codeList != 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode') then
+			else if (count($validCodeList) = 0) then
 				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode'})
 		 	else ()
 		)[position() le $limitErrors]
@@ -354,26 +363,35 @@ let $messages :=
 		 let $rid := $record/gmd:fileIdentifier/*/text()
 		 let $pocs := 
 			if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
-				$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+			    $record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
 			else
-				$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+			    $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
 		 return
-		 if(not($pocs)) then
-		 	local:addMessage('TR.missingResponsibleParty', map { 'filename': local:filename($record), 'id': $rid })
-		 else
-		 for $poc in $pocs
-		 let $orgName := $poc/gmd:organisationName
-		 let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
-		 return
-		 	if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
-				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
-		 	else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
-				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
-		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode')) then
-				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
-		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
-				local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid })
-		 	else ()
+		    if(not($pocs)) then
+		 	    local:addMessage('TR.missingResponsibleParty', map { 'filename': local:filename($record), 'id': $rid })
+		    else
+				for $poc in $pocs
+				let $orgName := $poc/gmd:organisationName
+				let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+				let $validCodeList :=
+					for $x in $poc/gmd:role/gmd:CI_RoleCode
+					where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+					    $x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+						$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+						$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+						$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+						$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode')
+					return $x
+				return
+					if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
+					    local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
+				    else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
+					    local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
+				    else if (not(count($poc/gmd:role/gmd:CI_RoleCode) = count($validCodeList))) then
+					    local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+				    else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
+					    local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid })
+				    else ()
 		)[position() le $limitErrors]
 	return
 	(if ($messages) then 'FAILED' else 'PASSED',
@@ -409,6 +427,15 @@ let $messages :=
 	else 
 		for $ci_date in $ci_dates
 		let $dateType := $ci_date/gmd:dateType/gmd:CI_DateTypeCode
+		let $validCodeList :=
+			for $x in $dateType
+			where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode')
+			return $x
 		return
 		if (not($ci_date/gmd:date/gco:Date or $ci_date/gmd:date/gco:DateTime)) then
 			local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
@@ -418,7 +445,7 @@ let $messages :=
 			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType)) then
 			local:addMessage('TR.noDateType', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($dateType/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')) then
+		else if (not(count($dateType) = count($validCodeList))) then
 			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType/@codeListValue = ('publication','revision','creation'))) then
 			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
@@ -584,12 +611,21 @@ let $messages :=
 	 let $title := $thesaurus/gmd:CI_Citation/gmd:title
 	 let $date := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date
 	 let $dateTypeCode := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+	 let $validCodeList :=
+		for $x in $dateTypeCode
+		where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode')
+		return $x
 	 return 
 	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
-	 	else if (not($dateTypeCode) or $dateTypeCode/@codeList != 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode') then local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($dateTypeCode) or not(count($dateTypeCode) = count($validCodeList))) then local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
 		else ()
 	)[position() le $limitErrors]
 return
@@ -657,7 +693,12 @@ let $messages :=
 		let $validAccessConstraints :=
 			for $ac in $x/gmd:accessConstraints
 			where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
-				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode'))
+				(starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#MD_RestrictionCode')))
 			return $ac
 		let $validAnchor := 
 			for $y in $x/gmd:otherConstraints/gmx:Anchor
@@ -669,12 +710,23 @@ let $messages :=
 				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
 				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
 				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
-				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
 			return $y
 		let $invalidAnchor := 
 			for $y in $x/gmd:otherConstraints/gmx:Anchor
 			where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
-				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
 			return $y
 		return 
 			if(count($validAccessConstraints) != 1) then ()
