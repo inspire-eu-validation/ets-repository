@@ -611,12 +611,21 @@ let $messages :=
 	 let $title := $thesaurus/gmd:CI_Citation/gmd:title
 	 let $date := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date
 	 let $dateTypeCode := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+	 let $validCodeList :=
+		for $x in $dateTypeCode
+		where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode')
+		return $x
 	 return 
 	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
-	 	else if (not($dateTypeCode) or $dateTypeCode/@codeList != 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode') then local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($dateTypeCode) or not(count($dateTypeCode) = count($validCodeList))) then local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
 		else ()
 	)[position() le $limitErrors]
 return
