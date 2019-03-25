@@ -427,6 +427,15 @@ let $messages :=
 	else 
 		for $ci_date in $ci_dates
 		let $dateType := $ci_date/gmd:dateType/gmd:CI_DateTypeCode
+		let $validCodeList :=
+			for $x in $dateType
+			where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode')
+			return $x
 		return
 		if (not($ci_date/gmd:date/gco:Date or $ci_date/gmd:date/gco:DateTime)) then
 			local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
@@ -436,7 +445,7 @@ let $messages :=
 			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType)) then
 			local:addMessage('TR.noDateType', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($dateType/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')) then
+		else if (not(count($dateType) = count($validCodeList))) then
 			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType/@codeListValue = ('publication','revision','creation'))) then
 			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
