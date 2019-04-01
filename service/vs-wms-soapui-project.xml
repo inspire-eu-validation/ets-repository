@@ -41,6 +41,17 @@ testRunner.testCase.testSuite.project.setPropertyValue( 'lastServiceEndpoint', '
 
 def tsGetObservation = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["at04-getcapabilities-xml-schema-validation"].getTestStepByName('http-request-xml-schema-valid');
 tsGetObservation.setDisabled(true);
+
+def ts = testRunner.testCase.testSuite.project.testSuites['GetMap_Operation'];
+ts.setPropertyValue('getMapEndpoint', '');
+ts.setPropertyValue('layers', '');
+ts.setPropertyValue('styles', '');
+ts.setPropertyValue('crs', '');
+ts.setPropertyValue('bbox', '');	
+ts.setPropertyValue('width', '');
+ts.setPropertyValue('height', '');
+ts.setPropertyValue('format', '');
+ts.setPropertyValue('wrongValue', '');
 </script></con:config></con:testStep><con:testStep type="httprequest" name="http-request" id="57d85050-3859-433d-a242-15b9c47e35d5"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="e3a4c9b4-ff53-4b3a-a62d-908b2de3aa7f" name="http-request" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="a3a3f4d9-6cec-439c-87dd-fc3d74d56270" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="OwsExceptionReportAssertion" id="fdda2347-adad-4635-af5f-5b9e49bc0567" name="Fail if service returns OWS Exception Report"/><con:assertion type="Response SLA Assertion" id="0352da2a-abdd-488a-a66d-211b62371836" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style><con:default>${#Project#version}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="set-extended-capabilities-scenario" id="e968301b-09cb-40f5-a278-e0c8a7adf202"><con:settings/><con:config><script>def response = context.expand('${http-request#Response}');
 def capabilities = new XmlSlurper().parseText(response);
 def scenario = '1';
@@ -58,21 +69,43 @@ if(capabilities.Capability.ExtendedCapabilities.ResourceLocator.size() == 1 ||
 	testRunner.testCase.testSuite.project.setPropertyValue( "extended_capabilities_scenario", scenario );
 }
 log.info('Extended Capabilities Scenario: ' + scenario);</script></con:config></con:testStep><con:testStep type="groovy" name="set-lastserviceendpoint" id="b34c2e7e-3d7d-401e-8a5e-f1a7d7e1ad6f"><con:settings/><con:config><script>def lastServiceEndpoint = context.expand('${http-request#EndPoint}');
-testRunner.testCase.testSuite.project.setPropertyValue( 'lastServiceEndpoint', lastServiceEndpoint);</script></con:config></con:testStep><con:testStep type="groovy" name="set-getmap-operation-properties" id="53593fba-d4c0-4a1d-8792-6dab56be904b"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+testRunner.testCase.testSuite.project.setPropertyValue( 'lastServiceEndpoint', lastServiceEndpoint);</script></con:config></con:testStep><con:testStep type="groovy" name="set-getmap-operation-properties" id="53593fba-d4c0-4a1d-8792-6dab56be904b"><con:settings/><con:config><script><![CDATA[import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites['GetCapabilities_Operation'].testCases['initial-testcase'];
 def response = tc.getTestStepByName('http-request').getPropertyValue('Response');
 def capabilities = new XmlSlurper(false, true).parseText(response);
 def ts = testRunner.testCase.testSuite.project.testSuites['GetMap_Operation'];
 
-def layer = capabilities.Capability.depthFirst().findAll{it.name()=='Layer'  &amp;&amp; it.Name.size() > 0}[0];
+def layer = capabilities.Capability.depthFirst().findAll{it.name()=='Layer'  && it.Name.size() > 0}[0];
 if(layer.size() == 1){
 	ts.setPropertyValue('getMapEndpoint', capabilities.Capability.Request.GetMap.DCPType.HTTP.Get.OnlineResource.@'xlink:href'.toString());
 	ts.setPropertyValue('layers', layer.Name.toString());
 	ts.setPropertyValue('styles', layer.Style[0].Name.toString());
-	ts.setPropertyValue('crs', layer.CRS[0].toString());
 	
-	def boundingBox = layer.depthFirst().findAll{it.@CRS == layer.CRS[0]}[0];
-	def bbox = boundingBox.@minx.toString() + ',' + boundingBox.@miny.toString() + ',' + boundingBox.@maxx.toString() + ',' + boundingBox.@maxy.toString();
+	def allCRS = [];
+	layer.CRS.each{
+		allCRS << it.toString();
+	};
+	def layerParent = layer.parent();
+	while(layerParent.name() == 'Layer' && allCRS.size() == 0){
+		if(layerParent.CRS.size() != 0){
+			layerParent.CRS.each{ crs ->
+				allCRS << crs;
+			}
+		}
+		layerParent = layerParent.parent();
+	}
+	def boundingBox = layer.depthFirst().findAll{it.@CRS == allCRS[0]};
+	ts.setPropertyValue('crs', allCRS[0].toString());
+	
+	layerParent = layer.parent();
+	while(layerParent.name() == 'Layer' && boundingBox.size() == 0){
+		boundingBox = layerParent.depthFirst().findAll{it.@CRS == allCRS[0]};
+		layerParent = layerParent.parent();
+	}
+	def bbox = "";
+	if(boundingBox.size() != 0){
+		bbox = boundingBox[0].@minx.toString() + ',' + boundingBox[0].@miny.toString() + ',' + boundingBox[0].@maxx.toString() + ',' + boundingBox[0].@maxy.toString();
+	}
 	ts.setPropertyValue('bbox', bbox);
 	
 	ts.setPropertyValue('width', '500');
@@ -87,7 +120,9 @@ if(layer.size() == 1){
 	else{
 		ts.setPropertyValue('format', '');
 	}
-}</script></con:config></con:testStep><con:testStep type="httprequest" name="http-request-layer-harmonised-names" id="df044432-b759-4ce3-829b-f82c830b056f"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="8c4fb121-c42b-458b-94f0-7e538585bf99" name="http-request-layer-harmonised-names" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://inspire.ec.europa.eu/layer/layer.en.xml</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b6c9b346-a247-4fbe-9a4a-b3ebdae4c5f5" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="47c7fb18-1139-4c95-aedf-3162af6847d1" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="452f3b7c-9db1-47c7-9621-6f76b761feea" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="check-initial-testcase" searchProperties="true"><con:settings/><con:testStep type="groovy" name="run-initial-testcase-if-needed" id="bb0e3025-748d-436e-8910-7b4db9452988"><con:settings/><con:config><script>def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+	ts.setPropertyValue('wrongValue', 'zzzz');
+}
+]]></script></con:config></con:testStep><con:testStep type="httprequest" name="http-request-layer-harmonised-names" id="df044432-b759-4ce3-829b-f82c830b056f"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="8c4fb121-c42b-458b-94f0-7e538585bf99" name="http-request-layer-harmonised-names" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://inspire.ec.europa.eu/layer/layer.en.xml</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="b6c9b346-a247-4fbe-9a4a-b3ebdae4c5f5" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="47c7fb18-1139-4c95-aedf-3162af6847d1" name="Response SLA"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="452f3b7c-9db1-47c7-9621-6f76b761feea" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="check-initial-testcase" searchProperties="true"><con:settings/><con:testStep type="groovy" name="run-initial-testcase-if-needed" id="bb0e3025-748d-436e-8910-7b4db9452988"><con:settings/><con:config><script>def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
 def serviceEndPoint = testRunner.testCase.testSuite.project.getPropertyValue( 'serviceEndpoint');
 def lastServiceEndPoint = testRunner.testCase.testSuite.project.getPropertyValue( 'lastServiceEndpoint');
 def makeInitialRequest = false;
@@ -1485,4 +1520,4 @@ if(capabilities.Capability.ExtendedCapabilities.ResponseLanguage.size() != 1){
 if(capabilities.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString().length() == 0){
 	String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage/Language'];
 	throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-}</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>http://www.ign.es/wms-inspire/unidades-administrativas?request=GetCapabilities&amp;service=WMS&amp;version=1.3.0</con:value></con:property><con:property><con:name>service</con:name><con:value>WMS</con:value></con:property><con:property><con:name>version</con:name><con:value>1.3.0</con:value></con:property><con:property><con:name>extended_capabilities_scenario</con:name><con:value/></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value/></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, extended_capabilities_scenario, lastServiceEndpoint, authUser, authPwd</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EID7c15a770-986a-4aa0-b4cd-7facbca96a1d</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EIDfa68eb83-a25a-4009-84dd-036de4539c93</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EID9981e87e-d642-43b3-ad5f-e77469075e74</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-11-07T00:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-03-29T13:30:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.3.4</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/ets-repository/tree/master/service/vs-wms-soapui-project.xml</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
+}</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value>http://www.ign.es/wms-inspire/unidades-administrativas?request=GetCapabilities&amp;service=WMS&amp;version=1.3.0</con:value></con:property><con:property><con:name>service</con:name><con:value>WMS</con:value></con:property><con:property><con:name>version</con:name><con:value>1.3.0</con:value></con:property><con:property><con:name>extended_capabilities_scenario</con:name><con:value/></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value/></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, extended_capabilities_scenario, lastServiceEndpoint, authUser, authPwd</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EID7c15a770-986a-4aa0-b4cd-7facbca96a1d</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EIDfa68eb83-a25a-4009-84dd-036de4539c93</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EID9981e87e-d642-43b3-ad5f-e77469075e74</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2018-11-07T00:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-04-01T16:30:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.3.5</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/ets-repository/tree/master/service/vs-wms-soapui-project.xml</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
