@@ -300,11 +300,12 @@ let $messages :=
 			local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
 		else 		
 			let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
+			let $wrongCodeList := $languageCodes/@codeList[not(. = 'http://www.loc.gov/standards/iso639-2/')]
 			return
 			if ($wrongCodeValues) then
 				local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-			else if(not($languageCodes/@codeList = 'http://www.loc.gov/standards/iso639-2/')) then
-				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+			else if($wrongCodeList) then
+				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/'})
 			else ()     	
 	)[position() le $limitErrors]
 return
@@ -317,6 +318,7 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.noLanguageCode"/>
 										<translationTemplate ref="TR.invalidLanguageCode"/>
+										<translationTemplate ref="TR.wrongCodeList_Param"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDae4bda0e-1dec-4e66-97b8-d4c43b66d2b8">
