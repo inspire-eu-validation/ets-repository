@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID9a31ecfc-6673-43c0-9a31-b4595fb53a98" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID9a31ecfc-6673-43c0-9a31-b4595fb53a98" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
 	<itemHash>bQ==</itemHash>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/interoperability-metadata</remoteResource>
 	<localPath>/auto</localPath>
@@ -11,7 +11,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/interoperability
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119" target="_blank">Conformance Class 'INSPIRE Profile based on EN ISO 19115 and EN ISO 19119'</a></li></ul>]]></description>
 	<reference>../../inspire-md-bsxets.xq</reference>
-	<version>0.2.2</version>
+	<version>0.2.4</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-12-07T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
@@ -162,12 +162,10 @@ let $messages :=
 		local:addMessage('TR.noEncoding', map { 'filename': local:filename($record), 'id': $rid })
 	 else for $format in $formats
 	   return 
-	   (if ($format/gmd:MD_Format/gmd:name/gco:CharacterString) then () else
+	   (if ($format/gmd:MD_Format/gmd:name/*) then () else
 		 local:addMessage('TR.incompleteEncoding', map { 'filename': local:filename($record), 'id': $rid, 'missing': 'name' }),
-	    if ($format/gmd:MD_Format/gmd:version/gco:CharacterString) then () else
-		 local:addMessage('TR.incompleteEncoding', map { 'filename': local:filename($record), 'id': $rid, 'missing': 'version' }),
-	    if ($format/gmd:MD_Format/gmd:specification/gco:CharacterString) then () else
-		 local:addMessage('TR.incompleteEncoding', map { 'filename': local:filename($record), 'id': $rid, 'missing': 'specification' }))
+	    if ($format/gmd:MD_Format/gmd:version/*) then () else
+		 local:addMessage('TR.incompleteEncoding', map { 'filename': local:filename($record), 'id': $rid, 'missing': 'version' }))
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -206,7 +204,7 @@ return
 								<TestAssertion id="EID6fc9b97a-19ff-417b-bcd1-d8e37c718ca9">
 									<label>md-iop.a.5: Character Encoding</label>
 									<description><![CDATA[<p>Verify that the identifier(s) of the character encoding(s) used in the data set have been created and published in the metadata for the data set. This element is mandatory only if an encoding is used that is not based on UTF-8.<br/><br/>
-For each value of Character Encoding in the data set metadata, test that the value is one of the <a href="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml">valid character encodings</a>.</p>
+For each value of Character Encoding in the data set metadata, test that the value is one of the <a href="https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml">valid character encodings</a>.</p>
 <p>Relevant requirement(s):</p>
 <ul>
 <li>IR Requirement Article 13(5): The metadata describing a spatial data set shall include the following metadata element required for interoperability: Character Encoding: The character encoding used in the data set. This element is mandatory only if an encoding is used that is not based on UTF-8.</li>
@@ -217,7 +215,7 @@ For each value of Character Encoding in the data set metadata, test that the val
 									<parent ref="EID8f1b8fb1-1ddb-4ecf-8dbc-b0d33fe9ffcf"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $validCodes := doc('http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml')//gmx:ML_CodeListDictionary[@gml:id='MD_CharacterSetCode']/gmx:codeEntry/gmx:ML_CodeDefinition/gml:identifier/text()									
+let $validCodes := doc('https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/ML_gmxCodelists.xml')//gmx:ML_CodeListDictionary[@gml:id='MD_CharacterSetCode']/gmx:codeEntry/gmx:ML_CodeDefinition/gml:identifier/text()									
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
@@ -244,7 +242,7 @@ return
 								<TestAssertion id="EIDa6fc5c79-85f2-4a3c-9520-f3968dd0cb4d">
 									<label>md-iop.a.6: Spatial Representation Type</label>
 									<description><![CDATA[<p>Verify that the identifier(s) of the spatial representation type(s) used in the data set have been created, taken from the list of allowed values and published in the metadata for the data set.<br/><br/>
-Inspect the data set metadata whether metadata describing the spatial representation type(s) have been created and published in spatialRepresentationType.<br/><br/>Verify that each value is one of the <a href="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml">valid values</a>.</p>
+Inspect the data set metadata whether metadata describing the spatial representation type(s) have been created and published in spatialRepresentationType.<br/><br/>Verify that each value is one of the <a href="https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml">valid values</a>.</p>
 <p>Relevant requirement(s):</p>
 <ul>
 <li>IR Requirement Article 13(5): The metadata describing a spatial data set shall include the following metadata element required for interoperability: Spatial Representation Type: The method used to spatially represent geographic information.</li>
@@ -255,7 +253,7 @@ Inspect the data set metadata whether metadata describing the spatial representa
 									<parent ref="EID8f1b8fb1-1ddb-4ecf-8dbc-b0d33fe9ffcf"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $validCodes := doc('http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml')//gmx:CodeListDictionary[@gml:id='MD_SpatialRepresentationTypeCode']/gmx:codeEntry/gmx:CodeDefinition/gml:identifier/text()	
+let $validCodes := doc('https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml')//gmx:CodeListDictionary[@gml:id='MD_SpatialRepresentationTypeCode']/gmx:codeEntry/gmx:CodeDefinition/gml:identifier/text()	
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 

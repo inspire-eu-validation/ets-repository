@@ -173,6 +173,32 @@ return
 										<translationTemplate ref="TR.wrongServiceIdentificationMultiplicity"/>
 									</translationTemplates>
 								</TestAssertion>
+								
+								<TestAssertion id="EID2b2b468e-297c-4bb4-81b0-7f63898dfa8c">
+									<label>md sds 3.3: Spatial Resolution</label>
+									<description>
+									<![CDATA[<p>Test that a spatial resolution restriction is provided being mandatory when there is a restriction on the spatial resolution for the service.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds/spatial-resolution" target="_blank">Spatial Resolution</a></p>]]>									
+									</description>
+									<parent ref="EIDa389f1a0-803b-4748-ad13-3fc4a3bb9d73"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+		for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		return local:addMessage('TR.manualCheckSpatialResolution', map { 'filename': local:filename($record), 'id': $rid })
+
+return
+(if ($messages) then 'PASSED_MANUAL' else 'PASSED',
+ 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  </expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.manualCheckSpatialResolution"/>
+									</translationTemplates>
+								</TestAssertion>
 
 								<TestAssertion id="EID3dbd5b9f-5bd7-4033-a921-6f51a032e383">
 									<label>md sds 3.4: Spatial Data Service Category</label>
@@ -184,7 +210,8 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 <!-- DONE -->
-let $validCategories := ('humanInteractionService','humanCatalogueViewer','humanGeographicViewer','humanGeographicSpreadsheetViewer','humanServiceEditor','humanChainDefinitionEditor','humanWorkflowEnactmentManager','humanGeographicFeatureEditor','humanGeographicSymbolEditor','humanFeatureGeneralizationEditor','humanGeographicDataStructureViewer')
+let $validCategoriesUrl := fn:doc('http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceCategory/SpatialDataServiceCategory.en.xml')/*:metadata-codelist/*:containeditems/*:value/@id
+let $validCategories := for $x in $validCategoriesUrl return fn:substring($x, 74)
 let $messages :=
 	(for $record in $records
 		let $keywordElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
@@ -193,7 +220,6 @@ let $messages :=
 		if ( not($keywordElements) ) then
 			local:addMessage('TR.keywordElementNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
 		else
-
 			let $valid :=
 				(for $keyword in $keywordElements
 					return
@@ -238,11 +264,14 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $type := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/text()
+		let $typeCodeSpace := string($record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/@codeSpace)
 		return
 		if (not(count($type) = 1)) then
 			local:addMessage('TR.exactlyOneServiceType', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($type)) })
 		else if(not($type = $codes)) then
 			local:addMessage('TR.noTypeFromSpatialDataServiceType',  map { 'filename': local:filename($record), 'id': $rid, 'url': $spatialDataServiceTypeCodeListURL, 'type': $type })
+		else if(not($typeCodeSpace = $spatialDataServiceTypeCodeListURL)) then
+			local:addMessage('TR.wrongCodeSpaceFromSpatialDataServiceType',  map { 'filename': local:filename($record), 'id': $rid, 'url': $typeCodeSpace})
 		else ()
 	)[position() le $limitErrors]
 return
@@ -255,6 +284,7 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.exactlyOneServiceType"/>
 										<translationTemplate ref="TR.noTypeFromSpatialDataServiceType"/>
+										<translationTemplate ref="TR.wrongCodeSpaceFromSpatialDataServiceType"/>
 									</translationTemplates>
 								</TestAssertion>
 

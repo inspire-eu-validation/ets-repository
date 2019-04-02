@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDec7323d5-d8f0-4cfe-b23a-b826df86d58c" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDec7323d5-d8f0-4cfe-b23a-b826df86d58c" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
 	<itemHash>bQ==</itemHash>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/metadata/iso</remoteResource>
 	<localPath>/auto</localPath>
@@ -12,7 +12,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a></li></ul>]]></description>
 	<reference>../../inspire-md-bsxets.xq</reference>
-	<version>0.2.5</version>
+	<version>0.2.9</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-30T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
@@ -67,7 +67,6 @@ Pre-requisite conformance classes:
 					<parent ref="EID4c5d8006-3ac6-43d9-a1a3-1e19bf163ff3"/>
 					<testSteps>
 						<TestStep id="EID95a1a8a8-3132-453f-921a-c0334781e8bb">
-
 							<label>IGNORE</label>
 							<description>IGNORE</description>
 							<parent ref="EID31c568d6-1073-4ff5-a5b2-f0e6b9683177"/>
@@ -82,7 +81,7 @@ The title is a characteristic, and often unique, name by which the resource is k
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $title := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:title/*[1]
@@ -113,7 +112,7 @@ The abstract is a brief narrative summary of the content of the resource and pro
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $abstract := $record/gmd:identificationInfo[1]/*/gmd:abstract/*[1]
@@ -153,7 +152,7 @@ The basic test to detect missing or empty use limitation information is executed
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $useLimitations := $record/gmd:identificationInfo[1]/*/gmd:resourceConstraints/*/gmd:useLimitation/*[1]
@@ -167,13 +166,13 @@ let $messages :=
 return
 (if ($messages) then 'FAILED' else 'PASSED_MANUAL',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- if ($messages) then $messages 
+ if ($messages) then $messages
  else
   for $record in $records
 	let $rid := $record/gmd:fileIdentifier/*/text()
 	let $useLimitations := $record/gmd:identificationInfo[1]/*/gmd:resourceConstraints/*/gmd:useLimitation/*[1]
 	 return
-	  if (some $useLim in $useLimitations satisfies string-length(normalize-space($useLim/text())) &gt; 0) then 
+	  if (some $useLim in $useLimitations satisfies string-length(normalize-space($useLim/text())) &gt; 0) then
 	  local:addMessage('TR.checkUseLimitation', map { 'filename': local:filename($record), 'id': $rid, 'text': string-join($useLimitations, '; ') })
 	  else ())
 							  </expression>
@@ -209,18 +208,18 @@ return
 									<expression>
 let $iso19115_MD_ClassificationCode := ('unclassified','restricted','confidential','secret','topSecret')
 let $iso19115_MD_RestrictionCode_without_otherRestrictions := ('copyright','patent','patentPending','trademark','license','intellectualPropertyRights','restricted')
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $resourceConstraints := $record/gmd:identificationInfo/*/gmd:resourceConstraints/*
-	 let $validConstraints := 
+	 let $validConstraints :=
 		for $resCon in $resourceConstraints
-			let $oneValidAccessConstraint := 
+			let $oneValidAccessConstraint :=
 				if ($resCon[gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue ='otherRestrictions' and string-length(normalize-space(fn:string-join(gmd:otherConstraints/*/text(),', '))) &gt; 0]) then true()
 				else if($resCon/gmd:accessConstraints/gmd:MD_RestrictionCode[@codeListValue = $iso19115_MD_RestrictionCode_without_otherRestrictions]) then true()
 				else false()
 			let $oneValidClassification := boolean($resCon/gmd:classification/gmd:MD_ClassificationCode[@codeListValue = $iso19115_MD_ClassificationCode])
-			return 
+			return
 			if ($oneValidAccessConstraint or $oneValidClassification) then $resCon else ()
 	 return
 	 if ($validConstraints) then ()
@@ -252,24 +251,31 @@ Relevant requirement(s):</p>
 <p>Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119/ds-specification" target="_blank">Abstract Test Case 'Dataset specification'</a></p>]]></description>
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>
+									<expression>									
+let $levels := ('dataset', 'series')
+let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]									
 let $messages := 
-	(for $record in $records
+	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/*/gmd:result/*/gmd:specification
+	 let $specifications := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification
+	 let $DQ_ConformanceResults := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
 	 return 
-	 if (not($specifications)) then () (: Only failure situations are reported, no warnings :)
+	 if (not($specifications)) then local:addMessage('TR.noSpecifications', map { 'filename': local:filename($record), 'id': $rid })
 	 else
-	 for $spec in $specifications
-		return
-		if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
-			local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
-			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
-		else if (not($spec/ancestor::gmd:DQ_DomainConsistency)) then
-			local:addMessage('TR.noDQDomainConsistencyParent', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+	 for $DQ_ConformanceResult in $DQ_ConformanceResults
+		let $spec := $DQ_ConformanceResult/gmd:specification
+		return (
+		if (not($spec)) then ()
+		else
+			if (not($spec/gmd:CI_Citation/gmd:title/*[1][string-length(normalize-space(text())) &gt; 0])) then
+				local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+			else (),
+		if (not($DQ_ConformanceResult/gmd:pass/gco:Boolean)) then
+			local:addMessage('TR.noBooleanValueForPass', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 		else ()
-	)[position() le $limitErrors]
+	))[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -279,7 +285,8 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.noTitleForSpecification"/>
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
-										<translationTemplate ref="TR.noDQDomainConsistencyParent"/>
+										<translationTemplate ref="TR.noSpecifications"/>
+										<translationTemplate ref="TR.noBooleanValueForPass"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -295,20 +302,20 @@ Relevant requirement(s):</p>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $codes := ('bul','hrv','cze','dan','dut','eng','est','fin','fre','ger','gre','hun','gle','ita','lav','lit','mlt','pol','por','rum','slo','slv','spa','swe')
-let $messages :=    
-	(for $record in $records    
+let $messages :=
+	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $metadataLanguageCode := $record/gmd:language/gmd:LanguageCode/@codeListValue
 	 return
 	 if (not($metadataLanguageCode)) then
 		local:addMessage('TR.noMetadataLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
-	 else 
+	 else
 		let $wrongCodeValue := not($metadataLanguageCode = $codes)
 		return
 		if ($wrongCodeValue) then
 			local:addMessage('TR.invalidMetadataLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCode' : data($metadataLanguageCode) })
-		else ()     
-	)[position() le $limitErrors] 
+		else ()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -337,7 +344,7 @@ Relevant requirement(s):</p>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $regex := '^[a-zA-Z0-9\._%\+-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}$'
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $pocs := $record/gmd:contact/* (: At least one gmd:contact is required - the XML Schema validation checks whether this condition is met. :)
@@ -345,16 +352,16 @@ let $messages :=
 		for $poc in $pocs
 		let $organisationName := $poc/gmd:organisationName/*[1]
 		let $emails := $poc/gmd:contactInfo/*/gmd:address/*/gmd:electronicMailAddress/*[1]/text()
-		return 
+		return
 		(if (not($organisationName) or string-length(normalize-space($organisationName/text())) = 0) then
 			local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid }) else (),
 		 if (not($emails)) then
 			local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 		 else if (some $email in $emails satisfies not(matches($email,$regex))) then
-		 	for $email in $emails 
+		 	for $email in $emails
 		 	where not(matches($email,$regex))
 			return
-				local:addMessage('TR.invalidMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid, 'email': $email }) 
+				local:addMessage('TR.invalidMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid, 'email': $email })
 		 else ()
 		)
 	)[position() le $limitErrors]
@@ -386,7 +393,7 @@ Relevant requirement(s):</p>
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $pocs := $record/gmd:contact/* (: At least one gmd:contact is required - the XML Schema validation checks whether this condition is met. :)
@@ -418,7 +425,7 @@ Relevant requirement(s):</p>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $cl := ('CI_DateTypeCode','http://www.isotc211.org/2005/resources/codeList.xml#CI_DateTypeCode')
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $creationDates := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/*[gmd:dateType/*/@codeList = $cl and gmd:dateType/*/@codeListValue = 'creation']/gmd:date/*
@@ -455,7 +462,7 @@ Relevant requirement(s):</p>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $regex := '^[a-zA-Z0-9\._%\+-]+@[a-zA-Z0-9\.-]+\.[a-zA-Z]{2,}$'
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $pocs := $record/gmd:identificationInfo/*/gmd:pointOfContact/*
@@ -466,16 +473,16 @@ let $messages :=
 		for $poc in $pocs
 		let $organisationName := $poc/gmd:organisationName/*[1]
 		let $emails := $poc/gmd:contactInfo/*/gmd:address/*/gmd:electronicMailAddress/*[1]/text()
-		return 
+		return
 		(if (not($organisationName) or string-length(normalize-space($organisationName/text())) = 0) then
 			local:addMessage('TR.noPOCOrganisationName', map { 'filename': local:filename($record), 'id': $rid }) else (),
 		 if (not($emails)) then
-			local:addMessage('TR.noPOCEmailAddress', map { 'filename': local:filename($record), 'id': $rid }) 
+			local:addMessage('TR.noPOCEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 		 else if (some $email in $emails satisfies not(matches($email,$regex))) then
-		 	for $email in $emails 
+		 	for $email in $emails
 		 	where not(matches($email,$regex))
 			return
-				local:addMessage('TR.invalidPOCEmailAddress', map { 'filename': local:filename($record), 'id': $rid, 'email': $email }) 
+				local:addMessage('TR.invalidPOCEmailAddress', map { 'filename': local:filename($record), 'id': $rid, 'email': $email })
 		 else ()
 		)
 	)[position() le $limitErrors]
@@ -504,7 +511,7 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $iso19115_CIRoleCode := ('resourceProvider','custodian','owner','user','distributor','originator','pointOfContact','principalInvestigator','processor','publisher','author')
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $pocs := $record/gmd:identificationInfo/*/gmd:pointOfContact/*
@@ -610,12 +617,12 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $distinctRecordIdentifiers := 
+let $distinctRecordIdentifiers :=
   for $rec in $records
   return
     distinct-values($rec/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:identifier/*/gmd:code/*/text())
 let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($distinctRecordIdentifiers,.)[2]]
-let $messages := 
+let $messages :=
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
 	 let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:identifier/*/gmd:code/*/text()
@@ -660,21 +667,21 @@ This test case only applies to records with a hierarchyLevel value 'dataset' or 
 									<expression>
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]
 let $codes := ('aar','abk','ace','ach','ada','ady','afa','afh','afr','ain','aka','akk','alb','ale','alg','alt','amh','ang','anp','apa','ara','arc','arg','arm','arn','arp','art','arw','asm','ast','ath','aus','ava','ave','awa','aym','aze','bad','bai','bak','bal','bam','ban','baq','bas','bat','bej','bel','bem','ben','ber','bho','bih','bik','bin','bis','bla','bnt','bos','bra','bre','btk','bua','bug','bul','bur','byn','cad','cai','car','cat','cau','ceb','cel','cha','chb','che','chg','chi','chk','chm','chn','cho','chp','chr','chu','chv','chy','cmc','cop','cor','cos','cpe','cpf','cpp','cre','crh','crp','csb','cus','cze','dak','dan','dar','day','del','den','dgr','din','div','doi','dra','dsb','dua','dum','dut','dyu','dzo','efi','egy','eka','elx','eng','enm','epo','est','ewe','ewo','fan','fao','fat','fij','fil','fin','fiu','fon','fre','frm','fro','frr','frs','fry','ful','fur','gaa','gay','gba','gem','geo','ger','gez','gil','gla','gle','glg','glv','gmh','goh','gon','gor','got','grb','grc','gre','grn','gsw','guj','gwi','hai','hat','hau','haw','heb','her','hil','him','hin','hit','hmn','hmo','hrv','hsb','hun','hup','iba','ibo','ice','ido','iii','ijo','iku','ile','ilo','ina','inc','ind','ine','inh','ipk','ira','iro','ita','jav','jbo','jpn','jpr','jrb','kaa','kab','kac','kal','kam','kan','kar','kas','kau','kaw','kaz','kbd','kha','khi','khm','kho','kik','kin','kir','kmb','kok','kom','kon','kor','kos','kpe','krc','krl','kro','kru','kua','kum','kur','kut','lad','lah','lam','lao','lat','lav','lez','lim','lin','lit','lol','loz','ltz','lua','lub','lug','lui','lun','luo','lus','mac','mad','mag','mah','mai','mak','mal','man','mao','map','mar','mas','may','mdf','mdr','men','mga','mic','min','mis','mkh','mlg','mlt','mnc','mni','mno','moh','mon','mos','mul','mun','mus','mwl','mwr','myn','myv','nah','nai','nap','nau','nav','nbl','nde','ndo','nds','nep','new','nia','nia','nic','niu','nno','nob','nog','non','nor','nqo','nso','nub','nwc','nya','nym','nyn','nyo','nzi','oci','oji','ori','orm','osa','oss','ota','oto','paa','pag','pal','pam','pan','pap','pau','peo','per','phi','phn','pli','pol','pon','por','pra','pro','pus','qaa-qtz','que','raj','rap','rar','roa','roh','rom','rum','run','rup','rus','sad','sag','sah','sai','sal','sam','san','sas','sat','scn','sco','sel','sem','sga','sgn','shn','sid','sin','sio','sit','sla','slo','slv','sma','sme','smi','smj','smn','smo','sms','sna','snd','snk','sog','som','son','sot','spa','srd','srn','srp','srr','ssa','ssw','suk','sun','sus','sux','swa','swe','syc','syr','tah','tai','tam','tat','tel','tem','ter','tet','tgk','tgl','tha','tib','tig','tir','tiv','tkl','tlh','tli','tmh','tog','ton','tpi','tsi','tsn','tso','tuk','tum','tup','tur','tut','tvl','twi','tyv','udm','uga','uig','ukr','umb','und','urd','uzb','vai','ven','vie','vol','vot','wak','wal','war','was','wel','wen','wln','wol','xal','xho','yao','yap','yid','yor','ypk','zap','zbl','zen','zha','znd','zul','zun','zxx','zza')
-let $messages :=    
+let $messages :=
 	if (not($recordsToInspect)) then ()
 	else
-	(for $record in $recordsToInspect    
+	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode	 
+	 let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode
 	 return
 	 if (not($languageCodes)) then
 		local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
-	 else 
+	 else
 		let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
 		return
 		if ($wrongCodeValues) then
 		local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-		else ()     
+		else ()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -711,6 +718,27 @@ let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels and gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage]
 let $urls := fn:distinct-values($recordsToInspect/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text())
 let $map := local:check-resource-uris($urls, 30, true())
+let $first_validation := (for $record in $recordsToInspect
+  let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
+  return
+  if (not($urls)) then ()
+  else
+  for $url in $urls
+    let $validuri := map:get($map, $url)
+    return
+    if ($validuri = 'notHTTP') then ()
+    else if ($validuri = 'idNotFound') then ()
+    else if (starts-with($validuri, 'EXCEPTION')) then ()
+    else if (matches($validuri,'^\d{3}$')) then ()
+    else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
+      try { 
+      	let $root := fn:doc($url)/element()
+        	return
+        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then 'validuri'
+			else ()
+		} catch * { 
+      }
+    else ())[position() le $limitErrors]
 let $messages := (for $record in $recordsToInspect
   let $rid := $record/gmd:fileIdentifier/*/text()
   let $urls := $record/gmd:distributionInfo/*/gmd:transferOptions/*/gmd:onLine/*/gmd:linkage/gmd:URL/text()
@@ -730,14 +758,16 @@ let $messages := (for $record in $recordsToInspect
     else if (matches($validuri,'^\d{3}$')) then
 		local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
     else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
-      try { 
-      	let $root := fn:doc($url)/element()
-        	return
-        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
-			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
-		} catch * { 
-			local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
-      }
+	  if ($first_validation = 'validuri') then ()
+	  else
+		  try {
+			let $root := fn:doc($url)/element()
+			return
+			if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
+			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) })
+		  } catch * {
+				local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
+		  }
     else
        local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri }))[position() le $limitErrors]
 return
@@ -772,12 +802,19 @@ return
 									<expression>
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
+let $regulation := (lower-case("РЕГЛАМЕНТ (ЕС) № 1089/2010 НА КОМИСИЯТА от 23 ноември 2010 година за прилагане на Директива 2007/2/ЕО на Европейския парламент и на Съвета по отношение на оперативната съвместимост на масиви от пространствени данни и услуги за пространствени данни"), lower-case("NAŘÍZENÍ KOMISE (EU) č. 1089/2010 ze dne 23. listopadu 2010, kterým se provádí směrnice Evropského parlamentu a Rady 2007/2/ES, pokud jde o interoperabilitu sad prostorových dat a služeb prostorových dat"), lower-case("KOMMISSIONENS FORORDNING (EU) Nr. 1089/2010 af 23. november 2010 om gennemførelse af Europa-Parlamentets og Rådets direktiv 2007/2/EF for så vidt angår interoperabilitet for geodatasæt og -tjenester"), lower-case("VERORDENING (EU) Nr. 1089/2010 VAN DE COMMISSIE van 23 november 2010 ter uitvoering van Richtlijn 2007/2/EG van het Europees Parlement en de Raad betreffende de interoperabiliteit van verzamelingen ruimtelijke gegevens en van diensten met betrekking tot ruimtelijke gegevens"), lower-case("COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services"), lower-case("KOMISJONI MÄÄRUS (EL) nr 1089/2010, 23. november 2010, millega rakendatakse Euroopa Parlamendi ja nõukogu direktiivi 2007/2/EÜ seoses ruumiandmekogumite ja -teenuste ristkasutatavusega"), lower-case("KOMISSION ASETUS (EU) N:o 1089/2010, annettu 23 päivänä marraskuuta 2010, Euroopan parlamentin ja neuvoston direktiivin 2007/2/EY täytäntöönpanosta paikkatietoaineistojen ja -palvelujen yhteentoimivuuden osalta"), lower-case("RÈGLEMENT (UE) No 1089/2010 DE LA COMMISSION du 23 novembre 2010 portant modalités d'application de la directive 2007/2/CE du Parlement européen et du Conseil en ce qui concerne l'interopérabilité des séries et des services de données géographiques"), lower-case("VERORDNUNG (EG) Nr. 1089/2010 DER KOMMISSION vom 23. November 2010 zur Durchführung der Richtlinie 2007/2/EG des Europäischen Parlaments und des Rates hinsichtlich der Interoperabilität von Geodatensätzen und -diensten"), lower-case("COMMISSION REGULATION (EU) No 1089/2010 of 23 November 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards interoperability of spatial data sets and services"), lower-case("ΚΑΝΟΝΙΣΜΟΣ (ΕΕ) αριθ. 1089/2010 ΤΗΣ ΕΠΙΤΡΟΠΗΣ της 23ης Νοεμβρίου 2010 σχετικά με την εφαρμογή της οδηγίας 2007/2/ΕΚ του Ευρωπαϊκού Κοινοβουλίου και του Συμβουλίου όσον αφορά τη διαλειτουργικότητα των συνόλων και των υπηρεσιών χωρικών δεδομένων"), lower-case("A BIZOTTSÁG 1089/2010/EU RENDELETE (2010. november 23.) a 2007/2/EK európai parlamenti és tanácsi irányelv téradatkészletek és -szolgáltatások interoperabilitására vonatkozó rendelkezéseinek végrehajtásáról"), lower-case("REGOLAMENTO (UE) N. 1089/2010 DELLA COMMISSIONE del 23 novembre 2010 recante attuazione della direttiva 2007/2/CE del Parlamento europeo e del Consiglio per quanto riguarda l'interoperabilità dei set di dati territoriali e dei servizi di dati territoriali"), lower-case("KOMISIJAS REGULA (ES) Nr. 1089/2010 (2010. gada 23. novembris), ar kuru īsteno Eiropas Parlamenta un Padomes Direktīvu 2007/2/EK attiecībā uz telpisko datu kopu un telpisko datu pakalpojumu savstarpējo izmantojamību"), lower-case("KOMISIJOS REGLAMENTAS (ES) Nr. 1089/2010 2010 m. lapkričio 23 d. kuriuo įgyvendinamos Europos Parlamento ir Tarybos direktyvos 2007/2/EB nuostatos dėl erdvinių duomenų rinkinių ir paslaugų sąveikumo"), lower-case("REGOLAMENT TAL-KUMMISSJONI (UE) Nru 1089/2010 tat-23 ta' Novembru 2010 li jimplimenta d-Direttiva 2007/2/KE tal-Parlament Ewropew u tal-Kunsill fir-rigward tal- interoperabbiltà tas-settijiet ta’ dejta u servizzi ġeografiċi"), lower-case("ROZPORZĄDZENIE KOMISJI (UE) NR 1089/2010 z dnia 23 listopada 2010 r. w sprawie wykonania dyrektywy 2007/2/WE Parlamentu Europejskiego i Rady w zakresie interoperacyjności zbiorów i usług danych przestrzennych"), lower-case("REGULAMENTO (UE) N. o 1089/2010 DA COMISSÃO de 23 de Novembro de 2010 que estabelece as disposições de execução da Directiva 2007/2/CE do Parlamento Europeu e do Conselho relativamente à interoperabilidade dos conjuntos e serviços de dados geográficos"), lower-case("REGULAMENTUL (UE) NR. 1089/2010 AL COMISIEI din 23 noiembrie 2010 de punere în aplicare a Directivei 2007/2/CE a Parlamentului European şi a Consiliului în ceea ce priveşte interoperabilitatea seturilor şi serviciilor de date spaţiale"), lower-case("NARIADENIE KOMISIE (EÚ) č. 1089/2010 z 23. novembra 2010, ktorým sa vykonáva smernica Európskeho parlamentu a Rady 2007/2/ES, pokiaľ ide o interoperabilitu súborov a služieb priestorových údajov"), lower-case("UREDBA KOMISIJE (EU) št. 1089/2010 z dne 23. novembra 2010 o izvajanju Direktive 2007/2/ES Evropskega parlamenta in Sveta glede medopravilnosti zbirk prostorskih podatkov in storitev v zvezi s prostorskimi podatki"), lower-case("REGLAMENTO (UE) No 1089/2010 DE LA COMISIÓN de 23 de noviembre de 2010 por el que se aplica la Directiva 2007/2/CE del Parlamento Europeo y del Consejo en lo que se refiere a la interoperabilidad de los conjuntos y los servicios de datos espaciales"), lower-case("KOMMISSIONENS FÖRORDNING (EU) nr 1089/2010 av den 23 november 2010 om genomförande av Europaparlamentets och rådets direktiv 2007/2/EG vad gäller interoperabilitet för rumsliga datamängder och datatjänster"))
 let $messages := 
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $confResPasses := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:pass
+	 let $DQ_ConformanceResults := $record/gmd:dataQualityInfo/*/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+	 let $hasExpectedCitation := boolean($DQ_ConformanceResults/*/gmd:CI_Citation[normalize-space(lower-case(gmd:title/*/text())) = $regulation and gmd:date/*/gmd:dateType/*/@codeListValue = 'publication' and gmd:date/*/gmd:date/*/text() = '2010-12-08'])
 	 return 
-	 if (not($confResPasses)) then
+	 if (not($DQ_ConformanceResults)) then
+			local:addMessage('TR.noDQConformanceResults', map { 'filename': local:filename($record), 'id': $rid })
+	 else if (not($hasExpectedCitation)) then
+		local:addMessage('TR.noExpectedCitation', map { 'filename': local:filename($record), 'id': $rid })
+	 else if (not($confResPasses)) then
 		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
 	 else
 		for $confResPass in $confResPasses
@@ -793,6 +830,8 @@ return
 							  </expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.noDQConformanceResults"/>
+										<translationTemplate ref="TR.noExpectedCitation"/>
 										<translationTemplate ref="TR.noConformityStatement"/>
 										<translationTemplate ref="TR.declareNoConformityEvaluationAsUnknown"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
@@ -814,15 +853,15 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]
-let $messages :=   
+let $messages :=
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $topicCategories := $record/gmd:identificationInfo[1]/*/gmd:topicCategory/*
-	 return 
+	 return
 	 if (not($topicCategories[self::gmd:MD_TopicCategoryCode])) then
 		local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
 	 else () (: XML Schema validation takes care of correct element content:)
-	)[position() le $limitErrors] 
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -836,9 +875,7 @@ return
 								</TestAssertion>
 								<TestAssertion id="EIDdd254a75-cd7a-4e59-9e9d-b38e251376b1">
 									<label>md-iso.c.6: Dataset geographic Bounding box</label>
-									<description><![CDATA[<p>This test checks if the metadata record has a valid geographic extent, expressed as a geographic 
-									bounding box with four coordinates (westBoundLongitude, eastBoundLongitude, southBoundLatitude, and northBoundLatitude).
-									In addition, the bounding box shall be as small as possible. This requires a manual check.</p>
+									<description><![CDATA[<p>This test checks if the metadata record has a valid geographic extent, expressed as a geographic bounding box with four coordinates (westBoundLongitude, eastBoundLongitude, southBoundLatitude, and northBoundLatitude). In addition, the bounding box shall be as small as possible. This requires a manual check.</p>
 <p>This test case only applies to records with a hierarchyLevel value 'dataset' or 'series'.</p>
 <p>The test checks if:</p>
 <ul>
@@ -863,7 +900,7 @@ return
 let $levels := ('dataset', 'series')
 let $regex := '^-?\d+\.\d{2,}'
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
-let $messages := 
+let $messages :=
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
 	 let $bboxes := $record/gmd:identificationInfo[1]/*/gmd:extent/*/gmd:geographicElement/gmd:EX_GeographicBoundingBox
@@ -876,8 +913,8 @@ let $messages :=
 			let $west := $bbox/gmd:westBoundLongitude/*/text()
 			let $east := $bbox/gmd:eastBoundLongitude/*/text()
 			let $south := $bbox/gmd:southBoundLatitude/*/text()
-			let $north := $bbox/gmd:northBoundLatitude/*/text() 
-			return     
+			let $north := $bbox/gmd:northBoundLatitude/*/text()
+			return
 			if (($west and matches($west,$regex) and fn:number($west) &gt;= -180 and fn:number($west) &lt;= 180) and
 				 ($east and matches($east,$regex) and fn:number($east) &gt;= -180 and fn:number($east) &lt;= 180) and
 				 ($south and matches($south,$regex) and fn:number($south) &gt;= -90 and fn:number($south) &lt;= 90) and
@@ -891,7 +928,7 @@ let $messages :=
 			let $west := $bbox/gmd:westBoundLongitude/*/text()
 			let $east := $bbox/gmd:eastBoundLongitude/*/text()
 			let $south := $bbox/gmd:southBoundLatitude/*/text()
-			let $north := $bbox/gmd:northBoundLatitude/*/text() 
+			let $north := $bbox/gmd:northBoundLatitude/*/text()
 			return
 			local:addMessage('TR.invalidGeographicBoundingBox', map { 'filename': local:filename($record), 'id': $rid, 'west': $west, 'east': $east, 'south': $south, 'north': $north })
 		else ()
@@ -921,17 +958,17 @@ return
 							  <expectedResult>NOT_APPLICABLE</expectedResult>
 							  <expression>
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]
-let $messages :=   
+let $messages :=
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $lineageStatement := $record/gmd:dataQualityInfo/*/gmd:lineage/*/gmd:statement/*[1]
-	 return 
+	 return
 	 if (count($lineageStatement) ne 1) then
 		local:addMessage('TR.wrongNumberOfLineageStatements',  map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($lineageStatement)) })
 	 else if (string-length(normalize-space($lineageStatement/text())) = 0) then
 		local:addMessage('TR.emptyLineageStatement',  map { 'filename': local:filename($record), 'id': $rid })
-	 else ()        
-	)[position() le $limitErrors] 
+	 else ()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -1044,13 +1081,13 @@ let $messages := (for $record in $recordsToInspect
 		local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
     else if (matches($validuri,'^\d{3}$')) then
 		local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
-    else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.')) then
+    else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.') or starts-with($validuri,'application/atom')) then
       try { 
       	let $root := fn:doc($url)/element()
         	return
         	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
-			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) }) 
-		} catch * { 
+			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) })
+		} catch * {
 			local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
       }
     else
@@ -1083,11 +1120,11 @@ return
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service' and gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn]
 let $urls := $recordsToInspect/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
 let $map := local:check-resource-uris($urls, 30, false())
-let $messages := 
+let $messages :=
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $urls := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
-	 return  
+	 return
 	 if (not($urls)) then
 		local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
 	 else
@@ -1104,12 +1141,12 @@ let $messages :=
 		else if (matches($validuri,'^\d{3}$')) then
 			local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
 		else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
-			try { 
+			try {
 				let $root := fn:doc($url)/element()
 				return
 				if ($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]) then ()
-				else local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) }) 
-			} catch * { 
+				else local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) })
+			} catch * {
 				local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
 			}
 		else
@@ -1155,7 +1192,7 @@ return
 									<parent ref="EID0a65ace3-6866-4b69-90f6-bc9cb7defbe3"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $keywords := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:keyword/*[1]
@@ -1219,7 +1256,7 @@ let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListV
 let $messages :=
 	if (not($recordsToInspect)) then ()
 	else
-		try {    
+		try {
 			let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
 			let $inspireThemesCodeListURL := 'http://inspire.ec.europa.eu/theme'
 			let $codeTitles := local:get-code-titles($inspireThemesCodeListURL,$officialLanguages)
@@ -1229,13 +1266,18 @@ let $messages :=
 			(for $record in $recordsToInspect
 			 let $rid := $record/gmd:fileIdentifier/*/text()
 			 let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]
+			 let $hasExpectedDate := boolean($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*[gmd:date/*/text() = '2008-06-01' and gmd:dateType/*/@codeListValue = 'publication'])
 			 return 
 			 if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
 				local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
+			 else if (not($hasExpectedDate)) then
+				local:addMessage('TR.invalidDateForThesaurusGemet',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
+			 else if (string-length(normalize-space($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*/gmd:dateType/*/text())) = 0) then
+				local:addMessage('TR.emptyDateTypeCode',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
 			 else ()
 			)[position() le $limitErrors]
-		} catch * {       
-			local:addMessage('TR.systemError',  map { 'text': $err:description }) 
+		} catch * {
+			local:addMessage('TR.systemError',  map { 'text': $err:description })
 		}
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -1245,6 +1287,8 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noKeywordFromINSPIREThemes"/>
+										<translationTemplate ref="TR.invalidDateForThesaurusGemet"/>
+										<translationTemplate ref="TR.emptyDateTypeCode"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -1267,7 +1311,7 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
  let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service']
- let $messages :=    
+ let $messages :=
 	 if (not($recordsToInspect)) then ()
 	 else
 		 try {
@@ -1282,8 +1326,8 @@ return
 			 	local:addMessage('TR.noKeywordFromSpatialDataServiceCategory',  map { 'filename': local:filename($record), 'id': $rid, 'url': $spatialDataServiceCategoriesCodeListURL, 'keywords': fn:string-join($keywords,'; ') })
 			  else ()
 			 )[position() le $limitErrors]
-		 } catch * {       
-			 local:addMessage('TR.systemError',  map { 'text': $err:description }) 
+		 } catch * {
+			 local:addMessage('TR.systemError',  map { 'text': $err:description })
 		 }
  return
  (if ($messages//@ref = ('TR.noKeywordFromSpatialDataServiceCategory','TR.systemError')) then 'FAILED' else 'PASSED',
@@ -1308,12 +1352,12 @@ Relevant requirement(s):</p>
 									<parent ref="EIDa445032d-1f63-47af-b100-edb86846d5d1"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages :=    
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $thesaurusTitles := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*[1]/text()
 	 let $duplicateTitles := $thesaurusTitles[index-of($thesaurusTitles,.)[2]]
-	 return 
+	 return
 	 if (count($duplicateTitles) &gt; 0) then
 		local:addMessage('TR.controlledVocabularyNotUnique',  map { 'filename': local:filename($record), 'id': $rid, 'duplicates': string-join($duplicateTitles,', ') })
 	 else ()
@@ -1347,7 +1391,7 @@ return
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $thesauri := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName
@@ -1358,7 +1402,7 @@ let $messages :=
 		let $keywords := string-join($thesaurus/../gmd:keyword/*[1]/text(), '; ')
 		let $hasExpectedDate := boolean($thesaurus/*/gmd:date/*[gmd:date/*/text() and gmd:dateType/*/@codeListValue = ('publication','revision','creation')])
 		return
-		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords }) 
+		(if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords })
 		 else if (string-length(normalize-space($title)) = 0) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'keywords' : $keywords })
 		 else (),
 		 if (not($hasExpectedDate)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title) then $title else '', 'keywords' : $keywords }) else ()
@@ -1403,7 +1447,7 @@ return
 <p>The test fails if either of these conditions is not fulfilled.</p>
 <p>Relevant requirement(s):</p>
 <ul>
-<li>TG MD Requirement 22: The INSPIRE Metadata Regulation 1205/2008/EC requires at least one temporal reference chosen from one of these four categories: 
+<li>TG MD Requirement 22: The INSPIRE Metadata Regulation 1205/2008/EC requires at least one temporal reference chosen from one of these four categories:
 <ul>
 <li>temporal extent</li>
 <li>date of publication</li>
@@ -1417,11 +1461,11 @@ return
 									<parent ref="EID35c8e53d-0947-43de-a410-8c34eac54e33"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $timePeriods := $record/gmd:identificationInfo[1]/*/*[self::gmd:extent or self::srv:extent]/*/gmd:temporalElement/*/gmd:extent/*[self::gml:TimePeriod or self::gml31:TimePeriod]
-	 let $invalidTimePeriods := 
+	 let $invalidTimePeriods :=
 		for $timePeriod in $timePeriods
 		return
 		if (not($timePeriod[(not(*:begin) or *:begin/*:TimeInstant) and (not(*:end) or *:end/*:TimeInstant)])) then $timePeriod
@@ -1482,11 +1526,11 @@ return
 									<parent ref="EID96ea0d7d-3115-4dd2-af86-82c788085239"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 
+let $messages :=
 	(for $record in $records
 	 let $rid := $record/gmd:fileIdentifier/*/text()
 	 let $timePeriods := $record/gmd:identificationInfo[1]/*/*[self::gmd:extent or self::srv:extent]/*/gmd:temporalElement/*/gmd:extent/*[self::gml:TimePeriod or self::gml31:TimePeriod]
-	 let $invalidTimePeriods := 
+	 let $invalidTimePeriods :=
 		for $timePeriod in $timePeriods
 		let $beginDate := ($timePeriod/*:begin/*:TimeInstant/*:timePosition/text(), $timePeriod/*:beginPosition/text())
 		let $endDate := ($timePeriod/*:end/*:TimeInstant/*:timePosition/text(), $timePeriod/*:endPosition/text())
@@ -1501,14 +1545,14 @@ let $messages :=
 	 let $frameOnInstant := boolean($timePeriods/*:begin/*/@frame | $timePeriods/*:end/*/*:timePosition/@frame)
 	 let $frameOnTimePosition := boolean($timePeriods/*:begin/*/@frame | $timePeriods/*:end/*/*:timePosition/@frame)
 	 let $relevantDates := $record/gmd:identificationInfo[1]/*/gmd:citation/*/gmd:date/*[gmd:dateType/*/@codeListValue = ('publication','revision','creation')]/gmd:date/*
-	 let $invalidRelevantDates := 
+	 let $invalidRelevantDates :=
 		for $relevantDate in $relevantDates
 		let $validDate := local:is-valid-date-or-dateTime($relevantDate)
 		return
 		if ($validDate) then ()
 		else $relevantDate
 	 return
-	 (if ($invalidTimePeriods) then 
+	 (if ($invalidTimePeriods) then
 	 	let $invalidDates :=
 			for $timePeriod in $timePeriods
 			let $beginDate := ($timePeriod/*:begin/*:TimeInstant/*:timePosition/text(), $timePeriod/*:beginPosition/text())
@@ -1518,15 +1562,15 @@ let $messages :=
 			 if (local:is-valid-date-or-dateTime($endDate)) then () else $endDate)
 		return
  		local:addMessage('TR.timePeriodWithInvalidDate', map { 'filename': local:filename($record), 'id': $rid, 'dates': fn:string-join($invalidDates, ', ') }) else (),
-	  if ($frameOnBeginPosition) then 
+	  if ($frameOnBeginPosition) then
  		local:addMessage('TR.timePeriodWithFrameOnBeginPosition', map { 'filename': local:filename($record), 'id': $rid }) else (),
-	  if ($frameOnEndPosition) then 
+	  if ($frameOnEndPosition) then
 		local:addMessage('TR.timePeriodWithFrameOnEndPosition', map { 'filename': local:filename($record), 'id': $rid }) else (),
-	  if ($frameOnPeriod) then 
+	  if ($frameOnPeriod) then
 		local:addMessage('TR.timePeriodWithFrame', map { 'filename': local:filename($record), 'id': $rid }) else (),
-	  if ($frameOnInstant) then 
+	  if ($frameOnInstant) then
 		local:addMessage('TR.timePeriodWithFrameOnTimeInstant', map { 'filename': local:filename($record), 'id': $rid }) else (),
-	  if ($frameOnTimePosition) then 
+	  if ($frameOnTimePosition) then
 		local:addMessage('TR.timePeriodWithFrameOnTimePosition', map { 'filename': local:filename($record), 'id': $rid }) else (),
 	  if ($invalidRelevantDates) then
 		local:addMessage('TR.invalidRelevantDate', map { 'filename': local:filename($record), 'id': $rid, 'dates': fn:string-join($relevantDates, ', ') }) else ())

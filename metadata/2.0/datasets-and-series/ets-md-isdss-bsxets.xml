@@ -134,10 +134,14 @@ let $messages :=
 			for $crs in $crsIdentifiers
 				let $code := $crs/gmd:code
 				let $codeSpace := $crs/gmd:codeSpace
-				let $codeNumberOpt1 := fn:substring($code/gco:CharacterString, fn:string-length($code/gco:CharacterString)-4+1)
-				let $codeNumberOpt2 := fn:substring($code/gmx:Anchor/@xlink:href, fn:string-length($code/gmx:Anchor/@xlink:href)-4+1)
+				let $defaultEpsgCode :=
+					for $x in $epsgCodes
+						return
+						if(contains($code/gco:CharacterString/text(), $x)) then $code/gco:CharacterString
+						else if(contains($code/gmx:Anchor/text(), $x)) then $code/gmx:Anchor/@xlink:href
+						else ()
 	 			return
-				if ($codeNumberOpt1 = $epsgCodes or $codeNumberOpt2 = $epsgCodes) then
+				if (not(count($defaultEpsgCode) = 0)) then
 					if (not($code[gco:CharacterString = $httpURIIdentifier] or $code[gmx:Anchor/@xlink:href = $httpURIIdentifier])) then
 						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
 					else if($codeSpace) then
@@ -286,6 +290,7 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.invalidCodeUTF8"/>
 										<translationTemplate ref="TR.invalidEncodingCode"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -326,14 +331,14 @@ let $messages :=
 				let $version := $format/gmd:MD_Format/gmd:version
 				return
 				if (not($name) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
-					local:addMessage('TR.emptyName', map { 'filename': local:filename($record), 'id': $rid, 'name': $name })
+					local:addMessage('TR.emptyName', map { 'filename': local:filename($record), 'id': $rid })
 				else if(string-length(normalize-space($version/*/text())) != 0) then
 					if (not($version) or not($version/gco:CharacterString/node() or $version/gmx:Anchor/node())) then
-						local:addMessage('TR.emptyVersion', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 	
+						local:addMessage('TR.emptyVersion', map { 'filename': local:filename($record), 'id': $rid }) 	
 					else ()
 				else
 					if (not($version/@gco:nilReason = 'unknown' or $version/@gco:nilReason = 'inapplicable')) then
-						local:addMessage('TR.invalidVersion', map { 'filename': local:filename($record), 'id': $rid, 'name': $name }) 
+						local:addMessage('TR.invalidVersion', map { 'filename': local:filename($record), 'id': $rid }) 
 					else () 
 	)[position() le $limitErrors] 
 return
