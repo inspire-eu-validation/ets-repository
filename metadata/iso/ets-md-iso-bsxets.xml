@@ -12,7 +12,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a></li></ul>]]></description>
 	<reference>../../inspire-md-bsxets.xq</reference>
-	<version>0.2.9</version>
+	<version>0.2.7</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-30T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
@@ -1272,8 +1272,6 @@ let $messages :=
 				local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
 			 else if (not($hasExpectedDate)) then
 				local:addMessage('TR.invalidDateForThesaurusGemet',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
-			 else if (string-length(normalize-space($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*/gmd:dateType/*/text())) = 0) then
-				local:addMessage('TR.emptyDateTypeCode',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
 			 else ()
 			)[position() le $limitErrors]
 		} catch * {
@@ -1288,7 +1286,6 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.noKeywordFromINSPIREThemes"/>
 										<translationTemplate ref="TR.invalidDateForThesaurusGemet"/>
-										<translationTemplate ref="TR.emptyDateTypeCode"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
