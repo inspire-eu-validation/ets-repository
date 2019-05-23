@@ -11,7 +11,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/interoperability
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119" target="_blank">Conformance Class 'INSPIRE Profile based on EN ISO 19115 and EN ISO 19119'</a></li></ul>]]></description>
 	<reference>../../inspire-md-bsxets.xq</reference>
-	<version>0.2.4</version>
+	<version>0.2.5</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-12-07T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
@@ -94,7 +94,7 @@ let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $crs := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString
+	 let $crs := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/*
 	 return
 	 if (not($crs)) then
 		local:addMessage('TR.noCoordinateReferenceSystem', map { 'filename': local:filename($record), 'id': $rid })
@@ -259,7 +259,7 @@ let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $codes := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode/@codeListValue
+	 let $codes := $record/gmd:identificationInfo/*/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode/@codeListValue
 	 return
 	 if (not($codes)) then
 		local:addMessage('TR.noSpatialRepresentationType', map { 'filename': local:filename($record), 'id': $rid })
