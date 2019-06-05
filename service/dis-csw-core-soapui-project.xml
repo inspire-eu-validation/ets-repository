@@ -150,46 +150,50 @@ def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCase
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
 
-// ServiceIdentification mandatory elements
-def serviceIdentification = capabilities.ServiceIdentification;
-if(serviceIdentification.size() != 1){
-	String[] assertParams = ['element', '/Capabilities/ServiceIdentification'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(serviceIdentification.Title.size() != 1){
-	String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Title'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(serviceIdentification.Abstract.size() != 1){
-	String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Abstract'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(serviceIdentification.Fees.size() == 0){
-	String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Fees'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-}
-if(serviceIdentification.AccessConstraints.size() == 0){
-	String[] assertParams = ['element', '/Capabilities/ServiceIdentification/AccessConstraints'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-}
+def scenario = testRunner.testCase.testSuite.project.getPropertyValue( "extended_capabilities_scenario").toInteger();
 
-// ServiceProvider mandatory elements
-def serviceProvider = capabilities.ServiceProvider;
-if(serviceProvider.size() != 1){
-	String[] assertParams = ['element', '/Capabilities/ServiceProvider'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(serviceProvider.ProviderName.size() != 1){
-	String[] assertParams = ['element', '/Capabilities/ServiceProvider/ProviderName'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(serviceProvider.ServiceContact.ContactInfo.Address.ElectronicMailAddress.size() != 1){
-	String[] assertParams = ['element', '/Capabilities/ServiceProvider/ServiceContact/ContactInfo/Address/ElectronicMailAddress'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(serviceProvider.role.size() != 1){
-	String[] assertParams = ['element', '/Capabilities/ServiceProvider/role'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+if(scenario == 2){
+	// ServiceIdentification mandatory elements
+	def serviceIdentification = capabilities.ServiceIdentification;
+	if(serviceIdentification.size() != 1){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(serviceIdentification.Title.size() != 1){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Title'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(serviceIdentification.Abstract.size() != 1){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Abstract'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(serviceIdentification.Fees.size() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Fees'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+	}
+	if(serviceIdentification.AccessConstraints.size() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/AccessConstraints'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+	}
+	
+	// ServiceProvider mandatory elements
+	def serviceProvider = capabilities.ServiceProvider;
+	if(serviceProvider.size() != 1){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(serviceProvider.ProviderName.size() != 1){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ProviderName'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(serviceProvider.ServiceContact.ContactInfo.Address.ElectronicMailAddress.size() != 1){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ServiceContact/ContactInfo/Address/ElectronicMailAddress'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(serviceProvider.role.size() != 1){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/role'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
 }
 </script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="88ca47a3-a58d-4e0f-848f-392faf695f07" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at-12-discover-resource-matching-query" searchProperties="true"><con:description><![CDATA[<p>Test that the Discover Metadata response contains at least the INSPIRE metadata elements.</p>
 <p>More information: <a href="https://github.com/inspire-eu-validation/discovery-service/blob/review-ats-csw-3.1/csw-iso-ap/at-12-discover-resource-matching-query.md" target="_blank">Discover Resource Matching Query</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="26403505-df57-44d1-9719-27d8633db877"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>c2bf56ae-2544-4b9d-9fdf-28654aa6111f</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-getrecords" id="9a580e6c-4634-453e-93f0-6635cfa94ddb"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="9b082eb2-2684-4b13-8895-788780c3f8a0" name="http-getrecords" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#getrecords_endpoint}</con:endpoint><con:request/><con:assertion type="Response SLA Assertion" id="fc15edb2-9b9d-4678-a757-7a8b55ffe455" name="Response SLA"><con:configuration><SLA>6000000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" id="60a2a91d-2a2d-446a-9390-e3377162b38d" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="OwsExceptionReportAssertion" id="7928c5bd-4e32-45d2-8168-b12ff0990eec" name="Fail if service returns OWS Exception Report"/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter required="false" disableUrlEncoding="false"><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter required="false" disableUrlEncoding="false"><con:name>request</con:name><con:value>GetRecords</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter required="false" disableUrlEncoding="false"><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter required="false" disableUrlEncoding="false"><con:name>typeNames</con:name><con:value>csw:Record</con:value><con:style>QUERY</con:style><con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>resultType</con:name><con:value>results</con:value><con:style>QUERY</con:style><con:default>results</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>outputFormat</con:name><con:value>application/xml</con:value><con:style>QUERY</con:style><con:default>application/xml</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>outputSchema</con:name><con:value>http://www.isotc211.org/2005/gmd</con:value><con:style>QUERY</con:style><con:default>http://www.isotc211.org/2005/gmd</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>elementSetName</con:name><con:value>full</con:value><con:style>QUERY</con:style><con:default>full</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>maxRecords</con:name><con:value>1000</con:value><con:style>QUERY</con:style><con:default>20</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="check-getrecords-response" id="afad2ab5-2aa3-4b20-82a6-5861f1dc07ce"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
@@ -489,4 +493,4 @@ a.exists(
   '//zzzz',
   'TR.manual.testManual32'
 );
-</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style><con:default>${#Project#version}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value/></con:property><con:property><con:name>service</con:name><con:value>CSW</con:value></con:property><con:property><con:name>version</con:name><con:value>2.0.2</con:value></con:property><con:property><con:name>extended_capabilities_scenario</con:name><con:value>1</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value/></con:property><con:property><con:name>getrecords_endpoint</con:name><con:value/></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, extended_capabilities_scenario, lastServiceEndpoint, getrecords_endpoint, authUser, authPwd, authMethod</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EID0861e71d-bb54-4fa2-8d32-816b41531da3</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EID6f004d02-ca77-4a67-99a4-62515725a573</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EID4b0fb35d-10f0-47df-bc0b-6d4548035ae2</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2019-05-02T10:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-05-30T13:30:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.0.4</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/discovery-service</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
+</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style><con:default>${#Project#version}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value/></con:property><con:property><con:name>service</con:name><con:value>CSW</con:value></con:property><con:property><con:name>version</con:name><con:value>2.0.2</con:value></con:property><con:property><con:name>extended_capabilities_scenario</con:name><con:value>1</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value/></con:property><con:property><con:name>getrecords_endpoint</con:name><con:value/></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, version, extended_capabilities_scenario, lastServiceEndpoint, getrecords_endpoint, authUser, authPwd, authMethod</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EID0861e71d-bb54-4fa2-8d32-816b41531da3</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EID6f004d02-ca77-4a67-99a4-62515725a573</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EID4b0fb35d-10f0-47df-bc0b-6d4548035ae2</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2019-05-02T10:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2019-06-05T18:30:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.1.0</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/discovery-service</con:value></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
