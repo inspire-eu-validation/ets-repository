@@ -87,8 +87,6 @@ Inspect the data set metadata whether metadata describing the coordinate referen
 									<parent ref="EID8f1b8fb1-1ddb-4ecf-8dbc-b0d33fe9ffcf"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $crsuris := (
-'http://www.opengis.net/def/crs/EPSG/0/4936', 'http://www.opengis.net/def/crs/EPSG/0/4937', 'http://www.opengis.net/def/crs/EPSG/0/4258', 'http://www.opengis.net/def/crs/EPSG/0/3035', 'http://www.opengis.net/def/crs/EPSG/0/3034', 'http://www.opengis.net/def/crs/EPSG/0/3038', 'http://www.opengis.net/def/crs/EPSG/0/3039', 'http://www.opengis.net/def/crs/EPSG/0/3040', 'http://www.opengis.net/def/crs/EPSG/0/3041', 'http://www.opengis.net/def/crs/EPSG/0/3042', 'http://www.opengis.net/def/crs/EPSG/0/3043', 'http://www.opengis.net/def/crs/EPSG/0/3044', 'http://www.opengis.net/def/crs/EPSG/0/3045', 'http://www.opengis.net/def/crs/EPSG/0/3046', 'http://www.opengis.net/def/crs/EPSG/0/3047', 'http://www.opengis.net/def/crs/EPSG/0/3048', 'http://www.opengis.net/def/crs/EPSG/0/3049', 'http://www.opengis.net/def/crs/EPSG/0/3050', 'http://www.opengis.net/def/crs/EPSG/0/3051', 'http://www.opengis.net/def/crs/EPSG/0/5730', 'http://www.opengis.net/def/crs/EPSG/0/7409')
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
@@ -98,8 +96,6 @@ let $messages :=
 	 return
 	 if (not($crs)) then
 		local:addMessage('TR.noCoordinateReferenceSystem', map { 'filename': local:filename($record), 'id': $rid })
-	 else if (not($crs=$crsuris)) then
-		local:addMessage('TR.unknownCRS3', map { 'filename': local:filename($record), 'id': $rid, 'crs': string-join($crs, ',') })
 	 else ()
 	)[position() le $limitErrors]
 return
@@ -110,7 +106,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noCoordinateReferenceSystem"/>
-										<translationTemplate ref="TR.unknownCRS3"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
