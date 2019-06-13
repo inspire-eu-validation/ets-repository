@@ -7,7 +7,7 @@
 	<localPath>/auto</localPath>
 	<label>Conformance Class 1: INSPIRE data sets and data set series baseline metadata.</label>
 	<description>
-		<![CDATA[<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
+		<![CDATA[<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
 Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
 There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/README#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.
 <br/><br/>
@@ -143,26 +143,37 @@ $messages)
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $levels := ('dataset', 'series')
-let $distinctRecordIdentifiers :=   
-    for $rec in $records
-    return
-    distinct-values($rec/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*/text())
+let $allIdent := 
+	for $rec in $records
+		for $x in $rec/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*
+		return
+		if($x/node-name() = QName('http://www.isotc211.org/2005/gco','gco:CharacterString')) then $x/text()
+		else if ($x/node-name() = QName('http://www.isotc211.org/2005/gmx','gmx:Anchor')) then $x/@xlink:href
+		else ()
+let $distinctRecordIdentifiers := distinct-values($allIdent)
 let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($distinctRecordIdentifiers,.)[2]]
 let $messages :=    
     (for $record in $records
         let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
         let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code
+		let $emptyIdentifiers :=
+			for $identifier in $identifiers
+            return
+			if (not($identifier)) then
+				$identifier
+			else if ($identifier/gco:CharacterString and not($identifier/gco:CharacterString/node())) then
+				$identifier
+			else if ($identifier/gmx:Anchor and string-length($identifier/gmx:Anchor/@xlink:href) = 0) then
+                $identifier
+            else ()
         return
         if (not($identifiers)) then
             local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($emptyIdentifiers) != 0) then
+			local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
 		else if(count($distinctRecordIdentifiers) != count($identifiers)) then
-            local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': fn:string-join($identifiers/*/text(),'; ') })
-        else
-            for $identifier in $identifiers
-            return
-			if (not($identifier) or not($identifier/gco:CharacterString/node() or $identifier/gmx:Anchor/node())) then
-                local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-            else ()
+            local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': fn:string-join($allIdent,'; ') })
+        else ()
     )[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -228,15 +239,31 @@ return
 									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages := 	
+let $regex_integer := '(^\d{1,40}$)'
+let $regex_float := '^-?\d+\.\d{2,}'
+let $messages :=
 	(for $record in $records
 		let $countResolutions := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution)
 		let $countScale := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale)
 		let $countDistance := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance)
+		let $invalidScale :=
+			for $x in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer
+			return
+			if(matches($x/text(), $regex_integer)) then ()
+			else $x
+		let $invalidDistance :=
+			for $x in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance
+			return
+			if(matches($x/text(), $regex_float)) then ()
+			else $x
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
 		if (($countResolutions &gt; 0) and ($countScale = 0) and ($countDistance = 0)) then
 			local:addMessage('TR.noResolutions', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($invalidScale) != 0) then
+			local:addMessage('TR.invalidScale', map { 'filename': local:filename($record), 'id': $rid, 'invalid': fn:string-join($invalidScale,'; ')})
+		else if(count($invalidDistance) != 0) then
+			local:addMessage('TR.invalidDistance', map { 'filename': local:filename($record), 'id': $rid, 'invalid': fn:string-join($invalidDistance,'; ')})
 		else
 			for $spatialResolution in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution
 			return
@@ -273,11 +300,12 @@ let $messages :=
 			local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
 		else 		
 			let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
+			let $wrongCodeList := $languageCodes/@codeList[not(. = 'http://www.loc.gov/standards/iso639-2/')]
 			return
 			if ($wrongCodeValues) then
 				local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-			else if(not($languageCodes/@codeList = 'http://www.loc.gov/standards/iso639-2/')) then
-				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+			else if($wrongCodeList) then
+				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/'})
 			else ()     	
 	)[position() le $limitErrors]
 return
@@ -290,6 +318,7 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.noLanguageCode"/>
 										<translationTemplate ref="TR.invalidLanguageCode"/>
+										<translationTemplate ref="TR.wrongCodeList_Param"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDae4bda0e-1dec-4e66-97b8-d4c43b66d2b8">
@@ -351,17 +380,17 @@ $messages)
 									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $regex_url := '(http://|https://|ftp://)([a-z0-9]{1})((\.[a-z0-9-])|([a-z0-9-]))*\.([a-z0-9-]{1,4})(/?)'
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
 		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource
 			let $url := $onLine/gmd:linkage/gmd:URL
-			let $valid_url := try { local:check-resource-uri($url, 30, false()) } catch * { false() }
 			return
 			if (not($url/node())) then
 				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
-			else if ($valid_url = 'notHTTP' or contains($valid_url, 'EXCEPTION')) then
+			else if (not(matches($url/text(), $regex_url))) then
 					local:addMessage('TR.invalidURL', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 	)[position() le $limitErrors]
@@ -414,12 +443,12 @@ return
 								</TestAssertion>
 								<TestAssertion id="EID8f663265-32b8-4c99-8997-2d40f6ce5b93">
 									<label>md datasets-and-series 1.10: Dataset Conformity</label>
-									<description><![CDATA[<p>Test that the metadata includes information on the degree of conformity with the implementing rules on interoperability of spatial data sets.</p>
+									<description><![CDATA[<p>Test that the metadata contains a citation of the implementing rules on interoperability of spatial data sets (Regulation 1089/2010).</p>
 									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/conformity" target="_blank">Dataset Conformity</a></p>
-									<p>To fulfill this requirement, the evaluated metadata dataset shall be compliant with the following common requirements of the Technical Guide:</p>
-									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity" target="_blank"> Common ATS (C.20): 'Dataset conformity'</a></p>
-									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-specification" target="_blank"> Common ATS (C.21): 'Dataset conformity'</a></p>
-									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-degree" target="_blank"> Common ATS (C.22): 'Conformity degree '</a></p>						
+									<p>To fulfill this requirement, the evaluated metadata dataset shall be encoded according to the following common requirements of the Technical Guide:</p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity" target="_blank"> Common ATS (C.20): 'Dataset Conformity'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-specification" target="_blank"> Common ATS (C.21): 'Dataset Conformity Specifications'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-degree" target="_blank"> Common ATS (C.22): 'Conformity Degree '</a></p>						
 									]]></description>
 									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
@@ -446,7 +475,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.noConformityStatement"/>
-										<translationTemplate ref="TR.wrongNumberOfSpecification"/>
+										<translationTemplate ref="TR.wrongNumberOfSpecificationForPurpose"/>
 										<translationTemplate ref="TR.declareNoConformityBoolean"/>
 										<translationTemplate ref="TR.declareNoConformityEvaluationAsUnknown"/>
 										<translationTemplate ref="TR.noTitleForSpecification"/>
