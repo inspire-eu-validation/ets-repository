@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID47c569bc-677d-4ce3-8411-e2b29189332a" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID47c569bc-677d-4ce3-8411-e2b29189332a" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
 	<itemHash>bQ==</itemHash>
 	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data-au/au-gml</remoteResource>
 	<localPath>/auto</localPath>
 	<label>Conformance class: GML application schemas, Administrative Units</label>
 	<description><![CDATA[This test suite examines the GML encoding of spatial objects specified in the INSPIRE GML application schemas 'Administrative Units - Administrative Units' and 'Administrative Units - Maritime Units'. Both currently approved GML application schema versions (3.0 and 4.0) are tested. For martime units only version 3.0 is an approved version (but is aligned with the other version 4.0 schemas, not the 3.0 schemas).<br/><br/>
-<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/interactive-instruments/ets-repository/issues" target="_blank">in GitHub</a>.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
 Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/3.1/au-gml" target="_blank">Conformance Class 'GML application schemas, Administrative Units'</a><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-gml" target="_blank">Conformance Class 'GML application schemas, Administrative Units'</a><br/><br/>
 Pre-requisite conformance classes:
-<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/3.0rc3/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 	<author>PwC</author>
 	<creationDate>2016-10-24T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
@@ -62,11 +62,11 @@ Pre-requisite conformance classes:
 								<TestAssertion id="EIDe2573fbe-782a-4f96-bee6-651d134a1bd4">
 									<label>au-gml.a.1: Administrative Unit feature in dataset</label>
 									<description><![CDATA[Check that the set of features in the spatial data set is not empty.<br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/3.1/au-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_AU_v3.1.pdf">INSPIRE Data Specification on Administrative Units, A.1.1, (A.6.1)</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_AU_v3.1.pdf">INSPIRE Data Specification on Administrative Units, A.1.1, (A.6.1)</a>]]></description>
 									<parent ref="EIDd21eedfd-dadb-469a-b8b3-878605550d20"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresFromAppSchema := $features[self::*:AdministrativeBoundary | self::*:AdministrativeUnit | self::*:Condominium | self::*:Baseline | self::*:MaritimeBoundary | self::*:MaritimeZone]
+let $featuresFromAppSchema := $features[descendant-or-self::*:AdministrativeBoundary | descendant-or-self::*:AdministrativeUnit | descendant-or-self::*:Condominium | descendant-or-self::*:Baseline | descendant-or-self::*:MaritimeBoundary | descendant-or-self::*:MaritimeZone]
 return
  (if ($featuresFromAppSchema) then 'PASSED' else 'FAILED',
   if (not($featuresFromAppSchema)) then local:addMessage('TR.noFeature', map { 'theme': 'Administrative Units' }) else ())
