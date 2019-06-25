@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite 
+	xmlns="http://www.interactive-instruments.de/etf/2.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDe4a95862-9cc9-436b-9fdd-a0115d342350" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/metadata/2.0</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance Class 1: INSPIRE data sets and data set series baseline metadata.</label>
+	<description>
+		<![CDATA[<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/issues" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
+There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/README#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.
+<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series" target="_blank">Conformance Class 1: 'Baseline metadata for data sets and data set series'</a><br/><br/>
+Pre-requisite conformance classes: Common Requirements]]>
+	</description>
+	<reference>../../../inspire-md-bsxets.xq</reference>
+		<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2018-06-30T00:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2018-08-30T20:45:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for metadata XML test objects">
+		<!-- TODO clean up, currently disabled due to open issues with schema validation
+		<parameter name="encoding" required="false"><defaultValue>CSW ISO AP 1.0.0</defaultValue><description ref="TR.metadataEncoding"/><allowedValues>^(CSW ISO AP 1\.0\.0|ISO/TS 19139)$</allowedValues><type>string</type></parameter><parameter name="Schema_file" required="false"><description ref="TR.metadataSchema"/><allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)?$</allowedValues><type>string</type></parameter>
+		-->
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID59692c11-df86-49ad-be7f-94a1e1ddd8da"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EIDfdc858d9-6a37-4dad-b74b-43b53a8b38dd">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDe4a95862-9cc9-436b-9fdd-a0115d342350"/>
+			<testCases>
+				<TestCase id="EIDf6fb6d58-03ec-432f-a456-984d093721e4">
+					<label>General Metadata</label>
+					<description>Execute tests that apply for all dataset / dataset series metadata records on elements that are directly child elements of the root node of the XML document: MD_Metadata node.
+					</description>
+					<parent ref="EIDfdc858d9-6a37-4dad-b74b-43b53a8b38dd"/>
+					<testSteps>
+						<TestStep id="EIDf3615b88-9451-4105-aa85-592897e0ff62">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDf6fb6d58-03ec-432f-a456-984d093721e4"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID9f5d8bbf-59d3-4278-82d3-c9df32d8f42d">
+									<label>md datasets-and-series 1.1: Resource Type</label>
+									<description><![CDATA[<p>Test that a resource type is provided as a dataset or series.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/resource-type" target="_blank">Resource Type</a></p>]]></description>
+									<parent ref="EIDf3615b88-9451-4105-aa85-592897e0ff62"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $values := ('dataset', 'series')
+let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $values)][position() le $limitErrors]
+return
+(if ($recordsWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count($recordsWithErrors)),
+ for $record in $recordsWithErrors
+   let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+   order by $rid
+   let $levels := $record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue
+   return
+     local:addMessage('TR.hierarchyLevel', map { 'filename': local:filename($record), 'id': $rid, 'hierarchyLevels': fn:string-join($levels,', ') })
+)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.hierarchyLevel"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID979c19da-48f9-416d-b751-37ef13912bc6">
+					<label>Identification</label>
+					<description>Execute tests that apply for all dataset / dataset series metadata records on elements that are child elements of the section of the XML document: Identification Info (property of the gmd:MD_Metadata element). This section contains information specific to the dataset / dataset series.</description>
+					<parent ref="EIDfdc858d9-6a37-4dad-b74b-43b53a8b38dd"/>
+					<testSteps>
+						<TestStep id="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+							<testAssertions>
+								<TestAssertion id="EIDfeb08775-3d07-4849-bd27-3a549c92d289">
+									<label>md datasets-and-series 1.2: Only One Data Identification</label>
+									<description><![CDATA[<p>Test that the identification info section of the metadata for data sets and data set series is provided correctly.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/only-one-md-data-identification" target="_blank">Only One Data Identification</a></p>]]></description>
+									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := (
+	for $record in $records
+	let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+	return
+	if(count($record/gmd:identificationInfo[1]/gmd:MD_DataIdentification) != 1) then
+		local:addMessage('TR.identificationInfo', map { 'filename': local:filename($record), 'id': $rid, 'identificationInfo': fn:string-join($record/gmd:identificationInfo[1]/gmd:MD_DataIdentification,', ') })
+	else ()
+)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.identificationInfo"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID06911d33-b5a3-4b76-b8ee-d473ebf3c8f4">
+									<label>md datasets-and-series 1.3: Dataset UID</label>
+									<description><![CDATA[<p>Test that every dataset or dataset series has an Unique Resource Identifier.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/dataset-uid" target="_blank">Dataset UID</a></p>]]></description>
+									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series')
+let $allIdent := 
+	for $rec in $records
+		for $x in $rec/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code/*
+		return
+		if($x/node-name() = QName('http://www.isotc211.org/2005/gco','gco:CharacterString')) then $x/text()
+		else if ($x/node-name() = QName('http://www.isotc211.org/2005/gmx','gmx:Anchor')) then $x/@xlink:href
+		else ()
+let $distinctRecordIdentifiers := distinct-values($allIdent)
+let $duplicateDistinctRecordIdentifiers := $distinctRecordIdentifiers[index-of($distinctRecordIdentifiers,.)[2]]
+let $messages :=    
+    (for $record in $records
+        let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+        let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code
+		let $emptyIdentifiers :=
+			for $identifier in $identifiers
+            return
+			if (not($identifier)) then
+				$identifier
+			else if ($identifier/gco:CharacterString and not($identifier/gco:CharacterString/node())) then
+				$identifier
+			else if ($identifier/gmx:Anchor and string-length($identifier/gmx:Anchor/@xlink:href) = 0) then
+                $identifier
+            else ()
+        return
+        if (not($identifiers)) then
+            local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($emptyIdentifiers) != 0) then
+			local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($distinctRecordIdentifiers) != count($identifiers)) then
+            local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': fn:string-join($allIdent,'; ') })
+        else ()
+    )[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noIdentifier"/>
+										<translationTemplate ref="TR.emptyIdentifier"/>
+										<translationTemplate ref="TR.duplicateIdentifier"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID84892cf0-e7db-4705-9b40-c27a856eacee">
+									<label>md datasets-and-series 1.4: INSPIRE Theme Keyword</label>
+									<description><![CDATA[<p>Test that the INSPIRE Data Themes, which the data belongs to, are declared using at least one keyword from the INSPIRE Spatial Data Themes vocabulary.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/inspire-theme-keyword" target="_blank">INSPIRE Theme Keyword</a></p>]]></description>
+									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series')
+let $THEMES_TITLE := 'GEMET - INSPIRE themes, version 1.0'
+let $messages :=
+	(try{
+		let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
+		let $inspireThemesCodeListURL := 'http://inspire.ec.europa.eu/theme'
+		let $codeTitles := local:get-code-titles($inspireThemesCodeListURL,$officialLanguages)
+		let $codeValues := local:get-code-list-values($inspireThemesCodeListURL)
+		let $codes := ($codeTitles,$codeValues)
+		for $record in $records
+			let $rid := $record/gmd:fileIdentifier/*/text()
+			let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords[gmd:thesaurusName/gmd:CI_Citation/gmd:title/*/text() = $THEMES_TITLE]
+			return
+			if (count($relevantDescriptiveKeywordsBlocks) = 0) then
+				local:addMessage('TR.wrongKeywordFromINSPIREThemesTitle', map { 'filename': local:filename($record), 'id': $rid })
+			else
+				if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
+					local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
+				else ()
+	} catch * {       						
+		local:addMessage('TR.systemError',  map { 'text': $err:description }) 				
+	}
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+																																				
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.systemError"/>
+										<translationTemplate ref="TR.wrongKeywordFromINSPIREThemesTitle"/>
+										<translationTemplate ref="TR.noKeywordFromINSPIREThemes"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID82a0442f-0185-4d6a-9b4e-0b7356613de7">
+									<label>md datasets-and-series 1.5: Spatial Resolution</label>
+									<description><![CDATA[<p>Test that the spatial resolution is defined using either an scale or a distance resolution.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/spatial-resolution" target="_blank">Spatial Resolution</a></p>]]></description>
+									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $regex_integer := '(^\d{1,40}$)'
+let $regex_float := '^-?\d+\.\d{2,}'
+let $messages :=
+	(for $record in $records
+		let $countResolutions := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution)
+		let $countScale := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale)
+		let $countDistance := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance)
+		let $invalidScale :=
+			for $x in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:equivalentScale/gmd:MD_RepresentativeFraction/gmd:denominator/gco:Integer
+			return
+			if(matches($x/text(), $regex_integer)) then ()
+			else $x
+		let $invalidDistance :=
+			for $x in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance
+			return
+			if(matches($x/text(), $regex_float)) then ()
+			else $x
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		return
+		if (($countResolutions &gt; 0) and ($countScale = 0) and ($countDistance = 0)) then
+			local:addMessage('TR.noResolutions', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($invalidScale) != 0) then
+			local:addMessage('TR.invalidScale', map { 'filename': local:filename($record), 'id': $rid, 'invalid': fn:string-join($invalidScale,'; ')})
+		else if(count($invalidDistance) != 0) then
+			local:addMessage('TR.invalidDistance', map { 'filename': local:filename($record), 'id': $rid, 'invalid': fn:string-join($invalidDistance,'; ')})
+		else
+			for $spatialResolution in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution
+			return
+			if (count($spatialResolution/gmd:MD_Resolution/gmd:equivalentScale) > 0 and count($spatialResolution/gmd:MD_Resolution/gmd:distance) > 0) then
+				local:addMessage('TR.mixedResolutions', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noResolutions"/>
+										<translationTemplate ref="TR.mixedResolutions"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID095d416e-3dfe-4936-83d4-71028e3d0c4c">
+									<label>md datasets-and-series 1.6: Resource Language</label>
+									<description><![CDATA[<p>Test that a resource language is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/resource-language" target="_blank">Resource Language</a></p>]]></description>
+									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codes := ('aar','abk','ace','ach','ada','ady','afa','afh','afr','ain','aka','akk','alb','ale','alg','alt','amh','ang','anp','apa','ara','arc','arg','arm','arn','arp','art','arw','asm','ast','ath','aus','ava','ave','awa','aym','aze','bad','bai','bak','bal','bam','ban','baq','bas','bat','bej','bel','bem','ben','ber','bho','bih','bik','bin','bis','bla','bnt','bos','bra','bre','btk','bua','bug','bul','bur','byn','cad','cai','car','cat','cau','ceb','cel','cha','chb','che','chg','chi','chk','chm','chn','cho','chp','chr','chu','chv','chy','cmc','cop','cor','cos','cpe','cpf','cpp','cre','crh','crp','csb','cus','cze','dak','dan','dar','day','del','den','dgr','din','div','doi','dra','dsb','dua','dum','dut','dyu','dzo','efi','egy','eka','elx','eng','enm','epo','est','ewe','ewo','fan','fao','fat','fij','fil','fin','fiu','fon','fre','frm','fro','frr','frs','fry','ful','fur','gaa','gay','gba','gem','geo','ger','gez','gil','gla','gle','glg','glv','gmh','goh','gon','gor','got','grb','grc','gre','grn','gsw','guj','gwi','hai','hat','hau','haw','heb','her','hil','him','hin','hit','hmn','hmo','hrv','hsb','hun','hup','iba','ibo','ice','ido','iii','ijo','iku','ile','ilo','ina','inc','ind','ine','inh','ipk','ira','iro','ita','jav','jbo','jpn','jpr','jrb','kaa','kab','kac','kal','kam','kan','kar','kas','kau','kaw','kaz','kbd','kha','khi','khm','kho','kik','kin','kir','kmb','kok','kom','kon','kor','kos','kpe','krc','krl','kro','kru','kua','kum','kur','kut','lad','lah','lam','lao','lat','lav','lez','lim','lin','lit','lol','loz','ltz','lua','lub','lug','lui','lun','luo','lus','mac','mad','mag','mah','mai','mak','mal','man','mao','map','mar','mas','may','mdf','mdr','men','mga','mic','min','mis','mkh','mlg','mlt','mnc','mni','mno','moh','mon','mos','mul','mun','mus','mwl','mwr','myn','myv','nah','nai','nap','nau','nav','nbl','nde','ndo','nds','nep','new','nia','nia','nic','niu','nno','nob','nog','non','nor','nqo','nso','nub','nwc','nya','nym','nyn','nyo','nzi','oci','oji','ori','orm','osa','oss','ota','oto','paa','pag','pal','pam','pan','pap','pau','peo','per','phi','phn','pli','pol','pon','por','pra','pro','pus','qaa-qtz','que','raj','rap','rar','roa','roh','rom','rum','run','rup','rus','sad','sag','sah','sai','sal','sam','san','sas','sat','scn','sco','sel','sem','sga','sgn','shn','sid','sin','sio','sit','sla','slo','slv','sma','sme','smi','smj','smn','smo','sms','sna','snd','snk','sog','som','son','sot','spa','srd','srn','srp','srr','ssa','ssw','suk','sun','sus','sux','swa','swe','syc','syr','tah','tai','tam','tat','tel','tem','ter','tet','tgk','tgl','tha','tib','tig','tir','tiv','tkl','tlh','tli','tmh','tog','ton','tpi','tsi','tsn','tso','tuk','tum','tup','tur','tut','tvl','twi','tyv','udm','uga','uig','ukr','umb','und','urd','uzb','vai','ven','vie','vol','vot','wak','wal','war','was','wel','wen','wln','wol','xal','xho','yao','yap','yid','yor','ypk','zap','zbl','zen','zha','znd','zul','zun','zxx','zza')
+let $messages :=    	
+	(for $record in $records    		 
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $languageCodes := $record/gmd:identificationInfo[1]/*/gmd:language/gmd:LanguageCode	 	 
+		return
+		if (not($languageCodes)) then
+			local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
+		else 		
+			let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
+			let $wrongCodeList := $languageCodes/@codeList[not(. = 'http://www.loc.gov/standards/iso639-2/')]
+			return
+			if ($wrongCodeValues) then
+				local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
+			else if($wrongCodeList) then
+				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/'})
+			else ()     	
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noLanguageCode"/>
+										<translationTemplate ref="TR.invalidLanguageCode"/>
+										<translationTemplate ref="TR.wrongCodeList_Param"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDae4bda0e-1dec-4e66-97b8-d4c43b66d2b8">
+									<label>md datasets-and-series 1.7: Topic Category</label>
+									<description><![CDATA[<p>Test that at least one Topic category describing the category of the resource is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/topic-category" target="_blank">Topic Category</a></p>]]></description>
+									<parent ref="EIDc0a43a9d-c2bc-4ea7-a8bb-8e966700f141"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codes := ('biota','boundaries','climatologyMeteorologyAtmosphere','economy','elevation','environment','farming','geoscientificInformation','health','imageryBaseMapsEarthCover','inlandWaters','intelligenceMilitary','location','oceans','planningCadastre','society','structure','transportation','utilitiesCommunication')
+let $messages :=    
+    (for $record in $records
+        let $rid := $record/gmd:fileIdentifier/*/text()
+		let $topicCategories := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:topicCategory
+        return
+		if (count($topicCategories) = 0) then
+            local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
+        else
+			for $topicCategory in $topicCategories
+			return
+			if(not($topicCategory/gmd:MD_TopicCategoryCode)) then
+            	local:addMessage('TR.noTopicCategory',  map { 'filename': local:filename($record), 'id': $rid})
+			else if (not($topicCategory/gmd:MD_TopicCategoryCode = $codes)) then
+                local:addMessage('TR.invalidTopicCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : $topicCategory/gmd:MD_TopicCategoryCode/text() })
+			else()
+    )[position() le $limitErrors] 
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noTopicCategory"/>
+										<translationTemplate ref="TR.invalidTopicCode"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID646900b2-9564-44b9-8576-cfcab22e3419">
+					<label>Distribution</label>
+					<description>Execute tests that apply for all dataset / dataset series metadata records on elements that are child elements of the section of the XML document: Distribution Information (property of the gmd:MD_Metadata element). This section contains information about who makes a resource available and how to get it.</description>
+					<parent ref="EIDfdc858d9-6a37-4dad-b74b-43b53a8b38dd"/>
+					<testSteps>
+						<TestStep id="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID646900b2-9564-44b9-8576-cfcab22e3419"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID4f536f56-3118-474e-81b4-c0e36344a70b">
+									<label>md datasets-and-series 1.8: Resource Locator</label>
+									<description><![CDATA[<p>Test if there is a resource or the url that points to a resource that provides additional information about the set data set or data set series.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/resource-locator" target="_blank">Resource Locator</a></p>]]></description>
+									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $regex_url := '(http://|https://|ftp://)([a-z0-9]{1})((\.[a-z0-9-])|([a-z0-9-]))*\.([a-z0-9-]{1,4})(/?)'
+let $messages := 	
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		return
+		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource
+			let $url := $onLine/gmd:linkage/gmd:URL
+			return
+			if (not($url/node())) then
+				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not(matches($url/text(), $regex_url))) then
+					local:addMessage('TR.invalidURL', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.linkageWithoutURL"/>
+										<translationTemplate ref="TR.invalidURL"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDc7ef6d4f-a03b-4797-85e2-3b4a49e0c5ff">
+									<label>md datasets-and-series 1.9: Data Quality Info Section</label>
+									<description><![CDATA[<p>Test that one citation of the product specification or user requirement against which data is being evaluated is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/one-data-quality-element" target="_blank">Data Quality Info Section</a></p>]]></description>
+									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages :=
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $dataQuality := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality
+		let $levels := ('dataset', 'series')
+		let $MD_ScopeCode := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode
+		return 	 
+		if (count($dataQuality) != 1) then
+			local:addMessage('TR.wrongNumberOfDataQuality', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($MD_ScopeCode/@codeListValue = $levels)) then
+			local:addMessage('TR.invalidCodeList', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($MD_ScopeCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode')) then
+			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.wrongNumberOfDataQuality"/>
+										<translationTemplate ref="TR.invalidCodeList"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID8f663265-32b8-4c99-8997-2d40f6ce5b93">
+									<label>md datasets-and-series 1.10: Dataset Conformity</label>
+									<description><![CDATA[<p>Test that the metadata contains a citation of the implementing rules on interoperability of spatial data sets (Regulation 1089/2010).</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/conformity" target="_blank">Dataset Conformity</a></p>
+									<p>To fulfill this requirement, the evaluated metadata dataset shall be encoded according to the following common requirements of the Technical Guide:</p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity" target="_blank"> Common ATS (C.20): 'Dataset Conformity'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-specification" target="_blank"> Common ATS (C.21): 'Dataset Conformity Specifications'</a></p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-degree" target="_blank"> Common ATS (C.22): 'Conformity Degree '</a></p>						
+									]]></description>
+									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $enum_files := ('enum_bul', 'enum_cze', 'enum_dan', 'enum_dut', 'enum_eng', 'enum_est', 'enum_est', 'enum_fre', 'enum_fre', 'enum_ger', 'enum_gle', 'enum_gre', 'enum_hun', 'enum_ita', 'enum_lav', 'enum_lit', 'enum_mlt', 'enum_pol', 'enum_por', 'enum_rum', 'enum_slo', 'enum_slv', 'enum_spa', 'enum_swe')
+let $conformityText := for $x in $enum_files
+	return fn:doc(concat('http://inspire.ec.europa.eu/schemas/common/1.0/enums/', $x, '.xsd'))/xs:schema/xs:complexType[starts-with(@name, 'citationInspireInteroperabilityRegulation')]/xs:complexContent/xs:restriction[@base = 'citationConformity']/xs:sequence/xs:element[@name = 'Title']/xs:simpleType/xs:restriction/xs:enumeration/@value
+let $conformityTextLower := for $x in $conformityText return normalize-space(lower-case($x))
+let $messages :=
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()[contains(.,'1089/2010')]
+		return
+		if ( not(normalize-space(lower-case($confResults)) = $conformityTextLower) ) then
+			local:addMessage('TR.wrongNumberOfSpecificationForPurpose', map { 'filename': local:filename($record), 'id': $rid })
+		else()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noConformityStatement"/>
+										<translationTemplate ref="TR.wrongNumberOfSpecificationForPurpose"/>
+										<translationTemplate ref="TR.declareNoConformityBoolean"/>
+										<translationTemplate ref="TR.declareNoConformityEvaluationAsUnknown"/>
+										<translationTemplate ref="TR.noTitleForSpecification"/>
+										<translationTemplate ref="TR.noDateForSpecification"/>
+										<translationTemplate ref="TR.invalidDateFormat"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID366b8ce9-9a73-47b8-96da-3d24166a0f3f">
+									<label>md datasets-and-series 1.11: Lineage</label>
+									<description><![CDATA[<p>Test that exactly one explanation about the lineage of a dataset is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-series/lineage" target="_blank">Lineage</a></p>]]></description>
+									<parent ref="EID4f629a5e-74a4-4bc6-ac35-a0bca04687ef"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages :=    
+    (for $record in $records
+        let $rid := $record/gmd:fileIdentifier/*/text()
+		let $lineageStatement := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:lineage/gmd:LI_Lineage/gmd:statement
+        return   
+        if (count($lineageStatement) != 1) then
+            local:addMessage('TR.wrongNumberOfLineageStatements',  map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($lineageStatement)) })
+        else if (not($lineageStatement) or not($lineageStatement/gco:CharacterString/node() or $lineageStatement/gmx:Anchor/node())) then
+            local:addMessage('TR.emptyLineageStatement',  map { 'filename': local:filename($record), 'id': $rid })
+        else ()         
+    )[position() le $limitErrors] 
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.wrongNumberOfLineageStatements"/>
+										<translationTemplate ref="TR.emptyLineageStatement"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>

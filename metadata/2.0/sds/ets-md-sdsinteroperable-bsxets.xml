@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite 
+	xmlns="http://www.interactive-instruments.de/etf/2.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID7514777a-6cb8-499c-acd5-912496dc84e9" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/metadata/2.0</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance Class 6: INSPIRE Interoperable Spatial Data Services metadata.</label>
+	<description>
+		<![CDATA[This test suite examines metadata records against the requirements for metadata in INSPIRE.<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/issues" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
+There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="https://github.com/inspire-eu-validation/metadata/blob/2.0/common/README.md#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.
+<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-interoperable" target="_blank">Conformance Class 5'INSPIRE Interoperable Spatial Data Services metadata'</a><br/><br/>
+Pre-requisite conformance classes: Conformance Class 5]]>
+	</description>
+	<reference>../../../inspire-md-bsxets.xq</reference>
+		<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2018-06-30T00:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2018-08-30T20:45:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for metadata XML test objects">
+		<!-- TODO clean up, currently disabled due to open issues with schema validation
+		<parameter name="encoding" required="false"><defaultValue>CSW ISO AP 1.0.0</defaultValue><description ref="TR.metadataEncoding"/><allowedValues>^(CSW ISO AP 1\.0\.0|ISO/TS 19139)$</allowedValues><type>string</type></parameter><parameter name="Schema_file" required="false"><description ref="TR.metadataSchema"/><allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)?$</allowedValues><type>string</type></parameter>
+		-->
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID8db54d8a-8578-4959-b891-5394d9f53a28"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID21c1bf4e-c9c6-4949-a92b-90ea20efd5b3">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID7514777a-6cb8-499c-acd5-912496dc84e9"/>
+			<testCases>
+				<TestCase id="EID5ea9439a-53f7-400f-9e6f-396ceff02331">
+					<label>General Metadata</label>
+					<description>Execute tests that apply for interopable services metadata records on elements that 
+					are directly child elements of the root node of the XML document: MD_Metadata node.</description>
+					<parent ref="EID21c1bf4e-c9c6-4949-a92b-90ea20efd5b3"/>
+					<testSteps>
+						<TestStep id="EID219d679e-ce9f-4313-a133-97ff99eb02ea">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5ea9439a-53f7-400f-9e6f-396ceff02331"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID00e056d5-d432-44b3-80a8-eb29dab5a588">
+									<label>md sds-interoperable 6.1: Coordinate Reference System element</label>
+									<description>
+									<![CDATA[<p>Test that the coordinate reference system identifiers are provided.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-interoperable/crs" target="_blank">Coordinates Reference System</a></p>]]>									
+									</description>
+									<parent ref="EID1caa9aef-495c-4578-8f7a-3f94c01e902a"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages :=  	
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $crsIdentifiers := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier
+
+		return 	 				
+		if (count($crsIdentifiers) = 0)  then
+			local:addMessage('TR.noCrsIdentifier', map { 'filename': local:filename($record), 'id': $rid })
+		else 						
+			for $crs in $crsIdentifiers
+				let $code := $crs/gmd:code
+				let $codeSpace := $crs/gmd:codeSpace
+	 			return 	 	 								
+				if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
+					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
+				else if ($codeSpace and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
+					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code/*/text() })
+				else () 		
+			
+	)[position() le $limitErrors] 
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  </expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noCrsIdentifier"/>
+										<translationTemplate ref="TR.noCrsCode"/>
+										<translationTemplate ref="TR.noCrsCodeSpace"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDaa4ba296-118f-41f2-bf3b-044f74dba5a7">
+									<label>md sds-interoperable 6.2: Coordinate Reference System Identifier</label>
+									<description>
+									<![CDATA[<p>Test that the default coordinate reference systems use a correct identifier.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-interoperable/crs-http-uris" target="_blank">Coordinates Reference Systems HTTP URIs</a></p>]]>									
+									</description>
+									<parent ref="EID1caa9aef-495c-4578-8f7a-3f94c01e902a"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $urlOpengis := 'http://www.opengis.net/def/crs/EPSG/0/'
+let $epsgCodes := ('4936','4937','4258','3035','3034','3038','3039','3040','3041','3042','3043','3044','3045','3046','3047','3048','3049','3050','3051','5730','5861','5715','7409')
+let $httpURIIdentifier :=
+	for $x in $epsgCodes
+	return
+	concat($urlOpengis, $x)
+let $messages :=  	
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $crsIdentifiers := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier
+		return
+			for $crs in $crsIdentifiers
+				let $code := $crs/gmd:code
+				let $codeSpace := $crs/gmd:codeSpace
+				let $codeNumberOpt1 := fn:substring($code/gco:CharacterString, fn:string-length($code/gco:CharacterString)-4+1)
+				let $codeNumberOpt2 := fn:substring($code/gmx:Anchor/@xlink:href, fn:string-length($code/gmx:Anchor/@xlink:href)-4+1)
+	 			return
+				if ($codeNumberOpt1 = $epsgCodes or $codeNumberOpt2 = $epsgCodes) then
+					if (not($code[gco:CharacterString = $httpURIIdentifier] or $code[gmx:Anchor/@xlink:href = $httpURIIdentifier])) then
+						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
+					else if($codeSpace) then
+						local:addMessage('TR.invalidCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
+					else ()
+				else ()
+	)[position() le $limitErrors] 
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  </expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noCrsIdentifier"/>
+										<translationTemplate ref="TR.noCrsCode"/>
+										<translationTemplate ref="TR.invalidCrsCode"/>
+										<translationTemplate ref="TR.noCrsCodeSpace"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID54774049-23c6-47db-bae8-0b795eb1ec0c">
+					<label>Identification</label>
+					<description>Execute tests that apply for interoperable metadata records on elements that are 
+					child elements of the section of the XML document: Identification Info (property of the 
+					gmd:MD_Metadata element). This section contains information specific to the interoperable services.</description>
+					<parent ref="EID86ef2bf7-382d-44b0-903b-3ae781275324"/>
+					<testSteps>
+						<TestStep id="EIDa1bc4e19-0130-4311-8039-03b7cb8fa0b0">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID54774049-23c6-47db-bae8-0b795eb1ec0c"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID83408921-66bc-41b7-b2e9-e27a222a411e">
+									<label>md sds-interoperable 6.3: Conditions Applying to Access and Use</label>
+									<description><![CDATA[<p>Test that the technical restrictions of access and use of an interoperable spatial data service are specified in the metadata.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-interoperable/conditions-applying-to-access-and-use" target="_blank">Conditions Applying to Access and Use</a></p>
+									<p>To fulfill this requirement, the evaluated metadata dataset shall be compliant with the following common requirements of the Technical Guide:</p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conditions-for-access-and-use" target="_blank"> Common ATS (C.18): 'Conditions for Access and Use'</a></p>					
+									]]>
+									</description>
+									<parent ref="EIDa1bc4e19-0130-4311-8039-03b7cb8fa0b0"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $legalConstraints := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:resourceConstraints/gmd:MD_LegalConstraints
+
+		return
+		if ( count($legalConstraints) = 0 ) then
+			local:addMessage('TR.noLegalConstraints', map { 'filename': local:filename($record), 'id': $rid })
+		else()
+
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  </expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noLegalConstraints"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID370682d6-0401-44d7-a2a5-4f7e76f85eb8">
+									<label>md sds-interoperable 6.4: Responsible Party</label>
+									<description><![CDATA[<p>Test that the interoperable spatial data service metadata contains information about the responsible party in the role of the custodian.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-interoperable/responsible-party" target="_blank">Responsible Party</a></p>
+									<p>To fulfill this requirement, the evaluated metadata dataset shall be compliant with the following common requirements of the Technical Guide:</p>
+									<p><a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/responsible-organisation" target="_blank"> Common ATS (C.10): 'Responsible Organization'</a></p>					
+									]]>
+									</description>
+									<parent ref="EIDa1bc4e19-0130-4311-8039-03b7cb8fa0b0"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages :=  	
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $party := 
+			for $x in $record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+			where $x/gmd:role/gmd:CI_RoleCode/@codeListValue = 'custodian'
+			return $x
+		return 	 						
+		if (count($party) = 0)  then
+			local:addMessage('TR.noParty', map { 'filename': local:filename($record), 'id': $rid })
+		else 									
+			for $part in $party
+				let $role := $part/gmd:role/gmd:CI_RoleCode
+				let $codeList := $part/gmd:role/gmd:CI_RoleCode/@codeList
+				let $codeListValue := $part/gmd:role/gmd:CI_RoleCode/@codeListValue
+
+	 			return 	 	 												 
+				if (not($role)) then
+					local:addMessage('TR.noRoleElement',  map { 'filename': local:filename($record), 'id': $rid })
+				else if ( not($codeList='http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode') ) then
+					local:addMessage('TR.invalidRoleCodeList',  map { 'filename': local:filename($record), 'id': $rid })
+				else if (not($codeListValue='custodian')) then
+					local:addMessage('TR.invalidRoleCodeListValue',  map { 'filename': local:filename($record), 'id': $rid })
+				else () 					
+	)[position() le $limitErrors] 
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  </expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noParty"/>
+										<translationTemplate ref="TR.noRoleElement"/>
+										<translationTemplate ref="TR.invalidRoleCodeList"/>
+										<translationTemplate ref="TR.invalidRoleCodeListValue"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EIDb2a3894a-9fa6-4ff2-85ed-294ff6cc9357">
+					<label>Data Quality</label>
+					<description>Execute tests that apply for harmonised services metadata records on elements that 
+					are child elements of the section of the XML document: Data Quality Information 
+					(property of the gmd:MD_Metadata element). This section contains information specific to the quality and lineage 
+					(including processing steps and sources) of the resource.</description>
+					<parent ref="EID86ef2bf7-382d-44b0-903b-3ae781275324"/>
+					<testSteps>
+						<TestStep id="EIDcf62bbea-3e2c-407b-8e4e-41c5b2fed4b3">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDb2a3894a-9fa6-4ff2-85ed-294ff6cc9357"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID28d2116f-1933-480d-9c19-c5e1abc82f5a">
+									<label>md sds-interoperable 6.5: Minimum estimated Quality of Service</label>
+									<description><![CDATA[<p>Test that Quality of Service is provided correctly.</p>
+                                    <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-interoperable/quality-of-service" target="_blank">Quality of Service</a></p>
+									]]>
+									</description>
+									<parent ref="EIDcf62bbea-3e2c-407b-8e4e-41c5b2fed4b3"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages :=  
+	(for $record in $records
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $results := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_ConceptualConsistency
+
+		return 	 
+		if (count($results) &lt; 3) then
+			local:addMessage('TR.wrongQualityCriteriaMultiplicity', map { 'filename': local:filename($record), 'id': $rid,  'count': count($results)})
+		else 	
+			for $result in $results
+				let $measureName := $result/gmd:nameOfMeasure
+				let $measureNameAnchor := $result/gmd:nameOfMeasure/gmx:Anchor/@xlink:href
+				let $validation1 := $result[(./gmd:nameOfMeasure/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/QualityOfServiceCriteriaCode/availability') and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/@xsi:type = ('xs:double','xsi:double')) and (data(./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record) &gt;= 0) and (data(./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record) &lt;= 100) and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/@xlink:href = 'urn:ogc:def:uom:OGC::percent')]
+				let $validation2 := $result[(./gmd:nameOfMeasure/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/QualityOfServiceCriteriaCode/performance') and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/@xsi:type = ('xs:double','xsi:double')) and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/@xlink:href = 'http://www.opengis.net/def/uom/SI/second')]
+				let $validation3 := $result[(./gmd:nameOfMeasure/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/QualityOfServiceCriteriaCode/capacity') and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/@xsi:type = ('xs:integer','xsi:integer')) and (./gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/@xlink:href = 'http://www.opengis.net/def/uom/OGC/1.0/unity')]
+
+				let $measureDescription := $result/gmd:measureDescription
+
+				let $quantitativeResult := $result/gmd:result/gmd:DQ_QuantitativeResult
+
+				let $valueUnit := $result/gmd:result/gmd:DQ_QuantitativeResult/gmd:valueUnit/@xlink:href
+				let $valueRecord := $result/gmd:result/gmd:DQ_QuantitativeResult/gmd:value/gco:Record/@xsi:type
+
+				return
+				if (not($measureName)) then
+					local:addMessage('TR.noMeasureName', map { 'filename': local:filename($record), 'id': $rid })
+				else if (not($measureNameAnchor)) then
+					local:addMessage('TR.noMeasureNameAnchor', map { 'filename': local:filename($record), 'id': $rid })
+				else if (not(($validation1) or ($validation2) or ($validation3))) then
+					local:addMessage('TR.invalidQualityCriteria', map { 'filename': local:filename($record), 'id': $rid })		
+				else if (not($measureDescription) or not($measureDescription/gco:CharacterString/node() or $measureDescription/gmx:Anchor/node())) then
+					local:addMessage('TR.noMeasureDescription', map { 'filename': local:filename($record), 'id': $rid })
+				else if (not($quantitativeResult)) then
+					local:addMessage('TR.noQuantitativeResult', map { 'filename': local:filename($record), 'id': $rid })
+				else if (not($valueUnit)) then
+					local:addMessage('TR.noValueUnit', map { 'filename': local:filename($record), 'id': $rid })
+				else if (not($valueRecord)) then
+					local:addMessage('TR.noValueRecord', map { 'filename': local:filename($record), 'id': $rid })	
+				else () 		
+	)[position() le $limitErrors] 
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  </expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.wrongQualityCriteriaMultiplicity"/>
+										<translationTemplate ref="TR.noMeasureName"/>
+										<translationTemplate ref="TR.noMeasureDescription"/>
+										<translationTemplate ref="TR.noQuantitativeResult"/>
+										<translationTemplate ref="TR.noMeasureNameAnchor"/>
+										<translationTemplate ref="TR.noValueUnit"/>
+										<translationTemplate ref="TR.noValueRecord"/>
+										<translationTemplate ref="TR.invalidQualityCriteria"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>

@@ -1,0 +1,1024 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite 
+	xmlns="http://www.interactive-instruments.de/etf/2.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	id="EID59692c11-df86-49ad-be7f-94a1e1ddd8da" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/metadata/2.0</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records.</label>
+	<description>
+		<![CDATA[<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/issues" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
+There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/README#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.
+<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target="_blank">Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records</a><br/><br/>]]>
+	</description>
+	<reference>../../../inspire-md-bsxets.xq</reference>
+		<version>0.1.1</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2018-06-30T00:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2019-05-16T11:40:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for metadata XML test objects">
+		<!-- TODO clean up, currently disabled due to open issues with schema validation
+		<parameter name="encoding" required="false"><defaultValue>CSW ISO AP 1.0.0</defaultValue><description ref="TR.metadataEncoding"/><allowedValues>^(CSW ISO AP 1\.0\.0|ISO/TS 19139)$</allowedValues><type>string</type></parameter><parameter name="Schema_file" required="false"><description ref="TR.metadataSchema"/><allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)?$</allowedValues><type>string</type></parameter>
+		-->
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
+	</supportedTestObjectTypes>
+	<testModules>
+		<TestModule id="EID137a11bc-4f87-4a55-ab71-59d03e6b28da">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID59692c11-df86-49ad-be7f-94a1e1ddd8da"/>
+			<testCases>
+				<TestCase id="EID61e7ffc0-c181-11e8-a355-529269fb1459">
+					<label>General requirements</label>
+					<description>Execute tests that apply for all metadata records on elements that are directly child elements of the root node of the XML document: MD_Metadata node.
+					</description>
+					<parent ref="EID137a11bc-4f87-4a55-ab71-59d03e6b28da"/>
+					<testSteps>
+						<TestStep id="EID61e80506-c181-11e8-a355-529269fb1459">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID61e7ffc0-c181-11e8-a355-529269fb1459"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID7c93c4d2-3942-4eb4-b5d3-4735d40262d8">
+									<label>md common req C.1: XML Schema</label>
+									<description><![CDATA[<p>Performs a schema validation of the document.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/xml-schema" target="_blank">XML Schema</a></p>]]></description>
+									<parent ref="EID61e80506-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+									let $messages :=    
+										(for $record in $records
+										let $rid := $record/gmd:fileIdentifier/*/text()
+										let $result_0 := try{ validate:xsd($record, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
+										let $result_1 := try{ 
+											if (not(string-length($result_0) = 0)) then validate:xsd($record, 'http://www.isotc211.org/2005/gmd/gmd.xsd')
+											else ()
+										} catch * {  $err:description }
+										let $result_2 := try{
+											if (not(string-length($result_0) = 0 and string-length($result_1) = 0)) then validate:xsd($record, 'http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd')
+											else ()
+										} catch * { $err:description }
+										return
+										if(not(string-length($result_0) = 0 or string-length($result_1) = 0 or string-length($result_2) = 0)) then
+											local:addMessage('TR.errorValidatingSchema',  map { 'filename': local:filename($record), 'id': $rid, 'description': concat($result_0, $result_1, $result_2) })
+										else ()
+										)[position() le $limitErrors]
+									return
+									(if ($messages) then 'FAILED' else 'PASSED',
+									 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+									 $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.errorValidatingSchema"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+
+								<TestAssertion id="EIDba885e87-dfec-4206-9a94-5620af734d44">
+									<label>md common req C.2: Root Element</label>
+									<description><![CDATA[<p>Test that the specification of a metadata is encoded through a root element MD_Metadata.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/root-element" target="_blank">Root Element</a></p>]]></description>
+									<parent ref="EID61e80506-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+									let $messages :=
+										(for $record in $records
+										let $rid := $record/gmd:fileIdentifier/*/text()
+										return
+										if(not($record/node-name() = QName('http://www.isotc211.org/2005/gmd','gmd:MD_Metadata'))) then
+											local:addMessage('TR.invalidRootElement',  map { 'filename': local:filename($record), 'id': namespace-uri($record) })
+										else ()
+										)[position() le $limitErrors]
+									return
+									(if ($messages) then 'FAILED' else 'PASSED',
+									 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+									 $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.invalidRootElement"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+
+								<TestAssertion id="EIDebdda4b4-0bb4-4255-a36a-db4fe540065c">
+									<label>md common req C.5: Language Code</label>
+									<description><![CDATA[<p>Test that a resource language is given pointing to one of the official languages of the Community expressed in conformity with ISO 639-2</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/metadata-language-code" target="_blank">Metadata Language</a></p>]]></description>
+									<parent ref="EID61e80506-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+									let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series','service')]
+									let $codes := ('bul', 'hrv', 'cze', 'dan', 'dut', 'eng', 'est', 'fin', 'fre', 'ger', 'gre', 'hun', 'gle', 'ita', 'lav', 'lit', 'mlt', 'pol', 'por', 'rum', 'slo', 'slv', 'spa', 'swe')
+									let $messages :=    
+										if (not($recordsToInspect)) then ()
+										else
+										(for $record in $recordsToInspect    
+										let $rid := $record/gmd:fileIdentifier/*/text()
+										let $languageCodes := $record/gmd:language/gmd:LanguageCode	 
+										return
+										if (not($languageCodes)) then
+											local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
+										else if (count($languageCodes) != 1) then
+											local:addMessage('TR.wrongLanguageCodeNumber',  map { 'filename': local:filename($record), 'id': $rid })
+										else if ($languageCodes/@codeList != 'http://www.loc.gov/standards/iso639-2/') then
+											local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/'})
+										else if ($languageCodes/@codeListValue[not(. = $codes)]) then
+											local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : $languageCodes/@codeListValue/string()})
+										else ()
+										)[position() le $limitErrors]
+									return
+									(if ($messages) then 'FAILED' else 'PASSED',
+									 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+									 $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noLanguageCode"/>
+										<translationTemplate ref="TR.wrongLanguageCodeNumber"/>
+										<translationTemplate ref="TR.invalidLanguageCode"/>
+										<translationTemplate ref="TR.wrongCodeList_Param"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDead447bf-7ace-4b13-b9b1-a80f8566c9cb">
+										<label>md common req C.6: Metadata Point of Contact</label>
+										<description><![CDATA[<p>Test that the description of the organisation responsible for the creation and maintenance of the metadata is provided.</p>
+										<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/md-point-of-contact" target="_blank">Metadata Point of Contact</a></p>]]></description>
+										<parent ref="EID61e80506-c181-11e8-a355-529269fb1459"/>
+										<expectedResult>NOT_APPLICABLE</expectedResult>
+										<expression>
+	let $messages := 
+		(for $record in $records
+		 let $rid := $record/gmd:fileIdentifier/*/text()
+		 let $pocs := $record/gmd:contact/gmd:CI_ResponsibleParty
+		 return
+		 if(not($pocs)) then 
+			local:addMessage('TR.noMetadataContact', map { 'filename': local:filename($record), 'id': $rid })
+		 else
+		 for $poc in $pocs
+		 let $orgName := $poc/gmd:organisationName
+		 let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+		 let $validCodeList :=
+			for $x in $poc/gmd:role/gmd:CI_RoleCode
+			where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+				$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode')
+			return $x
+		 return
+		 	if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
+				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
+		 	else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
+				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
+		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = 'pointOfContact')) then
+				local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'pocs': fn:string-join($pocs/gmd:role/*/@codeListValue) })
+			else if (count($validCodeList) = 0) then
+				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode'})
+		 	else ()
+		)[position() le $limitErrors]
+	return
+	(if ($messages) then 'FAILED' else 'PASSED',
+	 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+	 $messages)
+								  		</expression>
+										<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+										<translationTemplates>
+											<translationTemplate ref="TR.noMetadataContactOrganisationName"/>
+											<translationTemplate ref="TR.noMetadataContactEmailAddress"/>
+											<translationTemplate ref="TR.noMetadataContactRole"/>
+											<translationTemplate ref="TR.wrongCodeList_Param"/>
+											<translationTemplate ref="TR.recordsWithErrors"/>
+										</translationTemplates>
+									</TestAssertion>
+	      						<TestAssertion id="EID0b6c9678-31d1-4c7a-8183-6a4f4da60017">
+									<label>md common req C.7: Metadata Date</label>
+									<description><![CDATA[<p>Test that the document indicates the date when the metadata record was created or updated.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/md-date" target="_blank">Metadata Date</a></p>]]></description>
+									<parent ref="EID61e80506-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series', 'service')
+let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $levels]
+let $regex := '^(\d{4})(-(\d{2}))??(-(\d{2}))??(T(\d{2}):(\d{2})(:(\d{2}))??(\.(\d+))??(([\+\-]{1}\d{2}:\d{2})|Z)??)??$'
+let $messages :=
+	(for $record in $recordsToInspect
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	return
+		if (count($record/gmd:dateStamp) != 1 or not(count($record/gmd:dateStamp/gco:DateTime) + count($record/gmd:dateStamp/gco:Date) = 1)) then
+			local:addMessage('TR.oneDateStamp', map { 'filename': local:filename($record), 'id': $rid })
+		else if(count($record/gmd:dateStamp/gco:DateTime) = 1) then
+			if (not(matches($record/gmd:dateStamp/gco:DateTime, $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else()
+		else if(count($record/gmd:dateStamp/gco:Date) = 1) then
+			if (not(matches($record/gmd:dateStamp/gco:Date, $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else()
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.oneDateStamp"/>
+										<translationTemplate ref="TR.wrongDateFormat"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+							</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID61e80286-c181-11e8-a355-529269fb1459">
+					<label>Identification</label>
+					<description>Execute tests that apply for all metadata records on elements that are child elements of the section of the XML document: Identification Info (property of the gmd:MD_Metadata element). This section contains information specific to the dataset / dataset series.
+					</description>
+					<parent ref="EID137a11bc-4f87-4a55-ab71-59d03e6b28da"/>
+					<testSteps>
+						<TestStep id="EID61e80628-c181-11e8-a355-529269fb1459">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID61e80286-c181-11e8-a355-529269fb1459"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+							
+
+							<TestAssertion id="EID34195fe7-0d77-46bb-b74e-489463cadd2f">
+								<label>md common req C.8: Resource Title</label>
+								<description><![CDATA[<p>Test that a non-empty title of the described data is provided.</p>
+								<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/resource-title" target="_blank">Resource Title</a></p>]]></description>
+								<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+								<expectedResult>NOT_APPLICABLE</expectedResult>
+								<expression>
+let $messages :=
+	(for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $title := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:citation/gmd:CI_Citation/gmd:title
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:title
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	return
+		if (not($title)) then
+			local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
+		else if (count($title) != 1) then
+			local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then
+			local:addMessage('TR.emptyTitle', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noTitle"/>
+										<translationTemplate ref="TR.emptyTitle"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EID346ca433-1f21-4e4e-8fec-524d24fd6647">
+									<label>md common req C.9: Resource Abstract</label>
+									<description><![CDATA[<p>Test that a resource abstract is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/resource-abstract" target="_blank">Resource Abstract</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages :=
+	(
+	for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $abstract := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:abstract
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract
+	return
+	if (not($abstract)) then
+		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($abstract) != 1) then
+		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
+	else if (not($abstract/gco:CharacterString/node() or $abstract/gmx:Anchor/node())) then
+		local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($record), 'id': $rid })
+	else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noAbstract"/>
+										<translationTemplate ref="TR.emptyAbstract"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EID87ee2219-2ba5-4a27-91ac-2b3bf5730012">
+									<label>md common req C.10: Responsible Organization</label>
+									<description><![CDATA[<p>Test that the responsible organization metadata is provided</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/responsible-organisation" target="_blank">Responsible Organization</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $iso19115_CIRoleCode := ('resourceProvider','custodian','owner','user','distributor','originator','pointOfContact','principalInvestigator','processor','publisher','author')
+let $messages := 
+		(for $record in $records
+		 let $rid := $record/gmd:fileIdentifier/*/text()
+		 let $pocs := 
+			if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			    $record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+			else
+			    $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
+		 return
+		    if(not($pocs)) then
+		 	    local:addMessage('TR.missingResponsibleParty', map { 'filename': local:filename($record), 'id': $rid })
+		    else
+				for $poc in $pocs
+				let $orgName := $poc/gmd:organisationName
+				let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+				let $validCodeList :=
+					for $x in $poc/gmd:role/gmd:CI_RoleCode
+					where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+					    $x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+						$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+						$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
+						$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
+						$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode')
+					return $x
+				return
+					if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
+					    local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
+				    else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
+					    local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
+				    else if (not(count($poc/gmd:role/gmd:CI_RoleCode) = count($validCodeList))) then
+					    local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+				    else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
+					    local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid })
+				    else ()
+		)[position() le $limitErrors]
+	return
+	(if ($messages) then 'FAILED' else 'PASSED',
+	 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+	 $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingResponsibleParty"/>
+										<translationTemplate ref="TR.noMetadataContactOrganisationName"/>
+										<translationTemplate ref="TR.noMetadataContactEmailAddress"/>
+                    					<translationTemplate ref="TR.noPointOfContactRole"/>                   
+                    					<translationTemplate ref="TR.wrongCodeList"/>                   
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EID01ae1fe1-1990-4716-ae09-88d1208b408c">
+									<label>md common req C.11: Temporal Reference</label>
+									<description><![CDATA[<p>Test that there is at least one temporal reference and it is codified correctly.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/temporal-reference" target="_blank">Temporal Reference</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $regexDate := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0[1,3-9]|1[0-2])(-)(29|30))))$|^(?:(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(-)02(-)29)$|^(?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:0[1-9])|(?:1[0-2]))(-)(?:0[1-9]|1\d|2[0-8])$'
+let $regexDateTime := '^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(\\.[0-9]+)?(Z)?$'
+let $messages := 
+	(for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $ci_dates := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
+	return
+	(if(not($ci_dates/gmd:date)) then
+		local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
+	else 
+		for $ci_date in $ci_dates
+		let $dateType := $ci_date/gmd:dateType/gmd:CI_DateTypeCode
+		let $validCodeList :=
+			for $x in $dateType
+			where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+				$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode')
+			return $x
+		return
+		if (not($ci_date/gmd:date/gco:Date or $ci_date/gmd:date/gco:DateTime)) then
+			local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
+		else if ($ci_date/gmd:date/gco:Date and not(matches($ci_date/gmd:date/gco:Date/text(),$regexDate))) then
+			local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid }) 
+		else if ($ci_date/gmd:date/gco:DateTime and not(matches($ci_date/gmd:date/gco:DateTime/text(),$regexDateTime))) then
+			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($dateType)) then
+			local:addMessage('TR.noDateType', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not(count($dateType) = count($validCodeList))) then
+			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+		else if (not($dateType/@codeListValue = ('publication','revision','creation'))) then
+			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+		else())
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noRelevantDate"/>
+                    					<translationTemplate ref="TR.invalidDateFormat"/>
+										<translationTemplate ref="TR.wrongDateFormat"/>
+										<translationTemplate ref="TR.noDateType"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
+										<translationTemplate ref="TR.noDateTypeForSpecification"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EID109cce73-7e80-432e-a3e0-450e231f4120">
+									<label>md common req C.12: Max One Date of Creation</label>
+									<description><![CDATA[<p>Test that not more than one date of creation for the metadata is given</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/max-1-date-of-creation" target="_blank">Max One Date of Creation</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $regex := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0[1,3-9]|1[0-2])(-)(29|30))))$|^(?:(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(-)02(-)29)$|^(?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:0[1-9])|(?:1[0-2]))(-)(?:0[1-9]|1\d|2[0-8])$'
+
+let $dt := ('CI_DateTypeCode','http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')	
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
+	 let $creationTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('creation')]
+	 return
+ if(count($creationTempRefs) ne 1 and count($creationTempRefs) ne 0) then
+		local:addMessage('TR.moreThanOneCreationDate', map { 'filename': local:filename($record), 'id': $rid })
+	 else (for $date in $creationTempRefs
+   return 
+   if (not(matches($date/gmd:date/gco:Date/text(),$regex))) then
+        local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid }) 
+   else())
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.moreThanOneCreationDate"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+                    					<translationTemplate ref="TR.invalidDateFormat"/>
+									</translationTemplates>
+								</TestAssertion>
+							
+							<TestAssertion id="EID6b4e043c-7624-4b3c-8b0c-bec547d2f8f6">
+									<label>md common req C.13: Not More than one Date of Last Revision</label>
+									<description><![CDATA[<p>Test that not more than one date of last revision for the metadata is given.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/max-1-date-of-last-revision" target="_blank">Max one Date of Last Revision</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $regex := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0[1,3-9]|1[0-2])(-)(29|30))))$|^(?:(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(-)02(-)29)$|^(?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:0[1-9])|(?:1[0-2]))(-)(?:0[1-9]|1\d|2[0-8])$'
+
+let $dt := ('CI_DateTypeCode','http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')	
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $temporalReferences := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
+	 let $revisionTempRefs := $temporalReferences[gmd:dateType/*/@codeListValue = ('revision')]
+	 return
+ if(count($revisionTempRefs) ne 1 and count($revisionTempRefs) ne 0) then
+		local:addMessage('TR.moreThanOneCreationDate', map { 'filename': local:filename($record), 'id': $rid })
+	 else (for $date in $revisionTempRefs
+   return 
+   if (not(matches($date/gmd:date/gco:Date/text(),$regex))) then
+        local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid }) 
+   else())
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.moreThanOneRevisionDate"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+                    <translationTemplate ref="TR.invalidDateFormat"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID76f8fb3a-c00f-11e8-a355-529269fb1459">
+									<label>md common req C.14: Temporal Extent</label>
+									<description><![CDATA[<p>Test if a temporal reference is provided using the temporary extension. The temporal reference will be coded using an individual date or a period of time between two dates.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/temporal-extent" target="_blank">Temporal Extent</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $regex := '^(\d{4})(-(\d{2}))??(-(\d{2}))??(T(\d{2}):(\d{2})(:(\d{2}))??(\.(\d+))??(([\+\-]{1}\d{2}:\d{2})|Z)??)??$'
+	 let $temporalExtentextents := $record/gmd:identificationInfo[1]/*/gmd:extent/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent
+	 return
+	 	for $extent in $temporalExtentextents
+		let $timePosition := $extent/*:TimeInstant/*:timePosition
+		let $timePeriod := $extent/*:TimePeriod
+		let $beginPosition := $extent/*:TimePeriod/*:beginPosition
+		let $endPosition := $extent/*:TimePeriod/*:endPosition
+		return
+		if ($timePosition) then
+			if (not(matches($timePosition/text(), $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
+		else if($timePeriod) then
+			if (not($beginPosition/@indeterminatePosition) and not(matches($beginPosition/text(), $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else if ($beginPosition/@indeterminatePosition and not($beginPosition/@indeterminatePosition = 'unknown')) then
+				local:addMessage('TR.wrongIndeterminatePosition', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($endPosition/@indeterminatePosition) and not(matches($endPosition/text(), $regex))) then
+				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else if ($endPosition/@indeterminatePosition and not($endPosition/@indeterminatePosition = 'unknown' or $endPosition/@indeterminatePosition = 'now')) then
+				local:addMessage('TR.wrongIndeterminatePosition', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
+		else
+			local:addMessage('TR.noTimePositionOrPeriod', map { 'filename': local:filename($record), 'id': $rid })
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noTimePositionOrPeriod"/>
+										<translationTemplate ref="TR.wrongDateFormat"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID76f8ff36-c00f-11e8-a355-529269fb1459">
+									<label>md common req C.15: Keyword Originating CV</label>
+									<description><![CDATA[<p>Test that the citation of the source controlled vocabulary when giving the value of a keyword is provided correctly.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/keyword-originating-cv" target="_blank">Keyword Originating CV</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $regex := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0[1,3-9]|1[0-2])(-)(29|30))))$|^(?:(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(-)02(-)29)$|^(?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:0[1-9])|(?:1[0-2]))(-)(?:0[1-9]|1\d|2[0-8])$'
+
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $thesauri := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName
+	 return
+	 if(not($thesauri)) then ()
+	 else for $thesaurus in $thesauri
+	 let $title := $thesaurus/gmd:CI_Citation/gmd:title
+	 let $date := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date
+	 let $dateTypeCode := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+	 let $validCodeList :=
+		for $x in $dateTypeCode
+		where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
+			$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode')
+		return $x
+	 return 
+	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($dateTypeCode) or not(count($dateTypeCode) = count($validCodeList))) then local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noTitleForThesaurus"/>
+										<translationTemplate ref="TR.emptyTitleForThesaurus"/>
+										<translationTemplate ref="TR.invalidDateForThesaurus"/>
+                    					<translationTemplate ref="TR.invalidDateFormat"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID76f901ca-c00f-11e8-a355-529269fb1459">
+									<label>md common req C.16: Group Keywords by CV</label>
+									<description><![CDATA[<p>Test that a Keywords element only contain keywords originating from the one cited controlled vocabulary, or its version.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/group-keywords-by-cv" target="_blank">Group Keywords by CV</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $keywords := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
+	 let $thesaurusNameTitle := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+	 return
+	 if (count($thesaurusNameTitle) != count(distinct-values($thesaurusNameTitle))) then
+	   local:addMessage('TR.keywordsNotGroupedByVocabulary', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.keywordsNotGroupedByVocabulary"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EIDf7e5c9d6-7a5c-47cc-9c95-1d4f3a5f92eb">
+									<label>md common req C.17: Limitations on Public Access</label>
+									<description><![CDATA[<p>Test that information on the existence of some limitation of public access to spatial data sets and spatial data services is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/limitations-on-public-access" target="_blank">Limitations on Public Access</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $md_legalConstraints_Limitations :=
+		for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
+		let $validAccessConstraints :=
+			for $ac in $x/gmd:accessConstraints
+			where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
+				(starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#MD_RestrictionCode') or
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#MD_RestrictionCode')))
+			return $ac
+		let $validAnchor := 
+			for $y in $x/gmd:otherConstraints/gmx:Anchor
+			where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
+			return $y
+		let $invalidAnchor := 
+			for $y in $x/gmd:otherConstraints/gmx:Anchor
+			where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+				$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
+			return $y
+		return 
+			if(count($validAccessConstraints) != 1) then ()
+			else if(count($validAnchor) != 0 and count($invalidAnchor) = 0) then $x
+			else ()
+	 return
+	 if (count($md_legalConstraints_Limitations) != 1) then
+		local:addMessage('TR.noValidResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noValidResourceLimitations"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EID410b57a6-0314-4506-9352-19042f1723cd">
+									<label>md common req C.18: Conditions for Access and Use</label>
+									<description><![CDATA[<p>Test the technical restrictions of access and use of spatial data sets and services.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conditions-for-access-and-use" target="_blank">Conditions for Access and Use</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $md_legalConstraints_Conditions :=
+		for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
+		let $validAccessConstraints :=
+			for $ac in $x/gmd:accessConstraints
+			where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
+				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode'))
+			return $ac
+		let $validUseConstraints :=
+			for $uc in $x/gmd:useConstraints
+			where ($uc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
+				starts-with($uc/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode'))
+			return $uc
+		let $validAnchor := 
+			for $y in $x/gmd:otherConstraints/gmx:Anchor
+			where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
+			return $y
+		let $invalidAnchor := 
+			for $y in $x/gmd:otherConstraints/gmx:Anchor
+			where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
+				$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
+			return $y
+		return
+			if(count($validAccessConstraints) + count($validUseConstraints) != 1) then ()
+			else if(count($validAnchor) != 0 and count($invalidAnchor) = 0) then $x
+			else if(count($x/gmd:otherConstraints/gco:CharacterString) != 0 and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0) and count($invalidAnchor) = 0) then $x
+			else ()
+	return
+		if (count($md_legalConstraints_Conditions) != 1) then
+			local:addMessage('TR.noValidResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
+		else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noValidResourceConditions"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EID701be21b-1158-4055-9594-67a4e2005e38">
+									<label>md common req C.19: Geographical Bounding Box</label>
+									<description><![CDATA[<p>Test that the extent of the resource in the geographic space is specified using a geometric bounding box.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/bounding-box" target="_blank">Bounding Box</a></p>]]></description>
+									<parent ref="EID61e80628-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $extents := 
+    if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+		$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+    else
+        $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox
+	let $regex := '^-?\d+\.\d{2,}'
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	return
+		(if (($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'dataset' or $record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'series') and not($extents)) then
+		local:addMessage('TR.noGeographicBoundingBox', map { 'filename': local:filename($record), 'id': $rid })
+		else
+		(
+		for $extent in $extents
+		let $west := $extent/gmd:westBoundLongitude/gco:Decimal/text()
+		let $east := $extent/gmd:eastBoundLongitude/gco:Decimal/text()
+		let $south := $extent/gmd:southBoundLatitude/gco:Decimal/text()
+		let $north := $extent/gmd:northBoundLatitude/gco:Decimal/text()
+		return
+		if (not(($west and matches($west,$regex) and fn:number($west) &gt;= -180 and fn:number($west) &lt;= 180) and
+					($east and matches($east,$regex) and fn:number($east) &gt;= -180 and fn:number($east) &lt;= 180) and
+					($south and matches($south,$regex) and fn:number($south) &gt;= -90 and fn:number($south) &lt;= 90) and
+					($north and matches($north,$regex) and fn:number($north) &gt;= -90 and fn:number($north) &lt;= 90) and
+					(fn:number($south) &lt;= fn:number($north)))) then
+			local:addMessage('TR.invalidGeographicBoundingBox', map { 'filename': local:filename($record), 'id': $rid, 'west': $west, 'east': $east, 'south': $south, 'north': $north })
+		else ()
+		)
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noGeographicBoundingBox"/>
+										<translationTemplate ref="TR.invalidGeographicBoundingBox"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+							</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID61e803d0-c181-11e8-a355-529269fb1459">
+					<label>Data quality</label>
+					<description> Execute tests that apply for all metadata records on elements that are child 
+					elements of the section of the XML document: Data Quality Information (property of the gmd:MD_Metadata element). 
+					This section contains information specific to the quality and lineage (including processing steps and sources) of the 
+					resource.
+					</description>
+					<parent ref="EID137a11bc-4f87-4a55-ab71-59d03e6b28da"/>
+					<testSteps>
+						<TestStep id="EID61e80a06-c181-11e8-a355-529269fb1459">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID61e803d0-c181-11e8-a355-529269fb1459"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+							<TestAssertion id="EIDf55f2448-c4d5-4af0-a83b-40ccd0d2a7df">
+									<label>md common req C.20: Dataset Conformity</label>
+									<description><![CDATA[<p>Test that the metadata includes information on the degree of conformity with the implementing rules on interoperability of spatial data sets.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity" target="_blank">Dataset Conformity</a></p>]]></description>
+									<parent ref="EID61e80a06-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $levels := ('dataset', 'series', 'service')
+let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
+let $messages := 
+	(for $record in $recordsToInspect
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $confResult := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+	 return 
+	 if (not($confResult)) then
+		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
+	 else ()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.declareNoConformityEvaluationAsUnknown"/>
+										<translationTemplate ref="TR.noConformityStatement"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EID1f9ddbc5-679b-44b0-bd6f-db14c9c348a9">
+									<label>md common req C.21: Dataset Conformity Specifications</label>
+									<description><![CDATA[<p>Test that the DQ_ConformanceResult element is correctly specified through a citation of the INSPIRE Implementing Rule and a specification document or Conformance Class using CI_Citation element: including its official title and the date of publication of the document.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-specification" target="_blank">Dataset Conformity Specifications</a></p>]]></description>
+									<parent ref="EID61e80a06-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $regex := '^((?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:(?:0[13578]|1[02])(-)31)|((0[1,3-9]|1[0-2])(-)(29|30))))$|^(?:(?:(?:(?:1[6-9]|[2-9]\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00)))(-)02(-)29)$|^(?:(?:1[6-9]|2[0-9])\d{2})(-)(?:(?:0[1-9])|(?:1[0-2]))(-)(?:0[1-9]|1\d|2[0-8])$'
+let $levels := ('dataset', 'series', 'service')
+let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
+let $messages := 
+	(for $record in $recordsToInspect
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+	return 
+	if (not($result)) then
+		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
+	else if (not($result/gmd:specification/gmd:CI_Citation)) then
+		local:addMessage('TR.missingCitationSection', map { 'filename': local:filename($record), 'id': $rid })
+	else
+	 	(for $res in $result
+		return
+		if(not($res/gmd:specification/gmd:CI_Citation)) then
+			local:addMessage('TR.noCitationForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+		else
+		for $citation in $res/gmd:specification/gmd:CI_Citation
+			let $title := $citation/gmd:title
+			let $date := $citation/gmd:date
+			let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+			return
+			if (not($title)) then
+				local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($date)) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($dateTypeCode)) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($dateTypeCode/@codeList = ('http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode'))) then
+				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($dateTypeCode/@codeListValue = ('publication'))) then
+				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not(matches($date/gmd:CI_Date/gmd:date/gco:Date/text(), $regex))) then
+				local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid})
+			else ())
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noConformityStatement"/>
+										<translationTemplate ref="TR.noCitationForSpecification"/>
+										<translationTemplate ref="TR.missingCitationSection"/>
+										<translationTemplate ref="TR.noTitleForSpecification"/>
+										<translationTemplate ref="TR.noDateTypeForSpecification"/>
+										<translationTemplate ref="TR.invalidDateFormat"/>            
+										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
+									</translationTemplates>
+								</TestAssertion>
+							<TestAssertion id="EID614cd750-a8a2-4256-908c-e452c2b4e506">
+									<label>md common req C.22: Conformity Degree</label>
+									<description><![CDATA[<p>Test that each Conformance Result includes the degree of declared conformity against this specification using a property with value "true" for a conformant resource and "false" for non-conformant resource.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/conformity-degree" target="_blank">Conformity Degree</a></p>]]></description>
+									<parent ref="EID61e80a06-c181-11e8-a355-529269fb1459"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+	 return 
+	 if (not($result)) then
+		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
+	 else
+	 	(for $res in $result
+		let $pass := $res/gmd:pass
+		return
+		if ($pass) then
+			if($pass/gco:Boolean) then
+				if (not($pass/gco:Boolean/text() = 'true' or $pass/gco:Boolean/text() = 'false')) then
+					local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+				else ()
+			else if (not($pass/@gco:nilReason)) then
+				local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($pass/@gco:nilReason = 'unknown')) then
+				local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+			else ()
+		else 
+			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+		)
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.declareNoConformityEvaluationAsUnknown"/>
+										<translationTemplate ref="TR.noConformityStatement"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							
+							</testAssertions>
+							</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
