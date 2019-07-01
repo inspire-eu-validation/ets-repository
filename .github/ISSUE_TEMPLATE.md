@@ -1,14 +1,6 @@
-Please replace these lines with a brief summary of your issue and the expected
-behaviour.
+Dear user,
+we have recently created a new 'community space' on GitHub to be used as the unique place to interact with the community of the INSPIRE Reference Validator: https://github.com/inspire-eu-validation/community
 
-Don't forget to include:
+Please open a ticket in this new space (from https://github.com/inspire-eu-validation/community/issues/new/choose) to report a problem or bug of the Validator, to propose an improvement to the Validator, and to start a discussion about the Validator.
 
-- [ ] a link to the Test Report
-- [ ] the name of the Test that failed or better: change the `Level of Detail`
-in the Report by clicking on `All Details`, then scroll down to the failed test
-and copy the Link on the right-hand side of the `Assertion URI`
-- [ ] the URL of your service / the file you have uploaded or referenced.
-If your service is protected or you have confidential data that you cannot
-upload here, you can request an email address to which you can send URLs / files.
-Please note that issues cannot be fixed for services/datasets that we cannot
-access.
+This new space will be the only one to be kept monitored in the future.
