@@ -461,8 +461,15 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()[contains(.,'1089/2010')]
+        let $valid := 
+            (for $confResult in $confResults
+                return
+                if (normalize-space(lower-case($confResult)) = $conformityTextLower) then
+                    $confResult
+                else()
+            )
 		return
-		if ( not(normalize-space(lower-case($confResults)) = $conformityTextLower) ) then
+		if (count($valid) = 0) then
 			local:addMessage('TR.wrongNumberOfSpecificationForPurpose', map { 'filename': local:filename($record), 'id': $rid })
 		else()
 	)[position() le $limitErrors]
