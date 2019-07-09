@@ -623,8 +623,8 @@ let $messages :=
 	 return 
 	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
-		else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $thesaurus})
-	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $thesaurus})
+	 	else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($dateTypeCode) or not(count($dateTypeCode) = count($validCodeList))) then local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
 		else ()
 	)[position() le $limitErrors]
@@ -632,12 +632,12 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-									</expression>
+							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noTitleForThesaurus"/>
 										<translationTemplate ref="TR.emptyTitleForThesaurus"/>
-										<translationTemplate ref="TR.invalidDateForThesaurus2"/>
+										<translationTemplate ref="TR.invalidDateForThesaurus"/>
                     					<translationTemplate ref="TR.invalidDateFormat"/>
 										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
