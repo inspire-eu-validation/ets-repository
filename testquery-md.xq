@@ -4,7 +4,7 @@ declare namespace gss='http://www.isotc211.org/2005/gss';
 declare namespace gts='http://www.isotc211.org/2005/gts';
 declare namespace gmx='http://www.isotc211.org/2005/gmx'; 
 declare namespace srv='http://www.isotc211.org/2005/srv';
-declare namespace gco='http://www.isotc211.org/2005/gco';
+declare namespace gco='http://www.isotc211.org/2005/gco/basicTypes.xsd';
 declare namespace gmd='http://www.isotc211.org/2005/gmd';
 declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace gml31='http://www.opengis.net/gml';
@@ -226,7 +226,7 @@ declare function local:is-valid-date-or-dateTime($dateString as xs:string?) as x
    else
 	let $date := 
     try {
-      let $tmp := xs:date($dateString)
+      let $tmp := gco:Date($dateString)
       return
         (: NOTE: apparently, the value of the xs:date must be evaluated to be parsed by BaseX :)
        'DATE ' || $tmp
@@ -235,7 +235,7 @@ declare function local:is-valid-date-or-dateTime($dateString as xs:string?) as x
     }
   let $dateTime :=
     try {
-      let $tmp := gco:DateTime($dateString)
+      let $tmp := xs:dateTime($dateString)
       return 
        (: NOTE: apparently, the value of the xs:date must be evaluated to be parsed by BaseX :)
        'DATETIME ' || $tmp
