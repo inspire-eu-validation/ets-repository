@@ -242,26 +242,9 @@ declare function local:is-valid-date-or-dateTime($dateString as xs:string?) as x
     } catch * {
       'INVALID'
     }
-    	let $yearMonth := 
-    try {
-      let $tmp := xs:gYearMonth($dateString)
-      return
-        (: NOTE: apparently, the value of the xs:date must be evaluated to be parsed by BaseX :)
-       'DATE ' || $tmp
-    } catch * {
-      'INVALID'
-    }
-  let $dateTime :=
-    try {
-      let $tmp := xs:dateTime($dateString)
-      return 
-       (: NOTE: apparently, the value of the xs:date must be evaluated to be parsed by BaseX :)
-       'DATETIME ' || $tmp
-    } catch * {
-      'INVALID'
-    }
+    
   return
-    if(starts-with($date,'DATE') or starts-with($year,'DATE') or starts-with($yearMonth,'DATE') or starts-with($dateTime,'DATETIME')) then
+    if(starts-with($date,'DATE') or starts-with($dateTime,'DATETIME')) then
       true()
     else
       false()
