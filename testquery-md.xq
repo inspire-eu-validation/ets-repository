@@ -226,7 +226,7 @@ declare function local:is-valid-date-or-dateTime($dateString as xs:string?) as x
    else
 	let $date := 
     try {
-      let $tmp := xs:date($dateString)
+      let $tmp := gco:Date($dateString)
       return
         (: NOTE: apparently, the value of the xs:date must be evaluated to be parsed by BaseX :)
        'DATE ' || $tmp
