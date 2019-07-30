@@ -266,10 +266,7 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $characterCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:characterSet/gmd:MD_CharacterSetCode
-		return 	 						
-		if ((count($characterCodes) = 1) and ($characterCodes/@codeListValue) = 'utf8') then
-			local:addMessage('TR.invalidCodeUTF8', map { 'filename': local:filename($record), 'id': $rid })
-		else 			
+		return
 			for $characterCode in $characterCodes
 				let $codeListValue := $characterCode/@codeListValue
 				let $invalidCodeValues := $codeListValue[not(. = $codes)]
@@ -288,7 +285,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.invalidCodeUTF8"/>
 										<translationTemplate ref="TR.invalidEncodingCode"/>
 										<translationTemplate ref="TR.wrongCodeList"/>
 									</translationTemplates>
