@@ -240,7 +240,6 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $regex_integer := '(^\d{1,40}$)'
-let $regex_float := '^-?\d+\.\d{2,}'
 let $messages :=
 	(for $record in $records
 		let $countResolutions := count($record/gmd:identificationInfo[1]/*/gmd:spatialResolution)
@@ -254,7 +253,7 @@ let $messages :=
 		let $invalidDistance :=
 			for $x in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance
 			return
-			if(matches($x/text(), $regex_float)) then ()
+			if(xs:double($x/text())) then ()
 			else $x
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
