@@ -623,8 +623,8 @@ let $messages :=
 	 return 
 	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 	 	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
-	 	else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
-	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+	 	else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title/*[1]/text() != '') then $title/*[1]/text() else '- Title missing -', 'keywords' : '- Not reported -'})
+	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': if ($title/*[1]/text() != '') then $title/*[1]/text() else '- Title missing -', 'keywords' : '- Not reported -'})
 	 	else if (not($dateTypeCode) or not(count($dateTypeCode) = count($validCodeList))) then local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid})
 		else ()
 	)[position() le $limitErrors]
