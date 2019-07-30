@@ -383,8 +383,12 @@ let $regex_url := '(http://|https://|ftp://)([a-z0-9]{1})((\.[a-z0-9-])|([a-z0-9
 let $messages := 	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $httpOrFtpLinks := $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[matches(gmd:linkage/gmd:URL/text(), $regex_url)]
 		return
-		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource
+		if (count($httpOrFtpLinks) = 0) then
+			local:addMessage('TR.noLinkageFound', map { 'filename': local:filename($record), 'id': $rid, 'regex': $regex_url })
+		else
+		for $onLine in $httpOrFtpLinks
 			let $url := $onLine/gmd:linkage/gmd:URL
 			return
 			if (not($url/node())) then
@@ -403,6 +407,7 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.linkageWithoutURL"/>
 										<translationTemplate ref="TR.invalidURL"/>
+										<translationTemplate ref="TR.noLinkageFound"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDc7ef6d4f-a03b-4797-85e2-3b4a49e0c5ff">
