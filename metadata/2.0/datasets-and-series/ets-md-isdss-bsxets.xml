@@ -265,17 +265,22 @@ let $codes := ('ucs2','ucs4','utf7','utf8','8859part1','8859part2','8859part3','
 let $messages :=  		
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $characterCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:characterSet/gmd:MD_CharacterSetCode
+    let $allCharacterCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:characterSet/gmd:MD_CharacterSetCode
+		let $characterCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:characterSet/gmd:MD_CharacterSetCode[@codeListValue = $codes]
 		return
-			for $characterCode in $characterCodes
-				let $codeListValue := $characterCode/@codeListValue
-				let $invalidCodeValues := $codeListValue[not(. = $codes)]
-				return
-				if ($invalidCodeValues) then
-					local:addMessage('TR.invalidEncodingCode', map { 'filename': local:filename($record), 'id': $rid})
-				else if (not($characterCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode')) then
-					local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
-				else () 			
+			if (count($allCharacterCodes) = 0) then () (: utf8 is the default. Valid :)
+			else if (count($allCharacterCodes) > 0 and count($characterCodes) = 0) then
+				local:addMessage('TR.noValidEncodingCode', map { 'filename': local:filename($record), 'id': $rid, 'validCharset': string-join($codes, ', '), 'charset': string-join($allCharacterCodes/@codeListValue, ', ')})
+			else
+				for $characterCode in $characterCodes
+					let $codeListValue := $characterCode/@codeListValue
+					let $invalidCodeValues := $codeListValue[not(. = $codes)]
+					return
+					if ($invalidCodeValues) then
+						local:addMessage('TR.invalidEncodingCode', map { 'filename': local:filename($record), 'id': $rid})
+					else if (not($characterCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode')) then
+						local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
+					else ()
 	)[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -285,6 +290,7 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.noValidEncodingCode"/>
 										<translationTemplate ref="TR.invalidEncodingCode"/>
 										<translationTemplate ref="TR.wrongCodeList"/>
 									</translationTemplates>
