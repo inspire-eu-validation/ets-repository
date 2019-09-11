@@ -732,7 +732,8 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $messages := 
-	(for $record in $records
+	(
+	for $record in $records
 	let $rid := $record/gmd:fileIdentifier/*/text()
 	let $md_legalConstraints_Conditions :=
 		for $resourceConstraints in $record/gmd:identificationInfo/*/gmd:resourceConstraints
@@ -764,8 +765,13 @@ let $messages :=
 						$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
 						$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
 					return $y
-			return if(count($validAccessConstraints) + count($validUseConstraints) != 1) then () else if(count($validAnchor) != 0 and count($invalidAnchor) = 0) then $x else if(count($x/gmd:otherConstraints/gco:CharacterString) != 0 and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0) and count($invalidAnchor) = 0) then $x else ()
-		return $resourceConstraints
+			return if(count($validAccessConstraints) + count($validUseConstraints) != 1) 
+						then () 
+					else if(count($validAnchor) != 0 and count($invalidAnchor) = 0) 
+						then $x 
+					else if(count($x/gmd:otherConstraints/gco:CharacterString) != 0 and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0) and count($invalidAnchor) = 0) 
+						then $x
+					else ()
 	return
 		if (count($md_legalConstraints_Conditions) != 1) then
 			local:addMessage('TR.noValidResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
