@@ -264,14 +264,11 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $type := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/text()
-		let $typeCodeSpace := string($record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/srv:serviceType/gco:LocalName/@codeSpace)
 		return
 		if (not(count($type) = 1)) then
 			local:addMessage('TR.exactlyOneServiceType', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($type)) })
 		else if(not($type = $codes)) then
 			local:addMessage('TR.noTypeFromSpatialDataServiceType',  map { 'filename': local:filename($record), 'id': $rid, 'url': $spatialDataServiceTypeCodeListURL, 'type': $type })
-		else if(not($typeCodeSpace = $spatialDataServiceTypeCodeListURL)) then
-			local:addMessage('TR.wrongCodeSpaceFromSpatialDataServiceType',  map { 'filename': local:filename($record), 'id': $rid, 'url': $typeCodeSpace})
 		else ()
 	)[position() le $limitErrors]
 return
