@@ -1251,8 +1251,8 @@ return
 									<parent ref="EIDa445032d-1f63-47af-b100-edb86846d5d1"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $THEMES_TITLE := 'GEMET - INSPIRE themes, version 1.0'
-let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series') and gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*/gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]
+let $THEMES_TITLE := 'GEMET'
+let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]
 let $messages :=
 	if (not($recordsToInspect)) then ()
 	else
@@ -1265,14 +1265,19 @@ let $messages :=
 			return
 			(for $record in $recordsToInspect
 			 let $rid := $record/gmd:fileIdentifier/*/text()
-			 let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]
+			 let $descriptiveKeywordsBlocks := $record/gmd:identificationInfo/*/gmd:descriptiveKeywords/*
+			 let $relevantDescriptiveKeywordsBlocks := 
+				for $descriptiveKeywordsBlock in $descriptiveKeywordsBlocks
+				return if (contains($descriptiveKeywordsBlock/gmd:thesaurusName/*/gmd:title/*/text(), $THEMES_TITLE)) then 
+					$descriptiveKeywordsBlock
+				else ()
 			 let $hasExpectedDate := boolean($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*[gmd:date/*/text() = '2008-06-01' and gmd:dateType/*/@codeListValue = 'publication'])
 			 return 
-			 if ($relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
+			 if (count($relevantDescriptiveKeywordsBlocks) > 0 and $relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
 				local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
-			 else if (not($hasExpectedDate)) then
+			 else if (count($relevantDescriptiveKeywordsBlocks) > 0 and not($hasExpectedDate)) then
 				local:addMessage('TR.invalidDateForThesaurusGemet',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
-			 else if (string-length(normalize-space($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*/gmd:dateType/*/text())) = 0) then
+			 else if (count($relevantDescriptiveKeywordsBlocks) > 0 and string-length(normalize-space($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*/gmd:dateType/*/@codeListValue)) = 0) then
 				local:addMessage('TR.emptyDateTypeCode',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
 			 else ()
 			)[position() le $limitErrors]
