@@ -226,23 +226,21 @@ let $messages :=
 			for $x in $record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty
 			where $x/gmd:role/gmd:CI_RoleCode/@codeListValue = 'custodian'
 			return $x
-		return 	 						
+		return
 		if (count($party) = 0)  then
 			local:addMessage('TR.noParty', map { 'filename': local:filename($record), 'id': $rid })
-		else 									
+		else
 			for $part in $party
 				let $role := $part/gmd:role/gmd:CI_RoleCode
 				let $codeList := $part/gmd:role/gmd:CI_RoleCode/@codeList
 				let $codeListValue := $part/gmd:role/gmd:CI_RoleCode/@codeListValue
 
-	 			return 	 	 												 
+	 			return 
 				if (not($role)) then
 					local:addMessage('TR.noRoleElement',  map { 'filename': local:filename($record), 'id': $rid })
-				else if ( not($codeList='http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode') ) then
-					local:addMessage('TR.invalidRoleCodeList',  map { 'filename': local:filename($record), 'id': $rid })
 				else if (not($codeListValue='custodian')) then
 					local:addMessage('TR.invalidRoleCodeListValue',  map { 'filename': local:filename($record), 'id': $rid })
-				else () 					
+				else ()
 	)[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -254,7 +252,6 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.noParty"/>
 										<translationTemplate ref="TR.noRoleElement"/>
-										<translationTemplate ref="TR.invalidRoleCodeList"/>
 										<translationTemplate ref="TR.invalidRoleCodeListValue"/>
 									</translationTemplates>
 								</TestAssertion>
