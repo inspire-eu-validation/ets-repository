@@ -434,14 +434,11 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $dataQuality := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality
-		let $codeList := $record[gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode']
 		let $codeListValue := $record[gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:level/gmd:MD_ScopeCode/@codeListValue = 'service']
 		let $scopeDescription := $record/gmd:dataQualityInfo[1]/gmd:DQ_DataQuality/gmd:scope/gmd:DQ_Scope/gmd:levelDescription/gmd:MD_ScopeDescription/gmd:other
 		return
 		if ( count($dataQuality) != 1 ) then
 			local:addMessage('TR.oneDataQuality', map { 'filename': local:filename($record), 'id': $rid })
-		else if ( not($codeList) ) then
-			local:addMessage('TR.invalidCodeListSDS', map { 'filename': local:filename($record), 'id': $rid })
 		else if ( not($codeListValue) ) then
 			local:addMessage('TR.invalidCodeListValueSDS', map { 'filename': local:filename($record), 'id': $rid })
 		else if ( not($scopeDescription) or not($scopeDescription/gco:CharacterString/node() or $scopeDescription/gmx:Anchor/node()) ) then
@@ -457,7 +454,6 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.oneDataQuality"/>
-										<translationTemplate ref="TR.invalidCodeListSDS"/>
 										<translationTemplate ref="TR.invalidCodeListValueSDS"/>
 										<translationTemplate ref="TR.missingScopeDescription"/>
 									</translationTemplates>
