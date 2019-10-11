@@ -362,22 +362,11 @@ let $messages :=
 				for $poc in $pocs
 				let $orgName := $poc/gmd:organisationName
 				let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
-				let $validCodeList :=
-					for $x in $poc/gmd:role/gmd:CI_RoleCode
-					where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
-					    $x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
-						$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode' or
-						$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode' or
-						$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_RoleCode' or
-						$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_RoleCode')
-					return $x
 				return
 					if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
 					    local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
 				    else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
 					    local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
-				    else if (not(count($poc/gmd:role/gmd:CI_RoleCode) = count($validCodeList))) then
-					    local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 				    else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
 					    local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid })
 				    else ()
@@ -392,8 +381,7 @@ let $messages :=
 										<translationTemplate ref="TR.missingResponsibleParty"/>
 										<translationTemplate ref="TR.noMetadataContactOrganisationName"/>
 										<translationTemplate ref="TR.noMetadataContactEmailAddress"/>
-                    					<translationTemplate ref="TR.noPointOfContactRole"/>                   
-                    					<translationTemplate ref="TR.wrongCodeList"/>                   
+                    					<translationTemplate ref="TR.noPointOfContactRole"/>                 
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -416,15 +404,6 @@ let $messages :=
 	else 
 		for $ci_date in $ci_dates
 		let $dateType := $ci_date/gmd:dateType/gmd:CI_DateTypeCode
-		let $validCodeList :=
-			for $x in $dateType
-			where ($x/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
-				$x/@codeList = 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
-				$x/@codeList = 'http://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
-				$x/@codeList = 'https://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode' or
-				$x/@codeList = 'https://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/resources/codelist/gmxCodelists.xml#CI_DateTypeCode' or
-				$x/@codeList = 'https://schemas.isotc211.org/19139/resources/gmxCodelists.xml#CI_DateTypeCode')
-			return $x
 		return
 		if (not($ci_date/gmd:date/gco:Date or $ci_date/gmd:date/gco:DateTime)) then
 			local:addMessage('TR.noRelevantDate', map { 'filename': local:filename($record), 'id': $rid })
@@ -434,8 +413,6 @@ let $messages :=
 			local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType)) then
 			local:addMessage('TR.noDateType', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not(count($dateType) = count($validCodeList))) then
-			local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 		else if (not($dateType/@codeListValue = ('publication','revision','creation'))) then
 			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 		else())
@@ -451,7 +428,6 @@ return
                     					<translationTemplate ref="TR.invalidDateFormat"/>
 										<translationTemplate ref="TR.wrongDateFormat"/>
 										<translationTemplate ref="TR.noDateType"/>
-										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
@@ -736,13 +712,11 @@ let $messages :=
 		for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
 		let $validAccessConstraints :=
 			for $ac in $x/gmd:accessConstraints
-			where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
-				starts-with($ac/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode'))
+			where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
 			return $ac
 		let $validUseConstraints :=
 			for $uc in $x/gmd:useConstraints
-			where ($uc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions' and
-				starts-with($uc/gmd:MD_RestrictionCode/@codeList, 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode'))
+			where ($uc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
 			return $uc
 		let $validAnchor :=
 			for $y in $x/gmd:otherConstraints/gmx:Anchor
@@ -927,8 +901,6 @@ let $messages :=
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($dateTypeCode)) then
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($dateTypeCode/@codeList = ('http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode'))) then
-				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($dateTypeCode/@codeListValue = ('publication'))) then
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not(matches($date/gmd:CI_Date/gmd:date/gco:Date/text(), $regex))) then
@@ -949,7 +921,6 @@ return
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
 										<translationTemplate ref="TR.invalidDateFormat"/>            
 										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.wrongCodeList"/>
 									</translationTemplates>
 								</TestAssertion>
 							<TestAssertion id="EID614cd750-a8a2-4256-908c-e452c2b4e506">
