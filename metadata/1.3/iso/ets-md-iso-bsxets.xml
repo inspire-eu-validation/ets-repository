@@ -1273,7 +1273,11 @@ let $messages :=
 				else ()
 			 let $hasExpectedDate := boolean($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*[gmd:date/*/text() = '2008-06-01' and gmd:dateType/*/@codeListValue = 'publication'])
 			 return 
-			 if (count($relevantDescriptiveKeywordsBlocks) > 0 and $relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
+
+			 if (count($relevantDescriptiveKeywordsBlocks) = 0) then
+				local:addMessage('TR.missingGEMETKeyword',  map { 'filename': local:filename($record), 'id': $rid })
+
+			 else if (count($relevantDescriptiveKeywordsBlocks) > 0 and $relevantDescriptiveKeywordsBlocks[not(some $keyword in ./gmd:keyword/*/text() satisfies $keyword = $codes) ]) then
 				local:addMessage('TR.noKeywordFromINSPIREThemes',  map { 'filename': local:filename($record), 'id': $rid, 'url': $inspireThemesCodeListURL, 'keywords': fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
 			 else if (count($relevantDescriptiveKeywordsBlocks) > 0 and not($hasExpectedDate)) then
 				local:addMessage('TR.invalidDateForThesaurusGemet',  map { 'filename': local:filename($record), 'id': $rid, 'keywords' : fn:string-join($relevantDescriptiveKeywordsBlocks/gmd:keyword/*/text(),'; ') })
@@ -1294,6 +1298,7 @@ return
 										<translationTemplate ref="TR.noKeywordFromINSPIREThemes"/>
 										<translationTemplate ref="TR.invalidDateForThesaurusGemet"/>
 										<translationTemplate ref="TR.emptyDateTypeCode"/>
+										<translationTemplate ref="TR.missingGEMETKeyword"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
