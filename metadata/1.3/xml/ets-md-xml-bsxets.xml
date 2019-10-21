@@ -90,34 +90,40 @@ I.e., each document is validated using the following XML schema definition:
 									<parent ref="EID27dc9b72-0084-4f4a-981b-afc16e8d6e5e"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
- let $messages :=
-    (
-    if ($validationErrors) then
+ (: TODO BaseX validation is incomplete and needs to be replaced by a custom validation module, see 'known limitations' :)
+let $errors := (
+	if ($validationErrors) then
 		for $error in $validationErrors
 		return local:addMessage('TR.validationError', map { 'text': $error })
 	else
 		for $file in $db
-        return 
-            if ($file/element()/@xsi:schemaLocation) then 
-                let $result := try{ validate:xsd($file, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
-                return
-                if(not(string-length($result) = 0)) then
-                    local:addMessage('TR.invalidSchema',  map { 'filename': local:filename($file), 'count': string($result) })
-                else ()
-            else
-                for $record in $records
-                let $rid := $record/gmd:fileIdentifier/*/text()
-                let $result := try{ validate:xsd($record, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
-                return
-                if(not(string-length($result) = 0)) then
-                    local:addMessage('TR.xmlSchemaErrorRecord',  map { 'filename': local:filename($record), 'id': $rid, 'error': string($result) })
-                else ()
-    )[position() le $limitErrors]
+		  return 
+			 if ($file/element()/@xsi:schemaLocation) then 
+				let $start := prof:current-ms()
+				let $infos := validate:xsd-info($file)
+				let $duration := prof:current-ms()-$start
+				let $logentry := local:log('Validating file ' || local:filename($file) || ': ' || $duration || ' ms')
+				let $errors := count($infos)
+				return
+				  if ($errors&gt;0) then
+					 (local:addMessage('TR.invalidSchema', map { 'filename': local:filename($file), 'count': string($errors) }),
+					  for $info in $infos return local:addMessage('TR.xmlSchemaError', map { 'filename': local:filename($file), 'error': $info }))
+				  else ()
+			 else
+				for $record in $records[db:path(.)=db:path($file/element())]
+				  let $id := $record/gmd:fileIdentifier/gco:CharacterString/text()
+				  let $infos := validate:xsd-info($record)
+				  let $errors := count($infos)
+				  return
+					 if ($errors&gt;0) then
+						(local:addMessage('TR.invalidSchemaRecord', map { 'filename': local:filename($record), 'id': $id, 'count': string($errors) }),
+						for $info in $infos return local:addMessage('TR.xmlSchemaErrorRecord', map { 'filename': local:filename($record), 'id': $id, 'error': $info }))
+					 else ())[position() le $limitErrors]
 return
-(if ($messages) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.filesWithErrors', count($messages[@ref eq 'TR.invalidSchema'])),
- local:error-statistics('TR.recordsWithErrors', count($messages[@ref eq 'TR.invalidSchemaRecord'])),
- $messages)
+(if ($errors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.filesWithErrors', count($errors[@ref eq 'TR.invalidSchema'])),
+ local:error-statistics('TR.recordsWithErrors', count($errors[@ref eq 'TR.invalidSchemaRecord'])),
+ $errors[position() le $limitErrors])
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
