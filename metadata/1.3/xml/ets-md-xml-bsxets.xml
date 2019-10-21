@@ -99,7 +99,11 @@ let $messages :=
 		for $file in $db
         return 
             if ($file/element()/@xsi:schemaLocation) then 
-                let $result := try{ validate:xsd($file, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
+                let $result :=
+                    if ( contains($file/element()/@xsi:schemaLocation, 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/gmd/gmd.xsd') or contains($file/element()/@xsi:schemaLocation, 'http://www.isotc211.org/2005/gmd/gmd.xsd')) then
+                        try{ validate:xsd($file, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
+                    else
+                        try{ validate:xsd($file) } catch * {  $err:description }
                 return
                 if(not(string-length($result) = 0)) then
                     local:addMessage('TR.invalidSchema',  map { 'filename': local:filename($file), 'count': string($result) })
