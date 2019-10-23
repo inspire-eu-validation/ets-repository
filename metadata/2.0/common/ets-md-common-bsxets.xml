@@ -895,7 +895,7 @@ let $messages :=
 			let $date := $citation/gmd:date
 			let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
 			return
-			if (not($title)) then
+			if (not($title) or not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then
 				local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($date)) then
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
