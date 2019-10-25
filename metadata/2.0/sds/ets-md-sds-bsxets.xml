@@ -301,9 +301,10 @@ let $map := local:check-resource-uris($urls, 30, false())
 let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $operatesOnNodes := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn
 		let $urls := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
 		return  
-		if (not($urls)) then
+		if ($operatesOnNodes and not($urls)) then
 			local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
 		else
 			for $href in $urls
