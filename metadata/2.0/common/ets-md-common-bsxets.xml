@@ -895,8 +895,14 @@ let $messages :=
 			let $date := $citation/gmd:date
 			let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
 			return
-			if (not($title) or not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then
+			if (not($title) or not(string-length($title/gco:CharacterString/text()) != 0 or string-length($title/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+			else if ($title/gmd:PT_FreeText) then
+				for $localisedCharacterString in $title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString
+					return
+					if (string-length($localisedCharacterString) = 0) then
+					local:addMessage('TR.emptyFreeText', map{'filename': local:filename($record), 'id': $rid, 'path': '/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/$citation/gmd:title/gmd:PT_FreeText'})
+					else ()
 			else if (not($date)) then
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($dateTypeCode)) then
