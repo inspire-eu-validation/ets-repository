@@ -88,10 +88,10 @@ let $messages :=
 			for $crs in $crsIdentifiers
 				let $code := $crs/gmd:code
 				let $codeSpace := $crs/gmd:codeSpace
-	 			return 	 	 								
-				if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
+	 			return
+                if (not($code) or not(string-length($code/gco:CharacterString/text()) != 0 or string-length($code/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code })
-				else if ($codeSpace and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
+                else if (not($codeSpace) or not(string-length($codeSpace/gco:CharacterString/text()) != 0 or string-length($codeSpace/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid, 'crs': $code/*/text() })
 				else () 		
 			
@@ -312,8 +312,8 @@ let $messages :=
 				else if (not($measureNameAnchor)) then
 					local:addMessage('TR.noMeasureNameAnchor', map { 'filename': local:filename($record), 'id': $rid })
 				else if (not(($validation1) or ($validation2) or ($validation3))) then
-					local:addMessage('TR.invalidQualityCriteria', map { 'filename': local:filename($record), 'id': $rid })		
-				else if (not($measureDescription) or not($measureDescription/gco:CharacterString/node() or $measureDescription/gmx:Anchor/node())) then
+					local:addMessage('TR.invalidQualityCriteria', map { 'filename': local:filename($record), 'id': $rid })
+                else if (not($measureDescription) or not(string-length($measureDescription/gco:CharacterString/text()) != 0 or string-length($measureDescription/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noMeasureDescription', map { 'filename': local:filename($record), 'id': $rid })
 				else if (not($quantitativeResult)) then
 					local:addMessage('TR.noQuantitativeResult', map { 'filename': local:filename($record), 'id': $rid })
