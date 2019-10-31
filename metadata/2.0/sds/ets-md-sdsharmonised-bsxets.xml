@@ -133,7 +133,7 @@ let $messages :=
 				let $dcpList := $ops/srv:DCP/srv:DCPList
 				let $url := $ops/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
 	 			return
-				if (not(count($name) = 1) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
+                if (not(count($name) = 1) or not(string-length($name/gco:CharacterString/text()) != 0 or string-length($name/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noOperationName',  map { 'filename': local:filename($record), 'id': $rid, 'name': $name/*/text() })
 				else if (not($dcpList)) then
 					local:addMessage('TR.noDcpList',  map { 'filename': local:filename($record), 'id': $rid, 'name': $name/*/text() })
@@ -175,12 +175,12 @@ let $messages :=
 				let $optionality := $param/srv:optionality
 				let $repeat := $param/srv:repeatability/gco:Boolean
 				let $paramType := $param/srv:valueType/gco:TypeName/gco:Name
-	 			return 	 	 												 
-				if (count($name) != 1 or not($name) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
+	 			return
+                if (count($name) != 1 or not($name) or not(string-length($name/gco:CharacterString/text()) != 0 or string-length($name/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noNameElement',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
 				else if (count($attributeType) != 1 or not(fn:string-length(normalize-space($attributeType//text())) &gt; 0)) then
 					local:addMessage('TR.noAttributeType',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else if (count($optionality) != 1 or not($optionality) or not($optionality/gco:CharacterString/node() or $optionality/gmx:Anchor/node())) then
+                else if (count($optionality) != 1 or not($optionality) or not(string-length($optionality/gco:CharacterString/text()) != 0 or string-length($optionality/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noOptionality',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
 				else if (count($repeat) != 1 or not($repeat/text() = $booleanValues)) then
 					local:addMessage('TR.noRepeatability',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })

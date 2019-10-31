@@ -161,7 +161,7 @@ let $messages :=
             return
 			if (not($identifier)) then
 				$identifier
-			else if ($identifier/gco:CharacterString and not($identifier/gco:CharacterString/node())) then
+            else if ($identifier/gco:CharacterString and not(string-length($identifier/gco:CharacterString/text()) != 0)) then
 				$identifier
 			else if ($identifier/gmx:Anchor and string-length($identifier/gmx:Anchor/@xlink:href) = 0) then
                 $identifier
@@ -387,7 +387,7 @@ let $messages :=
 		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource
 			let $url := $onLine/gmd:linkage/gmd:URL
 			return
-			if (not($url/node())) then
+            if not(string-length($url/text()) != 0) then
 				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not(matches($url/text(), $regex_url))) then
 					local:addMessage('TR.invalidURL', map { 'filename': local:filename($record), 'id': $rid, 'url': $url/text()})
@@ -500,7 +500,7 @@ let $messages :=
         return   
         if (count($lineageStatement) != 1) then
             local:addMessage('TR.wrongNumberOfLineageStatements',  map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($lineageStatement)) })
-        else if (not($lineageStatement) or not($lineageStatement/gco:CharacterString/node() or $lineageStatement/gmx:Anchor/node())) then
+        else if (not($lineageStatement) or not(string-length($lineageStatement/gco:CharacterString/text()) != 0 or string-length($lineageStatement/gmx:Anchor/text()) != 0)) then
             local:addMessage('TR.emptyLineageStatement',  map { 'filename': local:filename($record), 'id': $rid })
         else ()         
     )[position() le $limitErrors] 

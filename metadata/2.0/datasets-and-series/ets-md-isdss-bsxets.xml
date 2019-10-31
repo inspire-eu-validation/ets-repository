@@ -85,9 +85,9 @@ let $messages :=
 				let $code := $crs/gmd:code
 				let $codeSpace := $crs/gmd:codeSpace
 	 			return
-				if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
+                if (not($code) or not(string-length($code/gco:CharacterString/text()) != 0 or string-length($code/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid})
-				else if (($codeSpace) and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
+                else if ($codeSpace and not(string-length($codeSpace/gco:CharacterString/text()) != 0 or string-length($codeSpace/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid})
 				else () 	
 	)[position() le $limitErrors] 
@@ -172,9 +172,9 @@ let $messages :=
 			let $code := $crs/gmd:code
 			let $codeSpace := $crs/gmd:codeSpace
 			return
-			if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
+            if (not($code) or not(string-length($code/gco:CharacterString/text()) != 0 or string-length($code/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
-			else if (($codeSpace) and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
+            else if (not($codeSpace) or not(string-length($codeSpace/gco:CharacterString/text()) != 0 or string-length($codeSpace/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid })
 			else ()		
 	)[position() le $limitErrors] 
@@ -315,10 +315,10 @@ let $messages :=
 				let $name := $format/gmd:MD_Format/gmd:name
 				let $version := $format/gmd:MD_Format/gmd:version
 				return
-				if (not($name) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
+                if (not($name) or not(string-length($name/gco:CharacterString/text()) != 0 or string-length($name/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.emptyName', map { 'filename': local:filename($record), 'id': $rid })
 				else if(string-length(normalize-space($version/*/text())) != 0) then
-					if (not($version) or not($version/gco:CharacterString/node() or $version/gmx:Anchor/node())) then
+                    if (not($version) or not(string-length($version/gco:CharacterString/text()) != 0 or string-length($version/gmx:Anchor/text()) != 0)) then
 						local:addMessage('TR.emptyVersion', map { 'filename': local:filename($record), 'id': $rid }) 	
 					else ()
 				else
@@ -428,7 +428,7 @@ let $messages :=
 				local:addMessage('TR.invalidPass', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($explanation)) then
 				local:addMessage('TR.noExplanation', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($explanation/gco:CharacterString/node() or $explanation/gmx:Anchor/node())) then
+            else if not(string-length($explanation/gco:CharacterString/text()) != 0 or string-length($explanation/gmx:Anchor/text()) != 0) then
 				local:addMessage('TR.emptyExplanation', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 	)[position() le $limitErrors]

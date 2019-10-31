@@ -186,9 +186,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 		 let $orgName := $poc/gmd:organisationName
 		 let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
 		 return
-		 	if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
+            if (not($orgName) or not(string-length($orgName/gco:CharacterString/text()) != 0 or string-length($orgName/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
-		 	else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
+            else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then 
 				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = 'pointOfContact')) then
 				local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'pocs': fn:string-join($pocs/gmd:role/*/@codeListValue) })
@@ -286,7 +286,7 @@ let $messages :=
 			local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
 		else if (count($title) != 1) then
 			local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
-		else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then
+        else if (not($title) or not(string-length($title/gco:CharacterString/text()) != 0 or string-length($title/gmx:Anchor/text()) != 0)) then
 			local:addMessage('TR.emptyTitle', map { 'filename': local:filename($record), 'id': $rid })
 		else ()
 	)[position() le $limitErrors]
@@ -323,7 +323,7 @@ let $messages :=
 		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
 	else if (count($abstract) != 1) then
 		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
-	else if (not($abstract/gco:CharacterString/node() or $abstract/gmx:Anchor/node())) then
+    else if (not($abstract) or not(string-length($abstract/gco:CharacterString/text()) != 0 or string-length($abstract/gmx:Anchor/text()) != 0)) then
 		local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($record), 'id': $rid })
 	else ()
 	)[position() le $limitErrors]
@@ -363,9 +363,9 @@ let $messages :=
 				let $orgName := $poc/gmd:organisationName
 				let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
 				return
-					if (not($orgName) or not($orgName/gco:CharacterString/node() or $orgName/gmx:Anchor/node())) then
+                    if (not($orgName) or not(string-length($orgName/gco:CharacterString/text()) != 0 or string-length($orgName/gmx:Anchor/text()) != 0)) then
 					    local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
-				    else if (not($email) or not($email/gco:CharacterString/node() or $email/gmx:Anchor/node())) then
+                    else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then
 					    local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 				    else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
 					    local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid })
@@ -579,7 +579,7 @@ let $messages :=
 	 let $dateTypeCode := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
 	 return 
 	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
-	 	else if (not($title/gco:CharacterString/node() or $title/gmx:Anchor/node())) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+        else if (not(string-length($title/gco:CharacterString/text()) != 0 or string-length($title/gmx:Anchor/text()) != 0)) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 		else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $title/*/text(), 'keywords' : $keywords})
 	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $title/*/text(), 'keywords' : $keywords})
 		else ()

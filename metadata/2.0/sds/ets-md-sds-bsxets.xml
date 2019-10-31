@@ -104,7 +104,7 @@ let $messages :=
 				local:addMessage('TR.wrongHierarchyLevelMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($level)) })
 			else if(count($levelname) != 1) then
 				local:addMessage('TR.wrongHierarchyLevelNameMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($levelname)) })
-			else if ( not($levelname/gco:CharacterString/node() or $levelname/gmx:Anchor/node()) ) then
+            else if not(string-length($levelname/gco:CharacterString/text()) != 0 or string-length($levelname/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.emptyHierarchyLevelName', map { 'filename': local:filename($record), 'id': $rid })
 			else()
 return
@@ -443,7 +443,7 @@ let $messages :=
 			local:addMessage('TR.oneDataQuality', map { 'filename': local:filename($record), 'id': $rid })
 		else if ( not($codeListValue) ) then
 			local:addMessage('TR.invalidCodeListValueSDS', map { 'filename': local:filename($record), 'id': $rid })
-		else if ( not($scopeDescription) or not($scopeDescription/gco:CharacterString/node() or $scopeDescription/gmx:Anchor/node()) ) then
+        else if (not($scopeDescription) or not(string-length($scopeDescription/gco:CharacterString/text()) != 0 or string-length($scopeDescription/gmx:Anchor/text()) != 0)) then
 			local:addMessage('TR.missingScopeDescription', map { 'filename': local:filename($record), 'id': $rid })
 		else()
 	)[position() le $limitErrors]
