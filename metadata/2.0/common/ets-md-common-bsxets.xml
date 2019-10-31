@@ -579,7 +579,7 @@ let $messages :=
 	 let $dateTypeCode := $thesaurus/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
 	 return 
 	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
-        else if not(string-length($title/gco:CharacterString/text()) != 0 or string-length($title/gmx:Anchor/text()) != 0) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
+        else if (not(string-length($title/gco:CharacterString/text()) != 0 or string-length($title/gmx:Anchor/text()) != 0)) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 		else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $title/*/text(), 'keywords' : $keywords})
 	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $title/*/text(), 'keywords' : $keywords})
 		else ()
