@@ -387,7 +387,7 @@ let $messages :=
 		for $onLine in $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource
 			let $url := $onLine/gmd:linkage/gmd:URL
 			return
-            if not(string-length($url/text()) != 0) then
+            if (not(string-length($url/text()) != 0)) then
 				local:addMessage('TR.linkageWithoutURL', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not(matches($url/text(), $regex_url))) then
 					local:addMessage('TR.invalidURL', map { 'filename': local:filename($record), 'id': $rid, 'url': $url/text()})
