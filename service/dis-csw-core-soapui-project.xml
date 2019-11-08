@@ -30,7 +30,14 @@ def capabilities = new XmlSlurper(false, true).parseText(response);
 
 def operation = capabilities.depthFirst().findAll{it.name() == 'Operation' &amp;&amp; it.'@name' == 'GetRecords' &amp;&amp; it.parent().name() == 'OperationsMetadata'}[0];
 
-def getrecords_endpoint = operation.DCP.HTTP.Get.'@xlink:href';
+def getrecords_endpoint = testRunner.testCase.testSuite.project.getPropertyValue('serviceEndpoint').toString().split(/\?/)[0];
+
+if (operation.DCP.HTTP.Get.'@xlink:href'.size() != 0){
+	getrecords_endpoint = operation.DCP.HTTP.Get.'@xlink:href';
+}
+else if (operation.DCP.HTTP.Post.'@xlink:href'.size() != 0){
+	getrecords_endpoint = operation.DCP.HTTP.Post.'@xlink:href';
+}
 
 testRunner.testCase.testSuite.project.setPropertyValue( 'getrecords_endpoint', getrecords_endpoint.toString());
 </script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="c2bf56ae-2544-4b9d-9fdf-28654aa6111f" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="check-initial-testcase" searchProperties="true"><con:description>&lt;p>This test case checks whether the Executable Test Suite has been initialized. If it has not been, it runs the initialization test case.&lt;/p></con:description><con:settings/><con:testStep type="groovy" name="run-initial-testcase-if-needed" id="832adc57-d05d-46a7-a631-4058a843a114"><con:settings/><con:config><script>def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
