@@ -361,11 +361,13 @@ let $messages :=
 		    else
 				for $poc in $pocs
 				let $orgName := $poc/gmd:organisationName
-				let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+				let $email := 
+				    for $y in $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address
+                    return $y/gmd:electronicMailAddress
 				return
                     if (not($orgName) or not(string-length($orgName/gco:CharacterString/text()) != 0 or string-length($orgName/gmx:Anchor/text()) != 0)) then
 					    local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
-                    else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then
+                    else if (count($email) = 0 or not(count(string-length($email/gco:CharacterString/text()) != 0) or count(string-length($email/gmx:Anchor/text()) != 0))) then
 					    local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 				    else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
 					    local:addMessage('TR.noPointOfContactRole', map { 'filename': local:filename($record), 'id': $rid })
