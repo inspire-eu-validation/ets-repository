@@ -191,7 +191,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
             else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then 
 				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 		 	else if (not($poc/gmd:role) or not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = 'pointOfContact')) then
-				local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'pocs': fn:string-join($pocs/gmd:role/*/@codeListValue) })
+				local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'poc': fn:string($poc/gmd:role/gmd:CI_RoleCode/@codeListValue)})
 		 	else ()
 		)[position() le $limitErrors]
 	return
