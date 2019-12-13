@@ -178,29 +178,37 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 		(for $record in $records
 		 let $rid := $record/gmd:fileIdentifier/*/text()
 		 let $pocs := $record/gmd:contact/gmd:CI_ResponsibleParty
+		 let $iso19115_CIRoleCode := ('resourceProvider','custodian','owner','user','distributor','originator','pointOfContact','principalInvestigator','processor','publisher','author')
 		 let $RoleCodes := $pocs/gmd:role/gmd:CI_RoleCode
 		 let $invalidCodeListValue := 
 		 (for $y in $RoleCodes 
 			return 
 		 		if ($RoleCodes/@codeListValue = 'pointOfContact') then ()
-				else $y)
+				else $y/@codeListValue)
 		 return
-		 if(not($pocs)) then 
-			local:addMessage('TR.noMetadataContact', map { 'filename': local:filename($record), 'id': $rid })
-		 else if(count($invalidCodeListValue) = count($RoleCodes)) then
-			local:addMessage('TR.noMetadataContactRole2', map { 'filename': local:filename($record), 'id': $rid})
-		 else
-		 for $poc in $pocs
-		 let $orgName := $poc/gmd:organisationName
-		 let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
-		 return
-            if (not($orgName) or not(string-length($orgName/gco:CharacterString/text()) != 0 or string-length($orgName/gmx:Anchor/text()) != 0)) then
-				local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
-            else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then 
-				local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($poc/gmd:role)) then
-				local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid, 'poc': fn:string($poc/gmd:role/gmd:CI_RoleCode/@codeListValue)})
-		 	else ()
+			if(not($pocs)) then 
+				local:addMessage('TR.noMetadataContact', map { 'filename': local:filename($record), 'id': $rid })
+			else if(1=1)
+				for $poc in $pocs
+				let $orgName := $poc/gmd:organisationName
+				let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+				return
+					if (not($orgName) or not(string-length($orgName/gco:CharacterString/text()) != 0 or string-length($orgName/gmx:Anchor/text()) != 0)) then
+						local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
+					else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then 
+						local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
+					else if (not($poc/gmd:role)) then
+						local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid})
+					else ()
+			else if(count($invalidCodeListValue) = count($RoleCodes) or not($invalidCodeListValue = $iso19115_CIRoleCode)) then
+				for $poc in $pocs
+				return
+					if (count($invalidCodeListValue) = count($RoleCodes))
+						local:addMessage('TR.invalidMetadataContactRoleCodeListValue', map { 'filename': local:filename($record), 'id': $rid, 'poc': fn:string($poc/gmd:role/gmd:CI_RoleCode/@codeListValue)})
+					else if (not($poc/gmd:role/gmd:CI_RoleCode/@codeListValue = $iso19115_CIRoleCode)) then
+						local:addMessage('TR.invalidMetadataContactRoleCodeListValue', map { 'filename': local:filename($record), 'id': $rid, 'poc': fn:string($poc/gmd:role/gmd:CI_RoleCode/@codeListValue)})
+					else ()
+			else()	
 		)[position() le $limitErrors]
 	return
 	(if ($messages) then 'FAILED' else 'PASSED',
