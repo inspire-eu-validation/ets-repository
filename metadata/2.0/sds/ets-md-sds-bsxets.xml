@@ -106,8 +106,6 @@ let $messages :=
 				local:addMessage('TR.wrongHierarchyLevelNameMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($levelname)) })
             else if (not(string-length($levelname/gco:CharacterString/text()) != 0 or string-length($levelname/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.emptyHierarchyLevelName', map { 'filename': local:filename($record), 'id': $rid })
-			else if ($levelname/gco:CharacterString/text() != lower-case($levelname/gco:CharacterString/text()) or $levelname/gmx:Anchor/text() != lower-case($levelname/gmx:Anchor/text())) then
-				local:addMessage('TR.invalidHierarchyLevelName', map { 'filename': local:filename($record), 'id': $rid })
 			else()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -459,8 +457,6 @@ let $messages :=
 			local:addMessage('TR.invalidCodeListValueSDS', map { 'filename': local:filename($record), 'id': $rid })
         else if (not($scopeDescription) or not(string-length($scopeDescription/gco:CharacterString/text()) != 0 or string-length($scopeDescription/gmx:Anchor/text()) != 0)) then
 			local:addMessage('TR.missingScopeDescription', map { 'filename': local:filename($record), 'id': $rid })
-		else if ($scopeDescription/gco:CharacterString/text() != lower-case($scopeDescription/gco:CharacterString/text()) or $scopeDescription/gmx:Anchor/text() != lower-case($scopeDescription/gmx:Anchor/text())) then
-			local:addMessage('TR.invalidScopeDescription', map { 'filename': local:filename($record), 'id': $rid })
 		else()
 	)[position() le $limitErrors]
 return
