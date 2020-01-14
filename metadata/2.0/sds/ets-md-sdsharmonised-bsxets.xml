@@ -5,7 +5,7 @@
 	<itemHash>bQ==</itemHash>
 	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/metadata/2.0</remoteResource>
 	<localPath>/auto</localPath>
-	<label>Conformance Class 7: INSPIRE Harmonised Spatial Data Services metadata.</label>
+	<label>Monitoring Requirements for INSPIRE metadata TEST</label>
 	<description>
 		<![CDATA[This test suite examines metadata records against the requirements for metadata in INSPIRE.<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
 Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
@@ -69,36 +69,53 @@ Pre-requisite conformance classes: Conformance Class 6]]>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID66cee90e-ccb1-4ad1-b857-826cd50fb60f">
-									<label>md sds-harmonised 7.1: Invocation Metadata</label>
+									<label>M.1: Spatial scope code list</label>
 									<description><![CDATA[<p>Test that the invocation metadata for the Spatial Data Harmonized Services is provided.</p>
 									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-harmonised/invocation-metadata" target="_blank">Invocation Metadata</a></p>]]></description>
 									<parent ref="EID53fc455a-3cc2-471a-ba6c-3c3bba442823"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $messages :=  		
+let $messages := 
 	(for $record in $records
-		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $operations := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata
-		return 	 									
-		if (count($operations) &gt; 0)  then
-			for $ops in $operations
-				let $connPoint := $ops/srv:connectPoint
-				return
-				if ($connPoint) then
-					for $conn in $connPoint
-						let $url := $connPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
-						return
-						if (count($url) = 0) then
-							local:addMessage('TR.noUrlElement', map { 'filename': local:filename($record), 'id': $rid })
-						else if(fn:starts-with($url, $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL)) then
-							local:addMessage('TR.invalidUrlElement', map { 'filename': local:filename($record), 'id': $rid })
-						else ()
-				else (
-					local:addMessage('TR.noConnectPoint', map { 'filename': local:filename($record), 'id': $rid })
-				)
+	let $rid := $record/gmd:fileIdentifier/*/text()
+	let $descriptiveKeywords := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
 		else
-			local:addMessage('TR.missingSV_OperationMetadata', map { 'filename': local:filename($record), 'id': $rid })
-	)[position() le $limitErrors] 
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
+	let $keywordsAnchor :=
+		for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor
+		where ($x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/european' or
+			  $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/global' or
+			  $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local' or
+			  $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/national' or
+			  $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/regional')
+		return $x
+	let $keywordsCharacterString :=
+	 	for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString
+		where ($x = 'European' or
+			  $x = 'Global' or
+			  $x = 'Local' or
+			  $x = 'National' or
+			  $x = 'Regional')
+		return $x
+	let $thesaurusNameTitle := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+	let $validThesaurusNameTitle :=
+		for $x in $thesaurusNameTitle
+		where ($x = 'Spatial scope' or
+			  $x/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope')
+		return $x
+	return
+	if (count($keywordsAnchor) = 0 and count($keywordsCharacterString) = 0) then
+		local:addMessage('TR.spatialScopeCodeListMissing', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($validThesaurusNameTitle) = 0) then
+		local:addMessage('TR.spatialScopeCitationMissing', map { 'filename': local:filename($record), 'id': $rid })
+	else()
+	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -107,103 +124,12 @@ return
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.noUrlElement"/>
-										<translationTemplate ref="TR.invalidUrlElement"/>
+										<translationTemplate ref="TR.spatialScopeCodeListMissing"/>
+										<translationTemplate ref="TR.spatialScopeCitationMissing"/>
 										<translationTemplate ref="TR.missingSV_OperationMetadata"/>
 									</translationTemplates>
 								</TestAssertion>
-								<TestAssertion id="EID191ba477-f310-481d-8f4f-2346397f3a0c">
-									<label>md sds-harmonised 7.2: Operation Metadata</label>
-									<description><![CDATA[<p>Test that operation metadata is encoded correctly.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-harmonised/operation-metadata" target="_blank">Operation Metadata</a></p>]]></description>
-									<parent ref="EID53fc455a-3cc2-471a-ba6c-3c3bba442823"/>
-									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>									
-let $messages :=
-	(for $record in $records
-		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $operations := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata
-		return
-		if (count($operations) = 0)  then
-			local:addMessage('TR.missingSV_OperationMetadata', map { 'filename': local:filename($record), 'id': $rid })
-		else
-			for $ops in $operations
-				let $name := $ops/srv:operationName
-				let $dcpList := $ops/srv:DCP/srv:DCPList
-				let $url := $ops/srv:connectPoint/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
-	 			return
-                if (not(count($name) = 1) or not(string-length($name/gco:CharacterString/text()) != 0 or string-length($name/gmx:Anchor/text()) != 0)) then
-					local:addMessage('TR.noOperationName',  map { 'filename': local:filename($record), 'id': $rid, 'name': $name/*/text() })
-				else if (not($dcpList)) then
-					local:addMessage('TR.noDcpList',  map { 'filename': local:filename($record), 'id': $rid, 'name': $name/*/text() })
-				else if (not($url)) then
-					local:addMessage('TR.noUrlElement', map { 'filename': local:filename($record), 'id': $rid, 'name': $name/*/text() })
-				else ()
-	)[position() le $limitErrors]
-return
-(if ($messages) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
-							  </expression>
-									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-									<translationTemplates>
-										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.noOperationName"/>
-										<translationTemplate ref="TR.noDcpList"/>
-										<translationTemplate ref="TR.noUrlElement"/>
-										<translationTemplate ref="TR.missingSV_OperationMetadata"/>
-									</translationTemplates>
-								</TestAssertion>
-								<TestAssertion id="EIDbf8645ef-8ede-4f62-8897-f875d345e39e">
-									<label>md sds-harmonised 7.3: Operation Metadata Parameters</label>
-									<description><![CDATA[<p>Test that operation metadata parameters are provided correctly.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds-harmonised/operation-metadata-parameters" target="_blank">Operation Metadata Parameters</a></p>]]></description>
-									<parent ref="EID53fc455a-3cc2-471a-ba6c-3c3bba442823"/>
-									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>
-let $booleanValues := ('true','false')
-let $messages :=
-	(for $record in $records
-		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $parameters := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:containsOperations/srv:SV_OperationMetadata/srv:parameters/srv:SV_Parameter
-		return
-		if (count($parameters) &gt; 0) then 
-			for $param in $parameters
-				let $name := $param/srv:name/gco:aName
-				let $attributeType := $param/srv:name/gco:attributeType
-				let $optionality := $param/srv:optionality
-				let $repeat := $param/srv:repeatability/gco:Boolean
-				let $paramType := $param/srv:valueType/gco:TypeName/gco:Name
-	 			return
-                if (count($name) != 1 or not($name) or not(string-length($name/gco:CharacterString/text()) != 0 or string-length($name/gmx:Anchor/text()) != 0)) then
-					local:addMessage('TR.noNameElement',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else if (count($attributeType) != 1 or not(fn:string-length(normalize-space($attributeType//text())) &gt; 0)) then
-					local:addMessage('TR.noAttributeType',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-                else if (count($optionality) != 1 or not($optionality) or not(string-length($optionality/gco:CharacterString/text()) != 0 or string-length($optionality/gmx:Anchor/text()) != 0)) then
-					local:addMessage('TR.noOptionality',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else if (count($repeat) != 1 or not($repeat/text() = $booleanValues)) then
-					local:addMessage('TR.noRepeatability',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else if (count($paramType) != 1 or not($paramType)) then
-					local:addMessage('TR.noParamType',  map { 'filename': local:filename($record), 'id': $rid, 'parameter': $name//text() })
-				else () 
-			else()					
-	)[position() le $limitErrors] 
-return
-(if ($messages) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
- $messages)
-							  </expression>
-									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-									<translationTemplates>
-										<translationTemplate ref="TR.recordsWithErrors"/>
-										<translationTemplate ref="TR.noNameElement"/>
-										<translationTemplate ref="TR.noAttributeType"/>
-										<translationTemplate ref="TR.noOptionality"/>
-										<translationTemplate ref="TR.noRepeatability"/>
-										<translationTemplate ref="TR.noParamType"/>
-									</translationTemplates>
-								</TestAssertion>
+								
 							</testAssertions>
 						</TestStep>
 					</testSteps>
