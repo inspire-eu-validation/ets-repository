@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite 
+	xmlns="http://www.interactive-instruments.de/etf/2.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	id="EID0b1956d9-896a-4b7c-be14-e227052c8829" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/metadata/2.0</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Monitoring Requirements for INSPIRE metadata</label>
+	<description>
+		<![CDATA[<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring" target="_blank">Monitoring Requirements for INSPIRE metadata</a><br/><br/>]]>
+	</description>
+	<reference>../../../inspire-md-bsxets.xq</reference>
+		<version>0.1.1</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-01-14T00:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-01-14T00:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for metadata XML test objects">
+		<!-- TODO clean up, currently disabled due to open issues with schema validation
+		<parameter name="encoding" required="false"><defaultValue>CSW ISO AP 1.0.0</defaultValue><description ref="TR.metadataEncoding"/><allowedValues>^(CSW ISO AP 1\.0\.0|ISO/TS 19139)$</allowedValues><type>string</type></parameter><parameter name="Schema_file" required="false"><description ref="TR.metadataSchema"/><allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)?$</allowedValues><type>string</type></parameter>
+		-->
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID59692c11-df86-49ad-be7f-94a1e1ddd8da"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID5f19352f-40f8-4a21-8cd0-4117e85cc511">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID0b1956d9-896a-4b7c-be14-e227052c8829"/>
+			<testCases>
+				<TestCase id="EID5f7e3e70-dbd5-449c-82d7-5374354b6bd7">
+					<label>General requirements</label>
+					<description>Execute tests that apply for all metadata records on elements that are directly child elements of the root node of the XML document: MD_Metadata node.
+					</description>
+					<parent ref="EID5f19352f-40f8-4a21-8cd0-4117e85cc511"/>
+					<testSteps>
+						<TestStep id="EID17947c8a-250d-4eea-88d9-d4d39dc6c907">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5f7e3e70-dbd5-449c-82d7-5374354b6bd7"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+
+								<TestAssertion id="EIDb4849d77-d7ca-465c-94dc-d6d71ffd6cd1">
+									<label>M.1: Spatial scope code list</label>
+									<description><![CDATA[<p>Test that the spatial scope covered by the data set, data series or service is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring/spatial-scope" target="_blank">Spatial Scope Code List</a></p>]]></description>
+									<parent ref="EID17947c8a-250d-4eea-88d9-d4d39dc6c907"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	 let $rid := $record/gmd:fileIdentifier/*/text()
+	 let $descriptiveKeywords := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
+	 let $keywordsAnchor :=
+		for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor
+		where $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/european'
+				or $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/global'
+				or $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local'
+				or $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/national'
+				or $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/regional'
+		return $x
+	 let $keywordsCharacterString :=
+	 	for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString
+		where $x = 'European'
+				or $x = 'Global'
+				or $x = 'Local'
+				or $x = 'National'
+				or $x = 'Regional'
+		return $x
+	return
+	if (count($keywordsAnchor) = 0 and count($keywordsCharacterString) = 0) then
+		local:addMessage('TR.spatialScopeCodeListMissing', map { 'filename': local:filename($record), 'id': $rid })
+	else()
+	)[position() le $limitErrors]
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  		</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.spatialScopeCodeListMissing"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+
+							</testAssertions>
+							</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
