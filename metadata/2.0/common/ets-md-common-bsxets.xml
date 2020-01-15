@@ -561,8 +561,10 @@ let $messages :=
 			let $endPosition := $extent/gml:TimePeriod/gml:endPosition
 			return
 		if ($timePosition) then
-			if ((not($timePosition/@indeterminatePosition) and not($timePosition/@indeterminatePosition = 'now')) and not(matches($timePosition/text(), $regex))) then
+			if (not($timePosition/@indeterminatePosition)  and not(matches($timePosition/text(), $regex))) then
 				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
+			else if($timePosition/@indeterminatePosition and not($timePosition/@indeterminatePosition = 'unknown' or $timePosition/@indeterminatePosition = 'now')) then
+				local:addMessage('TR.wrongTimeIndeterminatePosition', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 		else if($timePeriod) then
 			if (not($beginPosition/@indeterminatePosition) and not(matches($beginPosition/text(), $regex))) then
