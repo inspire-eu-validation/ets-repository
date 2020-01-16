@@ -309,7 +309,6 @@ return
 <!-- DONE -->
 let $urls := $records/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
 let $map := local:check-resource-uris($urls, 30, true())
-
 let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
@@ -334,7 +333,15 @@ let $messages :=
 					local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
 				else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
 					try { 
-						let $root := fn:doc($url)/element()
+						try{
+							let $root := fn:doc($url)/element()
+						}catch *{
+							if (starts-with($url, 'http')) then
+								let $root := fn:doc(fn:replace($url,"http://","https://"))/element()
+							else if (starts-with($url, 'https')) then
+								let $root := fn:doc(fn:replace($url,"https://","http://"))/element()
+							else ()
+						}
 						let $validCodes := ('dataset','series')
 						return
 						if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
