@@ -14,11 +14,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds" target="_b
 <br/><br/>
 Pre-requisite conformance classes: none]]></description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2019-06-06T18:12:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-01-16T16:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -308,8 +308,7 @@ return
 									<expression>
 <!-- DONE -->
 let $urls := $records/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
-let $map := local:check-resource-uris($urls, 30, false())
-
+let $map := local:check-resource-uris($urls, 30, true())
 let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
@@ -334,7 +333,7 @@ let $messages :=
 					local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
 				else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
 					try { 
-						let $root := fn:doc($url)/element()
+						let $root := local:switch-url-request($url)
 						let $validCodes := ('dataset','series')
 						return
 						if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
