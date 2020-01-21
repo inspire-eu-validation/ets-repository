@@ -2530,7 +2530,7 @@ try {
 	}
 }
 
-assert "completed" == autoConfiguration, "Failed to initialize Executable Test Suite"
+assert autoConfiguration == "completed", "Failed to initialize Executable Test Suite"
 </script></con:config>
       </con:testStep><con:testStep type="httprequest" name="Get Schema Definition" id="2911de8f-d001-415f-88d4-8d9da1be57fd"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="Get Schema Definition" id="0c05e8a6-f0ca-4457-bd10-2db68e643ad1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Get the schema definition for one FeatureType. This test step will most likely fail, if the Output Format is listed in the Capabilities but not supported by the implementing service. If the service is capable to serve the requested Output Format  but rejects the request, there might be an issue with the encoding of whitespaces ( %20 ) from the request. For technical reasons the schema must be publicly accesible without authentication and the test step will fail if this is not the case! Called by 'Analyze WFS Capabilities'.</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#endpt.DescribeFeatureType.Get}</con:endpoint><con:request/><con:assertion type="GroovyScriptAssertion" id="23a3c57b-db96-4570-a061-dec3596ebf12" name="SchemaLocations are publicly accessible without authentication"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
 import de.interactive_instruments.*
@@ -2618,9 +2618,10 @@ SOAPUI_I.init(log,context,testRunner);
 
 ProjectHelper ph = new ProjectHelper();
 
-String autoConfigurationCompleted = ph.getTestCase("AutoConfigure WFS").getPropertyValue("AutoConfigurationCompleted")
+def autoConfigurationCompleted = ph.getTestCase("AutoConfigure WFS").getPropertyValue("AutoConfigurationCompleted")
+def falseResult = "false"
 
-if(!"true".equals(autoConfigurationCompleted)) {
+if(falseResult.equals(autoConfigurationCompleted.toString())) {
 	throw new TranslatableAssertionError("TR.initializationAndBasicChecksFailed");
 }</script></con:config></con:testStep><con:properties><con:property><con:name>capabilities</con:name><con:value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><![CDATA[<wfs:WFS_Capabilities xsi:schemaLocation="http://www.opengis.net/wfs/2.0 http://aaaxs02/aaa-suite/schema/ogc/wfs/2.0/wfs.xsd http://inspire.ec.europa.eu/schemas/inspire_dls/1.0 http://aaaxs02/aaa-suite/schema/inspire/inspire_dls/1.0/inspire_dls.xsd" version="2.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:inspire_common="http://inspire.ec.europa.eu/schemas/common/1.0" xmlns:inspire_dls="http://inspire.ec.europa.eu/schemas/inspire_dls/1.0">
    <ows:ServiceIdentification>
@@ -4762,7 +4763,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.isTrue("//*[contains(@*:schemaLocation,'inspire_dls.xsd')]", "TR.missingDownloadServiceSchema");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="efa4fb4d-41e2-4da2-9719-2d97223a91c1" name="ExtendedCapabilities element exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("/wfs:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]", "TR.capabilities.extended.inspire.missingElement");</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+a.exists("//wfs:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities", "TR.capabilities.extended.inspire.missingElement");
+</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
           <con:jmsPropertyConfig/>
           <con:parameters>
 
@@ -5100,9 +5102,9 @@ Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*/@*:schemaLocation", "TR.missingSchemaLocation");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="2afebc3c-44dd-4822-be67-892e55ef4106" name="Metadata has ISO Metadata element (gmd_MD_Metadata exists)"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//gmd:MD_Metadata",
-  "TR.notIsoMetadata"
-)</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="fdd11996-f179-4179-a8e5-2db146b2338c" name="Metadata contains a coupled resource (srv:operatesOn)"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+   "//gmd:MD_Metadata", 
+   "TR.notIsoMetadata"
+   )</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="fdd11996-f179-4179-a8e5-2db146b2338c" name="Metadata contains a coupled resource (srv:operatesOn)"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn",
@@ -5248,7 +5250,7 @@ for( crs in supportedCrs ) {
 			ph.setTransferProperty("language", language)
 			ph.setTransferProperty("dataSetIdCode", dataSetIdCode)
 			ph.setTransferProperty("dataSetIdNamespace", spatialDataSetIdentifierNamespaces[i])
-   			ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier")
+   		ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier")
 		}
 	}
 }
