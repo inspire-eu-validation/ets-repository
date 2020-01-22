@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID9a31ecfc-6673-43c0-9a31-b4595fb53a98" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
 	<itemHash>bQ==</itemHash>
-	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/data/interoperability-metadata</remoteResource>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data/interoperability-metadata</remoteResource>
 	<localPath>/auto</localPath>
 	<label>Conformance class: Metadata for interoperability</label>
 	<description><![CDATA[This test suite examines metadata records against the requirements for metadata for interoperability in INSPIRE.<br/><br/>
@@ -9,9 +9,9 @@
 Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data/master/interoperability-metadata" target="_blank">Conformance class 'Metadata for interoperability'</a><br/><br/>
 Pre-requisite conformance classes:
-<ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/master/iso-19115-19119" target="_blank">Conformance Class 'INSPIRE Profile based on EN ISO 19115 and EN ISO 19119'</a></li></ul>]]></description>
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119" target="_blank">Conformance Class 'INSPIRE Profile based on EN ISO 19115 and EN ISO 19119'</a></li></ul>]]></description>
 	<reference>../../inspire-md-bsxets.xq</reference>
-	<version>0.2.4</version>
+	<version>0.2.5</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-12-07T00:00:00Z</creationDate>
 	<lastEditor>interactive instruments GmbH</lastEditor>
@@ -87,19 +87,15 @@ Inspect the data set metadata whether metadata describing the coordinate referen
 									<parent ref="EID8f1b8fb1-1ddb-4ecf-8dbc-b0d33fe9ffcf"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $crsuris := (
-'http://www.opengis.net/def/crs/EPSG/0/4936', 'http://www.opengis.net/def/crs/EPSG/0/4937', 'http://www.opengis.net/def/crs/EPSG/0/4258', 'http://www.opengis.net/def/crs/EPSG/0/3035', 'http://www.opengis.net/def/crs/EPSG/0/3034', 'http://www.opengis.net/def/crs/EPSG/0/3038', 'http://www.opengis.net/def/crs/EPSG/0/3039', 'http://www.opengis.net/def/crs/EPSG/0/3040', 'http://www.opengis.net/def/crs/EPSG/0/3041', 'http://www.opengis.net/def/crs/EPSG/0/3042', 'http://www.opengis.net/def/crs/EPSG/0/3043', 'http://www.opengis.net/def/crs/EPSG/0/3044', 'http://www.opengis.net/def/crs/EPSG/0/3045', 'http://www.opengis.net/def/crs/EPSG/0/3046', 'http://www.opengis.net/def/crs/EPSG/0/3047', 'http://www.opengis.net/def/crs/EPSG/0/3048', 'http://www.opengis.net/def/crs/EPSG/0/3049', 'http://www.opengis.net/def/crs/EPSG/0/3050', 'http://www.opengis.net/def/crs/EPSG/0/3051', 'http://www.opengis.net/def/crs/EPSG/0/5730', 'http://www.opengis.net/def/crs/EPSG/0/7409')
 let $levels := ('dataset', 'series')
 let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $crs := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/gco:CharacterString
+	 let $crs := $record/gmd:referenceSystemInfo/gmd:MD_ReferenceSystem/gmd:referenceSystemIdentifier/gmd:RS_Identifier/gmd:code/*
 	 return
 	 if (not($crs)) then
 		local:addMessage('TR.noCoordinateReferenceSystem', map { 'filename': local:filename($record), 'id': $rid })
-	 else if (not($crs=$crsuris)) then
-		local:addMessage('TR.unknownCRS3', map { 'filename': local:filename($record), 'id': $rid, 'crs': string-join($crs, ',') })
 	 else ()
 	)[position() le $limitErrors]
 return
@@ -110,7 +106,6 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noCoordinateReferenceSystem"/>
-										<translationTemplate ref="TR.unknownCRS3"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -259,7 +254,7 @@ let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
 	(for $record in $recordsToInspect
 	 let $rid := $record/gmd:fileIdentifier/*/text()
-	 let $codes := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode/@codeListValue
+	 let $codes := $record/gmd:identificationInfo/*/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode/@codeListValue
 	 return
 	 if (not($codes)) then
 		local:addMessage('TR.noSpatialRepresentationType', map { 'filename': local:filename($record), 'id': $rid })

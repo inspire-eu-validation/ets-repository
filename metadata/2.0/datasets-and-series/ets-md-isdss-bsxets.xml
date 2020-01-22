@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ExecutableTestSuite 
-	xmlns="http://www.interactive-instruments.de/etf/2.0" 
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID2be1480a-fe42-40b2-9420-eb0e69385c80" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
 	<itemHash>bQ==</itemHash>
-	<remoteResource>http://github.com/inspire-eu-validation/ets-repository/metadata/2.0</remoteResource>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/metadata/2.0</remoteResource>
 	<localPath>/auto</localPath>
 	<label>Conformance Class 2: INSPIRE data sets and data set series interoperability metadata.</label>
 	<description>
-		<![CDATA[This test suite examines metadata records against the requirements for metadata in INSPIRE.<br/><br/><b>This is a draft version. 
-		It has limitations and is expected to contain errors.</b> Please report any issues or problems 
-		<a href="https://github.com/inspire-eu-validation/community/issues" target="_blank">in GitHub</a>.<br/><br/>
+		<![CDATA[This test suite examines metadata records against the requirements for metadata in INSPIRE.<br/><br/><b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>	
 Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
-There is a general limitation in all assertions that polymorphism and containment by reference (see the 
-<a href="https://github.com/inspire-eu-validation/metadata/blob/2.0/common/README.md#ref_TG_MD" target="_blank">
-Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite 
-does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; 
-in addition, schema validation is only executed against the ISO/OGC schemas without extensions).
-It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.
+There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/README#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.
 <br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss" target="_blank">Conformance Class 'INSPIRE data sets and data set 
-series interoperability metadata'</a><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss" target="_blank">Conformance Class 2: 'INSPIRE data sets and data set series interoperability metadata'</a><br/><br/>
 Pre-requisite conformance classes: Conformance Class 1]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>0.1.0</version>
+	<version>0.1.0</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
@@ -78,7 +69,7 @@ Pre-requisite conformance classes: Conformance Class 1]]>
 								<TestAssertion id="EID02c29a8c-874b-4fa6-b08d-75a0759d85a3">
 									<label>md isdss 2.1: Coordinate Reference System</label>
 									<description><![CDATA[<p>Test that the coordinate reference system identifiers are provided.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/crs" target="_blank">Coordinate Reference System</a></p>]]></description>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/crs" target="_blank">Coordinate Reference System</a></p>]]></description>
 									<parent ref="EID4d635967-1bc6-4ff4-a085-238baf880104"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -94,9 +85,9 @@ let $messages :=
 				let $code := $crs/gmd:code
 				let $codeSpace := $crs/gmd:codeSpace
 	 			return
-				if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
+                if (not($code) or not(string-length($code/gco:CharacterString/text()) != 0 or string-length($code/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid})
-				else if (($codeSpace) and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
+                else if ($codeSpace and not(string-length($codeSpace/gco:CharacterString/text()) != 0 or string-length($codeSpace/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid})
 				else () 	
 	)[position() le $limitErrors] 
@@ -104,7 +95,7 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-							  </expression>
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
@@ -116,7 +107,7 @@ return
 								<TestAssertion id="EID9cc67cd3-19cf-4475-b2aa-dcbedab9f685">
 									<label>md isdss 2.2: Coordinate Reference System Identifiers</label>
 									<description><![CDATA[<p>Test that the default coordinate reference systems uses a correct identifier.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/crs-id" target="_blank">Coordinate Reference System Identifiers</a></p>]]></description>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/crs-id" target="_blank">Coordinate Reference System Identifiers</a></p>]]></description>
 									<parent ref="EIDef8d3d22-be0f-4618-88a2-2bc0bbfc8077"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -153,7 +144,7 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-							  </expression>
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
@@ -165,7 +156,7 @@ return
 								<TestAssertion id="EIDef8d3d22-be0f-4618-88a2-2bc0bbfc8077">
 									<label>md isdss 2.3: Temporal Reference Systems</label>
 									<description><![CDATA[<p>Test if the temporal reference system(s) is provided correctly.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/temporal-rs" target="_blank">Temporal Reference Systems</a></p>]]></description>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/temporal-rs" target="_blank">Temporal Reference Systems</a></p>]]></description>
 									<parent ref="EID4d635967-1bc6-4ff4-a085-238baf880104"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -181,9 +172,9 @@ let $messages :=
 			let $code := $crs/gmd:code
 			let $codeSpace := $crs/gmd:codeSpace
 			return
-			if (not($code) or not($code/gco:CharacterString/node() or $code/gmx:Anchor/node())) then
+            if (not($code) or not(string-length($code/gco:CharacterString/text()) != 0 or string-length($code/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.noCrsCode',  map { 'filename': local:filename($record), 'id': $rid })
-			else if (($codeSpace) and not($codeSpace/gco:CharacterString/node() or $codeSpace/gmx:Anchor/node())) then
+            else if (($codeSpace) and not(string-length($codeSpace/gco:CharacterString/text()) != 0 or string-length($codeSpace/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.noCrsCodeSpace',  map { 'filename': local:filename($record), 'id': $rid })
 			else ()		
 	)[position() le $limitErrors] 
@@ -191,7 +182,7 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-							  </expression>
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
@@ -221,7 +212,7 @@ return
 								<TestAssertion id="EIDf330358c-8d29-4069-976a-3afb9590ea51">
 									<label>md isdss 2.4: Spatial Representation Type</label>
 									<description><![CDATA[<p>Test the type of spatial representation of the data.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/spatial-representation-type" target="_blank">Spatial Representation Type</a></p>]]></description>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/spatial-representation-type" target="_blank">Spatial Representation Type</a></p>]]></description>
 									<parent ref="EIDa58167a7-8d43-4191-ad84-80c953ab0ab4"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -246,7 +237,7 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-							  </expression>
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
@@ -257,7 +248,7 @@ return
 								<TestAssertion id="EID83d11da2-265d-4080-bdc3-c25a325b824d">
 									<label>md isdss 2.5: Character Encoding</label>
 									<description><![CDATA[<p>Test that the character encoding for data sets and series is provided correctly.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/character-encoding" target="_blank">Character Encoding</a></p>]]></description>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/character-encoding" target="_blank">Character Encoding</a></p>]]></description>
 									<parent ref="EIDa58167a7-8d43-4191-ad84-80c953ab0ab4"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -266,31 +257,25 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $characterCodes := $record/gmd:identificationInfo[1]/gmd:MD_DataIdentification/gmd:characterSet/gmd:MD_CharacterSetCode
-		return 	 						
-		if ((count($characterCodes) = 1) and ($characterCodes/@codeListValue) = 'utf8') then
-			local:addMessage('TR.invalidCodeUTF8', map { 'filename': local:filename($record), 'id': $rid })
-		else 			
+		return 	 									
 			for $characterCode in $characterCodes
 				let $codeListValue := $characterCode/@codeListValue
 				let $invalidCodeValues := $codeListValue[not(. = $codes)]
 				return
 				if ($invalidCodeValues) then
 					local:addMessage('TR.invalidEncodingCode', map { 'filename': local:filename($record), 'id': $rid})
-				else if (not($characterCode/@codeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode')) then
-					local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 				else () 			
 	)[position() le $limitErrors] 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-							  </expression>
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.invalidCodeUTF8"/>
 										<translationTemplate ref="TR.invalidEncodingCode"/>
-										<translationTemplate ref="TR.wrongCodeList"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -314,7 +299,7 @@ return
 								<TestAssertion id="EID67230a54-f9b0-49d9-8928-fc5cf5d3ea8a">
 									<label>md isdss 2.6: Data Encoding</label>
 									<description><![CDATA[<p>Evaluate encoding and the storage or transmission format for data sets and series.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/data-encoding" target="_blank">Data Encoding</a></p>]]></description>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/data-encoding" target="_blank">Data Encoding</a></p>]]></description>
 									<parent ref="EIDa349088e-f3bf-4bd3-a0e9-bd3fc61181ee"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -330,10 +315,10 @@ let $messages :=
 				let $name := $format/gmd:MD_Format/gmd:name
 				let $version := $format/gmd:MD_Format/gmd:version
 				return
-				if (not($name) or not($name/gco:CharacterString/node() or $name/gmx:Anchor/node())) then
+                if (not($name) or not(string-length($name/gco:CharacterString/text()) != 0 or string-length($name/gmx:Anchor/text()) != 0)) then
 					local:addMessage('TR.emptyName', map { 'filename': local:filename($record), 'id': $rid })
 				else if(string-length(normalize-space($version/*/text())) != 0) then
-					if (not($version) or not($version/gco:CharacterString/node() or $version/gmx:Anchor/node())) then
+                    if (not($version) or not(string-length($version/gco:CharacterString/text()) != 0 or string-length($version/gmx:Anchor/text()) != 0)) then
 						local:addMessage('TR.emptyVersion', map { 'filename': local:filename($record), 'id': $rid }) 	
 					else ()
 				else
@@ -345,7 +330,7 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-							  </expression>
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
@@ -377,7 +362,7 @@ return
 								<TestAssertion id="EID0c1ad661-f3bf-49a5-b38a-3dd68e2c7bfd">
 									<label>md isdss 2.7: Topological Consistency Quantitative Results</label>
 									<description><![CDATA[<p>Test that the topological consistency quantitative results is provided correctly.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/topological-consistency-quantitative-results" target="_blank">Topological Consistency Quantitative Results</a></p>]]></description>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/topological-consistency-quantitative-results" target="_blank">Topological Consistency Quantitative Results</a></p>]]></description>
 									<parent ref="EID776ce1a6-2f16-4543-aeae-b48897b9ea54"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -403,7 +388,7 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-							  </expression>
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
@@ -415,7 +400,7 @@ return
 								<TestAssertion id="EID9fa0176c-5cc8-458b-9795-45f9a949cc56">
 									<label>md isdss 2.8: Topological Consistency Descriptive Results</label>
 									<description><![CDATA[<p>Test that the topological consistency descriptive results is provided correctly.</p>
-									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/topological-consistency-descriptive-results" target="_blank">Topological Consistency Descriptive Results</a></p>]]></description>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss/topological-consistency-descriptive-results" target="_blank">Topological Consistency Descriptive Results</a></p>]]></description>
 									<parent ref="EID776ce1a6-2f16-4543-aeae-b48897b9ea54"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -430,7 +415,6 @@ let $messages :=
 			let $title := $result/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
 			let $date := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/*/text()
 			let $dateTypeCode := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue
-			let $dateTypeCodeList := $result/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeList
 			let $pass := $result/gmd:pass
 			let $explanation := $result/gmd:explanation
 			return
@@ -438,15 +422,13 @@ let $messages :=
 				local:addMessage('TR.invalidTitle', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($date)) then
 				local:addMessage('TR.noDateElement', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($dateTypeCodeList = 'http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode')) then
-				local:addMessage('TR.wrongCodeList', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($dateTypeCode = 'publication')) then
 				local:addMessage('TR.noDateCodeList', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($pass = 'false')) then
 				local:addMessage('TR.invalidPass', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($explanation)) then
 				local:addMessage('TR.noExplanation', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($explanation/gco:CharacterString/node() or $explanation/gmx:Anchor/node())) then
+            else if (not(string-length($explanation/gco:CharacterString/text()) != 0 or string-length($explanation/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.emptyExplanation', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 	)[position() le $limitErrors]
@@ -454,7 +436,7 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
-							  </expression>
+									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.invalidTitle"/>
@@ -463,7 +445,6 @@ return
 										<translationTemplate ref="TR.invalidPass"/>
 										<translationTemplate ref="TR.noExplanation"/>
 										<translationTemplate ref="TR.emptyExplanation"/>
-										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
