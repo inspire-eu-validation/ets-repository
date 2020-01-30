@@ -219,7 +219,7 @@ let $messages :=
       if ($specialCase='NONE' and local-name($root)=$targets) then ()
       else if ($specialCase='formOfRoadNode' and local-name($root)='RoadServiceArea') then ()
       else if ($specialCase='formOfRoadNode' and local-name($root)='RoadNode') then
-       if ($root[((tn-ro3:formOfRoadNode/text() eq 'roadServiceArea') or (tn-ro:formOfRoadNode/@xlink:href eq 'https://inspire.ec.europa.eu/codelist/FormOfRoadNodeValue/roadServiceArea'))]) then ()
+       if ($root[((tn-ro3:formOfRoadNode/text() eq 'roadServiceArea') or (tn-ro:formOfRoadNode/@xlink:href eq 'http://inspire.ec.europa.eu/codelist/FormOfRoadNodeValue/roadServiceArea'))]) then ()
        else 
         for $feature in $sourcefeatures
          let $fid := string($feature/@gml:id)
