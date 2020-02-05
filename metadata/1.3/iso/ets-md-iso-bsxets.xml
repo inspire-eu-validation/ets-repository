@@ -1081,12 +1081,14 @@ let $messages := (for $record in $recordsToInspect
 		local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
     else if (matches($validuri,'^\d{3}$')) then
 		local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
-    else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.') or starts-with($validuri,'application/atom')) then
-      try { 
-      	let $root := fn:doc($url)/element()
-        	return
-        	if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
-			else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) })
+    else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml') or starts-with($validuri,'application/vnd.ogc.') or starts-with($validuri,'application/atom') or starts-with($validuri,'text/html')) then
+	  try { 
+		if (not(starts-with($validuri,'text/html'))) then
+			let $root := fn:doc($url)/element()
+				return
+				if ($root[self::wfs:WFS_Capabilities or self::wms:WMS_Capabilities or self::wcs:Capabilities or self::sos:Capabilities or self::atom:feed]) then ()
+				else local:addMessage('TR.unknownXMLResource', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'elementName': local-name($root), 'namespace': namespace-uri($root) })
+		else ()
 		} catch * {
 			local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
       }
