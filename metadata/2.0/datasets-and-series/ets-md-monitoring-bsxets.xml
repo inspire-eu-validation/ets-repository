@@ -16,7 +16,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring" tar
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-01-14T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-01-20T12:30:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-02-06T16:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -72,48 +72,79 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring" tar
 									<expression>
 let $messages := 
 	(for $record in $records
+	let $validDate := '2019-05-22'
+	let $spatialScopeCodeList := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope'
+	let $spatialScopeCodelistValue := ('European','Global','Local','National','Regional')
+	let $spatialScopeCodelistUri := ('http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/european',
+									 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/global',
+									 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local',
+									 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/national',
+									 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/regional')
 	let $rid := $record/gmd:fileIdentifier/*/text()
 	let $descriptiveKeywords := 
 		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
 			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
 		else
 			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
-	let $keywordsAnchor :=
-		for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gmx:Anchor
-		where ($x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/european' or
-			  $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/global' or
-			  $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local' or
-			  $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/national' or
-			  $x/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/regional')
+	let $MD_KeywordsSpatialScope := 
+		for $x in $descriptiveKeywords/gmd:MD_Keywords
+		where $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href = $spatialScopeCodeList or
+				$x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString = 'Spatial scope'
 		return $x
-	let $keywordsCharacterString :=
-	 	for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword/gco:CharacterString
-		where ($x = 'European' or
-			  $x = 'Global' or
-			  $x = 'Local' or
-			  $x = 'National' or
-			  $x = 'Regional')
+	let $keywordAnchorSpatialScope :=
+		for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
+		where $x/gmx:Anchor/@xlink:href[starts-with(.,$spatialScopeCodeList)]
+		return $x
+	let $validAnchorInMD_KeywordsSpatialScope := 
+		for $x in $MD_KeywordsSpatialScope/gmd:keyword
+		where ($x/gmx:Anchor/@xlink:href = $spatialScopeCodelistUri)
+		return $x
+	let $validCharacterStringInMD_KeywordsSpatialScope := 
+		for $x in $MD_KeywordsSpatialScope/gmd:keyword
+		where ($x/gco:CharacterString = $spatialScopeCodelistValue)
+		return $x	
+	let $thesaurusAnchorCodelist := 
+		for $x in $descriptiveKeywords/gmd:MD_Keywords
+		where $x/gmd:keyword/gmx:Anchor/@xlink:href[starts-with(.,$spatialScopeCodeList)] and count($x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href) > 0
+		return $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor
+	let $validThesaurusAnchorCodelist := 
+		for $x in $thesaurusAnchorCodelist
+		where $x/@xlink:href = $spatialScopeCodeList
 		return $x
 	let $thesaurusNameTitle := 
 		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
 			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
 		else
-			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
-	let $validThesaurusNameTitle :=
-		for $x in $thesaurusNameTitle
-		where ($x = 'Spatial scope' or
-			  $x/gmx:Anchor/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope')
-		return $x
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title		
 	return
-	if (count($keywordsAnchor) = 0 and count($keywordsCharacterString) = 0) then
+	
+	if (count($MD_KeywordsSpatialScope) = 0 and count($keywordAnchorSpatialScope) = 0) then
 		local:addMessage('TR.manualCheckSpatialScope', map { 'filename': local:filename($record), 'id': $rid })
-	else if ((count($keywordsAnchor) != 0 or count($keywordsCharacterString) != 0) and (count($validThesaurusNameTitle) = 0)) then
-		local:addMessage('TR.spatialScopeCitationMissing', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($MD_KeywordsSpatialScope) > 1) then
+		local:addMessage('TR.spatialScopeMultiplicity', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($thesaurusAnchorCodelist) = 1 and count($validThesaurusAnchorCodelist) = 0) then
+		local:addMessage('TR.spatialScopeInvalidThesaurusCodelist', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($keywordAnchorSpatialScope) = 1 and count($thesaurusNameTitle) = 0) then
+		local:addMessage('TR.spatialScopeCitationMissing', map { 'filename': local:filename($record), 'id': $rid })		
+	else if (count($keywordAnchorSpatialScope) > 1) then
+		local:addMessage('TR.spatialScopeKeywordMultiplicity', map { 'filename': local:filename($record), 'id': $rid })	
+	else if (count($keywordAnchorSpatialScope) = 1 and not(count($validAnchorInMD_KeywordsSpatialScope) = 1)) then
+		local:addMessage('TR.spatialScopeInvalidCodelistUri', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($keywordAnchorSpatialScope) = 0 and not(count($validCharacterStringInMD_KeywordsSpatialScope) = 1)) then
+		local:addMessage('TR.spatialScopeInvalidCodelistValue', map { 'filename': local:filename($record), 'id': $rid })
+	else if (not ($MD_KeywordsSpatialScope/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date = $validDate)) then
+		local:addMessage('TR.spatialScopeInvalidDate', map { 'filename': local:filename($record), 'id': $rid })
 	else()
 	)[position() le $limitErrors]
 return
 (if ($messages/@ref = 'TR.manualCheckSpatialScope') then 'PASSED_MANUAL' 
- else if ($messages/@ref = 'TR.spatialScopeCitationMissing') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeMultiplicity') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeKeywordMultiplicity') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeInvalidThesaurusCodelist') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeCitationMissing') then 'FAILED' 
+ else if ($messages/@ref = 'TR.spatialScopeInvalidCodelistUri') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeInvalidCodelistValue') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeInvalidDate') then 'FAILED' 
  else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
@@ -122,7 +153,13 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.manualCheckSpatialScope"/>
+										<translationTemplate ref="TR.spatialScopeMultiplicity"/>
+										<translationTemplate ref="TR.spatialScopeKeywordMultiplicity"/>
+										<translationTemplate ref="TR.spatialScopeInvalidThesaurusCodelist"/>
 										<translationTemplate ref="TR.spatialScopeCitationMissing"/>
+										<translationTemplate ref="TR.spatialScopeInvalidCodelistUri"/>
+										<translationTemplate ref="TR.spatialScopeInvalidCodelistValue"/>
+										<translationTemplate ref="TR.spatialScopeInvalidDate"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
