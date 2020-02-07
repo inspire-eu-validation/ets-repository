@@ -218,6 +218,10 @@ let $messages :=
 		for $x in $MD_KeywordsPriorityDatasets/gmd:keyword
 		where ($x/gco:CharacterString = $priorityDatasetsCodelistValue)
 		return $x
+	let $thesaurusAnchorCodelist := 
+		for $x in $descriptiveKeywords/gmd:MD_Keywords
+		where $x/gmd:keyword/gmx:Anchor/@xlink:href[starts-with(.,$priorityDatasetsCodeList)] and count($x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href) > 0
+		return $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor	
 	let $validThesaurusAnchorCodelist := 
 		for $x in $thesaurusAnchorCodelist
 		where $x/@xlink:href = $priorityDatasetsCodeList
@@ -233,6 +237,8 @@ let $messages :=
 		local:addMessage('TR.manualCheckPriorityDatasets', map { 'filename': local:filename($record), 'id': $rid })
 	else if (count($MD_KeywordsPriorityDatasets) > 1) then
 		local:addMessage('TR.priorityDatasetsMultiplicity', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($thesaurusAnchorCodelist) = 1 and count($validThesaurusAnchorCodelist) = 0) then
+		local:addMessage('TR.priorityDatasetsInvalidThesaurusCodelist', map { 'filename': local:filename($record), 'id': $rid })
 	else if (count($keywordAnchorPriorityDatasets) = 1 and count($thesaurusNameTitle) = 0) then
 		local:addMessage('TR.priorityDatasetsCitationMissing', map { 'filename': local:filename($record), 'id': $rid })		
 	else if (count($keywordAnchorPriorityDatasets) != count($validAnchorInMD_KeywordsPriorityDatasets)) then
@@ -250,6 +256,7 @@ let $messages :=
 return
 (if ($messages/@ref = 'TR.manualCheckPriorityDatasets') then 'PASSED_MANUAL' 
  else if ($messages/@ref = 'TR.priorityDatasetsMultiplicity') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsInvalidThesaurusCodelist') then 'FAILED'
  else if ($messages/@ref = 'TR.priorityDatasetsOutsideMDKeyword') then 'FAILED'
  else if ($messages/@ref = 'TR.priorityDatasetsCitationMissing') then 'FAILED' 
  else if ($messages/@ref = 'TR.priorityDatasetsInvalidDate') then 'FAILED'
@@ -264,6 +271,7 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.manualCheckPriorityDatasets"/>
 										<translationTemplate ref="TR.priorityDatasetsMultiplicity"/>
+										<translationTemplate ref="TR.priorityDatasetsInvalidThesaurusCodelist"/>
 										<translationTemplate ref="TR.priorityDatasetsOutsideMDKeyword"/>
 										<translationTemplate ref="TR.priorityDatasetsCitationMissing"/>
 										<translationTemplate ref="TR.priorityDatasetsInvalidDate"/>
