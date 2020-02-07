@@ -135,6 +135,8 @@ let $messages :=
 		local:addMessage('TR.spatialScopeInvalidCodelistValue', map { 'filename': local:filename($record), 'id': $rid })
 	else if (not ($MD_KeywordsSpatialScope/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date = $validDate)) then
 		local:addMessage('TR.spatialScopeInvalidDate', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($validAnchorInMD_KeywordsSpatialScope) != 1 and count($validCharacterStringInMD_KeywordsSpatialScope) != 1) then
+		local:addMessage('TR.spatialScopeExactlyOneKeyword', map { 'filename': local:filename($record), 'id': $rid })
 	else()
 	)[position() le $limitErrors]
 return
@@ -145,7 +147,8 @@ return
  else if ($messages/@ref = 'TR.spatialScopeCitationMissing') then 'FAILED' 
  else if ($messages/@ref = 'TR.spatialScopeInvalidCodelistUri') then 'FAILED'
  else if ($messages/@ref = 'TR.spatialScopeInvalidCodelistValue') then 'FAILED'
- else if ($messages/@ref = 'TR.spatialScopeInvalidDate') then 'FAILED' 
+ else if ($messages/@ref = 'TR.spatialScopeInvalidDate') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeExactlyOneKeyword') then 'FAILED' 
  else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
@@ -161,7 +164,8 @@ return
 										<translationTemplate ref="TR.spatialScopeInvalidCodelistUri"/>
 										<translationTemplate ref="TR.spatialScopeInvalidCodelistValue"/>
 										<translationTemplate ref="TR.spatialScopeInvalidDate"/>
-										<translationTemplate ref="TR.recordsWithErrors"/>
+										<translationTemplate ref="TR.spatialScopeInvalidDate"/>
+										<translationTemplate ref="TR.spatialScopeExactlyOneKeyword"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -213,11 +217,7 @@ let $messages :=
 	let $validCharacterStringInMD_KeywordsPriorityDatasets := 
 		for $x in $MD_KeywordsPriorityDatasets/gmd:keyword
 		where ($x/gco:CharacterString = $priorityDatasetsCodelistValue)
-		return $x	
-	let $thesaurusAnchorCodelist := 
-		for $x in $descriptiveKeywords/gmd:MD_Keywords
-		where $x/gmd:keyword/gmx:Anchor/@xlink:href[starts-with(.,$priorityDatasetsCodeList)] and count($x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href) > 0
-		return $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor
+		return $x
 	let $validThesaurusAnchorCodelist := 
 		for $x in $thesaurusAnchorCodelist
 		where $x/@xlink:href = $priorityDatasetsCodeList
@@ -233,16 +233,16 @@ let $messages :=
 		local:addMessage('TR.manualCheckPriorityDatasets', map { 'filename': local:filename($record), 'id': $rid })
 	else if (count($MD_KeywordsPriorityDatasets) > 1) then
 		local:addMessage('TR.priorityDatasetsMultiplicity', map { 'filename': local:filename($record), 'id': $rid })
-	else if (count($thesaurusAnchorCodelist) = 1 and count($validThesaurusAnchorCodelist) = 0) then
-		local:addMessage('TR.priorityDatasetsInvalidThesaurusCodelist', map { 'filename': local:filename($record), 'id': $rid })
 	else if (count($keywordAnchorPriorityDatasets) = 1 and count($thesaurusNameTitle) = 0) then
 		local:addMessage('TR.priorityDatasetsCitationMissing', map { 'filename': local:filename($record), 'id': $rid })		
-	else if (count($keywordAnchorPriorityDatasets) > 1) then
-		local:addMessage('TR.priorityDatasetsKeywordMultiplicity', map { 'filename': local:filename($record), 'id': $rid })	
-	else if (count($keywordAnchorPriorityDatasets) = 1 and not(count($validAnchorInMD_KeywordsPriorityDatasets) = 1)) then
-		local:addMessage('TR.priorityDatasetsInvalidCodelistUri', map { 'filename': local:filename($record), 'id': $rid })
-	else if (count($keywordAnchorPriorityDatasets) = 0 and not(count($validCharacterStringInMD_KeywordsPriorityDatasets) = 1)) then
-		local:addMessage('TR.priorityDatasetsInvalidCodelistValue', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($keywordAnchorPriorityDatasets) != count($validAnchorInMD_KeywordsPriorityDatasets)) then
+		local:addMessage('TR.priorityDatasetsOutsideMDKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($validAnchorInMD_KeywordsPriorityDatasets) = 0 and count($validCharacterStringInMD_KeywordsPriorityDatasets) = 0) then
+		local:addMessage('TR.priorityDatasetsAtleastOneKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($validAnchorInMD_KeywordsPriorityDatasets) != count($MD_KeywordsPriorityDatasets/gmd:keyword/gmx:Anchor)) then
+		local:addMessage('TR.priorityDatasetsInvalidKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($validCharacterStringInMD_KeywordsPriorityDatasets) != count($MD_KeywordsPriorityDatasets/gmd:keyword/gco:CharacterString)) then
+		local:addMessage('TR.priorityDatasetsInvalidKeyword', map { 'filename': local:filename($record), 'id': $rid })
 	else if (not ($MD_KeywordsPriorityDatasets/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date = $validDate)) then
 		local:addMessage('TR.priorityDatasetsInvalidDate', map { 'filename': local:filename($record), 'id': $rid })
 	else()
@@ -250,12 +250,11 @@ let $messages :=
 return
 (if ($messages/@ref = 'TR.manualCheckPriorityDatasets') then 'PASSED_MANUAL' 
  else if ($messages/@ref = 'TR.priorityDatasetsMultiplicity') then 'FAILED'
- else if ($messages/@ref = 'TR.priorityDatasetsKeywordMultiplicity') then 'FAILED'
- else if ($messages/@ref = 'TR.priorityDatasetsInvalidThesaurusCodelist') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsOutsideMDKeyword') then 'FAILED'
  else if ($messages/@ref = 'TR.priorityDatasetsCitationMissing') then 'FAILED' 
- else if ($messages/@ref = 'TR.priorityDatasetsInvalidCodelistUri') then 'FAILED'
- else if ($messages/@ref = 'TR.priorityDatasetsInvalidCodelistValue') then 'FAILED'
- else if ($messages/@ref = 'TR.priorityDatasetsInvalidDate') then 'FAILED' 
+ else if ($messages/@ref = 'TR.priorityDatasetsInvalidDate') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsAtleastOneKeyword') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsInvalidKeyword') then 'FAILED'
  else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
@@ -265,12 +264,11 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.manualCheckPriorityDatasets"/>
 										<translationTemplate ref="TR.priorityDatasetsMultiplicity"/>
-										<translationTemplate ref="TR.priorityDatasetsKeywordMultiplicity"/>
-										<translationTemplate ref="TR.priorityDatasetsInvalidThesaurusCodelist"/>
+										<translationTemplate ref="TR.priorityDatasetsOutsideMDKeyword"/>
 										<translationTemplate ref="TR.priorityDatasetsCitationMissing"/>
-										<translationTemplate ref="TR.priorityDatasetsInvalidCodelistUri"/>
-										<translationTemplate ref="TR.priorityDatasetsInvalidCodelistValue"/>
 										<translationTemplate ref="TR.priorityDatasetsInvalidDate"/>
+										<translationTemplate ref="TR.priorityDatasetsAtleastOneKeyword"/>
+										<translationTemplate ref="TR.priorityDatasetsInvalidKeyword"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
