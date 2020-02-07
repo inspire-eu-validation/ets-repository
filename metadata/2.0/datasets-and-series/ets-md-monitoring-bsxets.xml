@@ -76,13 +76,12 @@ let $messages :=
 
 	let $validDate := '2019-05-22'
 	let $spatialScopeCodeList := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope'
-	let $spatialScopeCodelistValue := ('European','Global','Local','National','Regional')
-	let $spatialScopeCodelistUri := ('http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/european',
-									 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/global',
-									 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local',
-									 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/national',
-									 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/regional')
-	
+	let $spatialScopeCodelistValue := local:get-code-titles($spatialScopeCodeList, 'en')
+	let $codeValues := local:get-code-list-values($spatialScopeCodeList)
+	let $spatialScopeCodelistUri :=
+		for $x in $codeValues
+		return fn:concat($spatialScopeCodeList, '/', $x)
+
 	let $descriptiveKeywords := 
 		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
 			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
