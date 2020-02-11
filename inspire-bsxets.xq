@@ -25,7 +25,7 @@ for $case in $module//*[local-name()='TestCase']
       let $assertion-results := 
         for $assertion in $step//*[local-name()='TestAssertion']
           let $type := $assertion/etf:testItemType
-          let $disabled := if (not(matches($assertion/etf:label,$tests_to_execute)) or $type/@ref='EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2' (:disabled :)) then 'NOT_APPLICABLE' else if ($type/@ref='EIDb48eeaa3-6a74-414a-879c-1dc708017e11' (: manual :)) then 'PASSED_MANUAL' else ()
+          let $disabled := if (not(matches($assertion/etf:label,$tests_to_execute)) or $type/@ref='EID92f22a19-2ec2-43f0-8971-c2da3eaafcd2' (:disabled :)) then 'NOT_APPLICABLE' (: else if ($type/@ref='EIDb48eeaa3-6a74-414a-879c-1dc708017e11' (: manual :)) then 'PASSED_MANUAL':) else ()
           return
 if ($disabled) then "
   let $startmessage := prof:void(local:start('" || $assertion/@id || "')) 
@@ -177,7 +177,7 @@ else ()}
 let $writeQuery := file:write($queryFile, $query, map { "method": "text", "media-type": "text/plain" })
 
 return try {
-  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(@gml:id), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile })
+  xquery:eval($query, map {'features': $features, 'idMap': map:merge($features ! map:entry(fn:string(@gml:id), .)), 'validationErrors': $validationErrors, 'db': $db, 'files_to_test': $files_to_test, 'connectivity_tolerance' : $connectivity_tolerance,'tests_to_execute': $tests_to_execute, 'limitErrors': $limitErrors, 'testObjectId': $testObjectId, 'logFile': $logFile, 'statFile': $statFile })
 } catch * {
 let $text := '[' || $err:code || '] ' || $err:description || ' 
 ' || $err:module || ' (' || $err:line-number || '/' || $err:column-number || ')'
@@ -278,6 +278,7 @@ else ()}
 (: Parameters as strings :)
 declare variable $files_to_test external := ".*";
 declare variable $tests_to_execute external := ".*";
+declare variable $connectivity_tolerance external := "1";
 declare variable $schema_file external;
 
 (: ETF test driver parameters :)
@@ -322,6 +323,13 @@ try { let $x := matches('filename.gml',$files_to_test)
 return ()
 } catch * {
 error($paramerror,concat("Parameter $files_to_test must be a valid regular expression. You have set the value to '",data($files_to_test),"', which results in the following error during execution:&#xa; '",data($err:description),"'&#xa;"))
+},
+try{
+$connectivity_tolerance
+
+}catch *{
+error($paramerror, concat("Parameter $connectivity_tolerance must be a number. You have set the value to '",data($connectivity_tolerance),"'. ",data($etsFile)))
+
 },
 
 try { let $x := matches('module.case.assertion',$tests_to_execute) 

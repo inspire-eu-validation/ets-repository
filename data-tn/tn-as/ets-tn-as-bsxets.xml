@@ -35,6 +35,11 @@ Pre-requisite conformance classes:
 			<allowedValues>.*</allowedValues>
 			<type>string</type>
 		</parameter>
+		<parameter name="connectivity_tolerance" required="true">
+			<defaultValue>1</defaultValue>
+			<description ref="TR.connectivityTolerance"/>
+			<type>double</type>
+		</parameter>
 	</ParameterList>
 	<supportedTestObjectTypes>
 		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
@@ -601,8 +606,22 @@ Relevant requirements:
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/master/tn-as/network-connectivity" target="_blank">Abstract Test Case 'Network connectivity'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_TN_v3.2.pdf">INSPIRE Data Specification on Transport Networks, A.1.10</a>]]></description>
 									<parent ref="EID39e3afa5-cccc-4856-8329-4e9d57ee41b2"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
-									<expression>NOT_APPLICABLE</expression>
+									<expression>
+let $dummy := local:log('Connectivity tolerance:  ' || string($connectivity_tolerance))
+return
+if (1=1) then 'FAILED' else 'PASSED',
+	local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+	for $feature in $featuresWithErrors
+		order by $feature/@gml:id
+		return
+			local:addMessage('TR.freeNode', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) })
+									</expression>
 									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.exactlyOneServiceType"/>
+										<translationTemplate ref="TR.noTypeFromSpatialDataServiceType"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>
