@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a></li></ul>]]></description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-30T00:00:00Z</creationDate>
-	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2019-11-12T11:44:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-01-30T17:53:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID3b9846c7-3940-4795-ae1d-0b5d82375c76"/>
 	</tags>
@@ -1251,7 +1251,7 @@ return
 									<parent ref="EIDa445032d-1f63-47af-b100-edb86846d5d1"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $THEMES_TITLE := 'GEMET'
+let $THEMES_TITLE := 'GEMET - INSPIRE themes, version 1.0'
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series')]
 let $messages :=
 	if (not($recordsToInspect)) then ()
@@ -1265,12 +1265,7 @@ let $messages :=
 			return
 			(for $record in $recordsToInspect
 			 let $rid := $record/gmd:fileIdentifier/*/text()
-			 let $descriptiveKeywordsBlocks := $record/gmd:identificationInfo/*/gmd:descriptiveKeywords/*
-			 let $relevantDescriptiveKeywordsBlocks := 
-				for $descriptiveKeywordsBlock in $descriptiveKeywordsBlocks
-				return if (contains($descriptiveKeywordsBlock/gmd:thesaurusName/*/gmd:title/*/text(), $THEMES_TITLE)) then 
-					$descriptiveKeywordsBlock
-				else ()
+			 let $relevantDescriptiveKeywordsBlocks := $record/gmd:identificationInfo[1]/*/gmd:descriptiveKeywords/*[gmd:thesaurusName/*/gmd:title/*/text() = $THEMES_TITLE]
 			 let $hasExpectedDate := boolean($relevantDescriptiveKeywordsBlocks/gmd:thesaurusName/*/gmd:date/*[gmd:date/*/text() = '2008-06-01' and gmd:dateType/*/@codeListValue = 'publication'])
 			 return 
 
