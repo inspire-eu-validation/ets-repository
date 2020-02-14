@@ -19,7 +19,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-02-11T10:50:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-02-14T09:10:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -709,9 +709,9 @@ let $messages :=
 					else ()
 		return
 			if (count($md_legalConstraints_Limitations) = 0) then
-				local:addMessage('TR.noValidResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
+				local:addMessage('TR.noResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
 			else if (count($md_legalConstraints_Limitations) != 1) then
-				local:addMessage('TR.exceededResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
+				local:addMessage('TR.noValidResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 	)[position() le $limitErrors]
 return
@@ -722,7 +722,8 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noValidResourceLimitations"/>
-										<translationTemplate ref="TR.exceededResourceLimitations"/>
+										<translationTemplate ref="TR.noResourceLimitations"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -791,8 +792,8 @@ let $messages :=
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
-						return $y
-				let $invalidAnchor :=
+						return $y 
+				let $limitationAnchor :=
 					for $y in $x/gmd:otherConstraints/gmx:Anchor
 						where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
@@ -813,17 +814,29 @@ let $messages :=
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
 						return $y
+				
+				let $wrongAnchor :=
+                   for $y in $x/gmd:otherConstraints/gmx:Anchor
+                       where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse'))
+                           return
+						    if (not($y/@xlink:href = "http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply") and
+                                not($y/@xlink:href = "http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown") and
+                                not($y/@xlink:href = "https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply") and
+                                not($y/@xlink:href = "https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown")) then $y 
+							else ()
+				
 				return
-					if(count($validAccessConstraints) = 1 and (count($validAnchor) >= 1 or (not(count($x/gmd:otherConstraints/gco:CharacterString) = 0) and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0)) )) then $x
-					else if(count($validUseConstraints) = 1 and (count($validAnchor) >= 1 or (not(count($x/gmd:otherConstraints/gco:CharacterString) = 0) and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0)) )) then $x
+					if(count($validAccessConstraints) = 1 and (count($validAnchor) = 1 or (not(count($x/gmd:otherConstraints/gco:CharacterString) = 0) and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0)))) then $x
+					else if(count($validUseConstraints) = 1 and (count($validAnchor) = 1 or (not(count($x/gmd:otherConstraints/gco:CharacterString) = 0) and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0)))) then $x
+					else if(count($validAccessConstraints) = 1 and ((not(count($x/gmd:otherConstraints/gco:CharacterString) = 0) and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0)) or (string-length($x/gmd:otherConstraints/gmx:Anchor) and count($wrongAnchor) = 0 and count($limitationAnchor) = 0))) then $x
+					else if(count($validUseConstraints) = 1 and ((not(count($x/gmd:otherConstraints/gco:CharacterString) = 0) and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0)) or (string-length($x/gmd:otherConstraints/gmx:Anchor) and count($wrongAnchor) = 0 and count($limitationAnchor) = 0))) then $x
 					else ()
 		return 
-			if (count($md_legalConstraints_Conditions) = 0) then
-				local:addMessage('TR.noValidResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
-
+			if(count($md_legalConstraints_Conditions) = 0) then
+				local:addMessage('TR.noResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
 			else if (count($md_legalConstraints_Conditions) != 1) then
-				if (not(count($md_legalConstraints_Limitations) = 0 and count($md_legalConstraints_Conditions) = 2)) then
-					local:addMessage('TR.exceededResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
+				if (not(count($md_legalConstraints_Limitations) = 0 and count($md_legalConstraints_Conditions) = 2)) then 
+					local:addMessage('TR.noValidResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
 				else ()
 			else ()
 		)[position() le $limitErrors]
@@ -836,7 +849,7 @@ $messages)
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noValidResourceConditions"/>
-										<translationTemplate ref="TR.exceededResourceConditions"/>
+										<translationTemplate ref="TR.noResourceConditions"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
