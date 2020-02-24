@@ -207,13 +207,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas/gml-mode
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $indeterminatePositionValues := ('unknown', 'now')
-let $featuresWithErrors := $features[*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)] or */*/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)]][position() le $limitErrors]
+let $featuresWithErrors := $features[*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or (string-length(@uom)&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)] or */*/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or (string-length(@uom)&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $properties := $feature/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)] | $feature/*/*/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)]
+   let $properties := $feature/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or (string-length(@uom)&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)] | $feature/*/*/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or (string-length(@uom)&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)]
    return
      local:addMessage('TR.emptyValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'propertyNames': fn:string-join($properties/local-name(),', ') }))
 									</expression>
