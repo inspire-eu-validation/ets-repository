@@ -83,9 +83,21 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 											if (not(string-length($result_0) = 0 and string-length($result_1) = 0)) then validate:xsd($record, 'http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd')
 											else ()
 										} catch * { $err:description }
+										let $result_3 := try{
+											if (not(string-length($result_0) = 0 and string-length($result_1) = 0 and string-length($result_2) = 0)) then validate:xsd($record, 'http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd')
+											else ()
+										} catch * { $err:description }
+										let $result_4 := try{
+											if (not(string-length($result_0) = 0 and string-length($result_1) = 0 and string-length($result_2) = 0 and string-length($result_3) = 0)) then validate:xsd($record, 'http://schemas.opengis.net/iso/19139/20060504/gmx/gmx.xsd')
+											else ()
+										} catch * { $err:description }
+										let $result_5 := try{
+											if (not(string-length($result_0) = 0 and string-length($result_1) = 0 and string-length($result_2) = 0 and string-length($result_3) = 0 and string-length($result_4) = 0)) then validate:xsd($record, 'http://schemas.opengis.net/iso/19139/20060504/srv/srv.xsd')
+											else ()
+										} catch * { $err:description }
 										return
-										if(not(string-length($result_0) = 0 or string-length($result_1) = 0 or string-length($result_2) = 0)) then
-											local:addMessage('TR.errorValidatingSchema',  map { 'filename': local:filename($record), 'id': $rid, 'description': concat($result_0, $result_1, $result_2) })
+										if(not(string-length($result_0) = 0 or string-length($result_1) = 0 or string-length($result_2) = 0 or string-length($result_3) = 0 or string-length($result_4) = 0 or string-length($result_5) = 0)) then
+											local:addMessage('TR.errorValidatingSchema',  map { 'filename': local:filename($record), 'id': $rid, 'description': concat($result_0, $result_1, $result_2, $result_3) })
 										else ()
 										)[position() le $limitErrors]
 									return
