@@ -139,6 +139,8 @@ let $messages :=
 		local:addMessage('TR.spatialScopeInvalidDate', map { 'filename': local:filename($record), 'id': $rid })
 	else if (count($validAnchorInMD_KeywordsSpatialScope) != 1 and count($validCharacterStringInMD_KeywordsSpatialScope) != 1) then
 		local:addMessage('TR.spatialScopeExactlyOneKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if ($MD_KeywordsSpatialScope/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode@codeListValue != 'publication') then
+		local:addMessage('TR.spatialScopeInvalidDateCodeListValue', map { 'filename': local:filename($record), 'id': $rid })
 	else()
 	)[position() le $limitErrors]
 return
@@ -151,6 +153,8 @@ return
  else if ($messages/@ref = 'TR.spatialScopeInvalidCodelistValue') then 'FAILED'
  else if ($messages/@ref = 'TR.spatialScopeInvalidDate') then 'FAILED'
  else if ($messages/@ref = 'TR.spatialScopeExactlyOneKeyword') then 'FAILED' 
+ else if ($messages/@ref = 'TR.spatialScopeInvalidDateCodeListValue') then 'FAILED' 
+
  else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
@@ -168,6 +172,7 @@ return
 										<translationTemplate ref="TR.spatialScopeInvalidDate"/>
 										<translationTemplate ref="TR.spatialScopeInvalidDate"/>
 										<translationTemplate ref="TR.spatialScopeExactlyOneKeyword"/>
+										<translationTemplate ref="TR.spatialScopeInvalidDateCodeListValue"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
