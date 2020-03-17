@@ -299,12 +299,12 @@ let $messages :=
 			local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
 		else 		
 			let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
-			let $wrongCodeList := $languageCodes/@codeList[not(. = 'http://www.loc.gov/standards/iso639-2/')]
+			let $wrongCodeList := $languageCodes/@codeList[not(. = 'http://www.loc.gov/standards/iso639-2/') and not(. = 'http://www.loc.gov/standards/iso639-2')]
 			return
 			if ($wrongCodeValues) then
 				local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
 			else if($wrongCodeList) then
-				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/'})
+				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/ or http://www.loc.gov/standards/iso639-2'})
 			else ()     	
 	)[position() le $limitErrors]
 return
