@@ -272,8 +272,8 @@ let $messages :=
 			else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 			else (),
-		if (not($DQ_ConformanceResult/gmd:pass/gco:Boolean)) then
-			local:addMessage('TR.noBooleanValueForPass', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+		if (not($DQ_ConformanceResult/gmd:pass/gco:Boolean or $DQ_ConformanceResult/gmd:pass/@gco:nilReason = "unknown")) then
+			local:addMessage('TR.invalidValueForPass', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 		else ()
 	))[position() le $limitErrors]
 return
@@ -286,7 +286,7 @@ return
 										<translationTemplate ref="TR.noTitleForSpecification"/>
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
 										<translationTemplate ref="TR.noSpecifications"/>
-										<translationTemplate ref="TR.noBooleanValueForPass"/>
+										<translationTemplate ref="TR.invalidValueForPass"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
