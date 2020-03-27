@@ -19,7 +19,7 @@ Pre-requisite conformance classes: Common Requirements]]>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-03-17T19:15:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-03-12T12:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -299,12 +299,13 @@ let $messages :=
 			local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
 		else 		
 			let $wrongCodeValues := $languageCodes/@codeListValue[not(. = $codes)]
-			let $wrongCodeList := $languageCodes/@codeList[not(. = 'http://www.loc.gov/standards/iso639-2/') and not(. = 'http://www.loc.gov/standards/iso639-2')]
+			let $wrongCodeListHTTP := $languageCodes/@codeList[not(. = 'http://www.loc.gov/standards/iso639-2/')]
+			let $wrongCodeListHTTPS := $languageCodes/@codeList[not(. = 'https://www.loc.gov/standards/iso639-2/')]
 			return
 			if ($wrongCodeValues) then
 				local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : string-join($wrongCodeValues,', ') })
-			else if($wrongCodeList) then
-				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/ or http://www.loc.gov/standards/iso639-2'})
+			else if($wrongCodeListHTTP and $wrongCodeListHTTPS) then
+				local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/'})
 			else ()     	
 	)[position() le $limitErrors]
 return

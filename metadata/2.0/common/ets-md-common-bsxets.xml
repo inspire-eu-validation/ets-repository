@@ -837,7 +837,7 @@ let $messages :=
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
 						return $y
-				
+
 				let $wrongAnchor :=
                    for $y in $otherConstraintsAnchor
                        where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse'))
@@ -847,16 +847,24 @@ let $messages :=
                                 not($y/@xlink:href = "https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply") and
                                 not($y/@xlink:href = "https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown")) then $y 
 							else ()
-				
+
+				let $validCharacterString := 
+					for $oc in $x/gmd:otherConstraints/gco:CharacterString
+						where (not(string-length($oc) = 0))
+							return $oc
+
+				let $validAnchorText :=
+					for $oc in $x/gmd:otherConstraints/gmx:Anchor
+						where (not(string-length($oc) = 0))
+							return $oc
+
 				return
-					for $oc in $x/gmd:otherConstraints
-						return
-							if(count($validAccessConstraints) = 1 and (count($validAnchor) = 1 or (not(count($oc/gco:CharacterString) = 0) and not(string-length($oc/gco:CharacterString) = 0)))) then $oc
-							else if(count($validUseConstraints) = 1 and (count($validAnchor) = 1 or (not(count($oc/gco:CharacterString) = 0) and not(string-length($oc/gco:CharacterString) = 0)))) then $oc
-							else if(count($validAccessConstraints) = 1 and ((not(count($oc/gco:CharacterString) = 0) and not(string-length($oc/gco:CharacterString) = 0)) or (string-length($oc/gmx:Anchor) and count($wrongAnchor) = 0 and count($limitationAnchor) = 0))) then $oc
-							else if(count($validUseConstraints) = 1 and ((not(count($oc/gco:CharacterString) = 0) and not(string-length($oc/gco:CharacterString) = 0)) or (string-length($oc/gmx:Anchor) and count($wrongAnchor) = 0 and count($limitationAnchor) = 0))) then $oc
-							else ()
-					
+					if(count($validAccessConstraints) = 1 and (count($validAnchor) = 1 and (not(count($validCharacterString) = 0)))) then $x
+					else if(count($validAccessConstraints) = 1 and (not(count($validCharacterString) = 0) or (not(count($validAnchorText) = 0) and count($wrongAnchor) = 0 and count($limitationAnchor) = 0))) then $x
+					else if(count($validUseConstraints) = 1 and (count($validAnchor) = 1 or not(count($validCharacterString) = 0))) then $x
+					else if(count($validUseConstraints) = 1 and (not(count($validCharacterString) = 0) or (not(count($validAnchorText) = 0) and count($wrongAnchor) = 0 and count($limitationAnchor) = 0))) then $x
+					else ()
+				
 		return 
 			if(count($md_legalConstraints_Conditions) = 0) then
 				local:addMessage('TR.noResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
