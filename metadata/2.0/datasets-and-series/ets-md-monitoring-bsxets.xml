@@ -16,7 +16,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring" tar
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-01-14T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-03-17T17:40:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-03-30T14:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -237,7 +237,7 @@ let $messages :=
 		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
 			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
 		else
-			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title		
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
 	return
 	
 	if (count($MD_KeywordsPriorityDatasets) = 0 and count($keywordAnchorPriorityDatasets) = 0) then
@@ -258,6 +258,8 @@ let $messages :=
 		local:addMessage('TR.priorityDatasetsAtleastOneKeyword', map { 'filename': local:filename($record), 'id': $rid })
 	else if (not ($MD_KeywordsPriorityDatasets/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date = $validDate)) then
 		local:addMessage('TR.priorityDatasetsInvalidDate', map { 'filename': local:filename($record), 'id': $rid })
+	else if ($MD_KeywordsPriorityDatasets/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue != 'publication') then
+		local:addMessage('TR.priorityDatasetsInvalidDateCodeListValue', map { 'filename': local:filename($record), 'id': $rid })
 	else()
 	)[position() le $limitErrors]
 return
@@ -269,6 +271,7 @@ return
  else if ($messages/@ref = 'TR.priorityDatasetsInvalidDate') then 'FAILED'
  else if ($messages/@ref = 'TR.priorityDatasetsAtleastOneKeyword') then 'FAILED'
  else if ($messages/@ref = 'TR.priorityDatasetsInvalidKeyword') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsInvalidDateCodeListValue') then 'FAILED' 
  else 'PASSED',
  local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
@@ -284,6 +287,7 @@ return
 										<translationTemplate ref="TR.priorityDatasetsInvalidDate"/>
 										<translationTemplate ref="TR.priorityDatasetsAtleastOneKeyword"/>
 										<translationTemplate ref="TR.priorityDatasetsInvalidKeyword"/>
+										<translationTemplate ref="TR.priorityDatasetsInvalidDateCodeListValue"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
