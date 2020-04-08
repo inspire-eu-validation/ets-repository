@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/iso-19115-19119
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a></li></ul>]]></description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-01-30T17:53:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-03-26T18:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID3b9846c7-3940-4795-ae1d-0b5d82375c76"/>
 	</tags>
@@ -272,8 +272,8 @@ let $messages :=
 			else if (not($spec/gmd:CI_Citation/gmd:date/*/gmd:dateType/*[@codeListValue = ('publication','creation','revision')])) then
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 			else (),
-		if (not($DQ_ConformanceResult/gmd:pass/gco:Boolean)) then
-			local:addMessage('TR.noBooleanValueForPass', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
+		if (not($DQ_ConformanceResult/gmd:pass/gco:Boolean or $DQ_ConformanceResult/gmd:pass/@gco:nilReason = "unknown")) then
+			local:addMessage('TR.invalidValueForPass', map { 'filename': local:filename($record), 'id': $rid, 'specification':  $spec/gmd:CI_Citation/gmd:title/*[1]/text() })
 		else ()
 	))[position() le $limitErrors]
 return
@@ -286,7 +286,7 @@ return
 										<translationTemplate ref="TR.noTitleForSpecification"/>
 										<translationTemplate ref="TR.noDateTypeForSpecification"/>
 										<translationTemplate ref="TR.noSpecifications"/>
-										<translationTemplate ref="TR.noBooleanValueForPass"/>
+										<translationTemplate ref="TR.invalidValueForPass"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
