@@ -5,14 +5,14 @@
 	<localPath>/auto</localPath>
 	<label>Conformance class: XML encoding of ISO 19115/19119 metadata</label>
 	<description><![CDATA[This test suite examines XML documents containing gmd:MD_Metadata records against basic requirements for the encoding for metadata in INSPIRE.<br/><br/>
-<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/1.3/xml-encoding" target="_blank">Conformance Class 'XML encoding of ISO 19115/19119 metadata'</a>]]></description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>0.2.0</version>
+	<version>1.0.2</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-30T00:00:00Z</creationDate>
-	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-02-21T17:00:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-02-12T15:10:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -98,12 +98,14 @@ let $messages :=
 	else
 		for $file in $db
         return 
-            if ($file/element()/@xsi:schemaLocation) then 
+            if ($file/element()/@xsi:schemaLocation and $file/element()/name() = 'gmd:MD_Metadata') then 
                 let $result :=
-                    if ( contains($file/element()/@xsi:schemaLocation, 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/gmd/gmd.xsd') or contains($file/element()/@xsi:schemaLocation, 'http://www.isotc211.org/2005/gmd/gmd.xsd')) then
-                        try{ validate:xsd($file, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
-                    else
-                        try{ validate:xsd($file) } catch * {  $err:description }
+                    if (not($file/element()/@xsi:schemaLocation)) then
+                  		try{ validate:xsd($file, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
+                	else if ( contains($file/element()/@xsi:schemaLocation, 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/gmd/gmd.xsd') or contains($file/element()/@xsi:schemaLocation, 'http://www.isotc211.org/2005/gmd/gmd.xsd') or contains($file/element()/@xsi:schemaLocation, 'http://schemas.opengis.net/csw/2.0.2/profiles/apiso/1.0.0/apiso.xsd') or contains($file/element()/@xsi:schemaLocation, 'http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd')) then
+                  		try{ validate:xsd($file, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
+                	else
+                  		try{ validate:xsd($file) } catch * {  $err:description }
                 return
                 if(not(string-length($result) = 0)) then
                     local:addMessage('TR.invalidSchema',  map { 'filename': local:filename($file), 'count': string($result) })
@@ -112,7 +114,9 @@ let $messages :=
                 for $record in $records
                 let $rid := $record/gmd:fileIdentifier/*/text()
                 let $result := 
-                    if ( contains($record/element()/@xsi:schemaLocation, 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/gmd/gmd.xsd') or contains($record/element()/@xsi:schemaLocation, 'http://www.isotc211.org/2005/gmd/gmd.xsd')) then
+                  	if (not($record/element()/@xsi:schemaLocation)) then
+                      try{ validate:xsd($record, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
+                    else if ( contains($record/element()/@xsi:schemaLocation, 'http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/gmd/gmd.xsd') or contains($record/element()/@xsi:schemaLocation, 'http://www.isotc211.org/2005/gmd/gmd.xsd') or contains($record/element()/@xsi:schemaLocation, 'http://schemas.opengis.net/csw/2.0.2/profiles/apiso/1.0.0/apiso.xsd') or contains($record/element()/@xsi:schemaLocation, 'http://schemas.opengis.net/iso/19139/20060504/gmd/gmd.xsd')) then
                         try{ validate:xsd($record, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/apiso-inspire/apiso-inspire.xsd') } catch * {  $err:description }
                     else
                         try{ validate:xsd($record) } catch * {  $err:description }

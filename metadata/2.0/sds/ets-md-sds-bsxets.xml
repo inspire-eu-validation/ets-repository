@@ -6,7 +6,7 @@ id="EID8f869e23-c9e9-4e86-8dca-be30ff421229" xsi:schemaLocation="http://www.inte
 	<localPath>/auto</localPath>
 	<label>Conformance Class 3: INSPIRE Spatial Data Service baseline metadata.</label>
 	<description><![CDATA[This test suite examines metadata records against the requirements for metadata in INSPIRE.<br/><br/>
-<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
 Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
 There is a general limitation in all assertions that polymorphism and containment by reference (see the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common/READMEd#ref_TG_MD" target="_blank">Technical Guidance</a>, sub-clauses A.3, A.4 and A.5) are not supported. However, the current Abstract Test Suite does not support polymorphism and references either (all XPath expressions do not support polymorhism or references; in addition, schema validation is only executed against the ISO/OGC schemas without extensions). It is therefore unclear if this is really a limitation or if the sections in the technical guidance are outdated.
 <br/><br/>
@@ -14,11 +14,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds" target="_b
 <br/><br/>
 Pre-requisite conformance classes: none]]></description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>0.1.0</version>
+		<version>1.0.2</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2018-08-30T20:45:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-02-13T16:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -87,7 +87,7 @@ Pre-requisite conformance classes: none]]></description>
 									<parent ref="EID95a1a8a8-3132-453f-921a-c0334781e8bb"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-<!-- DONE -->
+ <!-- DONE -->
 let $listvalues := ('service')
 let $recordsWithErrors := $records[not(gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $listvalues)][position() le $limitErrors]
 let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = $listvalues][position() le $limitErrors]
@@ -102,7 +102,7 @@ let $messages :=
 			return
 			if (count($level) != 1) then
 				local:addMessage('TR.wrongHierarchyLevelMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($level)) })
-			else if(count($levelname) != 1) then
+			else if(count($levelname) = 0) then
 				local:addMessage('TR.wrongHierarchyLevelNameMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($levelname)) })
             else if (not(string-length($levelname/gco:CharacterString/text()) != 0 or string-length($levelname/gmx:Anchor/text()) != 0)) then
 				local:addMessage('TR.emptyHierarchyLevelName', map { 'filename': local:filename($record), 'id': $rid })
@@ -118,6 +118,7 @@ return
 										<translationTemplate ref="TR.isNotService"/>
 										<translationTemplate ref="TR.wrongHierarchyLevelMultiplicity"/>
 										<translationTemplate ref="TR.wrongHierarchyLevelNameMultiplicity"/>
+										<translationTemplate ref="TR.invalidHierarchyLevelName"/>
 										<translationTemplate ref="TR.emptyHierarchyLevelName"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -212,27 +213,53 @@ return
 <!-- DONE -->
 let $validCategoriesUrl := fn:doc('http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceCategory/SpatialDataServiceCategory.en.xml')/*:metadata-codelist/*:containeditems/*:value/@id
 let $validCategories := for $x in $validCategoriesUrl return fn:substring($x, 74)
+let $spatialDataServiceCategory := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceCategory'
 let $messages :=
 	(for $record in $records
 		let $keywordElements := $record/gmd:identificationInfo[1]/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
+		let $sdsCategoryKeywordAnchors :=
+			for $x in $keywordElements
+			where $x/gmx:Anchor/@xlink:href[starts-with(.,$spatialDataServiceCategory)]
+			return $x
+		let $sdsCategoryCharacterStrings :=
+			for $x in $keywordElements
+			where $x/gco:CharacterString = $validCategories
+			return $x
+		let $validSdsKeywordAnchors :=	
+			for $x in $sdsCategoryKeywordAnchors
+			where $x/gmx:Anchor/@xlink:href = $validCategoriesUrl
+			return $x
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
-		if ( not($keywordElements) ) then
-			local:addMessage('TR.keywordElementNotFound', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
+		if (not($keywordElements)) then
+			local:addMessage('TR.keywordElementNotFound', map { 'filename': local:filename($record), 'id': $rid})
+		else if (not(count($sdsCategoryKeywordAnchors) = count($validSdsKeywordAnchors))) then
+			local:addMessage('TR.SpatialDataServiceCategoryInvalid', map { 'filename': local:filename($record), 'id': $rid})
+		else if (count($validSdsKeywordAnchors) = 0 and count($sdsCategoryCharacterStrings) = 0) then
+			local:addMessage('TR.SpatialDataServiceCategoryNotFound', map { 'filename': local:filename($record), 'id': $rid})		
 		else
-			let $valid :=
+			let $emptyKeywordsText :=
 				(for $keyword in $keywordElements
 					return
-					if ( $keyword/gco:CharacterString/text() = $validCategories or $keyword/gmx:Anchor/text() = $validCategories ) then
-						true()
-					else()
-				)[position() le $limitErrors]
-
+						if (fn:exists($keyword/gco:CharacterString) and not(string-length($keyword/gco:CharacterString/text()) != 0)) then $keyword
+						else if(fn:exists($keyword/gmx:Anchor) and not(string-length($keyword/gmx:Anchor/text()) != 0)) then $keyword
+						else ())
+			let $totalAnchor :=
+				(for $keyword in $keywordElements
+					return $keyword/gmx:Anchor/@xlink:href)
+			let $invalidAnchor :=
+				(for $keyword in $keywordElements
+					return
+						if (not($keyword/gmx:Anchor/@xlink:href = $validCategoriesUrl)) then $keyword/gmx:Anchor/@xlink:href
+						else ())
 			return
-			if ( not($valid = true())  ) then
-				local:addMessage('TR.missingValidKeywordElement', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($keywordElements)) })
-			else()
-
+				if (not(count($emptyKeywordsText) = 0)) then
+					local:addMessage('TR.missingValidKeywordElement', map { 'filename': local:filename($record), 'id': $rid, 'found':count($emptyKeywordsText)})
+				else if (count($invalidAnchor) = count($totalAnchor)) then
+					(for $Anchor in $invalidAnchor
+						return 
+							local:addMessage('TR.missingValidKeywordAnchor', map { 'filename': local:filename($record), 'id': $rid, 'anchor': string($Anchor)}))
+				else()
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -243,7 +270,10 @@ return
 									<translationTemplates>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 										<translationTemplate ref="TR.keywordElementNotFound"/>
+										<translationTemplate ref="TR.SpatialDataServiceCategoryNotFound"/>
+										<translationTemplate ref="TR.SpatialDataServiceCategoryInvalid"/>
 										<translationTemplate ref="TR.missingValidKeywordElement"/>
+										<translationTemplate ref="TR.missingValidKeywordAnchor"/>
 									</translationTemplates>
 								</TestAssertion>
 
@@ -296,8 +326,7 @@ return
 									<expression>
 <!-- DONE -->
 let $urls := $records/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn/@xlink:href
-let $map := local:check-resource-uris($urls, 30, false())
-
+let $map := local:check-resource-uris($urls, 30, true())
 let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
@@ -322,7 +351,7 @@ let $messages :=
 					local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
 				else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
 					try { 
-						let $root := fn:doc($url)/element()
+						let $root := local:switch-url-request($url)
 						let $validCodes := ('dataset','series')
 						return
 						if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
@@ -458,6 +487,7 @@ return
 										<translationTemplate ref="TR.oneDataQuality"/>
 										<translationTemplate ref="TR.invalidCodeListValueSDS"/>
 										<translationTemplate ref="TR.missingScopeDescription"/>
+										<translationTemplate ref="TR.invalidScopeDescription"/>
 									</translationTemplates>
 								</TestAssertion>
 
