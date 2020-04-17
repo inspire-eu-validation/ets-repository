@@ -864,7 +864,7 @@ def validHarmonisedNames = register.containeditems.depthFirst().findAll{ it.name
 
 def invalidLayers = [];
 
-def excludedACMFLayers = 'ACMF';
+def excludedLayers = ['ACMF', 'AM', 'AU', 'GE', 'PF', 'SD', 'SO', 'US'];
 
 layers.each{layer->
 	if(layer.Name.size() != 1){
@@ -873,9 +873,17 @@ layers.each{layer->
 	}else if(layer.Name.toString().length() == 0){
 		String[] assertParams = ['element', 'Layer/Name'];
 		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}else if (!(layer.Name.toString().startsWith(excludedACMFLayers))){
-		if(!(layer.Name in validHarmonisedNames)){
-			invalidLayers.add(layer.Name.toString());
+	}else{
+		def isExcluded = false;
+		for (item in excludedLayers){
+			if(layer.Name.toString().startsWith(item)){
+				isExcluded = true;
+			}
+		}
+		if(!isExcluded){
+			if(!(layer.Name in validHarmonisedNames)){
+				invalidLayers.add(layer.Name.toString());
+			}
 		}
 	}
 }
