@@ -48,9 +48,8 @@ Pre-requisite conformance classes:
 			<parent ref="EIDbc6635ae-84a6-11ea-bc55-0242ac130003"/>
 			<testCases>
 				<TestCase id="EID46c06b72-84aa-11ea-bc55-0242ac130003">
-					<label>Code list values</label>
-					<description><![CDATA[Verify whether all attributes whose value type is a code list take the values set out therein. <br/><br/>
-Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as/code-list-values.md" target="_blank">Code list values</a>]]></description>
+					<label>IGNORE</label>
+					<description>IGNORE</description>
 					<parent ref="EID8cdf9066-84a9-11ea-bc55-0242ac130003"/>
 					<testSteps>
 						<TestStep id="EIDd881fa8a-84aa-11ea-bc55-0242ac130003">
@@ -61,19 +60,20 @@ Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EIDf9f717ea-84aa-11ea-bc55-0242ac130003">
-									<label>IGNORE</label>
-									<description>IGNORE</description>
+									<label>Code list values</label>
+									<description><![CDATA[Verify whether all attributes whose value type is a code list take the values set out therein. <br/><br/>
+Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as/code-list-values.md" target="_blank">Code list values</a>]]></description>
 									<parent ref="EIDd881fa8a-84aa-11ea-bc55-0242ac130003"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $featuresFromAppSchema := $features[descendant-or-self::*:ManagementRestrictionOrRegulationZone]
-return
- (if ($featuresFromAppSchema) then 'PASSED' else 'FAILED',
-  if (not($featuresFromAppSchema)) then local:addMessage('TR.noFeature', map { 'theme': 'ManagementRestrictionOrRegulationZone' }) else ())
+let $objects := $features[self::*:ManagementRestrictionOrRegulationZone]/am:environmentalDomain
+let $messages := local:check-code-list-values($objects, 'method', 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain', 1)
+return (if ($messages) then 'FAILED' else 'PASSED', $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.noFeature"/>
+										<translationTemplate ref="TR.reviewCodeListValue"/>
+										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
