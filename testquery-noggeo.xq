@@ -1,3 +1,4 @@
+declare namespace am='http://inspire.ec.europa.eu/schemas/am/4.0';
 declare namespace au3='urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0';
 declare namespace ad3='urn:x-inspire:specification:gmlas:Addresses:3.0';
 declare namespace cp3='urn:x-inspire:specification:gmlas:CadastralParcels:3.0'; 
