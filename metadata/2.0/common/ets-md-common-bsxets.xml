@@ -851,7 +851,9 @@ let $messages :=
 								not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown'))
 								then $y
 							else()
-
+							
+				
+						
 				let $limitationAnchor :=
 					for $y in $otherConstraintsAnchor
                        where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess'))
@@ -892,9 +894,22 @@ let $messages :=
 					else if(count($validUseConstraints) = 1 and (count($validAnchor) = 1 or not(count($validCharacterString) = 0))) then $x
 					else if(count($validUseConstraints) = 1 and (not(count($validCharacterString) = 0) or (not(count($validAnchorText) = 0) and count($invalidConditionsAnchor) = 0 and count($limitationAnchor) = 0))) then $x
 					else ()
+					
+			let $invalidAccessCodelist :=
+				for $ac in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:accessConstraints
+					where ($ac/gmd:MD_RestrictionCode/@codeListValue != 'otherRestrictions')
+					return $ac
+			let $invalidUseConstraintsCodelist :=
+				for $uc in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:useConstraints
+					where ($uc/gmd:MD_RestrictionCode/@codeListValue != 'otherRestrictions')
+					return $uc
 				
 		return 
-			if(count($md_legalConstraints_Conditions) = 0) then
+			if(count($md_legalConstraints_Conditions) = 0 and count($invalidAccessCodelist) > 0) then
+				local:addMessage('TR.invalidOtherRestrictionsCodelistValue', map { 'filename': local:filename($record), 'id': $rid })	
+			else if(count($md_legalConstraints_Conditions) = 0 and count($invalidUseConstraintsCodelist) > 0) then
+				local:addMessage('TR.invalidOtherRestrictionsCodelistValue', map { 'filename': local:filename($record), 'id': $rid })						
+			else if(count($md_legalConstraints_Conditions) = 0) then
 				local:addMessage('TR.noResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
 			else if (count($md_legalConstraints_Conditions) != 1) then
 				if (not(count($md_legalConstraints_Limitations) = 0 and count($md_legalConstraints_Conditions) = 2)) then 
@@ -910,6 +925,7 @@ $messages)
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.invalidOtherRestrictionsCodelistValue"/>
 										<translationTemplate ref="TR.noValidResourceConditions"/>
 										<translationTemplate ref="TR.noResourceConditions"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
