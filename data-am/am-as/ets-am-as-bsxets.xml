@@ -68,13 +68,13 @@ Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as
 									<expression>
 let $codelist := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain/EnvironmentalDomain.en.xml'
 let $valid_href := fn:doc($codelist)/*:codelist/*:containeditems/*:value/@id
-let $objects := $features[self::am:ManagementRestrictionOrRegulationZone]
+let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
 let $messages :=
-	for $object in $objects
-	let $value := $object/am:environmentalDomain/@xlink:href
+	for $feature in $features_selected
+	let $value := $feature/am:environmentalDomain/@xlink:href
 	return
 		if(not($value = $valid_href)) then
-			local:addMessage('TR.disallowedCodeListValue ',  map {'filename': local:filename($record), 'featureType':'ManagementRestrictionOrRegulationZone', 'gmlid': string($object/@*:id), 'property': 'environmentalDomain', 'value': string($value), 'codelist': $codelist}) 
+			local:addMessage('TR.disallowedCodeListValue ',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($value), 'codelist': $codelist}) 
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
