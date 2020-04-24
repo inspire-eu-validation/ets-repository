@@ -71,9 +71,10 @@ let $valid_href := fn:doc($codelist)/*:codelist/*:containeditems/*:value/@id
 let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
 let $messages :=
 	for $feature in $features_selected
-	let $value := $feature/am:environmentalDomain/@xlink:href
+	let $envDom := $feature/am:environmentalDomain
+	let $value := $envDom/@xlink:href
 	return
-		if(not($value = $valid_href)) then
+		if(not($envDom) or not($value) or not($value = $valid_href)) then
 			local:addMessage('TR.disallowedCodeListValue ',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($value), 'codelist': $codelist}) 
 		else ()
 return
