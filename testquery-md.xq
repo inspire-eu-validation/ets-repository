@@ -170,22 +170,12 @@ declare function local:get-document($url as xs:string) as element()*
 
 declare function local:replaceCharacters($uri as xs:string) as xs:string
 {
-  let $characters := ('[', ']')
-  let $fixedURI := replace($uri, ' ', '+')
+  let $characters := ('\[', '\]', ' ')
+  let $replacement := ('%5B', '%5D', '+')
 
-  let $updatedURIs :=
-    for $character in $characters where contains($fixedURI, $character)
-      return replace($fixedURI, concat('\', $character), fn:encode-for-uri($character))
-
-  let $updatedURI :=
-      if (count($updatedURIs)!=0) then
-          for $updateURI in $updatedURIs where not(contains($updateURI, $characters))
-            return $updateURI
-      else $fixedURI
+  let $fixedURI := functx:replace-multi($uri, $characters, $replacement)
   
-  
-  return $updatedURI
-    
+  return $fixedURI
 };
 
 
