@@ -66,21 +66,23 @@ Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as
 									<parent ref="EIDd881fa8a-84aa-11ea-bc55-0242ac130003"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain/EnvironmentalDomain'
+let $codelist := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain/EnvironmentalDomain.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
 let $messages :=
 	for $feature in $features_selected
-	let $envDom := $feature/am:environmentalDomain
+	let $envDoms := $feature/am:environmentalDomain
 	return
 		if(not($envDom)) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain'}) 
-		else if(not($envDom/@xlink:href)) then
-			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'attribute': 'xlink:href'}) 
-		else if(not($envDom/@xlink:href = $valid_href)) then
-			local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($envDom/@xlink:href), 'codelist': $codelist}) 
-		else ()
+		else
+			for $envDom in $envDoms
+				if(not($envDom/@xlink:href)) then
+					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'attribute': 'xlink:href'}) 
+				else if(not($envDom/@xlink:href = $valid_href)) then
+					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($envDom/@xlink:href), 'codelist': $codelist}) 
+				else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
