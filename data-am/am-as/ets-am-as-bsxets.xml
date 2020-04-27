@@ -72,14 +72,13 @@ let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZo
 let $messages :=
 	for $feature in $features_selected
 	let $envDom := $feature/am:environmentalDomain
-	let $value := $envDom/@xlink:href
 	return
 		if(not($envDom)) then
 			local:addMessage('TR.disallowedCodeListValue ',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': '', 'codelist': $codelist}) 
-		else if(not($value)) then
+		else if(not($envDom/@xlink:href)) then
 			local:addMessage('TR.disallowedCodeListValue ',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': '', 'codelist': $codelist}) 
-		else if(not($value = $valid_href)) then
-			local:addMessage('TR.disallowedCodeListValue ',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($value), 'codelist': $codelist}) 
+		else if(not($envDom/@xlink:href = $valid_href)) then
+			local:addMessage('TR.disallowedCodeListValue ',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($envDom/@xlink:href), 'codelist': $codelist}) 
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
