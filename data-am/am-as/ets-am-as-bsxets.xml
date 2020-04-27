@@ -74,10 +74,11 @@ let $messages :=
 	for $feature in $features_selected
 	let $envDoms := $feature/am:environmentalDomain
 	return
-		if(not($envDom)) then
+		if(not($envDoms)) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain'}) 
 		else
 			for $envDom in $envDoms
+			return
 				if(not($envDom/@xlink:href)) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'attribute': 'xlink:href'}) 
 				else if(not($envDom/@xlink:href = $valid_href)) then
@@ -90,6 +91,8 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElement "/>
+										<translationTemplate ref="TR.missingAttribute "/>
 										<translationTemplate ref="TR.disallowedCodeListValue "/>
 									</translationTemplates>
 								</TestAssertion>
