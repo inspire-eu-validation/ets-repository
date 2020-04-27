@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-04-22T17:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-04-27T13:30:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-04-27T13:45:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -66,17 +66,18 @@ Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as
 									<parent ref="EIDd881fa8a-84aa-11ea-bc55-0242ac130003"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain/EnvironmentalDomain.en.xml'
-let $valid_href := fn:doc($codelist)/*:codelist/*:containeditems/*:value/@id
+let $codelist := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain/EnvironmentalDomain'
+let $codelisturl := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain/EnvironmentalDomain.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
 let $messages :=
 	for $feature in $features_selected
 	let $envDom := $feature/am:environmentalDomain
 	return
 		if(not($envDom)) then
-			local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': '', 'codelist': $codelist}) 
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain'}) 
 		else if(not($envDom/@xlink:href)) then
-			local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': '', 'codelist': $codelist}) 
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'attribute': 'xlink:href'}) 
 		else if(not($envDom/@xlink:href = $valid_href)) then
 			local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($envDom/@xlink:href), 'codelist': $codelist}) 
 		else ()
