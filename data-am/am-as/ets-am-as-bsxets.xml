@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-04-22T17:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-04-27T13:45:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-04-29T19:35:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -83,6 +83,96 @@ let $messages :=
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'attribute': 'xlink:href'}) 
 				else if(not($envDom/@xlink:href = $valid_href)) then
 					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($envDom/@xlink:href), 'codelist': $codelist}) 
+				else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement "/>
+										<translationTemplate ref="TR.missingAttribute "/>
+										<translationTemplate ref="TR.disallowedCodeListValue "/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID5a7accef-4fb2-4776-80bf-68af5e530048">
+					<label>Constraints</label>
+					<description><![CDATA[Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.<br/><br/>
+Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as/constraints.md" target="_blank">Constraints</a>]]></description>
+					<parent ref="EID8cdf9066-84a9-11ea-bc55-0242ac130003"/>
+					<testSteps>
+						<TestStep id="EID55ece75d-d166-438a-9694-99c00a6f686f">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5a7accef-4fb2-4776-80bf-68af5e530048"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDf7d8aafd-a2cd-45fb-b553-f03cd2cc5258">
+									<label>am-as.2.1: Constraint for legalBasis</label>
+									<description>Check that at least the most specific legal instrument that required the establishment of zone shall is provided using the legalBasis association role.</description>
+									<parent ref="EID55ece75d-d166-438a-9694-99c00a6f686f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
+let $messages :=
+	for $feature in $features_selected
+	let $legalBasis := $feature/am:legalBasis
+	return
+		if(not($legalBasis)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'legalBasis'}) 
+		else
+			for $x in $legalBasis
+			return
+				if(not($x/@xlink:href)) then
+					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'legalBasis', 'attribute': 'xlink:href'}) 
+				else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement "/>
+										<translationTemplate ref="TR.missingAttribute "/>
+										<translationTemplate ref="TR.disallowedCodeListValue "/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+						<TestStep id="EID89171ea6-8a52-4a48-ab85-90a47772037f">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5a7accef-4fb2-4776-80bf-68af5e530048"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID1ac9de98-f3f4-42d6-92e6-fddc72ade639">
+									<label>am-as.2.2: Constraint for competentAuthority</label>
+									<description>Check that the role attribute of the competentAuthority takes the value "authority"</description>
+									<parent ref="EID89171ea6-8a52-4a48-ab85-90a47772037f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
+let $messages :=
+	for $feature in $features_selected
+	let $competentAuthorities := $feature/am:competentAuthority
+	return
+		if(not($competentAuthorities)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority'}) 
+		else
+			for $x in $competentAuthorities
+			return
+				if(not($x/base2:RelatedParty/base2:role)) then
+					local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role'}) 
+				else if(not($x/base2:RelatedParty/base2:role/@xlink:href)) then
+					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role', 'attribute': 'xlink:href'}) 
 				else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
