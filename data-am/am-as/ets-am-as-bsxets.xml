@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-04-22T17:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-04-29T19:35:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-04-30T19:25:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -160,6 +160,7 @@ $messages)
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
+let $valid_href := 'http://inspire.ec.europa.eu/codelist/RelatedPartyRoleValue/authority'
 let $messages :=
 	for $feature in $features_selected
 	let $competentAuthorities := $feature/am:competentAuthority
@@ -173,6 +174,8 @@ let $messages :=
 					local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role'}) 
 				else if(not($x/base2:RelatedParty/base2:role/@xlink:href)) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role', 'attribute': 'xlink:href'}) 
+				else if(not($x/base2:RelatedParty/base2:role/@xlink:href = $valid_href)) then
+					local:addMessage('TR.wrongHref',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'competentAuthority/RelatedParty/role', 'valid': $valid_href, 'value': string($x/base2:RelatedParty/base2:role/@xlink:href)}) 
 				else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -183,7 +186,7 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElement "/>
 										<translationTemplate ref="TR.missingAttribute "/>
-										<translationTemplate ref="TR.disallowedCodeListValue "/>
+										<translationTemplate ref="TR.wrongHref "/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
