@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-04-22T17:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-04-30T19:25:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-04T19:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -122,20 +122,30 @@ Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as
 let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
 let $messages :=
 	for $feature in $features_selected
-	let $legalBasis := $feature/am:legalBasis
-	return
-		if(not($legalBasis)) then
-			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'legalBasis'}) 
-		else
-			for $x in $legalBasis
-			return
-				if(not($x/@xlink:href)) then
-					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'legalBasis', 'attribute': 'xlink:href'}) 
+	let $validLegalBasis := 
+		for $x in $feature/am:legalBasis 
+		return
+			if($x/@xlink:href) then
+				if(not($x/@xlink:href = "")) then
+					$x
 				else ()
+			else if ($x/base2:LegislationCitation) then
+				$x
+			else ()
+	return
+		if(not($feature/am:legalBasis)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'legalBasis'}) 
+		else if(not($validLegalBasis)) then
+			local:addMessage('TR.noValidLegalBasis',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id)}) 
+		else ()
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages) then 'FAILED' else 'PASSED_MANUAL',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)
+if ($messages) then $messages
+else 
+	for $feature in $features_selected
+	return local:addMessage('TR.checkManualLegalBasis',  map {'filename': local:filename($feature)}) 
+)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
