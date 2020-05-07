@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-04-22T17:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-05-04T19:30:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-07T09:15:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -173,20 +173,22 @@ let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZo
 let $valid_href := 'http://inspire.ec.europa.eu/codelist/RelatedPartyRoleValue/authority'
 let $messages :=
 	for $feature in $features_selected
-	let $competentAuthorities := $feature/am:competentAuthority
+	let $validCompetentAuth := 
+		for $x in $feature/am:competentAuthority/base2:RelatedParty/base2:role/@xlink:href
+		return
+			if($x = $valid_href) then
+				$x
+			else ()
 	return
-		if(not($competentAuthorities)) then
+		if(not($feature/am:competentAuthority)) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority'}) 
-		else
-			for $x in $competentAuthorities
-			return
-				if(not($x/base2:RelatedParty/base2:role)) then
-					local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role'}) 
-				else if(not($x/base2:RelatedParty/base2:role/@xlink:href)) then
-					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role', 'attribute': 'xlink:href'}) 
-				else if(not($x/base2:RelatedParty/base2:role/@xlink:href = $valid_href)) then
-					local:addMessage('TR.wrongHref',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'competentAuthority/RelatedParty/role', 'valid': $valid_href, 'value': string($x/base2:RelatedParty/base2:role/@xlink:href)}) 
-				else ()
+		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role'}) 
+		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role/@xlink:href)) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role', 'attribute': 'xlink:href'}) 
+		else if(not($validCompetentAuth)) then
+			local:addMessage('TR.noValidCompetentAuth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id)}) 
+		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -196,7 +198,7 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.wrongHref"/>
+										<translationTemplate ref="TR.noValidCompetentAuth"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
