@@ -76,8 +76,18 @@ let $messages :=
 
 	let $validDate := '2019-05-22'	
 	let $spatialScopeCodeList := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope'
+	let $spatialScopeRegistryUrl := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/SpatialScope'
 	let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
 	let $spatialScopeCodelistValue := local:get-code-titles($spatialScopeCodeList, $officialLanguages)
+	let $spatialScopeLabels := (
+		for $lang in $officialLanguages
+		let $url := $spatialScopeRegistryUrl || '.' || $lang || '.xml'
+	    return try {
+			fn:doc($url)/*:metadata-codelist/*:label/text()
+		} catch * {
+			error((), $url || ' cannot be accessed.')
+		}
+	)
 	let $codeValues := local:get-code-list-values($spatialScopeCodeList)
 	let $spatialScopeCodelistUri :=
 		for $x in $codeValues
@@ -91,7 +101,7 @@ let $messages :=
 	let $MD_KeywordsSpatialScope := 
 		for $x in $descriptiveKeywords/gmd:MD_Keywords
 		where $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href = $spatialScopeCodeList or
-				$x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString = 'Spatial scope'
+				$x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString = $spatialScopeLabels
 		return $x
 	let $keywordAnchorSpatialScope :=
 		for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
@@ -198,8 +208,18 @@ let $messages :=
 
 	let $validDate := '2018-04-04'	
 	let $priorityDatasetsCodeList := 'http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset'
+	let $priorityDatasetRegistryUrl := 'http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset/PriorityDataset'
 	let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
 	let $priorityDatasetsCodelistValue := local:get-code-titles($priorityDatasetsCodeList, $officialLanguages)
+	let $priorityDatasetLabels := (
+		for $lang in $officialLanguages
+		let $url := $priorityDatasetRegistryUrl || '.' || $lang || '.xml'
+	    return try {
+			fn:doc($url)/*:metadata-codelist/*:label/text()
+		} catch * {
+			error((), $url || ' cannot be accessed.')
+		}
+	)
 	let $codeValues := local:get-code-list-values($priorityDatasetsCodeList)
 	let $priorityDatasetsCodelistUri :=
 		for $x in $codeValues
@@ -213,7 +233,7 @@ let $messages :=
 	let $MD_KeywordsPriorityDatasets := 
 		for $x in $descriptiveKeywords/gmd:MD_Keywords
 		where $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href = $priorityDatasetsCodeList or
-				$x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString = 'INSPIRE priority data set'
+				$x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString = $priorityDatasetLabels
 		return $x
 	let $keywordAnchorPriorityDatasets :=
 		for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
