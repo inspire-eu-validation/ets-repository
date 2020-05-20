@@ -208,10 +208,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 				for $poc in $pocs
 					let $orgName := $poc/gmd:organisationName
 					let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+					let $emptyEmail := 
+						for $x in $email
+							where (not(string-length($x/gco:CharacterString/text()) != 0 or string-length($x/gmx:Anchor/text()) != 0))
+							return $x
 					return
 						if (not($orgName) or not(string-length($orgName/gco:CharacterString/text()) != 0 or string-length($orgName/gmx:Anchor/text()) != 0)) then
 							local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
-						else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then 
+						else if (not($email) or count($emptyEmail) > 0) then 
 							local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 						else if (not($poc/gmd:role)) then
 							local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid})
