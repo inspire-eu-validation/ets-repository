@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-05-15T10:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-05-21T14:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-21T18:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -223,7 +223,7 @@ $messages)
 								</TestAssertion>
 								<TestAssertion id="EIDf8143a35-9668-4006-bcad-e6381478d337">
 									<label>am-ia.b.2: plan</label>
-									<description><![CDATA[Verify that any plan reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+									<description><![CDATA[Verify that any plan reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-ia/code-list.md" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
 									<parent ref="EIDf9f1050a-1760-46b2-9389-1790da40c25f"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
@@ -249,14 +249,6 @@ let $messages :=
 			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION')) then
 				$url
 			else ()
-	let $notXML :=
-		for $href in $urls
-		let $url := string($href)
-		let $validuri := map:get($map, $url)
-		return
-			if (not(starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml'))) then
-				$url
-			else ()
 	let $invalid_element_reference :=
 		for $x in $feature/am:plan/@xlink:href
 		return
@@ -268,8 +260,6 @@ let $messages :=
 	return
 		if ($invalid_urls) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls)}) 
-		else if ($notXML) then
-			local:addMessage('TR.notXMLresponse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($notXML)}) 
 		else if ($invalid_element_reference) then
 			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference)}) 
 		else ()
@@ -282,7 +272,6 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.brokenLink"/>
 										<translationTemplate ref="TR.missingReferencedElement"/>
-										<translationTemplate ref="TR.notXMLresponse"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID2de6df7d-2267-4cb1-93cc-c006bb1502cf">
@@ -313,14 +302,6 @@ let $messages :=
 			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION')) then
 				$url
 			else ()
-	let $notXML :=
-		for $href in $urls
-		let $url := string($href)
-		let $validuri := map:get($map, $url)
-		return
-			if (not(starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml'))) then
-				$url
-			else ()
 	let $invalid_element_reference :=
 		for $x in $feature/am:legalBasis/@xlink:href
 		return
@@ -332,8 +313,6 @@ let $messages :=
 	return
 		if ($invalid_urls) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls)}) 
-		else if ($notXML) then
-			local:addMessage('TR.notXMLresponse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($notXML)}) 
 		else if ($invalid_element_reference) then
 			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference)}) 
 		else ()
@@ -347,7 +326,6 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.brokenLink"/>
 										<translationTemplate ref="TR.missingReferencedElement"/>
-										<translationTemplate ref="TR.notXMLresponse"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
