@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-05-15T10:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-05-21T18:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-22T12:15:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -60,20 +60,21 @@ Pre-requisite conformance classes:
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID04cd9872-c7d3-45b5-890c-6fc70477d55c">
-									<label>am-ia.a.1: ZoneTypeCode</label>
-									<description><![CDATA[Verify that any ZoneType code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+									<label>am-ia.a.1: zoneType</label>
+									<description><![CDATA[Verify that any zoneType code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-ia/code-list.md" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
 									<parent ref="EID0054b173-5e58-4e73-8506-60dd3095ae58"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
 let $gml_ids := $features//@gml:id
+let $property_string := 'zoneType'
 let $messages :=
 	for $feature in $features_selected
 	let $urls := 
 		for $x in $feature/am:zoneType/@xlink:href
 		return
-		if (starts-with($x, '#') or starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+		if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 			()
 		else
 			$x
@@ -87,8 +88,12 @@ let $messages :=
 				$url
 			else ()
 	return
-		if ($invalid_urls) then
-			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'zoneType', 'value': string-join($invalid_urls)}) 
+		if (not($feature/am:zoneType)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (not(count($feature/am:zoneType) = count($feature/am:zoneType/@xlink:href))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'}) 
+		else if ($invalid_urls) then
+			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls)}) 
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -97,6 +102,8 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
 										<translationTemplate ref="TR.brokenLink"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -109,12 +116,13 @@ Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-ia
 									<expression>
 let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
 let $gml_ids := $features//@gml:id
+let $property_string := 'specialisedZoneType'
 let $messages :=
 	for $feature in $features_selected
 	let $urls := 
 		for $x in $feature/am:specialisedZoneType/@xlink:href
 		return
-		if (starts-with($x, '#') or starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+		if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 			()
 		else
 			$x
@@ -129,7 +137,7 @@ let $messages :=
 			else ()
 	return
 		if ($invalid_urls) then
-			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'specialisedZoneType', 'value': string-join($invalid_urls)}) 
+			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls)}) 
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -172,10 +180,10 @@ let $messages :=
 	let $urls := 
 		for $x in $feature/am:relatedZone/@xlink:href
 		return
-		if (starts-with($x, 'http')) then
-			$x
-		else
+		if (starts-with($x, '#')) then
 			()
+		else
+			$x
 	let $map := local:check-resource-uris($urls, 30, true())
 	let $invalid_urls :=
 		for $href in $urls
@@ -236,10 +244,10 @@ let $messages :=
 	let $urls := 
 		for $x in $feature/am:plan/@xlink:href
 		return
-		if (starts-with($x, 'http')) then
-			$x
-		else
+		if (starts-with($x, '#')) then
 			()
+		else
+			$x
 	let $map := local:check-resource-uris($urls, 30, true())
 	let $invalid_urls :=
 		for $href in $urls
@@ -290,9 +298,9 @@ let $messages :=
 		for $x in $feature/am:legalBasis/@xlink:href
 		return
 		if (starts-with($x, 'http')) then
-			$x
-		else
 			()
+		else
+			$x
 	let $map := local:check-resource-uris($urls, 30, true())
 	let $invalid_urls :=
 		for $href in $urls
@@ -311,7 +319,9 @@ let $messages :=
 			else ()
 		else ()
 	return
-		if ($invalid_urls) then
+		if (not($feature/am:legalBasis)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if ($invalid_urls) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls)}) 
 		else if ($invalid_element_reference) then
 			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference)}) 
@@ -324,6 +334,7 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.brokenLink"/>
 										<translationTemplate ref="TR.missingReferencedElement"/>
 									</translationTemplates>
