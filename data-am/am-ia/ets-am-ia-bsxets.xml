@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-05-15T10:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-05-22T12:15:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-27T17:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -84,7 +84,7 @@ let $messages :=
 		let $url := string($href)
 		let $validuri := map:get($map, $url)
 		return
-			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION')) then
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 				$url
 			else ()
 	return
@@ -132,11 +132,13 @@ let $messages :=
 		let $url := string($href)
 		let $validuri := map:get($map, $url)
 		return
-			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION')) then
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 				$url
 			else ()
 	return
-		if ($invalid_urls) then
+		if (count($feature/am:specialisedZoneType) > 1) then
+			local:addMessage('TR.wrongMultiplicitySpecialisedZoneType',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'count': count($feature/am:specialisedZoneType)}) 
+		else if ($invalid_urls) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls)}) 
 		else ()
 return
@@ -147,6 +149,7 @@ $messages)
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.brokenLink"/>
+										<translationTemplate ref="TR.wrongMultiplicitySpecialisedZoneType"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -190,15 +193,7 @@ let $messages :=
 		let $url := string($href)
 		let $validuri := map:get($map, $url)
 		return
-			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION')) then
-				$url
-			else ()
-	let $notXML :=
-		for $href in $urls
-		let $url := string($href)
-		let $validuri := map:get($map, $url)
-		return
-			if (not(starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml'))) then
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 				$url
 			else ()
 	let $invalid_element_reference :=
@@ -212,8 +207,6 @@ let $messages :=
 	return
 		if ($invalid_urls) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls)}) 
-		else if ($notXML) then
-			local:addMessage('TR.notXMLresponse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($notXML)}) 
 		else if ($invalid_element_reference) then
 			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference)}) 
 		else ()
@@ -254,7 +247,7 @@ let $messages :=
 		let $url := string($href)
 		let $validuri := map:get($map, $url)
 		return
-			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION')) then
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 				$url
 			else ()
 	let $invalid_element_reference :=
@@ -307,7 +300,7 @@ let $messages :=
 		let $url := string($href)
 		let $validuri := map:get($map, $url)
 		return
-			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION')) then
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 				$url
 			else ()
 	let $invalid_element_reference :=
