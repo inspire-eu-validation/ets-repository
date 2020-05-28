@@ -151,17 +151,47 @@ declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as x
   ))
 };
 
-declare function local:switch-url-request($url as xs:string) as element()*
+declare function local:get-document($url as xs:string) as element()*
 {
-  try{
-    fn:doc($url)/element()
-  }catch * {
-    if (starts-with($url, 'http://')) then
-      fn:doc(fn:replace($url,"http://","https://"))/element()
-    else if (starts-with($url, 'https://')) then
-      fn:doc(fn:replace($url,"https://","http://"))/element()
-    else ()
-  }
+  let $finalURI := local:get-final-url($url, 30, true())
+  let $loginfo := local:log('Final URL: ''' || $finalURI || '''')
+
+
+  let $fixedURL := local:replaceCharacters($finalURI)
+  (:~ let $decodedURI := web:decode-url($finalURI)
+  let $loginfo2 := local:log('Decoded: ''' || $decodedURI || '''')
+
+  let $encodedURI := fn:encode-for-uri($decodedURI)
+  let $loginfo3 := local:log('Encoded: ''' || $encodedURI || '''') ~:)
+
+
+  return fn:doc(fn:string($fixedURL))/element()
+};
+
+declare function local:replaceCharacters($uri as xs:string) as xs:string
+{
+  let $characters := ('\[', '\]', ' ')
+  let $replacement := ('%5B', '%5D', '+')
+
+  let $fixedURI := functx:replace-multi($uri, $characters, $replacement)
+  
+  return $fixedURI
+};
+
+
+declare function local:get-final-url($uri as xs:string, $timeoutInS as xs:integer, $redirect as xs:boolean) as xs:string
+{
+    let $loginfo := local:log('Checking URL: ''' || $uri || '''')
+    let $query := "import module namespace http = 'http://expath.org/ns/http-client'; declare variable $timeoutInS external; declare variable $redirect external; declare variable $uri external; http:send-request(<http:request method='get' timeout='{$timeoutInS}' status-only='true' follow-redirect='{$redirect}'/>, $uri)"
+    let $response := xquery:eval($query, map{ 'timeoutInS' : $timeoutInS, 'uri': $uri, 'redirect': $redirect }, map{ 'timeout': $timeoutInS })
+    
+    return
+      if ($response/@status=('200','204')) then
+        $uri
+      else if ($redirect and $response/@status=('301','302','303','307')) then
+        local:get-final-url($response/http:header[@name='Location']/@value, $timeoutInS, $redirect)				
+      else
+        $response/@status
 };
 
 (:

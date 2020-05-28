@@ -15,11 +15,11 @@ There is a general limitation in all assertions that polymorphism and containmen
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target="_blank">Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.6</version>
+		<version>1.0.7</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-04-01T17:30:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-20T17:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -208,10 +208,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 				for $poc in $pocs
 					let $orgName := $poc/gmd:organisationName
 					let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+					let $emptyEmail := 
+						for $x in $email
+							where (not(string-length($x/gco:CharacterString/text()) != 0 or string-length($x/gmx:Anchor/text()) != 0))
+							return $x
 					return
 						if (not($orgName) or not(string-length($orgName/gco:CharacterString/text()) != 0 or string-length($orgName/gmx:Anchor/text()) != 0)) then
 							local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
-						else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then 
+						else if (not($email) or count($emptyEmail) > 0) then 
 							local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 						else if (not($poc/gmd:role)) then
 							local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid})
