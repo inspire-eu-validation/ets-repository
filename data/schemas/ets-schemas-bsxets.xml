@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target=
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-encoding/master/inspire-gml" target="_blank">Conformance Class 'INSPIRE GML encoding'</a></li></ul>]]></description>
 	<reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.5</version>
+	<version>0.2.6</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
-	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-10-18T00:10:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-02-21T12:20:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDaeed5629-2c33-4fa6-aa66-f59418abaa70"/>
 	</tags>
@@ -207,13 +207,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas/gml-mode
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $indeterminatePositionValues := ('unknown', 'now')
-let $featuresWithErrors := $features[*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)] or */*/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)]][position() le $limitErrors]
+let $featuresWithErrors := $features[*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or (string-length(@uom)&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)] or */*/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or (string-length(@uom)&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)]][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
  for $feature in $featuresWithErrors
    order by $feature/@gml:id
-   let $properties := $feature/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)] | $feature/*/*/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)]
+   let $properties := $feature/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or (string-length(@uom)&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)] | $feature/*/*/*[not(@xlink:href or element() or (text() and string-length(normalize-space(text()))&gt;0) or (string-length(@uom)&gt;0) or @xsi:nil eq 'true' or @indeterminatePosition = $indeterminatePositionValues)]
    return
      local:addMessage('TR.emptyValue', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'propertyNames': fn:string-join($properties/local-name(),', ') }))
 									</expression>
