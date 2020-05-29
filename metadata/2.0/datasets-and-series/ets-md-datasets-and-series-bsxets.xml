@@ -15,11 +15,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-se
 Pre-requisite conformance classes: Common Requirements]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.3</version>
+		<version>1.0.4</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-03-26T08:20:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-26T16:45:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -156,6 +156,13 @@ let $messages :=
     (for $record in $records
         let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
         let $identifiers := $record/gmd:identificationInfo[1]/*/gmd:citation/gmd:CI_Citation/gmd:identifier/*/gmd:code
+		let $duplicateIdentifier := 
+			for $id in $identifiers
+			return 
+			if (count(fn:index-of($allIdent,$id)) > 1) then
+				$id
+			else ()
+		return
 		let $emptyIdentifiers :=
 			for $identifier in $identifiers
             return
@@ -171,8 +178,8 @@ let $messages :=
             local:addMessage('TR.noIdentifier', map { 'filename': local:filename($record), 'id': $rid })
 		else if(count($emptyIdentifiers) != 0) then
 			local:addMessage('TR.emptyIdentifier', map { 'filename': local:filename($record), 'id': $rid })
-		else if(count($distinctRecordIdentifiers) != count($identifiers)) then
-            local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': fn:string-join($allIdent,'; ') })
+		else if(count($duplicateIdentifier)) then
+            local:addMessage('TR.duplicateIdentifier', map { 'filename': local:filename($record), 'id': $rid, 'identifier': fn:string-join(distinct-values($duplicateIdentifier),'; ') })
         else ()
     )[position() le $limitErrors]
 return
