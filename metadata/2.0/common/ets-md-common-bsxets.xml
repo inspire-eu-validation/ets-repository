@@ -15,11 +15,11 @@ There is a general limitation in all assertions that polymorphism and containmen
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target="_blank">Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.1</version>
+		<version>1.0.7</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-01-28T13:16:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-20T17:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -83,9 +83,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 											if (not(string-length($result_0) = 0 and string-length($result_1) = 0)) then validate:xsd($record, 'http://schemas.opengis.net/iso/19139/20070417/gmd/gmd.xsd')
 											else ()
 										} catch * { $err:description }
+										let $result_3 := try{
+											if (not(string-length($result_0) = 0 and string-length($result_1) = 0 and string-length($result_2) = 0)) then validate:xsd($record, 'https://inspire.ec.europa.eu/draft-schemas/inspire-md-schemas-temp/iso_19139_20060504/iso_19139_20060504_wrapper.xsd')
+											else ()
+										} catch * { $err:description }
 										return
-										if(not(string-length($result_0) = 0 or string-length($result_1) = 0 or string-length($result_2) = 0)) then
-											local:addMessage('TR.errorValidatingSchema',  map { 'filename': local:filename($record), 'id': $rid, 'description': concat($result_0, $result_1, $result_2) })
+										if(not(string-length($result_0) = 0 or string-length($result_1) = 0 or string-length($result_2) = 0 or string-length($result_3) = 0)) then
+											local:addMessage('TR.errorValidatingSchema',  map { 'filename': local:filename($record), 'id': $rid, 'description': string($result_0) })
 										else ()
 										)[position() le $limitErrors]
 									return
@@ -147,7 +151,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 											local:addMessage('TR.noLanguageCode',  map { 'filename': local:filename($record), 'id': $rid })
 										else if (count($languageCodes) != 1) then
 											local:addMessage('TR.wrongLanguageCodeNumber',  map { 'filename': local:filename($record), 'id': $rid })
-										else if ($languageCodes/@codeList != 'http://www.loc.gov/standards/iso639-2/' and $languageCodes/@codeList != 'http://www.loc.gov/standards/iso639-2') then
+										else if ($languageCodes/@codeList != 'http://www.loc.gov/standards/iso639-2/' and $languageCodes/@codeList != 'https://www.loc.gov/standards/iso639-2/' and $languageCodes/@codeList != 'http://www.loc.gov/standards/iso639-2' and $languageCodes/@codeList != 'https://www.loc.gov/standards/iso639-2') then
 											local:addMessage('TR.wrongCodeList_Param',  map { 'filename': local:filename($record), 'id': $rid, 'param': 'http://www.loc.gov/standards/iso639-2/ or http://www.loc.gov/standards/iso639-2'})
 										else if ($languageCodes/@codeListValue[not(. = $codes)]) then
 											local:addMessage('TR.invalidLanguageCode',  map { 'filename': local:filename($record), 'id': $rid, 'invalidCodes' : $languageCodes/@codeListValue/string()})
@@ -204,10 +208,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 				for $poc in $pocs
 					let $orgName := $poc/gmd:organisationName
 					let $email := $poc/gmd:contactInfo/gmd:CI_Contact/gmd:address/gmd:CI_Address/gmd:electronicMailAddress
+					let $emptyEmail := 
+						for $x in $email
+							where (not(string-length($x/gco:CharacterString/text()) != 0 or string-length($x/gmx:Anchor/text()) != 0))
+							return $x
 					return
 						if (not($orgName) or not(string-length($orgName/gco:CharacterString/text()) != 0 or string-length($orgName/gmx:Anchor/text()) != 0)) then
 							local:addMessage('TR.noMetadataContactOrganisationName', map { 'filename': local:filename($record), 'id': $rid })
-						else if (not($email) or not(string-length($email/gco:CharacterString/text()) != 0 or string-length($email/gmx:Anchor/text()) != 0)) then 
+						else if (not($email) or count($emptyEmail) > 0) then 
 							local:addMessage('TR.noMetadataContactEmailAddress', map { 'filename': local:filename($record), 'id': $rid })
 						else if (not($poc/gmd:role)) then
 							local:addMessage('TR.noMetadataContactRole', map { 'filename': local:filename($record), 'id': $rid})
@@ -429,7 +437,7 @@ let $messages :=
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $regexDate := '(^(\d{4})(-?)(0[1-9]|1[0-2])(-?)(0[1-9]|[12]\d|3[01])$)|(^(\d{4})(-?)([0-3][0-9][0-9])$)|(^(\d{4})(-?)(0[1-9]|1[0-2])$)|(^(\d{4})$)'
-let $regexDateTime := '(^(\d{4})(-?)(0[1-9]|1[0-2])(-?)(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:?)([0-5]\d)(:?)([0-5]\d)(.?)([0-9]+)([+\-][0-9]{2}:[0-9]{2}|Z)$)|(^(\d{4})(-?)(0[1-9]|1[0-2])(-?)(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:?)([0-5]\d)(:?)([0-5]\d)([+\-][0-9]{2}:[0-9]{2}|Z)$)|(^(\d{4})(-?)(0[1-9]|1[0-2])(-?)(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:?)([0-5]\d)([+\-][0-9]{2}:[0-9]{2}|Z)$)'
+let $regexDateTime := '(^(\d{4})(-?)(0[1-9]|1[0-2])(-?)(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:?)([0-5]\d)(:?)([0-5]\d)(.?)([0-9]+)([+\-][0-9]{2}:[0-9]{2}|Z)$)|(^(\d{4})(-?)(0[1-9]|1[0-2])(-?)(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:?)([0-5]\d)(:?)([0-5]\d)([+\-][0-9]{2}:[0-9]{2}|[Z]?)$)|(^(\d{4})(-?)(0[1-9]|1[0-2])(-?)(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])(:?)([0-5]\d)([+\-][0-9]{2}:[0-9]{2}|Z)$)'
 let $messages := 
 	(for $record in $records
 	let $rid := $record/gmd:fileIdentifier/*/text()
@@ -543,10 +551,10 @@ let $messages :=
 	 let $temporalExtentextents := $record/gmd:identificationInfo[1]/*/*:extent/gmd:EX_Extent/gmd:temporalElement/gmd:EX_TemporalExtent/gmd:extent
 	 return
 	 	for $extent in $temporalExtentextents
-			let $timePosition := $extent/gml:TimeInstant/gml:timePosition
-			let $timePeriod := $extent/gml:TimePeriod
-			let $beginPosition := $extent/gml:TimePeriod/gml:beginPosition
-			let $endPosition := $extent/gml:TimePeriod/gml:endPosition
+			let $timePosition := $extent/*:TimeInstant/*:timePosition
+			let $timePeriod := $extent/*:TimePeriod
+			let $beginPosition := $extent/*:TimePeriod/*:beginPosition
+			let $endPosition := $extent/*:TimePeriod/*:endPosition
 			return
 		if ($timePosition) then
 			if (not($timePosition/@indeterminatePosition)  and not(matches($timePosition/text(), $regex))) then
@@ -676,9 +684,15 @@ let $messages :=
 					for $ac in $x/gmd:accessConstraints
 						where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
 						return $ac
+				let $otherConstraintsAnchor := 
+					for $oc in $x/gmd:otherConstraints
+						where (exists($oc/gmx:Anchor)) 
+						return $oc/gmx:Anchor
 				let $validAnchor :=
-					for $y in $x/gmd:otherConstraints/gmx:Anchor
-						where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+					for $y in $otherConstraintsAnchor
+                       where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess'))
+						return
+						if ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
@@ -695,23 +709,50 @@ let $messages :=
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
-							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
-						return $y
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations') then $y
+						else ()
+				let $invalidLimitationsAnchor :=
+					for $y in $otherConstraintsAnchor
+                       where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess'))
+							return
+								if (not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a') and
+									not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b') and
+									not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c') and
+									not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d') and
+									not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e') and
+									not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f') and
+									not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g') and
+									not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h') and
+									not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h') and
+									not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations'))
+										then $y
+								else()
+
 				let $invalidAnchor :=
-					for $y in $x/gmd:otherConstraints/gmx:Anchor
+					for $y in $otherConstraintsAnchor
 						where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
 						return $y
+				let $dummy := local:log('Valid Anchor - ' || count($validAnchor) || ', valid Access Constraints - ' || count($validAccessConstraints) || ', invalid Anchor - ' || count($invalidAnchor) || ', Invalid limitations Anchor - ' || count($invalidLimitationsAnchor))
+				
 				return
-					if(count($validAnchor) >= 1 and count($validAccessConstraints) = 1) then $x
+					if(count($validAnchor) >= 1 and count($validAccessConstraints) = 1 and count($invalidAnchor) = 0 and count($invalidLimitationsAnchor) = 0) then $x
 					else ()
 		return
 			if (count($md_legalConstraints_Limitations) = 0) then
-				local:addMessage('TR.noValidResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
+				local:addMessage('TR.noResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
 			else if (count($md_legalConstraints_Limitations) != 1) then
-				local:addMessage('TR.exceededResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
+				local:addMessage('TR.noValidResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 	)[position() le $limitErrors]
 return
@@ -722,7 +763,8 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noValidResourceLimitations"/>
-										<translationTemplate ref="TR.exceededResourceLimitations"/>
+										<translationTemplate ref="TR.noResourceLimitations"/>
+										<translationTemplate ref="TR.wrongCodeList"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -738,63 +780,20 @@ let $messages :=
 		let $rid := $record/gmd:fileIdentifier/*/text()
 
 		let $md_legalConstraints_Limitations :=
-					for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints where (count($x/gmd:accessConstraints) != 0)
-						let $validAccessConstraints :=
-							for $ac in $x/gmd:accessConstraints
-								where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
-								return $ac
-						let $validAnchor :=
-							for $y in $x/gmd:otherConstraints/gmx:Anchor
-								where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
-								return $y
-						let $invalidAnchor :=
-							for $y in $x/gmd:otherConstraints/gmx:Anchor
-								where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
-									$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
-									$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
-								return $y
-						return
-							if(count($validAnchor) >= 1 and count($validAccessConstraints) = 1) then $x
-							else ()
-
-		let $md_legalConstraints_Conditions :=
-			for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
+			for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints where (count($x/gmd:accessConstraints) != 0)
 				let $validAccessConstraints :=
 					for $ac in $x/gmd:accessConstraints
 						where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
 						return $ac
-				let $validUseConstraints :=
-					for $uc in $x/gmd:useConstraints
-						where ($uc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
-						return $uc
+				let $otherConstraintsAnchor := 
+					for $oc in $x/gmd:otherConstraints
+						where (exists($oc/gmx:Anchor)) 
+						return $oc/gmx:Anchor
 				let $validAnchor :=
-					for $y in $x/gmd:otherConstraints/gmx:Anchor
-						where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
-							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
-							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
-							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
-						return $y
-				let $invalidAnchor :=
-					for $y in $x/gmd:otherConstraints/gmx:Anchor
-						where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+					for $y in $otherConstraintsAnchor
+                       where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess'))
+						return 
+						if($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
@@ -811,19 +810,153 @@ let $messages :=
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
 							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
-							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations')
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations') then $y
+						else ()
+
+				let $invalidAnchor :=
+					for $y in $otherConstraintsAnchor
+						where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
 						return $y
 				return
-					if(count($validAccessConstraints) = 1 and (count($validAnchor) >= 1 or (not(count($x/gmd:otherConstraints/gco:CharacterString) = 0) and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0)) )) then $x
-					else if(count($validUseConstraints) = 1 and (count($validAnchor) >= 1 or (not(count($x/gmd:otherConstraints/gco:CharacterString) = 0) and not(string-length($x/gmd:otherConstraints/gco:CharacterString) = 0)) )) then $x
+					if(count($validAnchor) >= 1 and count($validAccessConstraints) = 1) then $x
 					else ()
-		return 
-			if (count($md_legalConstraints_Conditions) = 0) then
-				local:addMessage('TR.noValidResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
+		let $md_legalConstraints_Conditions :=
+			for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
+				let $validAccessConstraints :=
+					for $ac in $x/gmd:accessConstraints
+						where ($ac/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
+						return $ac
+				let $validUseConstraints :=
+					for $uc in $x/gmd:useConstraints
+						where ($uc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
+						return $uc
+				let $otherConstraintsAnchor := 
+					for $oc in $x/gmd:otherConstraints
+						where (exists($oc/gmx:Anchor)) 
+						return $oc/gmx:Anchor
+				let $validAnchor :=
+					for $y in $otherConstraintsAnchor
+						where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
+						return $y 
 
+				let $invalidConditionsAnchor :=
+					for $y in $otherConstraintsAnchor
+                       where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse'))
+						return 
+							if (not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply') and
+								not($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown') and
+								not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply') and
+								not($y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown'))
+								then $y
+							else()
+							
+				
+						
+				let $limitationAnchor :=
+					for $y in $otherConstraintsAnchor
+                       where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess'))
+						return
+						if ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
+							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
+							$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations') then $y
+						else ()
+
+				let $validCharacterString := 
+					for $oc in $x/gmd:otherConstraints/gco:CharacterString
+						where (not(string-length($oc) = 0))
+							return $oc
+
+				let $validAnchorText :=
+					for $oc in $x/gmd:otherConstraints/gmx:Anchor
+						where (not(string-length($oc) = 0))
+							return $oc
+
+				return
+					if(count($validAccessConstraints) = 1 and (count($validAnchor) = 1 and (not(count($validCharacterString) = 0)))) then $x
+					else if(count($validAccessConstraints) = 1 and (not(count($validCharacterString) = 0) or (not(count($validAnchorText) = 0) and count($invalidConditionsAnchor) = 0 and count($limitationAnchor) = 0))) then $x
+					else if(count($validUseConstraints) = 1 and (count($validAnchor) = 1 or not(count($validCharacterString) = 0))) then $x
+					else if(count($validUseConstraints) = 1 and (not(count($validCharacterString) = 0) or (not(count($validAnchorText) = 0) and count($invalidConditionsAnchor) = 0 and count($limitationAnchor) = 0))) then $x
+					else ()
+					
+			
+			let $conditionsConstraint :=
+				for $x in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints
+					let $otherConstraintsAnchor := 
+						for $oc in $x/gmd:otherConstraints
+							where (exists($oc/gmx:Anchor)) 
+							return $oc/gmx:Anchor
+					let $validAnchor :=
+						for $y in $otherConstraintsAnchor
+							where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
+							return $y 
+					let $limitationAnchor :=
+						for $y in $otherConstraintsAnchor
+						   where (starts-with($y/@xlink:href, 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess') or starts-with($y/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess'))
+							return
+							if ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
+								$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1a' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1b' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1c' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1d' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1e' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1f' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1g' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/INSPIRE_Directive_Article13_1h' or
+								$y/@xlink:href = 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations') then $y
+							else ()
+					return
+						if(count($validAnchor) = 1 and count($limitationAnchor) = 0) then $x
+						else ()
+						
+				let $validAccessCodelist :=
+					for $cc in $conditionsConstraint
+						where ($cc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
+						return $cc
+				let $validUseConstraintsCodelist :=
+					for $cc in $conditionsConstraint
+						where ($cc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
+						return $cc
+			
+		return 
+			if(count($md_legalConstraints_Conditions) = 0 and count($conditionsConstraint) > 0 and count($validAccessCodelist) = 0 and count($validUseConstraintsCodelist) = 0) then
+				local:addMessage('TR.noValidOtherRestrictionsCodelistValue', map { 'filename': local:filename($record), 'id': $rid, 'invalidElement': string($conditionsConstraint[1]/*/gmd:MD_RestrictionCode/@codeListValue) })								
+			else if(count($md_legalConstraints_Conditions) = 0) then
+				local:addMessage('TR.noResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
 			else if (count($md_legalConstraints_Conditions) != 1) then
-				if (not(count($md_legalConstraints_Limitations) = 0 and count($md_legalConstraints_Conditions) = 2)) then
-					local:addMessage('TR.exceededResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
+				if (not(count($md_legalConstraints_Limitations) = 0 and count($md_legalConstraints_Conditions) = 2)) then 
+					local:addMessage('TR.noValidResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
 				else ()
 			else ()
 		)[position() le $limitErrors]
@@ -835,8 +968,9 @@ $messages)
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.noValidOtherRestrictionsCodelistValue"/>
 										<translationTemplate ref="TR.noValidResourceConditions"/>
-										<translationTemplate ref="TR.exceededResourceConditions"/>
+										<translationTemplate ref="TR.noResourceConditions"/>
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
