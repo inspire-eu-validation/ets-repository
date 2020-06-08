@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite 
+	xmlns="http://www.interactive-instruments.de/etf/2.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID0b86f7a3-2947-4841-823d-6a00d8e06d70" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 ../../schema/model/resultSet.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/metadata/2.0</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance Class 2b: INSPIRE data sets and data set series metadata for Monitoring</label>
+	<description>
+		<![CDATA[This test suite examines metadata records against the requirements for metadata in INSPIRE.<br/><br/>Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring" target="_blank">Conformance Class 2b: INSPIRE data sets and data set series metadata for Monitoring</a><br/><br/>]]>
+	</description>
+	<reference>../../../inspire-md-bsxets.xq</reference>
+		<version>1.0.1</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-01-14T00:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-05-11T17:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for metadata XML test objects">
+		<!-- TODO clean up, currently disabled due to open issues with schema validation
+		<parameter name="encoding" required="false"><defaultValue>CSW ISO AP 1.0.0</defaultValue><description ref="TR.metadataEncoding"/><allowedValues>^(CSW ISO AP 1\.0\.0|ISO/TS 19139)$</allowedValues><type>string</type></parameter><parameter name="Schema_file" required="false"><description ref="TR.metadataSchema"/><allowedValues>^(apiso\.xsd|gmd\.xsd|apiso-csw\.xsd|gmd-csw\.xsd)?$</allowedValues><type>string</type></parameter>
+		-->
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EID5a60dded-0cb0-4977-9b06-16c6c2321d2e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EIDe4a95862-9cc9-436b-9fdd-a0115d342350"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID105d4019-8fc7-4a2a-a34b-ffed01b17252">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID0b86f7a3-2947-4841-823d-6a00d8e06d70"/>
+			<testCases>
+				<TestCase id="EID1d36be2a-6236-430e-8221-b6705d9accda">
+					<label>Monitoring requirements</label>
+					<description>Execute tests that apply for monitoring metadata.</description>
+					<parent ref="EID105d4019-8fc7-4a2a-a34b-ffed01b17252"/>
+					<testSteps>
+						<TestStep id="EID2a595fad-2019-400a-8079-5759231c52c1">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID1d36be2a-6236-430e-8221-b6705d9accda"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDa09768e4-1fab-48b4-ac7c-3dc0af7e8649">
+									<label>M.1: Spatial scope keyword</label>
+									<description><![CDATA[<p>Test that the spatial scope covered by the data set or data set series is provided.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring/spatial-scope" target="_blank">Spatial Scope Keyword</a></p>]]></description>
+									<parent ref="EID2a595fad-2019-400a-8079-5759231c52c1"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+
+	let $validDate := '2019-05-22'	
+	let $spatialScopeCodeList := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope'
+	let $spatialScopeRegistryUrl := 'http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/SpatialScope'
+	let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
+	let $spatialScopeCodelistValue := local:get-code-titles($spatialScopeCodeList, $officialLanguages)
+	let $spatialScopeLabels := (
+		for $lang in $officialLanguages
+		let $url := $spatialScopeRegistryUrl || '.' || $lang || '.xml'
+	    return try {
+			fn:doc($url)/*:metadata-codelist/*:label/text()
+		} catch * {
+			error((), $url || ' cannot be accessed.')
+		}
+	)
+	let $codeValues := local:get-code-list-values($spatialScopeCodeList)
+	let $spatialScopeCodelistUri :=
+		for $x in $codeValues
+		return fn:concat($spatialScopeCodeList, '/', $x)
+
+	let $descriptiveKeywords := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
+	let $MD_KeywordsSpatialScope := 
+		for $x in $descriptiveKeywords/gmd:MD_Keywords
+		where $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href = $spatialScopeCodeList or
+				$x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString = $spatialScopeLabels
+		return $x
+	let $keywordAnchorSpatialScope :=
+		for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
+		where $x/gmx:Anchor/@xlink:href[starts-with(.,$spatialScopeCodeList)]
+		return $x
+	let $validAnchorInMD_KeywordsSpatialScope := 
+		for $x in $MD_KeywordsSpatialScope/gmd:keyword
+		where ($x/gmx:Anchor/@xlink:href = $spatialScopeCodelistUri)
+		return $x
+	let $validCharacterStringInMD_KeywordsSpatialScope := 
+		for $x in $MD_KeywordsSpatialScope/gmd:keyword
+		where ($x/gco:CharacterString = $spatialScopeCodelistValue)
+		return $x	
+	let $thesaurusAnchorCodelist := 
+		for $x in $descriptiveKeywords/gmd:MD_Keywords
+		where $x/gmd:keyword/gmx:Anchor/@xlink:href[starts-with(.,$spatialScopeCodeList)] and count($x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href) > 0
+		return $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor
+	let $validThesaurusAnchorCodelist := 
+		for $x in $thesaurusAnchorCodelist
+		where $x/@xlink:href = $spatialScopeCodeList
+		return $x
+	let $thesaurusNameTitle := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title		
+	return
+	
+	if (count($MD_KeywordsSpatialScope) = 0 and count($keywordAnchorSpatialScope) = 0) then
+		local:addMessage('TR.manualCheckSpatialScope', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($MD_KeywordsSpatialScope) > 1) then
+		local:addMessage('TR.spatialScopeMultiplicity', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($MD_KeywordsSpatialScope/gmd:keyword) > 1) then
+		local:addMessage('TR.spatialScopeKeywordMultiplicity', map { 'filename': local:filename($record), 'id': $rid })	
+	else if (count($thesaurusAnchorCodelist) = 1 and count($validThesaurusAnchorCodelist) = 0) then
+		local:addMessage('TR.spatialScopeInvalidThesaurusCodelist', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($keywordAnchorSpatialScope) = 1 and count($thesaurusNameTitle) = 0) then
+		local:addMessage('TR.spatialScopeCitationMissing', map { 'filename': local:filename($record), 'id': $rid })		
+	else if (count($keywordAnchorSpatialScope) > 1) then
+		local:addMessage('TR.spatialScopeKeywordMultiplicity', map { 'filename': local:filename($record), 'id': $rid })	
+	else if (count($keywordAnchorSpatialScope) = 1 and not(count($validAnchorInMD_KeywordsSpatialScope) = 1)) then
+		local:addMessage('TR.spatialScopeInvalidCodelistUri', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($keywordAnchorSpatialScope) = 0 and not(count($validCharacterStringInMD_KeywordsSpatialScope) = 1)) then
+		local:addMessage('TR.spatialScopeInvalidCodelistValue', map { 'filename': local:filename($record), 'id': $rid })
+	else if (not ($MD_KeywordsSpatialScope/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date = $validDate)) then
+		local:addMessage('TR.spatialScopeInvalidDate', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($validAnchorInMD_KeywordsSpatialScope) != 1 and count($validCharacterStringInMD_KeywordsSpatialScope) != 1) then
+		local:addMessage('TR.spatialScopeExactlyOneKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if ($MD_KeywordsSpatialScope/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue != 'publication') then
+		local:addMessage('TR.spatialScopeInvalidDateCodeListValue', map { 'filename': local:filename($record), 'id': $rid })
+	else()
+	)[position() le $limitErrors]
+return
+(if ($messages/@ref = 'TR.manualCheckSpatialScope') then 'PASSED_MANUAL' 
+ else if ($messages/@ref = 'TR.spatialScopeMultiplicity') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeKeywordMultiplicity') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeInvalidThesaurusCodelist') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeCitationMissing') then 'FAILED' 
+ else if ($messages/@ref = 'TR.spatialScopeInvalidCodelistUri') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeInvalidCodelistValue') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeInvalidDate') then 'FAILED'
+ else if ($messages/@ref = 'TR.spatialScopeExactlyOneKeyword') then 'FAILED' 
+ else if ($messages/@ref = 'TR.spatialScopeInvalidDateCodeListValue') then 'FAILED' 
+
+ else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  																																																						
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.manualCheckSpatialScope"/>
+										<translationTemplate ref="TR.spatialScopeMultiplicity"/>
+										<translationTemplate ref="TR.spatialScopeKeywordMultiplicity"/>
+										<translationTemplate ref="TR.spatialScopeInvalidThesaurusCodelist"/>
+										<translationTemplate ref="TR.spatialScopeCitationMissing"/>
+										<translationTemplate ref="TR.spatialScopeInvalidCodelistUri"/>
+										<translationTemplate ref="TR.spatialScopeInvalidCodelistValue"/>
+										<translationTemplate ref="TR.spatialScopeInvalidDate"/>
+										<translationTemplate ref="TR.spatialScopeInvalidDate"/>
+										<translationTemplate ref="TR.spatialScopeExactlyOneKeyword"/>
+										<translationTemplate ref="TR.spatialScopeInvalidDateCodeListValue"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+						<TestStep id="EIDcc7e6b3a-11cb-494a-afbd-9a15ba60b428">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID1d36be2a-6236-430e-8221-b6705d9accda"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID5147ecc7-bc34-4283-a6a2-8adf34581106">
+									<label>M.2: Priority datasets keyword</label>
+									<description><![CDATA[<p>Test that keyword(s) for priority data sets are provided in the metadata.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring/priority-datasets" target="_blank">Priority Datasets Keyword</a></p>]]></description>
+									<parent ref="EIDcc7e6b3a-11cb-494a-afbd-9a15ba60b428"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $messages := 
+	(for $record in $records
+	let $rid := $record/gmd:fileIdentifier/*/text()
+
+	let $validDate := '2018-04-04'	
+	let $priorityDatasetsCodeList := 'http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset'
+	let $priorityDatasetRegistryUrl := 'http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset/PriorityDataset'
+	let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
+	let $priorityDatasetsCodelistValue := local:get-code-titles($priorityDatasetsCodeList, $officialLanguages)
+	let $priorityDatasetLabels := (
+		for $lang in $officialLanguages
+		let $url := $priorityDatasetRegistryUrl || '.' || $lang || '.xml'
+	    return try {
+			fn:doc($url)/*:metadata-codelist/*:label/text()
+		} catch * {
+			error((), $url || ' cannot be accessed.')
+		}
+	)
+	let $codeValues := local:get-code-list-values($priorityDatasetsCodeList)
+	let $priorityDatasetsCodelistUri :=
+		for $x in $codeValues
+		return fn:concat($priorityDatasetsCodeList, '/', $x)
+	
+	let $descriptiveKeywords := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords
+	let $MD_KeywordsPriorityDatasets := 
+		for $x in $descriptiveKeywords/gmd:MD_Keywords
+		where $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href = $priorityDatasetsCodeList or
+				$x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gco:CharacterString = $priorityDatasetLabels
+		return $x
+	let $keywordAnchorPriorityDatasets :=
+		for $x in $descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
+		where $x/gmx:Anchor/@xlink:href[starts-with(.,$priorityDatasetsCodeList)]
+		return $x
+	let $validAnchorInMD_KeywordsPriorityDatasets := 
+		for $x in $MD_KeywordsPriorityDatasets/gmd:keyword
+		where ($x/gmx:Anchor/@xlink:href = $priorityDatasetsCodelistUri)
+		return $x
+	let $validCharacterStringInMD_KeywordsPriorityDatasets := 
+		for $x in $MD_KeywordsPriorityDatasets/gmd:keyword
+		where ($x/gco:CharacterString = $priorityDatasetsCodelistValue)
+		return $x
+	let $thesaurusAnchorCodelist := 
+		for $x in $descriptiveKeywords/gmd:MD_Keywords
+		where $x/gmd:keyword/gmx:Anchor/@xlink:href[starts-with(.,$priorityDatasetsCodeList)] and count($x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor/@xlink:href) > 0
+		return $x/gmd:thesaurusName/gmd:CI_Citation/gmd:title/gmx:Anchor	
+	let $validThesaurusAnchorCodelist := 
+		for $x in $thesaurusAnchorCodelist
+		where $x/@xlink:href = $priorityDatasetsCodeList and $x = 'INSPIRE priority data set'
+		return $x
+	let $thesaurusNameTitle := 
+		if ($record/gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = 'service') then
+			$record/gmd:identificationInfo/srv:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+		else
+			$record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+	return
+	
+	if (count($MD_KeywordsPriorityDatasets) = 0 and count($keywordAnchorPriorityDatasets) = 0) then
+		local:addMessage('TR.manualCheckPriorityDatasets', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($MD_KeywordsPriorityDatasets) > 1) then
+		local:addMessage('TR.priorityDatasetsMultiplicity', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($thesaurusAnchorCodelist) = 1 and count($validThesaurusAnchorCodelist) = 0) then
+		local:addMessage('TR.priorityDatasetsInvalidThesaurusCodelist', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($keywordAnchorPriorityDatasets) = 1 and count($thesaurusNameTitle) = 0) then
+		local:addMessage('TR.priorityDatasetsCitationMissing', map { 'filename': local:filename($record), 'id': $rid })		
+	else if (count($validAnchorInMD_KeywordsPriorityDatasets) != count($MD_KeywordsPriorityDatasets/gmd:keyword/gmx:Anchor)) then
+		local:addMessage('TR.priorityDatasetsInvalidKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($validCharacterStringInMD_KeywordsPriorityDatasets) != count($MD_KeywordsPriorityDatasets/gmd:keyword/gco:CharacterString)) then
+		local:addMessage('TR.priorityDatasetsInvalidKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($keywordAnchorPriorityDatasets) != count($validAnchorInMD_KeywordsPriorityDatasets)) then
+		local:addMessage('TR.priorityDatasetsOutsideMDKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if (count($validAnchorInMD_KeywordsPriorityDatasets) = 0 and count($validCharacterStringInMD_KeywordsPriorityDatasets) = 0) then
+		local:addMessage('TR.priorityDatasetsAtleastOneKeyword', map { 'filename': local:filename($record), 'id': $rid })
+	else if (not ($MD_KeywordsPriorityDatasets/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date = $validDate)) then
+		local:addMessage('TR.priorityDatasetsInvalidDate', map { 'filename': local:filename($record), 'id': $rid })
+	else if ($MD_KeywordsPriorityDatasets/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue != 'publication') then
+		local:addMessage('TR.priorityDatasetsInvalidDateCodeListValue', map { 'filename': local:filename($record), 'id': $rid })
+	else()
+	)[position() le $limitErrors]
+return
+(if ($messages/@ref = 'TR.manualCheckPriorityDatasets') then 'PASSED_MANUAL' 
+ else if ($messages/@ref = 'TR.priorityDatasetsMultiplicity') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsInvalidThesaurusCodelist') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsOutsideMDKeyword') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsCitationMissing') then 'FAILED' 
+ else if ($messages/@ref = 'TR.priorityDatasetsInvalidDate') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsAtleastOneKeyword') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsInvalidKeyword') then 'FAILED'
+ else if ($messages/@ref = 'TR.priorityDatasetsInvalidDateCodeListValue') then 'FAILED' 
+ else 'PASSED',
+ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+ $messages)
+							  																																																						
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.manualCheckPriorityDatasets"/>
+										<translationTemplate ref="TR.priorityDatasetsMultiplicity"/>
+										<translationTemplate ref="TR.priorityDatasetsInvalidThesaurusCodelist"/>
+										<translationTemplate ref="TR.priorityDatasetsOutsideMDKeyword"/>
+										<translationTemplate ref="TR.priorityDatasetsCitationMissing"/>
+										<translationTemplate ref="TR.priorityDatasetsInvalidDate"/>
+										<translationTemplate ref="TR.priorityDatasetsAtleastOneKeyword"/>
+										<translationTemplate ref="TR.priorityDatasetsInvalidKeyword"/>
+										<translationTemplate ref="TR.priorityDatasetsInvalidDateCodeListValue"/>
+										<translationTemplate ref="TR.recordsWithErrors"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
