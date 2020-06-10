@@ -850,6 +850,8 @@ layers.each{ layer ->
 }
 ]]></script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="0cc2fbb2-944c-43c0-9250-0116f6e7d237" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at39-getcapabilities-layer-name" searchProperties="true"><con:description><![CDATA[<p>Test that in each layer, the layer name is mapped into the Name element.</p>
 <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/iso-19128/at39-getcapabilities-layer-name" target="_blank">Layer Name</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="42070b1c-23cd-4b35-a5cc-e5231b16f269"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-name" id="738051b8-6344-42be-8315-6fbc69f52575"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+import de.interactive_instruments.xtf.*;
+
 def tc = testRunner.testCase.testSuite.project.testSuites['GetCapabilities_Operation'].testCases['initial-testcase'];
 def response = tc.getTestStepByName('http-request').getPropertyValue('Response');
 
@@ -866,6 +868,11 @@ def validHarmonisedNames = register.containeditems.depthFirst().findAll{ it.name
 def invalidLayers = [];
 
 def excludedLayers = ['ACMF', 'AM', 'AU', 'GE', 'PF', 'SD', 'SO', 'US'];
+
+ProjectHelper ph = new ProjectHelper();
+
+String needManual = "not";
+
 
 layers.each{layer->
 	if(layer.Name.size() != 1){
@@ -889,14 +896,28 @@ layers.each{layer->
 	}
 }
 if(invalidLayers.size() > 0){
-	String[] assertParams = ['layerid', invalidLayers.join(', ')];
-	throw new TranslatableAssertionError('TR.notHarmonisedValue', assertParams);
+	needManual = "manual";
+	 ph.setTransferProperty("needManual", needManual);
+	 <!-- ph.runTestStep("manual-check-harmonized"); -->
+
 }
 
 if(layers.Name.size() != layers.Name.unique().size()){
 	throw new TranslatableAssertionError('TR.notUniqueLayerName');
 }
-</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="c8f3aa9a-fdbc-4267-9964-602f471efdd0" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at40-getcapabilities-layer-crs" searchProperties="true"><con:description><![CDATA[<p>Test that a supported CRS is provided based on ETRS89 for continental Europe and on ITRS outside continental Europe.</p>
+</script></con:config></con:testStep><con:testStep type="httprequest" name="manual-check-harmonized" id="54a784c3-91d8-4e82-ae25-5f5cec7b4a30"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="aa8563b5-23e6-4dc9-b3c1-7d4bab711049" name="manual-check-harmonized" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Called to check if manual check is neccesary</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="GroovyScriptAssertion" id="13bfe9ee-dde2-4e44-8171-466bc4214d51" name="manual-check-harmonized"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*;
+import de.interactive_instruments.xtf.*;
+
+Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+final ProjectHelper ph = new ProjectHelper();
+
+def needManual = ph.getTransferProperty("needManual");
+
+if(needManual == "manual"){
+	a.exists('//zzzz','TR.manual.notHarmonisedValue');
+}
+
+</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="c8f3aa9a-fdbc-4267-9964-602f471efdd0" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at40-getcapabilities-layer-crs" searchProperties="true"><con:description><![CDATA[<p>Test that a supported CRS is provided based on ETRS89 for continental Europe and on ITRS outside continental Europe.</p>
 <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/review-ats-tg_3.11/iso-19128/at40-getcapabilities-layer-crs" target="_blank">Layer coordinate Reference system</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="f3014167-b4af-4dd2-b87d-e48a5ae7e30b"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-layer-crs" id="e0c401ac-1f13-4f14-b02b-1def8f2a2703"><con:settings/><con:config><script><![CDATA[import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
