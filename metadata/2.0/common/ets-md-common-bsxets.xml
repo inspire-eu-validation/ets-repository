@@ -723,13 +723,19 @@ let $messages :=
 						where ($y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/noConditionsApply' or
 							$y/@xlink:href = 'http://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse/conditionsUnknown')
 						return $y
-				let $dummy := local:log('Valid Anchor - ' || count($validAnchor) || ', valid Access Constraints - ' || count($validAccessConstraints) || ', invalid Anchor - ' || count($invalidAnchor) || ', Invalid limitations Anchor - ' || count($invalidLimitationsAnchor))
 				
-				return
-					if(count($validAnchor) >= 1 and count($validAccessConstraints) = 1 and count($invalidAnchor) = 0 and count($invalidLimitationsAnchor) = 0) then $x
-					else ()
+						return
+						if(count($validAnchor) >= 1 and count($validAccessConstraints) = 1 and count($invalidAnchor) = 0 and count($invalidLimitationsAnchor) = 0) then $x
+						else ()
+
+			let $invalidURI :=
+				for $iu in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints/gmx:Anchor
+					where (starts-with($iu/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess'))
+					return $iu
 		return
-			if (count($md_legalConstraints_Limitations) = 0) then
+			if(count($invalidURI) != 0) then
+				local:addMessage('TR.invalidHttpsUri', map { 'filename': local:filename($record), 'id': $rid, 'type': 'LimitationsOnPublicAccess'})								
+			else if (count($md_legalConstraints_Limitations) = 0) then
 				local:addMessage('TR.noResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
 			else if (count($md_legalConstraints_Limitations) != 1) then
 				local:addMessage('TR.noValidResourceLimitations', map { 'filename': local:filename($record), 'id': $rid })
@@ -893,9 +899,16 @@ let $messages :=
 					for $cc in $conditionsConstraint
 						where ($cc/gmd:MD_RestrictionCode/@codeListValue = 'otherRestrictions')
 						return $cc
+
+			let $invalidURI :=
+				for $iu in $record/gmd:identificationInfo/*/gmd:resourceConstraints/gmd:MD_LegalConstraints/gmd:otherConstraints/gmx:Anchor
+					where (starts-with($iu/@xlink:href, 'https://inspire.ec.europa.eu/metadata-codelist/ConditionsApplyingToAccessAndUse'))
+					return $iu
 			
 		return 
-			if(count($md_legalConstraints_Conditions) = 0 and count($conditionsConstraint) > 0 and count($validAccessCodelist) = 0 and count($validUseConstraintsCodelist) = 0) then
+			if(count($invalidURI) != 0) then
+				local:addMessage('TR.invalidHttpsUri', map { 'filename': local:filename($record), 'id': $rid, 'type': 'ConditionsApplyingToAccessAndUse' })								
+			else if(count($md_legalConstraints_Conditions) = 0 and count($conditionsConstraint) > 0 and count($validAccessCodelist) = 0 and count($validUseConstraintsCodelist) = 0) then
 				local:addMessage('TR.noValidOtherRestrictionsCodelistValue', map { 'filename': local:filename($record), 'id': $rid, 'invalidElement': string($conditionsConstraint[1]/*/gmd:MD_RestrictionCode/@codeListValue) })								
 			else if(count($md_legalConstraints_Conditions) = 0) then
 				local:addMessage('TR.noResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
@@ -913,6 +926,7 @@ $messages)
 							  		</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.invalidHttpsUri"/>
 										<translationTemplate ref="TR.noValidOtherRestrictionsCodelistValue"/>
 										<translationTemplate ref="TR.noValidResourceConditions"/>
 										<translationTemplate ref="TR.noResourceConditions"/>
