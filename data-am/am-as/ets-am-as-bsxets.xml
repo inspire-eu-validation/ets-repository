@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDbc6635ae-84a6-11ea-bc55-0242ac130003" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-am/am-as</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Application Schema, Area Management, Restriction/Regulation Zones and Reporting Units</label>
+	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="https://github.com/inspire-eu-validation/data-am/tree/3.0/am-as" target="_blank">Conformance Class 'Application schema, Area Management, Restriction/Regulation Zones and Reporting Units'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="https://github.com/inspire-eu-validation/data-am/tree/3.0/am-gml" target="_blank">Conformance Class 'GML application schemas, Area Management, Restriction/Regulation Zones and Reporting Units'</a></li></ul>]]></description>
+  <reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-04-22T17:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-05-13T19:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID0f7a4498-83bb-11ea-bc55-0242ac130003"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID8cdf9066-84a9-11ea-bc55-0242ac130003">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDbc6635ae-84a6-11ea-bc55-0242ac130003"/>
+			<testCases>
+				<TestCase id="EID46c06b72-84aa-11ea-bc55-0242ac130003">
+					<label>Code list values</label>
+					<description><![CDATA[Verify whether all attributes whose value type is a code list take the values set out therein. <br/><br/>
+Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as/code-list-values.md" target="_blank">Code list values</a>]]></description>
+					<parent ref="EID8cdf9066-84a9-11ea-bc55-0242ac130003"/>
+					<testSteps>
+						<TestStep id="EIDd881fa8a-84aa-11ea-bc55-0242ac130003">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID46c06b72-84aa-11ea-bc55-0242ac130003"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDf9f717ea-84aa-11ea-bc55-0242ac130003">
+									<label>am-as.1: EnvironmentalDomain code list value</label>
+									<description>Check code list value for environmentalDomain</description>
+									<parent ref="EIDd881fa8a-84aa-11ea-bc55-0242ac130003"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codelist := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain'
+let $codelisturl := 'https://inspire.ec.europa.eu/codelist/EnvironmentalDomain/EnvironmentalDomain.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
+let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
+let $messages :=
+	for $feature in $features_selected
+	let $envDoms := $feature/am:environmentalDomain
+	return
+		if(not($envDoms)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain'}) 
+		else
+			for $envDom in $envDoms
+			return
+				if(not($envDom/@xlink:href)) then
+					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'attribute': 'xlink:href'}) 
+				else if(not($envDom/@xlink:href = $valid_href)) then
+					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'environmentalDomain', 'value': string($envDom/@xlink:href), 'codelist': $codelist}) 
+				else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID5a7accef-4fb2-4776-80bf-68af5e530048">
+					<label>Constraints</label>
+					<description><![CDATA[Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.<br/><br/>
+Source: <a href="https://github.com/inspire-eu-validation/data-am/blob/3.0/am-as/constraints.md" target="_blank">Constraints</a>]]></description>
+					<parent ref="EID8cdf9066-84a9-11ea-bc55-0242ac130003"/>
+					<testSteps>
+						<TestStep id="EID55ece75d-d166-438a-9694-99c00a6f686f">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5a7accef-4fb2-4776-80bf-68af5e530048"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDf7d8aafd-a2cd-45fb-b553-f03cd2cc5258">
+									<label>am-as.2.1: Constraint for legalBasis</label>
+									<description>Check that at least the most specific legal instrument that required the establishment of zone is provided using the legalBasis association role.</description>
+									<parent ref="EID55ece75d-d166-438a-9694-99c00a6f686f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
+let $messages :=
+	for $feature in $features_selected
+	let $validLegalBasis := 
+		for $x in $feature/am:legalBasis 
+		return
+			if($x/@xlink:href) then
+				if(not($x/@xlink:href = "")) then
+					$x
+				else ()
+			else if ($x/base2:LegislationCitation) then
+				$x
+			else ()
+	return
+		if(not($feature/am:legalBasis)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'legalBasis'}) 
+		else if(not($validLegalBasis)) then
+     			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one valid am:LegalBasis shall be provided with attribute xlink:href or with a child element base2:LegislationCitation.', 'additionalInfo':''})
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED_MANUAL',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+if ($messages) then $messages
+else 
+	for $feature in $features_selected
+	return local:addMessage('TR.checkManualLegalBasis',  map {'filename': local:filename($feature)}) 
+)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.checkManualLegalBasis"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+						<TestStep id="EID89171ea6-8a52-4a48-ab85-90a47772037f">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5a7accef-4fb2-4776-80bf-68af5e530048"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID1ac9de98-f3f4-42d6-92e6-fddc72ade639">
+									<label>am-as.2.2: Constraint for competentAuthority</label>
+									<description>Check that the role attribute of the competentAuthority takes the value "authority"</description>
+									<parent ref="EID89171ea6-8a52-4a48-ab85-90a47772037f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZone]
+let $valid_href := 'http://inspire.ec.europa.eu/codelist/RelatedPartyRoleValue/authority'
+let $messages :=
+	for $feature in $features_selected
+	let $validCompetentAuth := 
+		for $x in $feature/am:competentAuthority/base2:RelatedParty/base2:role/@xlink:href
+		return
+			if($x = $valid_href) then
+				$x
+			else ()
+	return
+		if(not($feature/am:competentAuthority)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority'}) 
+		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role'}) 
+		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role/@xlink:href)) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role', 'attribute': 'xlink:href'}) 
+		else if(not($validCompetentAuth)) then
+     			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one am:competentAuthority with role authority (http://inspire.ec.europa.eu/codelist/RelatedPartyRoleValue/authority) shall be provided.', 'additionalInfo':''})
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
