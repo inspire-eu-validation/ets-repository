@@ -1,4 +1,7 @@
 declare namespace elu='http://inspire.ec.europa.eu/schemas/elu/4.0';
+declare namespace gelu='http://inspire.ec.europa.eu/schemas/gelu/4.0';
+declare namespace plu='http://inspire.ec.europa.eu/schemas/plu/4.0';
+declare namespace selu='http://inspire.ec.europa.eu/schemas/selu/4.0';
 declare namespace lunom='http://inspire.ec.europa.eu/schemas/lunom/4.0';
 declare namespace au3='urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0';
 declare namespace ad3='urn:x-inspire:specification:gmlas:Addresses:3.0';
