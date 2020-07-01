@@ -314,20 +314,21 @@ let $messages :=
 		let $planDocument := $feature/plu:planDocument
 		let $invalidLegislationURL := 
 			if (exists($legislationCitation/@xlink:href)) then
-				let $dummy := local:log('Legislation URL ' || string($legislationCitation/@xlink:href) || '')
-				let $map := local:check-resource-uri(string($legislationCitation/@xlink:href), 30, true())
-				let $legislationUri := map:get($map,string($legislationCitation/@xlink:href))
+				let $url := string($legislationCitation/@xlink:href)
+				let $map := local:check-resource-uris(($url), 30, true())
+				let $legislationUri := map:get($map, $url)
 				return
-					if (($legislationUri = 'notHTTP' or starts-with($legislationUri, 'EXCEPTION') or $legislationUri = 'idNotFound' or matches($legislationUri, '^\d{3}$')) != 0) then $legislationUri
+					if (($legislationUri = 'notHTTP' or starts-with($legislationUri, 'EXCEPTION') or $legislationUri = 'idNotFound' or matches($legislationUri, '^\d{3}$'))) then $legislationUri
 					else()
 			else ()				
 			
 		let $invalidPlanDocumentURL := 
 			if (exists($planDocument/@xlink:href)) then
-				let $map := local:check-resource-uri(string($planDocument/@xlink:href), 30, true())
-				let $planDocumentUri := map:get($map,string($planDocument/@xlink:href))
+				let $url := string($planDocument/@xlink:href)
+				let $map := local:check-resource-uris(($url), 30, true())
+				let $planDocumentUri := map:get($map, $url)
 				return
-					if (($planDocumentUri = 'notHTTP' or starts-with($planDocumentUri, 'EXCEPTION') or $planDocumentUri = 'idNotFound' or matches($planDocumentUri, '^\d{3}$')) != 0) then $planDocumentUri
+					if (($planDocumentUri = 'notHTTP' or starts-with($planDocumentUri, 'EXCEPTION') or $planDocumentUri = 'idNotFound' or matches($planDocumentUri, '^\d{3}$'))) then $planDocumentUri
 					else()
 			else ()		
 
