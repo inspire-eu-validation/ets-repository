@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/3.0/lu-plu-as" targe
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-lu/3.0/lu-gml" target="_blank">Conformance Class 'GML application schemas, Land Use'</a></li></ul>]]></description>
   <reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-06-25T12:30:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-06-25T12:30:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-07-02T09:10:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID15a1a053-e359-4e99-a1b5-d7f8e646ed05"/>
 	</tags>
@@ -332,16 +332,22 @@ let $messages :=
 					else()
 			else ()		
 
+		let $invalidPlanDocumentURL := 
+			if (exists($regulationText)) then
+				return
+					if (string-length($regulationText) = 0) then $regulationText
+					else()
+			else ()	
 		
 		return
 			if(count($legislationCitation) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'regulationNature', 'multiplicity': 1, 'count': count($legislationCitation)}) 
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'legislationCitation', 'multiplicity': 1, 'count': count($legislationCitation)}) 
 			
 			else if(count($regulationText) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'regulationNature', 'multiplicity': 1, 'count': count($regulationText)}) 
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'regulationText', 'multiplicity': 1, 'count': count($regulationText)}) 
 			
 			else if(count($planDocument) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'regulationNature', 'multiplicity': 1, 'count': count($planDocument)}) 
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'planDocument', 'multiplicity': 1, 'count': count($planDocument)}) 
 			
 			else if (not(exists($legislationCitation)) and not(exists($regulationText)) and not(exists($planDocument))) then 
 				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'At least one of the attributes legislationCitation, regulationText or planDocument is populated with a non-void value.'})
@@ -351,6 +357,9 @@ let $messages :=
 			
 			else if (exists($planDocument/@xlink:href) and count($invalidPlanDocumentURL) != 0) then 
 				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'The provided URL in xlink:href attribute for planDocument must be working.'}) 
+
+			else if (exists($regulationText) and count($invalidPlanDocumentURL) != 0) then 
+				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'The provided regulationText element shall not be empty.'}
 			
 			else ()
 return
