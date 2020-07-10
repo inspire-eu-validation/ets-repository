@@ -5097,7 +5097,7 @@ declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0
 
 empty(//inspire_dls:ExtendedCapabilities/inspire_common:MetadataUrl/inspire_common:URL)</con:expression><con:targetStep>Test end</con:targetStep></con:condition></con:config></con:testStep><con:testStep type="httprequest" name="Request and check external ServiceMetadata" id="b313b52d-b03c-4861-8c7a-3f7b058e3e9f"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" name="Request and check external ServiceMetadata" id="28b7e82a-bda9-4e15-b5bb-e6503921a534" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:description>Uses the MetadataUrl from the ExtendedCapabilities to request the ServiceMetadata.</con:description><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding xsi:nil="true"/><con:endpoint>http://nowhere</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="bb542144-7b3f-4a81-95dd-927ee8e1898d" name="HTTP status code is 200"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="c8812bd6-1009-43e9-8b0c-a51ead65696a" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="OwsExceptionReportAssertion" id="5e62b0cc-9cf1-461e-9c2a-782abbdf46bc" name="Expect no exception"/><con:assertion type="GroovyScriptAssertion" id="62489eed-fc72-4957-ba42-e287fd79bfa6" name="xsi:schemaLocation attribute exists in root element"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("/*/@*:schemaLocation", "TR.missingSchemaLocation");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="2afebc3c-44dd-4822-be67-892e55ef4106" name="Metadata has ISO Metadata element (gmd_MD_Metadata exists)"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+a.exists("//@*:schemaLocation", "TR.missingSchemaLocation");</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="2afebc3c-44dd-4822-be67-892e55ef4106" name="Metadata has ISO Metadata element (gmd_MD_Metadata exists)"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//gmd:MD_Metadata",
@@ -5248,7 +5248,7 @@ for( crs in supportedCrs ) {
 			ph.setTransferProperty("language", language)
 			ph.setTransferProperty("dataSetIdCode", dataSetIdCode)
 			ph.setTransferProperty("dataSetIdNamespace", spatialDataSetIdentifierNamespaces[i])
-   		ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier")
+   			ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier")
 		}
 	}
 }
