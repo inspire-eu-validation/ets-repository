@@ -322,14 +322,12 @@ let $messages :=
 					if ($legislationUri = 'notHTTP' or starts-with($legislationUri, 'EXCEPTION') or $legislationUri = 'idNotFound' or matches($legislationUri, '^\d{3}$')) then $legislationUri
 					else()
 
-		let $invalidcomplexLegislationURL := 
-			for $x in $legislationCitation where exists($x/*:legislationCitation/*:level/@xlink:href)
-				let $url := string($x/*:legislationCitation/*:level/@xlink:href)
-				let $map := local:check-resource-uris(($url), 30, true())
-				let $legislationUri := map:get($map, $url)
-				return
-					if ($legislationUri = 'notHTTP' or starts-with($legislationUri, 'EXCEPTION') or $legislationUri = 'idNotFound' or matches($legislationUri, '^\d{3}$')) then $legislationUri
-					else()
+
+		let $invalidcomplexLegislation := 
+			for $x in $legislationCitation
+				return if (not(exists($x/*:LegislationCitation)))
+						then $x
+						else()
 
 		let $invalidPlanDocumentURL := 
 			for $x in $planDocument where exists($x/@xlink:href)
@@ -338,17 +336,14 @@ let $messages :=
 				let $planDocumentUri := map:get($map, $url)
 				return
 					if ($planDocumentUri = 'notHTTP' or starts-with($planDocumentUri, 'EXCEPTION') or $planDocumentUri = 'idNotFound' or matches($planDocumentUri, '^\d{3}$')) then $planDocumentUri
-					else()
-					
-		let $invalidcomplexPlanDocumentURL := 
-			for $x in $planDocument where exists($x/*:DocumentCitation/*:level/@xlink:href)
-				let $url := string($x/*:DocumentCitation/*:level/@xlink:href)
-				let $map := local:check-resource-uris(($url), 30, true())
-				let $planDocumentUri := map:get($map, $url)
-				return
-					if ($planDocumentUri = 'notHTTP' or starts-with($planDocumentUri, 'EXCEPTION') or $planDocumentUri = 'idNotFound' or matches($planDocumentUri, '^\d{3}$')) then $planDocumentUri
-					else()
-		
+					else()	
+
+		let $invalidcomplexPlanDocument := 
+			for $x in $planDocument
+				return if (not(exists($x/*:DocumentCitation)))
+						then $x
+						else()
+	
 		let $invalidregulationText := 
 			for $x in $regulationText where exists($x)
 				return
@@ -368,15 +363,24 @@ let $messages :=
 			else if (not(exists($legislationCitation)) and not(exists($regulationText)) and not(exists($planDocument))) then 
 				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'At least one of the attributes legislationCitation, regulationText or planDocument is populated with a non-void value.'})
 			
-			else if (exists($legislationCitation/@xlink:href) and (count($invalidLegislationURL) + count($invalidcomplexLegislationURL)) != 0 and count($invalidregulationText) != 0 and (count($invalidPlanDocumentURL) + count($invalidcomplexPlanDocumentURL)) != 0) then 
-				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'The provided URL in xlink:href attribute for legislationCitation must be working.'}) 
-			
-			else if (exists($planDocument/@xlink:href) and (count($invalidPlanDocumentURL) + count($invalidcomplexPlanDocumentURL)) != 0 and count($invalidregulationText) != 0 and (count($invalidLegislationURL) + count($invalidcomplexLegislationURL)) != 0) then 
-				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'The provided URL in xlink:href attribute for planDocument must be working.'}) 
-
-			else if (exists($regulationText) and count($invalidregulationText) != 0 and (count($invalidPlanDocumentURL) + count($invalidcomplexPlanDocumentURL)) != 0 and (count($invalidLegislationURL) + count($invalidcomplexLegislationURL)) != 0) then 
-				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'The provided regulationText element shall not be empty.'})
+			else if (exists($legislationCitation/@xlink:href) and ((count($invalidLegislationURL) != 0) and count($invalidcomplexLegislation) != 0 ) 
+					and ((not(exists($regulationText))) or (exists($regulationText) and count($invalidregulationText) != 0)) 
+					and ((not(exists($planDocument))) or (exists($planDocument/@xlink:href) and count($invalidPlanDocumentURL) != 0 and count($invalidcomplexPlanDocument) != 0) or (exists($planDocument) and (not(exists($planDocument/@xlink:href))) and count($invalidcomplexPlanDocument) != 0 ))
+					) then 
+				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'The provided URL in xlink:href attribute for legislationCitation must be working.'})
+			else if (exists($planDocument/@xlink:href) and ((count($invalidPlanDocumentURL) != 0) and count($invalidcomplexPlanDocument) != 0 ) 
+					and ((not(exists($regulationText))) or (exists($regulationText) and count($invalidregulationText) != 0)) 
+					and (not(exists($legislationCitation)))
+					) then 
+				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'The provided URL in xlink:href attribute for planDocument must be working.'})
+			else if ((exists($regulationText) and count($invalidregulationText) != 0)
+					and (not(exists($planDocument)))
+					and (not(exists($legislationCitation)))
+					) then 
+				local:addMessage('TR.constraintViolation2',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'The provided regulationText element shall not be empty.'}) 			
 			else ()
+
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
