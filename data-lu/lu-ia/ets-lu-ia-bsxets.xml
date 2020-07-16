@@ -72,7 +72,7 @@ let $property_string := 'LandUseClassificationValue'
 let $messages :=
 	for $feature in $features_selected
 	let $urls := 
-		for $x in $feature/lunom:orderedlist/@xlink:href
+		for $x in $feature/lunom:orderedList/@xlink:href
 			return
 			if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 				()
@@ -106,7 +106,7 @@ let $messages :=
 				else ()
 
 	let $urlsslu := 
-		for $x in $feature/specificLandUse/@xlink:href
+		for $x in $feature/*:specificLandUse/@xlink:href
 			return
 			if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 				()
@@ -122,14 +122,18 @@ let $messages :=
 					$urlslu
 				else ()
 	return
-		if (not((count($feature/lunom:orderedlist) = count($feature/lunom:orderedlist/@xlink:href))	and (count($feature/lunom:specificValue) = count($feature/lunom:specificValue/@xlink:href))	and (count($feature/specificLandUse) = count($feature/specificLandUse/@xlink:href)))) then
+		if (not((count($feature/lunom:orderedList) = count($feature/lunom:orderedList/@xlink:href))	and (count($feature/lunom:specificValue) = count($feature/lunom:specificValue/@xlink:href))	and (count($feature/*:specificLandUse) = count($feature/*:specificLandUse/@xlink:href)))) then
 			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'}) 
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
-		else if (count($invalid_urlssv) > 0) then
-			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlssv, ',')})
-		else if (count($invalid_urlsslu) > 0) then
-			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlsslu, ',')}) 
+		else if(count($invalid_urls) > 0 or count($invalid_urlssv) > 0 or count($invalid_urlsslu) > 0) then
+			for $feature in $features_selected
+				return
+					if ($feature/lunom:orderedList/@xlink:href = $invalid_urls) then
+						local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+					else if ($feature/lunom:specificValue/@xlink:href = $invalid_urlssv) then
+						local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlssv, ',')})
+					else if ($feature/*:specificLandUse/@xlink:href = $invalid_urlsslu) then
+						local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlsslu, ',')}) 
+					else()
 		else ()
 
 return
