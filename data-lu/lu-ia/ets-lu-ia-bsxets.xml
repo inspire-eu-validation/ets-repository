@@ -123,7 +123,9 @@ let $messages :=
 				else ()
 	return
 		if (not((count($feature/lunom:orderedList) = count($feature/lunom:orderedList/@xlink:href))	and (count($feature/lunom:specificValue) = count($feature/lunom:specificValue/@xlink:href))	and (count($feature/*:specificLandUse) = count($feature/*:specificLandUse/@xlink:href)))) then
-			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'}) 
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($feature/lunom:specificValue) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'PlanTypeNameValue', 'multiplicity': 1, 'count': count($feature/lunom:specificValue)})
 		else if(count($invalid_urls) > 0 or count($invalid_urlssv) > 0 or count($invalid_urlsslu) > 0) then
 			for $feature in $features_selected
 				return
@@ -145,7 +147,7 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.brokenLink"/>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID401de873-ed14-4c16-a003-b7a09022cf4e">
