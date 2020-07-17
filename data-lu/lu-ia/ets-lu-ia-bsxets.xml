@@ -155,13 +155,13 @@ Source: <a href="https://github.com/inspire-eu-validation/data-lu/blob/3.0/lu-ia
 									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features_selected := $features//*
+let $features_selected := $features[self::plu:SpatialPlan]
 let $gml_ids := $features//@gml:id
 let $property_string := 'PlanTypeNameValue'
 let $messages :=
 	for $feature in $features_selected
 	let $urls := 
-		for $x in $feature/*:planTypeName/@xlink:href
+		for $x in $feature/plu:planTypeName/@xlink:href
 		return
 		if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 			()
@@ -177,10 +177,10 @@ let $messages :=
 				$url
 			else ()
 	return
-		if(not($feature/*:planTypeName)) then
+		if(not($feature/plu:planTypeName)) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
-		else if (count($feature/*:planTypeName) > 1) then
-			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'PlanTypeNameValue', 'multiplicity': 1, 'count': count($feature/*:planTypeName)}) 
+		else if (count($feature/plu:planTypeName) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'PlanTypeNameValue', 'multiplicity': 1, 'count': count($feature/plu:planTypeName)}) 
 		else if (count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
@@ -203,13 +203,13 @@ Source: <a href="https://github.com/inspire-eu-validation/data-lu/blob/3.0/lu-ia
 									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features_selected := $features//*
+let $features_selected := $features[self::plu:SupplementaryRegulation]
 let $gml_ids := $features//@gml:id
 let $property_string := 'SpecificSupplementaryRegulationValue'
 let $messages :=
 	for $feature in $features_selected
 	let $urls := 
-		for $x in $feature/*:specificSupplementaryRegulation/@xlink:href
+		for $x in $feature/plu:specificSupplementaryRegulation/@xlink:href
 		return
 		if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 			()
@@ -225,7 +225,7 @@ let $messages :=
 				$url
 			else ()
 	return
-		if (not($feature/*:specificSupplementaryRegulation)) then
+		if (not($feature/plu:specificSupplementaryRegulation)) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
 		else if (count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
@@ -248,13 +248,13 @@ Source: <a href="https://github.com/inspire-eu-validation/data-lu/blob/3.0/lu-ia
 									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features_selected := $features//*
+let $features_selected := $features[self::plu:SupplementaryRegulation]
 let $gml_ids := $features//@gml:id
 let $property_string := 'SupplementaryRegulationValue'
 let $messages :=
 	for $feature in $features_selected
 	let $urls := 
-		for $x in $feature/*:SupplementaryRegulationValue/@xlink:href
+		for $x in $feature/plu:supplementaryRegulation/@xlink:href
 		return
 		if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 			()
@@ -270,8 +270,8 @@ let $messages :=
 				$url
 			else ()
 	return
-	if (not($feature/*:SupplementaryRegulationValue)) then
-	local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		if (not($feature/plu:supplementaryRegulation)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
 		else if (count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
