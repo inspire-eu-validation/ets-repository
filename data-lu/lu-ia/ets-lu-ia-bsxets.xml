@@ -60,7 +60,7 @@ Pre-requisite conformance classes:
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EIDfb93c048-2653-445a-bf0e-cf432e61b5e2">
-									<label>lu-ia.a.1: LandUseClassificationValue</label>
+									<label>lu-ia.a.1.a: LandUseClassificationValue(orderedlist)</label>
 									<description><![CDATA[Verify that any code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Source: <a href="https://github.com/inspire-eu-validation/data-lu/blob/3.0/lu-ia/code-list.md" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
 									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
@@ -88,6 +88,38 @@ let $messages :=
 					$url
 				else ()
 
+	return
+		if (not((count($feature/lunom:orderedList) = count($feature/lunom:orderedList/@xlink:href)))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDaab1fa13-b19a-44c3-8ca4-1e97b8cf05f5">
+									<label>lu-ia.a.1.b: LandUseClassificationValue(specificValue)</label>
+									<description><![CDATA[Verify that any code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="https://github.com/inspire-eu-validation/data-lu/blob/3.0/lu-ia/code-list.md" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features//*
+let $gml_ids := $features//@gml:id
+let $property_string := 'LandUseClassificationValue'
+let $messages :=
+	for $feature in $features_selected
 	let $urlssv := 
 		for $x in $feature/lunom:specificValue/@xlink:href
 			return
@@ -104,7 +136,40 @@ let $messages :=
 				if ($validurisv = 'notHTTP' or starts-with($validurisv, 'EXCEPTION') or $validurisv = 'idNotFound' or matches($validurisv,'^\d{3}$')) then
 					$urlsv
 				else ()
+	return
+		if (not((count($feature/lunom:specificValue) = count($feature/lunom:specificValue/@xlink:href)))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($feature/lunom:specificValue) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'PlanTypeNameValue', 'multiplicity': 1, 'count': count($feature/lunom:specificValue)})
+		else if(count($invalid_urlssv) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlssv, ',')})
+		else ()
 
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID8956b39a-bde3-446c-b72e-24ddf45251bd">
+									<label>lu-ia.a.1.c: LandUseClassificationValue(specificLandUse)</label>
+									<description><![CDATA[Verify that any code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="https://github.com/inspire-eu-validation/data-lu/blob/3.0/lu-ia/code-list.md" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:ZoningElement | self::elu:ExistingLandUseObject]
+let $gml_ids := $features//@gml:id
+let $property_string := 'LandUseClassificationValue'
+let $messages :=
+	for $feature in $features_selected
 	let $urlsslu := 
 		for $x in $feature/*:specificLandUse/@xlink:href
 			return
@@ -122,21 +187,10 @@ let $messages :=
 					$urlslu
 				else ()
 	return
-		if (not((count($feature/lunom:orderedList) = count($feature/lunom:orderedList/@xlink:href))	and (count($feature/lunom:specificValue) = count($feature/lunom:specificValue/@xlink:href)))) then
-			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-		else if (count($feature/lunom:specificValue) > 1) then
-			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'PlanTypeNameValue', 'multiplicity': 1, 'count': count($feature/lunom:specificValue)})
-		else if(count($invalid_urls) > 0 or count($invalid_urlssv) > 0 or count($invalid_urlsslu) > 0) then
-			for $feature in $features_selected
-				return
-					if ($feature/lunom:orderedList/@xlink:href = $invalid_urls) then
-						local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
-					else if ($feature/lunom:specificValue/@xlink:href = $invalid_urlssv) then
-						local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlssv, ',')})
-					else if ($feature/*:specificLandUse/@xlink:href = $invalid_urlsslu) then
-						local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlsslu, ',')}) 
-					else()
-		else ()
+		if(count($invalid_urlsslu) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlsslu, ',')}) 
+		else (
+		)
 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
