@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID5aab5d8a-e432-47dd-b072-7cbf520035be" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-nz/nz-as</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Application schema, Natural Risk Zones</label>
+	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as" target="_blank">Conformance Class 'GML Application schema, Natural Risk Zones'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml" target="_blank">Conformance Class 'GML application schema, Natural Risk Zones'</a></li></ul>]]></description>
+  <reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-07-10T13:30:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-07-29T14:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID00d4d7af-152b-4644-aeda-c8983df4535f"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<testModules>
+		<TestModule id="EID1e2dd0b2-dbcd-404c-9f64-dfcd504f1303">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID5aab5d8a-e432-47dd-b072-7cbf520035be"/>
+			<testCases>
+				<TestCase id="EID633b69a5-17f4-423c-ab6a-4725ba278ad7">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID1e2dd0b2-dbcd-404c-9f64-dfcd504f1303"/>
+					<testSteps>
+						<TestStep id="EID14411563-bf1b-4d3a-8a9d-1f60901ea1bc">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID633b69a5-17f4-423c-ab6a-4725ba278ad7"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+
+
+								<TestAssertion id="EID5ebcc7d0-d296-45a6-a479-dad4d75fe01e">
+									<label>nz-as.a.1: sourceOfSpatialRepresentation</label>
+									<description><![CDATA[Check that the set of features in the spatial data set is not empty. Otherwise report noFeature.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_GN_v3.1.pdf">INSPIRE Data Specification on Geographical Names, A.1.1, (A.6.1)</a>]]></description>
+									<parent ref="EID14411563-bf1b-4d3a-8a9d-1f60901ea1bc"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:ExposedElement]
+let $urls := $features_selected/nz-core:sourceOfSpatialRepresentation/@xlink:href
+let $map := local:check-resource-uris($urls, 30, true())
+let $messages :=
+	for $feature in $features_selected
+		return
+			if (not(exists($feature/nz-core:geometry)) and not(exists($feature/nz-core:sourceOfSpatialRepresenntation))) then 
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': ' sourceOfSpatialRepresentation association role or geometry are present', 'additionalInfo':''})
+			else if (count($feature/nz-core:sourceOfSpatialRepresentation) > 1) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element': 'nz-core:sourceOfSpatialRepresentation'}) 
+			else if (count($feature/nz-core:geometry) > 1) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:geometry'}) 
+			else if (exists($feature/nz-core:geometry) and not(has-children($feature/nz-core:geometry))) then 
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'geometry role must not be empty', 'additionalInfo':''})
+			else if (not(exists($feature/nz-core:geometry)) and exists($feature/nz-core:sourceOfSpatialRepresentation)) then 
+				let $dummy := "this variable is needed here to do not receive an incomplete if expression error"
+				return
+				if (not(exists($feature/nz-core:sourceOfSpatialRepresentation/@xlink:href)) and not(exists($feature/nz-core:sourceOfSpatialRepresentation/@nilReason)) and not(has-children($feature/nz-core:sourceOfSpatialRepresentation))) then
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'sourceOfSpatialRepresentation role must not be empty', 'additionalInfo':''})
+				else if (exists($feature/nz-core:sourceOfSpatialRepresentation/@xlink:href)) then
+					let $url := string($feature/nz-core:sourceOfSpatialRepresentation/@xlink:href)
+					let $validuri := map:get($map, $url)
+					return 
+						if ($validuri = 'notHTTP') then
+							local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url })
+						else if ($validuri = 'idNotFound') then
+							local:addMessage('TR.idNotFound', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url })
+						else if (starts-with($validuri, 'EXCEPTION')) then
+							local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
+						else if (matches($validuri,'^\d{3}$')) then
+							local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url, 'status' : $validuri })
+						else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then ()
+						else
+							local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url, 'mediaType': $validuri })
+				else ()
+			else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.urlNotHttp"/>
+										<translationTemplate ref="TR.idNotFound"/>
+										<translationTemplate ref="TR.resourceNotAccessibleException"/>
+										<translationTemplate ref="TR.resourceNotAccessible"/>
+										<translationTemplate ref="TR.operatesOnWithoutDatasetOrSeriesRecord"/>
+										<translationTemplate ref="TR.unknownResourceType"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+
+								<TestAssertion id="EID7d010fd2-29e5-4756-a0da-01a9cdfb87f5">
+									<label>nz-as.a.2: LevelOrIntensity</label>
+									<description><![CDATA[Check that the set of features in the spatial data set is not empty. Otherwise report noFeature.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_GN_v3.1.pdf">INSPIRE Data Specification on Geographical Names, A.1.1, (A.6.1)</a>]]></description>
+									<parent ref="EID14411563-bf1b-4d3a-8a9d-1f60901ea1bc"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:*]
+let $messages :=
+	for $feature in $features_selected/nz-core:LevelOrIntensity
+		return
+			if (count($feature/nz-core:qualitativeValue != 1)) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeValue'}) 
+			else if (count($feature/nz-core:quantitativeValue != 1)) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeValue'}) 
+			else if (string-length($feature/nz-core:qualitativeValue/text() = 0 or  not(exists($feature/nz-core:qualitativeValue/@nilReason)))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeValue role must not be empty', 'additionalInfo':''})
+			else if (string-length($feature/nz-core:quantitativeValue/text() = 0 or  not(exists($feature/nz-core:quantitativeValue/@nilReason)))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeValue role must not be empty', 'additionalInfo':''})
+			else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDc8408080-a82f-4683-a86b-381a181705c6">
+									<label>nz-as.a.3: LikelihoodOfOccurrence</label>
+									<description><![CDATA[Check that the domainSet shall be a rectified grid or referenceable grid and that The check is performed on all the different feature types that can be present in the dataset:<ul>
+<li>ExposedElementCoverage</li>
+<li>HazardCoverage</li>
+<li>ObservedEventCoverage</li>
+<li>RiskCoverage</li></ul>. Otherwise report constraintViolation.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_GN_v3.1.pdf">INSPIRE Data Specification on Geographical Names, A.1.1, (A.6.1)</a>]]></description>
+									<parent ref="EID14411563-bf1b-4d3a-8a9d-1f60901ea1bc"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:*]
+let $messages :=
+	for $feature in $features_selected/nz-core:LikelihoodOfOccurrence
+		return
+			if (count($feature/nz-core:qualitativeValue != 1)) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeValue'}) 
+			else if (count($feature/nz-core:quantitativeValue != 1)) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeValue'}) 
+			else if (string-length($feature/nz-core:qualitativeValue/text() = 0 or not(exists($feature/nz-core:qualitativeValue/@nilReason)))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeValue role must not be empty', 'additionalInfo':''})
+			else if (string-length($feature/nz-core:quantitativeValue/text() = 0 or not(exists($feature/nz-core:quantitativeValue/@nilReason)))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeValue role must not be empty', 'additionalInfo':''})
+			else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID1c6ce428-fbef-420f-a54d-68defa32c3ff">
+					<label>domainSet Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID1e2dd0b2-dbcd-404c-9f64-dfcd504f1303"/>
+					<testSteps>
+						<TestStep id="EID4571cd3b-09ba-4902-8321-5d402219b6f5">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID1c6ce428-fbef-420f-a54d-68defa32c3ff"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID1be760b5-0976-4999-bc89-865ea86ce933">
+									<label>nz-as.b.1: domainSet</label>
+									<description><![CDATA[Check that the domainSet shall be a rectified grid or referenceable grid and that The check is performed on all the different feature types that can be present in the dataset:<ul>
+<li>ExposedElementCoverage</li>
+<li>HazardCoverage</li>
+<li>ObservedEventCoverage</li>
+<li>RiskCoverage</li></ul>. Otherwise report constraintViolation.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_GN_v3.1.pdf">INSPIRE Data Specification on Geographical Names, A.1.1, (A.6.1)</a>]]>
+									
+									</description>
+									<parent ref="EID4571cd3b-09ba-4902-8321-5d402219b6f5"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[(*[self::nz-core:ExposedElementCoverage] and *[self::nz-core:HazardCoverage] and *[self::nz-core:ObservedEventCoverage and self::nz-core:RiskCoverage])]
+let $messages :=
+	for $feature in $features_selected/gml:domainSet
+		return
+			if (count($feature/gml:RectifiedGrid != 1)) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:RectifiedGrid'}) 
+			else if (string-length($feature/gml:RectifiedGrid/text() = 0)) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RectifiedGrid role must not be empty', 'additionalInfo':''})
+			else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
