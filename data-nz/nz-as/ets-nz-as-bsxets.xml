@@ -238,6 +238,147 @@ $messages)
 						</TestStep>
 					</testSteps>
 				</TestCase>
+
+				<TestCase id="EIDd72743c3-a819-4cc2-98ae-be2845e6177f">
+					<label>rangeSet Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID1e2dd0b2-dbcd-404c-9f64-dfcd504f1303"/>
+					<testSteps>
+						<TestStep id="EID20823e52-0ab9-4874-97e6-85f6dcb14102">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDd72743c3-a819-4cc2-98ae-be2845e6177f"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID43cf5f07-d750-4220-93d3-7d3866f4c496">
+									<label>nz-as.c.1: rangeSet</label>
+									<description><![CDATA[Check that the rangeSet shall be a rectified grid or referenceable grid and that The check is performed on all the different feature types that can be present in the dataset:<ul>
+<li>ExposedElementCoverage</li>
+<li>HazardCoverage</li>
+<li>ObservedEventCoverage</li>
+<li>RiskCoverage</li></ul>. Otherwise report constraintViolation.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_GN_v3.1.pdf">INSPIRE Data Specification on Geographical Names, A.1.1, (A.6.1)</a>]]>
+									
+									</description>
+									<parent ref="EID20823e52-0ab9-4874-97e6-85f6dcb14102"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>NOT_APPLICABLE</expression>
+									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+
+				<TestCase id="EIDd3f70a5b-437b-4a95-9d35-44bb0ca02b51">
+					<label>Risk zone theme-specific requirements</label>
+					<description>Verify that the features provided in the dataset adhere to the theme-specific requirements specified in the INSPIRE application schema.</description>
+					<parent ref="EID1e2dd0b2-dbcd-404c-9f64-dfcd504f1303"/>
+					<testSteps>
+						<TestStep id="EID59d0a1f0-b186-427c-b042-f72eaf1518bb">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDd3f70a5b-437b-4a95-9d35-44bb0ca02b51"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID19c62442-80d7-4dd3-9b6d-fe59e92a8f1e">
+									<label>nz-as.d.1: RiskZone.source</label>
+									<description><![CDATA[Check that the rangeSet shall be a rectified grid or referenceable grid and that The check is performed on all the different feature types that can be present in the dataset:<ul>
+<li>ExposedElementCoverage</li>
+<li>HazardCoverage</li>
+<li>ObservedEventCoverage</li>
+<li>RiskCoverage</li></ul>. Otherwise report constraintViolation.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_GN_v3.1.pdf">INSPIRE Data Specification on Geographical Names, A.1.1, (A.6.1)</a>]]>
+									
+									</description>
+									<parent ref="EID59d0a1f0-b186-427c-b042-f72eaf1518bb"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:RiskZone]
+let $features_hazard := $features[self::nz-core:HazardArea]/@gml:id
+let $messages :=
+	for $feature in $features_selected
+		return
+			if (not(exists($feature/nz-core:source))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:RectifiedGrid'}) 
+			else if (count($feature/nz-core:source) != 1) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:source'}) 
+			else if (not(exists($feature/nz-core:source/@xlink:href)) and not(exists($feature/nz-core:source/@nilReason) and not(exists($feature/nz-core:source/nz-core:ObservedEvent)))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'nz-core:source element must need an @xlink:href element or must have a nz-core:ObservedEvent children', 'additionalInfo':''})
+			else if (exists($feature/nz-core:source/@xlink:href) and not(contains($feature/nz-core:source/@xlink:href, $features_hazard))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': '@xlink:href must be refering to HazardArea element id', 'additionalInfo':''})
+			else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDbef48ff1-837f-4b83-b2fe-873a2493588f">
+									<label>nz-as.d.2: RiskZone.exposedElement</label>
+									<description><![CDATA[Check that the rangeSet shall be a rectified grid or referenceable grid and that The check is performed on all the different feature types that can be present in the dataset:<ul>
+<li>ExposedElementCoverage</li>
+<li>HazardCoverage</li>
+<li>ObservedEventCoverage</li>
+<li>RiskCoverage</li></ul>. Otherwise report constraintViolation.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_GN_v3.1.pdf">INSPIRE Data Specification on Geographical Names, A.1.1, (A.6.1)</a>]]>
+									
+									</description>
+									<parent ref="EID59d0a1f0-b186-427c-b042-f72eaf1518bb"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:RiskZone]
+let $features_hazard := $features[self::nz-core:ExposedElement]/@gml:id
+let $messages :=
+	for $feature in $features_selected
+
+		let $invalidExposedElement := 
+			for $x in $features_selected/nz-core:exposedElement
+				return 
+					if (not(exists($x/@xlink:href)) and not(exists($x/@nilReason) and not(exists($x/nz-core:ObservedEvent)))) then $x
+					else ()
+
+		let $invalidId :=
+			for $x in $features_selected/nz-core:exposedElement
+				return 
+					if (exists($x/@xlink:href) and not(contains($x/@xlink:href, $features_hazard))) then $x
+					else ()
+
+		return
+			if (not(exists($x))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:RectifiedGrid'}) 
+			else if (count($invalidExposedElement) != 0) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'nz-core:exposedElement element must need an @xlink:href element or must have a nz-core:ObservedEvent children', 'additionalInfo':''})
+			else if (count($invalidId) != 0) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': '@xlink:href must be refering to HazardArea element id', 'additionalInfo':''})
+			else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+
 			</testCases>
 		</TestModule>
 	</testModules>
