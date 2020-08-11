@@ -179,6 +179,8 @@ let $messages :=
 			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element': 'sd:referenceSpeciesId', 'count':count($envDom)}) 
 		else if(not($envDom/@xlink:href)) then
 			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'referenceSpeciesId', 'attribute': 'xlink:href'}) 
+		else if(starts-with($envDom/@xlink:href, '#')) then
+			local:addMessage('TR.manual.disallowedCodeListValue',  map {'property': 'referenceSpeciesId', 'value': string($envDom/@xlink:href), 'codelist': $natureCodelist}) 
 		else if($envDom/@xlink:href = $invalid_urls) then
 			let $dummy := "aaa"
 				return 
@@ -187,12 +189,14 @@ let $messages :=
 					else if (starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) then
 						local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'referenceSpeciesId', 'value': string($envDom/@xlink:href), 'codelist': $eunisCodelist}) 
 					else ()
-		else if(starts-with($envDom/@xlink:href, '#')) then
-			local:addMessage('TR.manual.disallowedCodeListValue',  map {'property': 'referenceSpeciesId', 'value': string($envDom/@xlink:href), 'codelist': $natureCodelist}) 
 		else ()
 
+
+
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and not($messages/@ref = ('TR.manual.disallowedCodeListValue'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.manual.disallowedCodeListValue')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
