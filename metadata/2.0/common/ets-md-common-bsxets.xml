@@ -314,7 +314,7 @@ let $messages :=
 			local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
 		else if (count($title) != 1) then
 			local:addMessage('TR.noTitle', map { 'filename': local:filename($record), 'id': $rid })
-        else if (not($title) or not(string-length($title/gco:CharacterString/text()) != 0 or string-length($title/gmx:Anchor/text()) != 0)) then
+        else if (not($title) or not(string-length($title/gco:CharacterString) != 0 or string-length($title/gmx:Anchor) != 0)) then
 			local:addMessage('TR.emptyTitle', map { 'filename': local:filename($record), 'id': $rid })
 		else ()
 	)[position() le $limitErrors]
@@ -351,7 +351,7 @@ let $messages :=
 		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
 	else if (count($abstract) != 1) then
 		local:addMessage('TR.noAbstract', map { 'filename': local:filename($record), 'id': $rid })
-    else if (not($abstract) or not(string-length($abstract/gco:CharacterString/text()) != 0 or string-length($abstract/gmx:Anchor/text()) != 0)) then
+    else if (not($abstract) or not(string-length($abstract/gco:CharacterString) != 0 or string-length($abstract/gmx:Anchor) != 0)) then
 		local:addMessage('TR.emptyAbstract', map { 'filename': local:filename($record), 'id': $rid })
 	else ()
 	)[position() le $limitErrors]
@@ -1067,7 +1067,7 @@ let $messages :=
 			let $date := $citation/gmd:date
 			let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
 			return
-			if (not($title) or not(string-length($title/gco:CharacterString/text()) != 0 or string-length($title/gmx:Anchor/text()) != 0)) then
+			if (not($title) or not(string-length($title/gco:CharacterString) != 0 or string-length($title/gmx:Anchor) != 0)) then
 				local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 			else if ($title/gmd:PT_FreeText) then
 				for $localisedCharacterString in $title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString
@@ -1081,8 +1081,13 @@ let $messages :=
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($dateTypeCode/@codeListValue = ('publication'))) then
 				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not(matches($date/gmd:CI_Date/gmd:date/gco:Date/text(), $regexDate))) then
-				local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid})
+			else if (exists($date/gmd:CI_Date/gmd:date/gco:Date/text())) then
+				let $dummy := "aaa"
+				for $dat in $date/gmd:CI_Date/gmd:date/gco:Date/text()
+					return
+					if (not(matches($dat, $regexDate))) then	
+						local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid})
+					else ()
 			else ())
 	)[position() le $limitErrors]
 return
