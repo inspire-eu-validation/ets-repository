@@ -74,7 +74,7 @@ let $map := local:check-resource-uris($urls, 30, true())
 let $messages :=
 	for $feature in $features_selected
 		return
-			if (not(exists($feature/nz-core:geometry)) and not(exists($feature/nz-core:sourceOfSpatialRepresenntation))) then 
+			if (not(exists($feature/nz-core:geometry)) and not(exists($feature/nz-core:sourceOfSpatialRepresentation))) then 
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': ' sourceOfSpatialRepresentation association role or geometry are present', 'additionalInfo':''})
 			else if (count($feature/nz-core:sourceOfSpatialRepresentation) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element': 'nz-core:sourceOfSpatialRepresentation'}) 
@@ -133,13 +133,13 @@ let $features_selected := $features[self::nz-core:*]
 let $messages :=
 	for $feature in $features_selected/nz-core:LevelOrIntensity
 		return
-			if (count($feature/nz-core:qualitativeValue != 1)) then
+			if (count($feature/nz-core:qualitativeValue) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeValue'}) 
-			else if (count($feature/nz-core:quantitativeValue != 1)) then
+			else if (count($feature/nz-core:quantitativeValue) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeValue'}) 
-			else if (string-length($feature/nz-core:qualitativeValue/text() = 0) and  not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
+			else if ((string-length($feature/nz-core:qualitativeValue/text()) = 0) and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeValue role must not be empty', 'additionalInfo':''})
-			else if (string-length($feature/nz-core:quantitativeValue/text() = 0) and  not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
+			else if ((string-length($feature/nz-core:quantitativeValue/text()) = 0) and not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeValue role must not be empty', 'additionalInfo':''})
 			else ()
 return
@@ -164,13 +164,13 @@ let $features_selected := $features[self::nz-core:*]
 let $messages :=
 	for $feature in $features_selected/nz-core:LikelihoodOfOccurrence
 		return
-			if (count($feature/nz-core:qualitativeValue != 1)) then
+			if (count($feature/nz-core:qualitativeValue) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeValue'}) 
-			else if (count($feature/nz-core:quantitativeValue != 1)) then
+			else if (count($feature/nz-core:quantitativeValue) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeValue'}) 
-			else if (string-length($feature/nz-core:qualitativeValue/text() = 0) and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
+			else if ((string-length($feature/nz-core:qualitativeValue/text()) = 0) and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeValue role must not be empty', 'additionalInfo':''})
-			else if (string-length($feature/nz-core:quantitativeValue/text() = 0) and not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
+			else if ((string-length($feature/nz-core:quantitativeValue/text()) = 0) and not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeValue role must not be empty', 'additionalInfo':''})
 			else ()
 return
@@ -215,13 +215,13 @@ let $features_selected := $features[self::nz-core:ExposedElementCoverage|self::n
 let $messages :=
 	for $feature in $features_selected
 		return
-			if (count($feature/gml:domainSet = 0)) then
+			if (count($feature/gml:domainSet) = 0) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:domainSet'}) 
-			else if (count($feature/gml:domainSet != 1)) then
+			else if (count($feature/gml:domainSet) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:domainSet'}) 
-			else if (count($feature/gml:domainSet/gml:RectifiedGrid != 1)) then
+			else if (count($feature/gml:domainSet/gml:RectifiedGrid) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:RectifiedGrid'}) 
-			else if (string-length($feature/gml:domainSet/gml:RectifiedGrid/text() = 0)) then
+			else if (string-length($feature/gml:domainSet/gml:RectifiedGrid/text()) = 0) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RectifiedGrid role must not be empty', 'additionalInfo':''})
 			else ()
 return
