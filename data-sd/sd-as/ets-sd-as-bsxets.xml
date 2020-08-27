@@ -101,9 +101,9 @@ let $messages :=
 	let $envDom := $feature/sd:speciesName/sd:SpeciesNameType/sd:referenceSpeciesScheme
 	return
 		if(not($envDom)) then
-			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'referenceSpeciesScheme', 'xpath':'sd:SpeciesDistributionUnit/sd:speciesName/sd:SpeciesNameType/sd:referenceSpeciesScheme'}) 
+			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'referenceSpeciesScheme'}) 
 		else if (count($envDom) != 1) then 
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element': 'sd:referenceSpeciesScheme', 'count':count($envDom)}) 
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:referenceSpeciesScheme', 'count':count($envDom)}) 
 		else if(not($envDom/@xlink:href)) then
 			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'referenceSpeciesScheme', 'attribute': 'xlink:href'}) 
 		else if(not($envDom/@xlink:href = $valid_href)) then
@@ -172,9 +172,9 @@ let $messages :=
 
 	return
 		if (not($envDom)) then
-			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'referenceSpeciesId', 'xpath':'sd:SpeciesDistributionUnit/sd:speciesName/sd:SpeciesNameType/sd:referenceSpeciesId'}) 
+			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'referenceSpeciesId'}) 
 		else if (count($envDom) != 1) then 
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element': 'sd:referenceSpeciesId', 'count':count($envDom)}) 
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:referenceSpeciesId', 'count':count($envDom)}) 
 		else if(not($envDom/@xlink:href)) then
 			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'referenceSpeciesId', 'attribute': 'xlink:href'}) 
 		else if(not(starts-with($envDom/@xlink:href, 'http://inspire.ec.europa.eu/codelist/NatureDirectivesCodeValue#')) and not(starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) and not(starts-with($envDom/@xlink:href, 'http://eunis.eea.europa.eu/species/'))) then
@@ -252,7 +252,7 @@ let $messages :=
 		return
 			if (count($envDom) > 1) then 
 				local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:qualifier', 'multiplicity': 1, 'count': count($envDom)}) 
-			else if(count($validXlink) = 0 and exists($envDom/@xlink:href)) then
+			else if(count($validXlink) = 0 and count($envDom/@nilReason) = 0) then
 				local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'qualifier', 'value': string($envDom/@xlink:href), 'codelist': $codelist})
 			else () 
 return
@@ -306,7 +306,7 @@ let $messages :=
 			let $dummy := "aaa"
 			return
 			if(not($envDom)) then
-				local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'countingMethod', 'xpath': 'sd:SpeciesDistributionUnit/sd:distributionInfo/sd:DistributionInfoType/sd:populationSize/sd:PopulationSizeType/sd:countingMethod'}) 
+				local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'countingMethod'}) 
 			else if (count($envDom) > 1) then 
 				local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:countingMethod', 'multiplicity': 1, 'count': count($envDom)}) 
 			else if(not($envDom/@xlink:href)) then
