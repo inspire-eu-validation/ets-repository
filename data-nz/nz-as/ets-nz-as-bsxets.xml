@@ -128,8 +128,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/constra
 let $features_selected := $features[self::nz-core:*]
 let $messages :=
 	for $feature in $features_selected//nz-core:LevelOrIntensity
-
-		let $dummy := local:log("qualitativeValue : " || count($feature/nz-core:qualitativeValue))
 		return
 			if (count($feature/nz-core:qualitativeValue) = 0 and count($feature/nz-core:quantitativeValue) = 0) then
 				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'nz-core:qualitativeValue or nz-core:quantitativeValue'}) 
@@ -137,9 +135,11 @@ let $messages :=
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeValue'}) 
 			else if (count($feature/nz-core:quantitativeValue) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeValue'}) 
-			else if (exists($feature/nz-core:qualitativeValue) and string-length($feature/nz-core:qualitativeValue) = 0 and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
+			else if (exists($feature/nz-core:qualitativeValue) and exists($feature/nz-core:quantitativeValue) and string-length($feature/nz-core:quantitativeValue/@uom) = 0 and not(exists($feature/nz-core:quantitativeValue/@nilReason)) and string-length($feature/nz-core:qualitativeValue) = 0 and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeValue or quantitativeValue roles must not be empty', 'additionalInfo':''})
+			else if (not(exists($feature/nz-core:quantitativeValue) and (string-length($feature/nz-core:quantitativeValue/@uom) != 0 or exists($feature/nz-core:quantitativeValue/@nilReason))) and exists($feature/nz-core:qualitativeValue) and string-length($feature/nz-core:qualitativeValue) = 0 and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeValue role must not be empty', 'additionalInfo':''})
-			else if (exists($feature/nz-core:quantitativeValue) and string-length($feature/nz-core:quantitativeValue/@uom) = 0 and not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
+			else if (not(exists($feature/nz-core:qualitativeValue) and (string-length($feature/nz-core:qualitativeValue) != 0 or exists($feature/nz-core:qualitativeValue/@nilReason))) and exists($feature/nz-core:quantitativeValue) and string-length($feature/nz-core:quantitativeValue/@uom) = 0 and not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeValue role must not be empty', 'additionalInfo':''})
 			else ()
 return
@@ -171,9 +171,11 @@ let $messages :=
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeLikelihood'}) 
 			else if (count($feature/nz-core:quantitativeLikelihood) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeLikelihood'}) 
-			else if (exists($feature/nz-core:qualitativeLikelihood) and string-length($feature/nz-core:qualitativeLikelihood) = 0 and not(exists($feature/nz-core:qualitativeLikelihood/@nilReason))) then
+			else if (exists($feature/nz-core:qualitativeLikelihood) and exists($feature/nz-core:quantitativeLikelihood) and not(ha-children($feature/nz-core:quantitativeLikelihood) and not(exists($feature/nz-core:quantitativeLikelihood/@nilReason)) and string-length($feature/nz-core:qualitativeLikelihood) = 0 and not(exists($feature/nz-core:qualitativeLikelihood/@nilReason))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeLikelihood or quantitativeLikelihood roles must not be empty', 'additionalInfo':''})
+			else if (not(exists($feature/nz-core:quantitativeLikelihood) and (has-children($feature/nz-core:quantitativeLikelihood) or exists($feature/nz-core:quantitativeLikelihood/@nilReason))) and exists($feature/nz-core:qualitativeLikelihood) and string-length($feature/nz-core:qualitativeLikelihood) = 0 and not(exists($feature/nz-core:qualitativeLikelihood/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeLikelihood role must not be empty', 'additionalInfo':''})
-			else if (exists($feature/nz-core:quantitativeLikelihood) and not(has-children($feature/nz-core:quantitativeLikelihood)) and not(exists($feature/nz-core:quantitativeLikelihood/@nilReason))) then
+			else if (not(exists($feature/nz-core:qualitativeLikelihood) and (string-length($feature/nz-core:qualitativeLikelihood) != 0 or exists($feature/nz-core:qualitativeLikelihood/@nilReason))) and exists($feature/nz-core:quantitativeLikelihood) and not(has-children($feature/nz-core:quantitativeLikelihood)) and not(exists($feature/nz-core:quantitativeLikelihood/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeLikelihood role must not be empty', 'additionalInfo':''})
 			else ()
 return
