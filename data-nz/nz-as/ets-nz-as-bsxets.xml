@@ -15,7 +15,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-07-10T13:30:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-08-04T12:20:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-08-31T11:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID00d4d7af-152b-4644-aeda-c8983df4535f"/>
 	</tags>
@@ -99,9 +99,7 @@ let $messages :=
 							local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
 						else if (matches($validuri,'^\d{3}$')) then
 							local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url, 'status' : $validuri })
-						else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then ()
-						else
-							local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url, 'mediaType': $validuri })
+						else ()
 				else ()
 			else ()
 return
@@ -116,8 +114,6 @@ $messages)
 										<translationTemplate ref="TR.idNotFound"/>
 										<translationTemplate ref="TR.resourceNotAccessibleException"/>
 										<translationTemplate ref="TR.resourceNotAccessible"/>
-										<translationTemplate ref="TR.operatesOnWithoutDatasetOrSeriesRecord"/>
-										<translationTemplate ref="TR.unknownResourceType"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -131,15 +127,19 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/constra
 									<expression>
 let $features_selected := $features[self::nz-core:*]
 let $messages :=
-	for $feature in $features_selected/nz-core:*/nz-core:LevelOrIntensity
+	for $feature in $features_selected//nz-core:LevelOrIntensity
+
+		let $dummy := local:log("qualitativeValue : " || count($feature/nz-core:qualitativeValue))
 		return
-			if (count($feature/nz-core:qualitativeValue) != 1) then
+			if (count($feature/nz-core:qualitativeValue) = 0 and count($feature/nz-core:quantitativeValue) = 0) then
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'nz-core:qualitativeValue or nz-core:quantitativeValue'}) 
+			else if (count($feature/nz-core:qualitativeValue) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeValue'}) 
-			else if (count($feature/nz-core:quantitativeValue) != 1) then
+			else if (count($feature/nz-core:quantitativeValue) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeValue'}) 
-			else if ((string-length($feature/nz-core:qualitativeValue/text()) = 0) and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
+			else if (exists($feature/nz-core:qualitativeValue) and string-length($feature/nz-core:qualitativeValue) = 0 and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeValue role must not be empty', 'additionalInfo':''})
-			else if ((string-length($feature/nz-core:quantitativeValue/text()) = 0) and not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
+			else if (exists($feature/nz-core:quantitativeValue) and string-length($feature/nz-core:quantitativeValue/@uom) = 0 and not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeValue role must not be empty', 'additionalInfo':''})
 			else ()
 return
@@ -149,6 +149,7 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
 										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
@@ -162,16 +163,18 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/constra
 									<expression>
 let $features_selected := $features[self::nz-core:*]
 let $messages :=
-	for $feature in $features_selected/nz-core:*/nz-core:LikelihoodOfOccurrence
+	for $feature in $features_selected//nz-core:LikelihoodOfOccurrence
 		return
-			if (count($feature/nz-core:qualitativeValue) != 1) then
-				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeValue'}) 
-			else if (count($feature/nz-core:quantitativeValue) != 1) then
-				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeValue'}) 
-			else if ((string-length($feature/nz-core:qualitativeValue/text()) = 0) and not(exists($feature/nz-core:qualitativeValue/@nilReason))) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeValue role must not be empty', 'additionalInfo':''})
-			else if ((string-length($feature/nz-core:quantitativeValue/text()) = 0) and not(exists($feature/nz-core:quantitativeValue/@nilReason))) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeValue role must not be empty', 'additionalInfo':''})
+			if (count($feature/nz-core:qualitativeLikelihood) = 0 and count($feature/nz-core:quantitativeLikelihood) = 0) then
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'nz-core:qualitativeLikelihood or nz-core:quantitativeLikelihood'}) 
+			else if (count($feature/nz-core:qualitativeLikelihood) > 1) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeLikelihood'}) 
+			else if (count($feature/nz-core:quantitativeLikelihood) > 1) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeLikelihood'}) 
+			else if (exists($feature/nz-core:qualitativeLikelihood) and string-length($feature/nz-core:qualitativeLikelihood) = 0 and not(exists($feature/nz-core:qualitativeLikelihood/@nilReason))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeLikelihood role must not be empty', 'additionalInfo':''})
+			else if (exists($feature/nz-core:quantitativeLikelihood) and not(has-children($feature/nz-core:quantitativeLikelihood)) and not(exists($feature/nz-core:quantitativeLikelihood/@nilReason))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'quantitativeLikelihood role must not be empty', 'additionalInfo':''})
 			else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -180,6 +183,7 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
 										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
@@ -216,7 +220,7 @@ let $messages :=
 	for $feature in $features_selected
 		return
 			if (count($feature/gml:domainSet) = 0) then
-				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:domainSet'}) 
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'gml:domainSet'}) 
 			else if (count($feature/gml:domainSet) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:domainSet'}) 
 			else if (count($feature/gml:domainSet/gml:RectifiedGrid) != 1) then
@@ -231,6 +235,7 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
 										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
@@ -299,7 +304,7 @@ let $messages :=
 	for $feature in $features_selected
 		return
 			if (not(exists($feature/nz-core:source))) then
-				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:RectifiedGrid'}) 
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'gml:RectifiedGrid'}) 
 			else if (count($feature/nz-core:source) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:source'}) 
 			else if (not(exists($feature/nz-core:source/@xlink:href)) and not(exists($feature/nz-core:source/@nilReason) and not(exists($feature/nz-core:source/nz-core:ObservedEvent)))) then
@@ -314,6 +319,7 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
 										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
@@ -344,7 +350,7 @@ let $messages :=
 
 		return
 			if (not(exists($features_selected/nz-core:exposedElement))) then
-				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:RectifiedGrid'}) 
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'gml:RectifiedGrid'}) 
 			else if (count($invalidExposedElement) != 0) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'nz-core:exposedElement element must need an @xlink:href element or must have a nz-core:ObservedEvent children', 'additionalInfo':''})
 			else if (count($invalidId) != 0) then
@@ -357,6 +363,7 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
 										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
