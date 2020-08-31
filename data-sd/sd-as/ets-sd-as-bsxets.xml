@@ -173,7 +173,7 @@ let $messages :=
 			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'referenceSpeciesId'}) 
 		else if (count($envDom) != 1) then 
 			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:referenceSpeciesId', 'multiplicity': 1, 'count':count($envDom)}) 
-		else if(not(starts-with($envDom/@xlink:href, 'http://inspire.ec.europa.eu/codelist/NatureDirectivesCodeValue#')) and not(starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) and not(starts-with($envDom/@xlink:href, 'http://eunis.eea.europa.eu/species/'))) then
+		else if(not(starts-with($envDom/@xlink:href, 'http://inspire.ec.europa.eu/codelist/NatureDirectivesCodeValue#')) and not(starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) and not(starts-with($envDom/@xlink:href, 'https://eunis.eea.europa.eu/species/'))) then
 			local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'referenceSpeciesId', 'value': string($envDom/@xlink:href), 'codelist': concat($euCodelist, concat(", ", concat($eunisCodelist, concat(" or ", $natureCodelist))))}) 
 		else if(starts-with($envDom/@xlink:href, 'http://inspire.ec.europa.eu/codelist/NatureDirectivesCodeValue#')) then
 			local:addMessage('TR.manual.disallowedCodeListValue',  map {'property': 'referenceSpeciesId', 'value': string($envDom/@xlink:href), 'codelist': $natureCodelist}) 
