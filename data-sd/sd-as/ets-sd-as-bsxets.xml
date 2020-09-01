@@ -104,6 +104,8 @@ let $messages :=
 			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'referenceSpeciesScheme'}) 
 		else if (count($envDom) != 1) then 
 			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:referenceSpeciesScheme','multiplicity': 1, 'count':count($envDom)}) 
+		else if(not($envDom/@xlink:href)) then
+			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'referenceSpeciesScheme'}) 
 		else if(not($envDom/@xlink:href = $valid_href)) then
 			local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'referenceSpeciesScheme', 'value': string($envDom/@xlink:href), 'codelist': $codelist}) 
 		else ()
@@ -173,6 +175,8 @@ let $messages :=
 			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'referenceSpeciesId'}) 
 		else if (count($envDom) != 1) then 
 			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:referenceSpeciesId', 'multiplicity': 1, 'count':count($envDom)}) 
+		else if (not($envDom/@xlink:href)) then
+			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id),'attribute':'@xlink:href', 'property': 'referenceSpeciesId'}) 
 		else if(not(starts-with($envDom/@xlink:href, 'http://inspire.ec.europa.eu/codelist/NatureDirectivesCodeValue#')) and not(starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) and not(starts-with($envDom/@xlink:href, 'https://eunis.eea.europa.eu/species/'))) then
 			local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'referenceSpeciesId', 'value': string($envDom/@xlink:href), 'codelist': concat($euCodelist, concat(", ", concat($eunisCodelist, concat(" or ", $natureCodelist))))}) 
 		else if(starts-with($envDom/@xlink:href, 'http://inspire.ec.europa.eu/codelist/NatureDirectivesCodeValue#')) then
@@ -246,9 +250,7 @@ let $messages :=
 					if ($envDom/@xlink:href = $valid_href) then $valid_href
 					else ()
 		return
-			if (count($envDom) > 1) then 
-				local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:qualifier', 'multiplicity': 1, 'count': count($envDom)}) 
-			else if(count($validXlink) = 0 and count($envDom/@nilReason) = 0) then
+			if(count($validXlink) = 0 and exists($envDom/@xlink:href) = 0) then
 				local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'qualifier', 'value': string($envDom/@xlink:href), 'codelist': $codelist})
 			else () 
 return
@@ -385,12 +387,12 @@ let $messages :=
 		if(count($feature/sd:geometry) > 1) then
 			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:geometry', 'multiplicity': 1, 'count': count($feature/sd:geometry)}) 
 		else if(count($feature/sd:spatialObject) > 1) then
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:geometry', 'multiplicity': 1, 'count': count($feature/sd:geometry)}) 
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sd:spatialObject', 'multiplicity': 1, 'count': count($feature/sd:geometry)}) 
 		else if (exists($feature/sd:geometry/@xlink:href) and count($geometry_invalid_urls) > 0) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'Geometry', 'value': string-join($geometry_invalid_urls, ',')}) 
 		else if (exists($feature/sd:spatialObject) and count($spatial_invalid_urls) > 0) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'Spatial Object', 'value': string-join($spatial_invalid_urls, ',')}) 
-		else if(not(has-children($feature/sd:geometry)) and not(exists($feature/sd:geometry/@xlink:href)) and not(exists($feature/sd:spatialObject/xlink:href))) then
+		else if(not(has-children($feature/sd:geometry)) and not(exists($feature/sd:geometry/@xlink:href)) and not(exists($feature/sd:spatialObject))) then
 			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'if the geometry of the Species Distribution Unit feature type has no value, a reference to a spatial object needs to be provided.', 'additionalInfo':''})
 		else ()
 return

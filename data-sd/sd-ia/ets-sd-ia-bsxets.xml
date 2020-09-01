@@ -209,7 +209,7 @@ let $messages :=
 			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
 		else if (not((count($envDom) = count($envDom/@xlink:href)))) then
 			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-		else if(count($invalid_urls) = 0) then
+		else if(count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
 		else ()
 
@@ -467,10 +467,10 @@ let $features_selected := $features[self::sd:SpeciesDistributionDataSet]
 let $gml_ids := $features//@gml:id
 let $property_string := 'SpeciesDistributionDataSet.spatialObject'
 let $messages := 
-	for $feature in $features_selected/sd:spatialObject
+	for $feature in $features_selected
 		
 		let $urls := 
-			for $x in $feature/@xlink:href
+			for $x in $feature/sd:spatialObject/@xlink:href
 			return
 				if (starts-with($x, '#')) then ()
 				else $x
@@ -485,14 +485,14 @@ let $messages :=
 					else ()
 
 		let $invalid_element_reference := 
-			for $x in $feature/@xlink:href
+			for $x in $feature/sd:spatialObject/@xlink:href
 			return
 				if (starts-with($x, '#')) then
 					if (not(substring($x, 2) = $gml_ids)) then $x
 					else ()
 				else ()
 		return
-			if (count($feature) > 1) then
+			if (count($feature/sd:spatialObject) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/sd:spatialObject)}) 
 			else if (count($invalid_urls) > 0) then
 				local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
