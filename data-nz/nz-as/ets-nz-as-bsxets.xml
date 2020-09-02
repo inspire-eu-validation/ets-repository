@@ -86,7 +86,7 @@ let $messages :=
 				let $dummy := "this variable is needed here to do not receive an incomplete if expression error"
 				return
 				if (not(exists($feature/nz-core:sourceOfSpatialRepresentation/@xlink:href)) and not(exists($feature/nz-core:sourceOfSpatialRepresentation/@nilReason)) and not(has-children($feature/nz-core:sourceOfSpatialRepresentation))) then
-						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'sourceOfSpatialRepresentation role must not be empty', 'additionalInfo':''})
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'sourceOfSpatialRepresentation association role or geometry are present', 'additionalInfo':''})
 				else if (exists($feature/nz-core:sourceOfSpatialRepresentation/@xlink:href)) then
 					let $url := string($feature/nz-core:sourceOfSpatialRepresentation/@xlink:href)
 					let $validuri := map:get($mapsp, $url)
@@ -105,7 +105,7 @@ let $messages :=
 				let $dummy := "this variable is needed here to do not receive an incomplete if expression error"
 				return
 				if (not(exists($feature/nz-core:geometry/@xlink:href)) and not(exists($feature/nz-core:geometry/@nilReason)) and not(has-children($feature/nz-core:geometry))) then
-						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'geometry role must not be empty', 'additionalInfo':''})
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'sourceOfSpatialRepresentation association role or geometry are present', 'additionalInfo':''})
 				else if (exists($feature/nz-core:geometry/@xlink:href)) then
 					let $url := string($feature/nz-core:geometry/@xlink:href)
 					let $validuri := map:get($mapg, $url)
@@ -239,15 +239,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/domainS
 let $features_selected := $features[self::nz-core:ExposedElementCoverage|self::nz-core:HazardCoverage|self::nz-core:ObservedEventCoverage|self::nz-core:RiskCoverage]
 let $messages :=
 	for $feature in $features_selected
+		for $f in $feature/gml:domainSet
 		return
-			if (count($feature/gml:domainSet) = 0) then
-				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'gml:domainSet'}) 
-			else if (count($feature/gml:domainSet) != 1) then
-				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:domainSet'}) 
-			else if (count($feature/gml:domainSet/gml:RectifiedGrid) != 1) then
+			if (count($f/gml:RectifiedGrid) = 0) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RectifiedGrid role must not be empty', 'additionalInfo':''})	
+			else if (count($f/gml:RectifiedGrid) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'gml:RectifiedGrid'}) 
-			else if (string-length($feature/gml:domainSet/gml:RectifiedGrid/text()) = 0) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RectifiedGrid role must not be empty', 'additionalInfo':''})
 			else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
