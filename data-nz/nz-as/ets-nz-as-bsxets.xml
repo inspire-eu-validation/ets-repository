@@ -69,8 +69,10 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/constra
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $features_selected := $features[self::nz-core:ExposedElement]
-let $urls := $features_selected/nz-core:sourceOfSpatialRepresentation/@xlink:href
-let $map := local:check-resource-uris($urls, 30, true())
+let $urlssp := $features_selected/nz-core:sourceOfSpatialRepresentation/@xlink:href
+let $mapsp := local:check-resource-uris($urlssp, 30, true())
+let $urlsg := $features_selected/nz-core:geometry/@xlink:href
+let $mapg := local:check-resource-uris($urlsg, 30, true())
 let $messages :=
 	for $feature in $features_selected
 		return
@@ -80,8 +82,6 @@ let $messages :=
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element': 'nz-core:sourceOfSpatialRepresentation'}) 
 			else if (count($feature/nz-core:geometry) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:geometry'}) 
-			else if (exists($feature/nz-core:geometry) and not(has-children($feature/nz-core:geometry))) then 
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'geometry role must not be empty', 'additionalInfo':''})
 			else if (not(exists($feature/nz-core:geometry)) and exists($feature/nz-core:sourceOfSpatialRepresentation)) then 
 				let $dummy := "this variable is needed here to do not receive an incomplete if expression error"
 				return
@@ -89,7 +89,26 @@ let $messages :=
 						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'sourceOfSpatialRepresentation role must not be empty', 'additionalInfo':''})
 				else if (exists($feature/nz-core:sourceOfSpatialRepresentation/@xlink:href)) then
 					let $url := string($feature/nz-core:sourceOfSpatialRepresentation/@xlink:href)
-					let $validuri := map:get($map, $url)
+					let $validuri := map:get($mapsp, $url)
+					return 
+						if ($validuri = 'notHTTP') then
+							local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url })
+						else if ($validuri = 'idNotFound') then
+							local:addMessage('TR.idNotFound', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url })
+						else if (starts-with($validuri, 'EXCEPTION')) then
+							local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
+						else if (matches($validuri,'^\d{3}$')) then
+							local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url, 'status' : $validuri })
+						else ()
+				else ()
+			else if (not(exists($feature/nz-core:sourceOfSpatialRepresentation)) and exists($feature/nz-core:geometry)) then 
+				let $dummy := "this variable is needed here to do not receive an incomplete if expression error"
+				return
+				if (not(exists($feature/nz-core:geometry/@xlink:href)) and not(exists($feature/nz-core:geometry/@nilReason)) and not(has-children($feature/nz-core:geometry))) then
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'geometry role must not be empty', 'additionalInfo':''})
+				else if (exists($feature/nz-core:geometry/@xlink:href)) then
+					let $url := string($feature/nz-core:geometry/@xlink:href)
+					let $validuri := map:get($mapg, $url)
 					return 
 						if ($validuri = 'notHTTP') then
 							local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($feature), 'id': string($feature/@*:id), 'url': $url })
@@ -165,13 +184,13 @@ let $features_selected := $features[self::nz-core:*]
 let $messages :=
 	for $feature in $features_selected//nz-core:LikelihoodOfOccurrence
 		return
-			if (count($feature/nz-core:qualitativeLikelihood) = 0 and count($feature/nz-core:quantitativeLikelihood) = 0) then
+			if ((count($feature/nz-core:qualitativeLikelihood) = 0) and (count($feature/nz-core:quantitativeLikelihood) = 0)) then
 				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'nz-core:qualitativeLikelihood or nz-core:quantitativeLikelihood'}) 
 			else if (count($feature/nz-core:qualitativeLikelihood) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:qualitativeLikelihood'}) 
 			else if (count($feature/nz-core:quantitativeLikelihood) > 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:quantitativeLikelihood'}) 
-			else if (exists($feature/nz-core:qualitativeLikelihood) and exists($feature/nz-core:quantitativeLikelihood) and not(ha-children($feature/nz-core:quantitativeLikelihood) and not(exists($feature/nz-core:quantitativeLikelihood/@nilReason)) and string-length($feature/nz-core:qualitativeLikelihood) = 0 and not(exists($feature/nz-core:qualitativeLikelihood/@nilReason))) then
+			else if (exists($feature/nz-core:qualitativeLikelihood) and exists($feature/nz-core:quantitativeLikelihood) and not(has-children($feature/nz-core:quantitativeLikelihood) and not(exists($feature/nz-core:quantitativeLikelihood/@nilReason)) and string-length($feature/nz-core:qualitativeLikelihood) = 0 and not(exists($feature/nz-core:qualitativeLikelihood/@nilReason)))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeLikelihood or quantitativeLikelihood roles must not be empty', 'additionalInfo':''})
 			else if (not(exists($feature/nz-core:quantitativeLikelihood) and (has-children($feature/nz-core:quantitativeLikelihood) or exists($feature/nz-core:quantitativeLikelihood/@nilReason))) and exists($feature/nz-core:qualitativeLikelihood) and string-length($feature/nz-core:qualitativeLikelihood) = 0 and not(exists($feature/nz-core:qualitativeLikelihood/@nilReason))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'qualitativeLikelihood role must not be empty', 'additionalInfo':''})
