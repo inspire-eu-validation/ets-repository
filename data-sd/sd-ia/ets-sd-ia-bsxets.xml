@@ -203,14 +203,14 @@ let $messages :=
 						$url
 					else ()
 	return
-		if (not(exists($envDom))) then
-			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string}) 
+		if (exists($feature/sd:distributionInfo/sd:DistributionInfoType) and not(exists($envDom))) then
+			local:addMessage('TR.missingElementSpeciesInformation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string}) 
 		else if (count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
-		else if (not((count($envDom) = count($envDom/@xlink:href)))) then
-			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-		else if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+		else if (exists($feature/sd:distributionInfo/sd:DistributionInfoType) and count($envDom/@xlink:href) != 1) then
+			local:addMessage('TR.missingAttributeSpeciesDistribution', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(exists($feature/sd:distributionInfo/sd:DistributionInfoType) and count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
 		else ()
 
 return
