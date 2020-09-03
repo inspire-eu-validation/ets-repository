@@ -322,13 +322,13 @@ let $messages :=
 	for $feature in $features_selected
 		return
 			if (not(exists($feature/nz-core:source))) then
-				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'gml:RectifiedGrid'}) 
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'nz-core:source'}) 
 			else if (count($feature/nz-core:source) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:source'}) 
 			else if (not(exists($feature/nz-core:source/@xlink:href)) and not(exists($feature/nz-core:source/@nilReason) and not(exists($feature/nz-core:source/nz-core:ObservedEvent)))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'nz-core:source element must need an @xlink:href element or must have a nz-core:ObservedEvent children', 'additionalInfo':''})
-			else if (exists($feature/nz-core:source/@xlink:href) and not(contains($feature/nz-core:source/@xlink:href, $features_hazard))) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': '@xlink:href must be refering to HazardArea element id', 'additionalInfo':''})
+			else if (exists($feature/nz-core:source/@xlink:href) and not($feature/nz-core:source/@xlink:href = $features_hazard)) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RiskZone and the HazardArea shall overlap', 'additionalInfo':''})
 			else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -363,16 +363,16 @@ let $messages :=
 		let $invalidId :=
 			for $x in $features_selected/nz-core:exposedElement
 				return 
-					if (exists($x/@xlink:href) and not(contains($x/@xlink:href, $features_hazard))) then $x
+					if (exists($x/@xlink:href) and not($x/@xlink:href = $features_hazard)) then $x
 					else ()
 
 		return
 			if (not(exists($features_selected/nz-core:exposedElement))) then
-				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'gml:RectifiedGrid'}) 
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'nz-core:exposedElement'}) 
 			else if (count($invalidExposedElement) != 0) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'nz-core:exposedElement element must need an @xlink:href element or must have a nz-core:ObservedEvent children', 'additionalInfo':''})
 			else if (count($invalidId) != 0) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': '@xlink:href must be refering to HazardArea element id', 'additionalInfo':''})
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RiskZone and the HazardArea shall overlap', 'additionalInfo':''})
 			else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
