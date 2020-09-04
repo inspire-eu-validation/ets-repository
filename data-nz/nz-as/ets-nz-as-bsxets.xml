@@ -327,7 +327,7 @@ let $messages :=
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:source'}) 
 			else if (not(exists($feature/nz-core:source/@xlink:href)) and not(exists($feature/nz-core:source/@nilReason)) and not(has-children($feature/nz-core:source))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'RiskZone and the HazardArea shall overlap', 'additionalInfo':''})
-			else if (exists($feature/nz-core:source/@xlink:href) and not($feature/nz-core:source/@xlink:href = $features_hazard)) then
+			else if (exists($feature/nz-core:source/@xlink:href) and not(substring($feature/nz-core:source/@xlink:href, 2) = $features_hazard)) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'RiskZone and the HazardArea shall overlap', 'additionalInfo':''})
 			else ()
 return
@@ -363,7 +363,7 @@ let $messages :=
 		let $invalidId :=
 			for $x in $features_selected/nz-core:exposedElement
 				return 
-					if (exists($x/@xlink:href) and not($x/@xlink:href = $features_exposed)) then $x
+					if (exists($x/@xlink:href) and not(substring($x/@xlink:href, 2) = $features_exposed)) then $x
 					else ()
 
 		return
