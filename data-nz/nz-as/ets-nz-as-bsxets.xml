@@ -325,7 +325,7 @@ let $messages :=
 				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'nz-core:source'}) 
 			else if (count($feature/nz-core:source) != 1) then
 				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element':'nz-core:source'}) 
-			else if (not(exists($feature/nz-core:source/@xlink:href)) and not(exists($feature/nz-core:source/@nilReason) and not(has-children($feature/nz-core:source)))) then
+			else if (not(exists($feature/nz-core:source/@xlink:href)) and not(exists($feature/nz-core:source/@nilReason)) and not(has-children($feature/nz-core:source))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RiskZone and the HazardArea shall overlap', 'additionalInfo':''})
 			else if (exists($feature/nz-core:source/@xlink:href) and not($feature/nz-core:source/@xlink:href = $features_hazard)) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RiskZone and the HazardArea shall overlap', 'additionalInfo':''})
@@ -370,9 +370,9 @@ let $messages :=
 			if (not(exists($features_selected/nz-core:exposedElement))) then
 				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@*:id), 'property':'nz-core:exposedElement'}) 
 			else if (count($invalidExposedElement) != 0) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RiskZone and the HazardArea shall overlap', 'additionalInfo':''})
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'ExposedElement shall overlap with the RiskZone', 'additionalInfo':''})
 			else if (count($invalidId) != 0) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'RiskZone and the HazardArea shall overlap', 'additionalInfo':''})
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'ExposedElement shall overlap with the RiskZone', 'additionalInfo':''})
 			else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
