@@ -78,8 +78,7 @@ let $this_features :=
 			return
 				if (name($this_feature) = 'nz-core:ExposedElement') then
 					$this_feature/nz-core:assessmentOfVulnerability
-				else ()
-
+				else $this_feature
 	for $actual_feature in $this_features
 	
 		let $feature := 
@@ -150,7 +149,7 @@ let $messages :=
 			return
 				if (name($this_feature) = 'nz-core:ExposedElement') then
 					$this_feature/nz-core:assessmentOfVulnerability
-				else ()
+				else $this_feature
 
 	for $actual_feature in $this_features
 	
@@ -181,8 +180,6 @@ let $messages :=
 			local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature),'featureType':local-name($actual_feature/..), 'gmlid':string($actual_feature/../@*:id), 'property':'nz-core:specificExposedElementType'}) 
 		else if (count($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:specificExposedElementType) != 1) then
 			local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($actual_feature), 'id': string($actual_feature/../@*:id), 'element': 'nz-core:specificExposedElementType'}) 
-		else if (not(exists($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:specificExposedElementType/@xlink:href)) and not(exists($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:specificExposedElementType/@nilReason))) then
-			local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 		else if(count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
@@ -332,8 +329,6 @@ let $messages :=
 			local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature),'featureType':local-name($actual_feature/..), 'gmlid':string($actual_feature/../@*:id), 'property':'nz-core:specificHazardType'}) 
 		else if (count($feature/nz-core:NaturalHazardClassification/nz-core:specificHazardType) != 1) then
 			local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($actual_feature), 'id': string($actual_feature/../@*:id), 'element': 'nz-core:specificHazardType'}) 
-		else if (not(exists($feature/nz-core:NaturalHazardClassification/nz-core:specificHazardType/@xlink:href)) and not(exists($feature/nz-core:NaturalHazardClassification/nz-core:specificHazardType/@nilReason))) then
-			local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 		else if(count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
