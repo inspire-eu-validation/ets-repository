@@ -103,11 +103,10 @@ if(makeInitialRequest){
 <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/discovery-service/review-ats-csw-3.1/csw-iso-ap/at-07-extended-capabilities" target="_blank">Extended Capabilities</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="dc4dae02-372f-4655-9642-75eb0fe0f447"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>c2bf56ae-2544-4b9d-9fdf-28654aa6111f</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-extended-capabilities" id="d284a466-cac4-49b2-9add-5828fea243dc"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-
+def regex = /\d{4}-(1[0-2]|0[1-9])-(3[0-1]|0[1-9]|[1-2][0-9])(T(2[0-3]|[0-1][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9]+)?)?(Z|([+|-](2[0-3]|[0-1][0-9]):([0-5][0-9]):([0-5][0-9])(\.[0-9])?)?)?/
 def capabilities = new XmlSlurper(false, true).parseText(response);
 def extendedCapabilities = capabilities.OperationsMetadata.ExtendedCapabilities;
 def scenario = testRunner.testCase.testSuite.project.getPropertyValue( "extended_capabilities_scenario").toInteger();
-
 if(extendedCapabilities.size() == 0){
 	throw new TranslatableAssertionError('TR.extendedCapabilitiesShallBeProvided');
 }
@@ -125,11 +124,10 @@ else{
 			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataUrl/URL'];
 			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
 		}
-		if(extendedCapabilities.MetadataUrl.URL.toString().length() == 0){
+		if(extendedCapabilities.MetadataUrl.URL.text().length() == 0){
 			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataUrl'];
 			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-		}
-		else{
+		}else{
 			def regEx1 = /(http|ftp|https):\/\/([\w+?\.\w+])+([a-zA-Z0-9\~\!\@\#\$\%\^\&amp;\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)?/
 			def MetadataUrlReplaced = extendedCapabilities.MetadataUrl.URL.toString().replaceAll(regEx1, '');
 			if(MetadataUrlReplaced.size() != 0){
@@ -144,8 +142,7 @@ else{
 			String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage'];
 			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
 		}
-	}
-	else if(scenario == 2){
+	}else if(scenario == 2){
 		if(extendedCapabilities.MetadataUrl.URL.size() == 1){
 			def regEx1 = /(http|ftp|https):\/\/([\w+?\.\w+])+([a-zA-Z0-9\~\!\@\#\$\%\^\&amp;\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)?/
 			def MetadataUrlReplaced = extendedCapabilities.MetadataUrl.URL.toString().replaceAll(regEx1, '');
@@ -153,41 +150,128 @@ else{
 				throw new TranslatableAssertionError('TR.metadataURLNotWellFormed');
 			}
 		}
-		if(extendedCapabilities.ResourceType.size() != 1){
+
+		try{
+			if(extendedCapabilities.ResourceType.size() != 1){
+				String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			}else if(extendedCapabilities.ResourceType.text().toUpperCase() == 'NONE'){
+				String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType'];
+				throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
+			}
+		}catch (NullPointerException e){
 			String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
 		}
-		if(extendedCapabilities.SpatialDataServiceType.size() != 1){
+
+
+		try {
+			if (extendedCapabilities.SpatialDataServiceType.size() != 1) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			} else if (extendedCapabilities.SpatialDataServiceType.text().toUpperCase() == 'NONE') {
+				String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
+				throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
+			}
+		} catch (NullPointerException e) {
 			String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+
 		}
-		if(extendedCapabilities.MandatoryKeyword.KeywordValue.size() == 0){
+
+		try {
+			if (extendedCapabilities.MandatoryKeyword.KeywordValue.size() == 0) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/MandatoryKeyword/KeywordValue'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+			} else if (extendedCapabilities.MandatoryKeyword.KeywordValue.text().toUpperCase() == 'NONE') {
+				String[] assertParams = ['element', 'ExtendedCapabilities/MandatoryKeyword/KeywordValue'];
+				throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
+			}
+		} catch (NullPointerException e) {
 			String[] assertParams = ['element', 'ExtendedCapabilities/MandatoryKeyword/KeywordValue'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
 		}
-		if(extendedCapabilities.Conformity.Specification.size() == 0){
+
+		try {
+			if (extendedCapabilities.Conformity.Specification.size() == 0) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Specification'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+			} else if (extendedCapabilities.Conformity.Specification.text().toUpperCase() == 'NONE') {
+				String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Specification'];
+				throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
+			}
+		} catch (NullPointerException e) {
 			String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Specification'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
 		}
-		if(extendedCapabilities.Conformity.Degree.size() == 0){
+
+		try {
+			if (extendedCapabilities.Conformity.Degree.size() == 0) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Degree'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+			} else if ((extendedCapabilities.Conformity.Degree.text() != 'conformant' &amp;&amp; extendedCapabilities.Conformity.Degree.text() != 'notConformant' &amp;&amp; extendedCapabilities.Conformity.Degree.text() != 'notEvaluated')) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Degree', 'found', extendedCapabilities.Conformity.Degree.text().toString()];
+				throw new TranslatableAssertionError('TR.degreeNotValidElement', assertParams);
+			}
+		} catch (NullPointerException e) {
 			String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Degree'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+
 		}
-		if(extendedCapabilities.MetadataPointOfContact.size() == 0){
+
+		try {
+			if (extendedCapabilities.MetadataPointOfContact.size() == 0) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+			} else if (extendedCapabilities.MetadataPointOfContact.text().toUpperCase() == 'NONE') {
+				String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact'];
+				throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
+			}
+		} catch (NullPointerException e) {
 			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+
 		}
-		if(extendedCapabilities.MetadataDate.size() != 1){
+
+		try {
+			if (extendedCapabilities.MetadataDate.size() != 1) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/MetadataDate'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			} else if ((extendedCapabilities.MetadataDate.text() =~regex) == false) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/MetadataDate'];
+				throw new TranslatableAssertionError('TR.dataNotValid', assertParams);
+			}
+		} catch (NullPointerException e) {
 			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataDate'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+
 		}
-		if(extendedCapabilities.SupportedLanguages.size() != 1){
+
+		try {
+			if (extendedCapabilities.SupportedLanguages.size() != 1) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			} else if (extendedCapabilities.SupportedLanguages.text().toUpperCase() == 'NONE') {
+				String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages'];
+				throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
+			}
+		} catch (NullPointerException e) {
 			String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+
 		}
-		if(extendedCapabilities.ResponseLanguage.size() != 1){
+
+		try {
+			if (extendedCapabilities.ResponseLanguage.size() != 1) {
+				String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage'];
+				throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			} else if (extendedCapabilities.ResponseLanguage.text().toUpperCase() == 'NONE') {
+				String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage'];
+				throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
+			}
+		} catch (NullPointerException e) {
 			String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
 		}
 	}
 }
@@ -205,21 +289,49 @@ if(scenario == 2){
 		String[] assertParams = ['element', '/Capabilities/ServiceIdentification'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
 	}
+	
 	if(serviceIdentification.Title.size() != 1){
 		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Title'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}else if(serviceIdentification.Title.text().length() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Title'];
+		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	}else if(serviceIdentification.Title.text().toUpperCase() == 'NONE'){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Title'];
+		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
 	}
+
 	if(serviceIdentification.Abstract.size() != 1){
 		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Abstract'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}else if(serviceIdentification.Abstract.text().length() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Abstract'];
+		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	}else if(serviceIdentification.Abstract.text().toUpperCase() == 'NONE'){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Abstract'];
+		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
 	}
+
 	if(serviceIdentification.Fees.size() == 0){
 		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Fees'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+	}else if(serviceIdentification.Fees.text().length() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Fees'];
+		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	}else if(serviceIdentification.Fees.text().toUpperCase() == 'NONE'){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Fees'];
+		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
 	}
+
 	if(serviceIdentification.AccessConstraints.size() == 0){
 		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/AccessConstraints'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+	}else if(serviceIdentification.AccessConstraints.text().length() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/AccessConstraints'];
+		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	}else if(serviceIdentification.AccessConstraints.text().toUpperCase() == 'NONE'){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/AccessConstraints'];
+		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
 	}
 	
 	// ServiceProvider mandatory elements
@@ -228,17 +340,38 @@ if(scenario == 2){
 		String[] assertParams = ['element', '/Capabilities/ServiceProvider'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
 	}
+
 	if(serviceProvider.ProviderName.size() != 1){
 		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ProviderName'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}else if(serviceIdentification.ProviderName.text().length() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/ProviderName'];
+		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	}else if(serviceIdentification.ProviderName.text().toUpperCase() == 'NONE'){
+		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/ProviderName'];
+		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
 	}
+
 	if(serviceProvider.ServiceContact.ContactInfo.Address.ElectronicMailAddress.size() != 1){
 		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ServiceContact/ContactInfo/Address/ElectronicMailAddress'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}else if(serviceProvider.ServiceContact.ContactInfo.Address.ElectronicMailAddress.text().length() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ServiceContact/ContactInfo/Address/ElectronicMailAddress'];
+		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	}else if(serviceProvider.ServiceContact.ContactInfo.Address.ElectronicMailAddress.text().toUpperCase() == 'NONE'){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ServiceContact/ContactInfo/Address/ElectronicMailAddress'];
+		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
 	}
+
 	if(serviceProvider.ServiceContact.Role.size() != 1){
 		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ServiceContact/Role'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}else if(serviceProvider.ServiceContact.Role.text().length() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ServiceContact/Role'];
+		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	}else if(serviceProvider.ServiceContact.Role.text().toUpperCase() == 'NONE'){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ServiceContact/Role'];
+		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
 	}
 }
 </script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="88ca47a3-a58d-4e0f-848f-392faf695f07" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at-12-discover-resource-matching-query" searchProperties="true"><con:description><![CDATA[<p>Test that the Discover Metadata response contains at least the INSPIRE metadata elements.</p>
