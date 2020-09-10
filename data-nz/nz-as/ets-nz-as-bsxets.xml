@@ -47,6 +47,152 @@ Pre-requisite conformance classes:
 			<description>IGNORE</description>
 			<parent ref="EID5aab5d8a-e432-47dd-b072-7cbf520035be"/>
 			<testCases>
+
+				<TestCase id="EID51545c50-5ce1-4585-95f5-16b40fe955a4">
+					<label>Code list values</label>
+					<description>Verify whether all attributes whose value type is a code list take the values set out therein.</description>
+					<parent ref="EID1e2dd0b2-dbcd-404c-9f64-dfcd504f1303"/>
+					<testSteps>
+						<TestStep id="EIDb2d8500e-a670-4170-9c79-6cc0593b4030">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID51545c50-5ce1-4585-95f5-16b40fe955a4"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID206276fc-1547-406b-a1bc-0cb875dcdccb">
+									<label>nz-as.a.1: hazardCategory</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II, III and IV of the Implementing Rule. To pass this test verify that any instance of an attribute:
+
+<ul>
+<li>takes only values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'none'.</li>
+<li>takes only a value explicitly specified in the INSPIRE code list register or shall take a value that is narrower (i.e. more specific) than those explicitly specified in the application schema when the code list‘s extensibility is 'narrower'.</li>
+<li>takes values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'open' or if a value is not one of the values listed in the code list register check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule and that all extensions conform to the requirements (This last check is a manual test).</li>
+</ul>.
+<br/><br/>The following check is performed for every feature in the dataset, for the 'narrower' codelist:
+<ul><li>Check that all the <a href='https://github.com/inspire-eu-validation/data-nz/blob/3.0/nz-as/code-list-values.md#hazardCategory'>hazardCategory</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/codelist/NaturalHazardCategoryValue'>pre-defined value</a>. If the check fails a manual check will be required asking to review the code list definition in order to verify that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule. In particular, for the 'narrower' codelist the extended values shall refer to a parent value defined by the Implementing Rule. If the check fails report reviewCodeListValue.</li></ul><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/code-list-value" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
+									<parent ref="EIDb2d8500e-a670-4170-9c79-6cc0593b4030"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $codelist := 'http://inspire.ec.europa.eu/codelist/NaturalHazardCategoryValue'
+let $codelisturl := 'http://inspire.ec.europa.eu/codelist/NaturalHazardCategoryValue/NaturalHazardCategoryValue.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
+let $property_string := 'NaturalHazardCategoryValue'
+let $features_selected := $features[self::nz-core:ObservedEvent|self::nz-core:HazardArea|self::nz-core:RiskZone|self::nz-core:ExposedElement]
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'nz-core:ExposedElement') then
+					$this_feature/nz-core:assessmentOfVulnerability
+				else if(name($this_feature) = 'nz-core:RiskZone') then
+					$this_feature/nz-core:sourceOfRisk
+				else if(name($this_feature) = 'nz-core:ObservedEvent' or name($this_feature) = 'nz-core:HazardArea') then
+					$this_feature/nz-core:typeOfHazard
+				else ()
+			
+	for $actual_feature in $this_features
+		let $feature := 
+				if (name($actual_feature) = 'nz-core:assessmentOfVulnerability') then
+					$actual_feature/nz-core:VulnerabilityAssessment/nz-core:sourceOfVulnerability
+				else $actual_feature
+
+		let $envDom := $feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory
+	
+		return
+			if((name($actual_feature) = 'nz-core:ExposedElement' and exists($envDom/..) and not(exists($envDom))) or (not(name($actual_feature) = 'nz-core:ExposedElement') and not(exists($envDom)))) then
+				local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'element': 'hazardCategory'}) 
+			else if((name($actual_feature) = 'nz-core:ExposedElement' and exists($envDom/..) and not(exists($envDom/@xlink:href))) or (not(name($actual_feature) = 'nz-core:ExposedElement') and not(exists($envDom/@xlink:href)))) then
+				local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($envDom) > 1) then 
+				local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'element': 'nz-core:hazardCategory', 'multiplicity': 1, 'count': count($envDom)}) 
+			else if(not(exists($envDom/@xlink:href = $valid_href))) then
+				local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': 'occurenceCategory', 'value': string($envDom/@xlink:href), 'count': count($feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory/@xlink:href = $envDom/@xlink:href)}) 
+			else ()
+return
+(if ($messages and not($messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.manual.reviewCodeListValue')) then 'PASSED_MANUAL' 
+else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID1be28c80-d444-4220-b510-ab666e91723a">
+									<label>nz-as.a.2: exposedElementCategory</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II, III and IV of the Implementing Rule. To pass this test verify that any instance of an attribute:
+
+<ul>
+<li>takes only values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'none'.</li>
+<li>takes only a value explicitly specified in the INSPIRE code list register or shall take a value that is narrower (i.e. more specific) than those explicitly specified in the application schema when the code list‘s extensibility is 'narrower'.</li>
+<li>takes values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'open' or if a value is not one of the values listed in the code list register check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule and that all extensions conform to the requirements (This last check is a manual test).</li>
+</ul>.
+<br/><br/>The following check is performed for every feature in the dataset, for the 'open' codelist:
+<ul><li>Check that all the <a href='https://github.com/inspire-eu-validation/data-nz/blob/3.0/nz-as/code-list-values.md#exposedElementCategory'>exposedElementCategory</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/codelist/ExposedElementCategoryValue'>pre-defined value</a>. If the check fails a manual check will be required asking to review the code list definition in order to verify that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule. If the check fails report reviewCodeListValue.</li></ul><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/code-list-value" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
+									<parent ref="EIDb2d8500e-a670-4170-9c79-6cc0593b4030"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codelist := 'http://inspire.ec.europa.eu/codelist/ExposedElementCategoryValue'
+let $codelisturl := 'http://inspire.ec.europa.eu/codelist/ExposedElementCategoryValue/ExposedElementCategoryValue.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
+let $property_string := 'ExposedElementCategoryValue'
+let $features_selected := $features[self::nz-core:ObservedEvent|self::nz-core:HazardArea|self::nz-core:RiskZone|self::nz-core:ExposedElement]
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'nz-core:ExposedElement') then
+					$this_feature/nz-core:assessmentOfVulnerability
+				else if(name($this_feature) = 'nz-core:ExposedElementCoverage') then
+					$this_feature/nz-core:typeOfHazard
+				else ()
+			
+	for $actual_feature in $this_features
+		let $feature := 
+				if (name($actual_feature) = 'nz-core:assessmentOfVulnerability') then
+					$actual_feature/nz-core:VulnerabilityAssessment/nz-core:sourceOfVulnerability
+				else $actual_feature
+
+		let $envDom := $feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory
+	
+		return
+			if(exists($envDom/..) and not(exists($envDom))) then
+				local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'element': 'hazardCategory'}) 
+			else if(exists($envDom/..) and not(exists($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($envDom) > 1) then 
+				local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'element': 'nz-core:hazardCategory', 'multiplicity': 1, 'count': count($envDom)}) 
+			else if(not(exists($envDom/@xlink:href = $valid_href))) then
+				local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': 'occurenceCategory', 'value': string($envDom/@xlink:href), 'count': count($feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory/@xlink:href = $envDom/@xlink:href)}) 
+			else ()
+return
+(if ($messages and not($messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.manual.reviewCodeListValue')) then 'PASSED_MANUAL' 
+else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+
+
 				<TestCase id="EID633b69a5-17f4-423c-ab6a-4725ba278ad7">
 					<label>Constraints</label>
 					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
@@ -62,7 +208,7 @@ Pre-requisite conformance classes:
 
 
 								<TestAssertion id="EID5ebcc7d0-d296-45a6-a479-dad4d75fe01e">
-									<label>nz-as.a.1: sourceOfSpatialRepresentation</label>
+									<label>nz-as.b.1: sourceOfSpatialRepresentation</label>
 									<description><![CDATA[Check that if the sourceOfSpatialRepresentation association role is empty, the geometry of the ExposedElement spatial object shall be provided. If the exposed element spatial object is provided with a spatial representation, then the object does not have to be linked to any other spatial object defined in another INSPIRE theme. If the exposed element spatial object is NOT provided with a spatial representation, then it shall reference another object defined in another INSPIRE theme by using the association sourceOfSpatialRepresentation.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
 									<parent ref="EID14411563-bf1b-4d3a-8a9d-1f60901ea1bc"/>
@@ -138,7 +284,7 @@ $messages)
 								</TestAssertion>
 
 								<TestAssertion id="EID7d010fd2-29e5-4756-a0da-01a9cdfb87f5">
-									<label>nz-as.a.2: LevelOrIntensity</label>
+									<label>nz-as.b.2: LevelOrIntensity</label>
 									<description><![CDATA[Check that for the data type LevelOrIntensity either the qualitative value or the quantitative value is provided.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
 									<parent ref="EID14411563-bf1b-4d3a-8a9d-1f60901ea1bc"/>
@@ -174,7 +320,7 @@ $messages)
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDc8408080-a82f-4683-a86b-381a181705c6">
-									<label>nz-as.a.3: LikelihoodOfOccurrence</label>
+									<label>nz-as.b.3: LikelihoodOfOccurrence</label>
 									<description><![CDATA[Check that for the data type LikelihoodOfOccurrence either the qualitative likelihood or the quantitative likelihood is provided.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
 									<parent ref="EID14411563-bf1b-4d3a-8a9d-1f60901ea1bc"/>
@@ -226,7 +372,7 @@ $messages)
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID1be760b5-0976-4999-bc89-865ea86ce933">
-									<label>nz-as.b.1: domainSet</label>
+									<label>nz-as.c.1: domainSet</label>
 									<description><![CDATA[Check that the domainSet shall be a rectified grid or referenceable grid and that The check is performed on all the different feature types that can be present in the dataset:<ul>
 <li>ExposedElementCoverage</li>
 <li>HazardCoverage</li>
@@ -276,7 +422,7 @@ $messages)
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID43cf5f07-d750-4220-93d3-7d3866f4c496">
-									<label>nz-as.c.1: rangeSet</label>
+									<label>nz-as.d.1: rangeSet</label>
 									<description><![CDATA[The following checks shall be performed for every feature in the dataset.<ul>
 <li>ExposedElementCoverage: The rangeSet shall be the level, or intensity, of the vulnerability assessment.</li>
 <li>HazardCoverage: The rangeSet shall be described by magnitude or intensity, or by the likelihood of occurence.</li>
@@ -310,7 +456,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/rangeSe
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID19c62442-80d7-4dd3-9b6d-fe59e92a8f1e">
-									<label>nz-as.d.1: RiskZone.source</label>
+									<label>nz-as.e.1: RiskZone.source</label>
 									<description><![CDATA[Check that if a RiskZone is associated with a HazardArea, the RiskZone and the HazardArea shall overlap.
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/riskZone-geometry" target="_blank">Abstract Test Case 'Risk zone theme-specific requirements'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
 									<parent ref="EID59d0a1f0-b186-427c-b042-f72eaf1518bb"/>
@@ -343,7 +489,7 @@ $messages)
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDbef48ff1-837f-4b83-b2fe-873a2493588f">
-									<label>nz-as.d.2: RiskZone.exposedElement</label>
+									<label>nz-as.e.2: RiskZone.exposedElement</label>
 									<description><![CDATA[Check that if a RiskZone is associated with an ExposedElement, the ExposedElement shall overlap with the RiskZone.
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/riskZone-geometry" target="_blank">Abstract Test Case 'Risk zone theme-specific requirements'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
 									<parent ref="EID59d0a1f0-b186-427c-b042-f72eaf1518bb"/>
