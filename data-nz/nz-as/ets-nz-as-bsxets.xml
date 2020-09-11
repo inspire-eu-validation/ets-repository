@@ -71,7 +71,7 @@ Pre-requisite conformance classes:
 </ul>.
 <br/><br/>The following check is performed for every feature in the dataset, for the 'narrower' codelist:
 <ul><li>Check that all the <a href='https://github.com/inspire-eu-validation/data-nz/blob/3.0/nz-as/code-list-values.md#hazardCategory'>hazardCategory</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/codelist/NaturalHazardCategoryValue'>pre-defined value</a>. If the check fails a manual check will be required asking to review the code list definition in order to verify that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule. In particular, for the 'narrower' codelist the extended values shall refer to a parent value defined by the Implementing Rule. If the check fails report reviewCodeListValue.</li></ul><br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/code-list-value" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
 									<parent ref="EIDb2d8500e-a670-4170-9c79-6cc0593b4030"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -103,7 +103,7 @@ let $messages :=
 	
 		return
 			if((name($actual_feature) = 'nz-core:ExposedElement' and exists($envDom/..) and not(exists($envDom))) or (not(name($actual_feature) = 'nz-core:ExposedElement') and not(exists($envDom)))) then
-				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'element': 'hazardCategory'}) 
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': 'nz-core:hazardCategory'}) 
 			else if((name($actual_feature) = 'nz-core:ExposedElement' and exists($envDom/..) and not(exists($envDom/@xlink:href))) or (not(name($actual_feature) = 'nz-core:ExposedElement') and not(exists($envDom/@xlink:href)))) then
 				local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if (count($envDom) > 1) then 
@@ -137,7 +137,7 @@ $messages)
 </ul>.
 <br/><br/>The following check is performed for every feature in the dataset, for the 'open' codelist:
 <ul><li>Check that all the <a href='https://github.com/inspire-eu-validation/data-nz/blob/3.0/nz-as/code-list-values.md#exposedElementCategory'>exposedElementCategory</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/codelist/ExposedElementCategoryValue'>pre-defined value</a>. If the check fails a manual check will be required asking to review the code list definition in order to verify that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule. If the check fails report reviewCodeListValue.</li></ul><br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/code-list-value" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2, (A.5.3.6.1)</a>]]></description>
 									<parent ref="EIDb2d8500e-a670-4170-9c79-6cc0593b4030"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -159,14 +159,14 @@ let $messages :=
 	for $actual_feature in $this_features
 		let $feature := 
 				if (name($actual_feature) = 'nz-core:assessmentOfVulnerability') then
-					$actual_feature/nz-core:VulnerabilityAssessment/nz-core:sourceOfVulnerability
+					$actual_feature/nz-core:VulnerabilityAssessment/nz-core:typeOfElement
 				else $actual_feature
 
-		let $envDom := $feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory
+		let $envDom := $feature/nz-core:ExposedElementClassification/nz-core:exposedElementCategory
 	
 		return
 			if(exists($envDom/..) and not(exists($envDom))) then
-				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'element': 'hazardCategory'}) 
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': 'nz-core:exposedElementCategory'}) 
 			else if(exists($envDom/..) and not(exists($envDom/@xlink:href))) then
 				local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if (count($envDom) > 1) then 
@@ -401,7 +401,6 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
 										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
