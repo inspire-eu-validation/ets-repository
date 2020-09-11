@@ -23,7 +23,6 @@ declare namespace tn-w3='urn:x-inspire:specification:gmlas:WaterTransportNetwork
 declare namespace bu-core3d3='http://inspire.jrc.ec.europa.eu/draft-schemas/bu-core3d/3.0';
 declare namespace net3='urn:x-inspire:specification:gmlas:Network:3.2'; 
 declare namespace base32='urn:x-inspire:specification:gmlas:BaseTypes:3.2'; 
-declare namespace sd='http://inspire.ec.europa.eu/schemas/sd/4.0';
 declare namespace hy='http://inspire.ec.europa.eu/schemas/hy/4.0'; 
 declare namespace hy-n='http://inspire.ec.europa.eu/schemas/hy-n/4.0'; 
 declare namespace hy-p='http://inspire.ec.europa.eu/schemas/hy-p/4.0'; 
