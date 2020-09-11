@@ -100,16 +100,16 @@ let $messages :=
 				else $actual_feature
 
 		let $envDom := $feature/nz-core:NaturalHazardClassification
-	
+
 		return
-			if((name($actual_feature) = 'nz-core:ExposedElement' and exists($envDom) and not(exists($envDom/nz-core:hazardCategory))) or (not(name($actual_feature) = 'nz-core:ExposedElement') and not(exists($envDom/nz-core:hazardCategory)))) then
-				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': 'nz-core:hazardCategory'}) 
-			else if((name($actual_feature) = 'nz-core:ExposedElement' and exists($envDom) and not(exists($envDom/nz-core:hazardCategory/@xlink:href))) or (not(name($actual_feature) = 'nz-core:ExposedElement') and not(exists($envDom/nz-core:hazardCategory/@xlink:href)))) then
-				local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			if((name($actual_feature/..) = 'nz-core:ExposedElement' and exists($envDom) and not(exists($envDom/nz-core:hazardCategory))) or (not(name($actual_feature/..) = 'nz-core:ExposedElement') and not(exists($envDom/nz-core:hazardCategory)))) then
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature/..), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': 'nz-core:hazardCategory'}) 
+			else if((name($actual_feature/..) = 'nz-core:ExposedElement' and exists($envDom) and not(exists($envDom/nz-core:hazardCategory/@xlink:href))) or (not(name($actual_feature/..) = 'nz-core:ExposedElement') and not(exists($envDom/nz-core:hazardCategory/@xlink:href)))) then
+				local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature/..), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if (count($envDom/nz-core:hazardCategory) > 1) then 
-				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'id': string($actual_feature/../@*:id), 'element': 'nz-core:hazardCategory'}) 
-			else if((name($actual_feature) = 'nz-core:ExposedElement' and exists($envDom) and not($envDom/nz-core:hazardCategory/@xlink:href = $valid_href)) or (not(name($actual_feature) = 'nz-core:ExposedElement') and not($envDom/nz-core:hazardCategory/@xlink:href = $valid_href))) then
-				local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'value': string($envDom/nz-core:hazardCategory/@xlink:href), 'count': count($feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory/@xlink:href = $envDom/@xlink:href)}) 
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation',  map {'filename': local:filename($actual_feature/..), 'featureType':local-name($actual_feature/..), 'id': string($actual_feature/../@*:id), 'element': 'nz-core:hazardCategory'}) 
+			else if((name($actual_feature/..) = 'nz-core:ExposedElement' and exists($envDom) and not($envDom/nz-core:hazardCategory/@xlink:href = $valid_href)) or (not(name($actual_feature/..) = 'nz-core:ExposedElement') and not($envDom/nz-core:hazardCategory/@xlink:href = $valid_href))) then
+				local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($actual_feature/..), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'value': string($envDom/nz-core:hazardCategory/@xlink:href), 'count': count($feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory/@xlink:href = $envDom/@xlink:href)}) 
 			else ()
 return
 (if ($messages and not($messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
@@ -164,9 +164,7 @@ let $messages :=
 				else $actual_feature
 
 		let $envDom := $feature/nz-core:ExposedElementClassification
-		let $dummy3 := local:log("Parent: " || local-name($actual_feature/..) || " " || string($actual_feature/../@*:id))
-		let $dummy := local:log("EnvDomParent: " || exists($envDom/..) || " " || name($envDom/..))
-		let $dummy2 := local:log("EnvDom: " || exists($envDom) || " " || name($envDom))
+
 		return
 			if(exists($envDom) and not(exists($envDom/nz-core:exposedElementCategory))) then
 				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': 'nz-core:exposedElementCategory'}) 
@@ -179,7 +177,8 @@ let $messages :=
 			else ()
 return
 (if ($messages and not($messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
-else if($messages/@ref = ('TR.manual.reviewCodeListValue')) then 'PASSED_MANUAL' 
+else if($messages/@ref = ('TR.manual.reviewCodeListValue') and not($messages/@ref != ('TR.manual.reviewCodeListValue'))) then 'PASSED_MANUAL' 
+else if($messages and $messages/@ref != ('TR.manual.reviewCodeListValue')) then 'FAILED' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
