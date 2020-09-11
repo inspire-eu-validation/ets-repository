@@ -1,4 +1,3 @@
-declare namespace nz-core	='http://inspire.ec.europa.eu/schemas/nz-core/4.0'; 
 declare namespace elu='http://inspire.ec.europa.eu/schemas/elu/4.0';
 declare namespace gelu='http://inspire.ec.europa.eu/schemas/gelu/4.0';
 declare namespace plu='http://inspire.ec.europa.eu/schemas/plu/4.0';
