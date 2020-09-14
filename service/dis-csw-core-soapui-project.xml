@@ -193,6 +193,27 @@ else{
 		}
 
 		try {
+			if (extendedCapabilities.TemporalReference.size() != 0) {
+				if (extendedCapabilities.TemporalReference.DateOfPublication.size() == 0  &amp;&amp; extendedCapabilities.TemporalReference.DateOfLastRevision.size() == 0  &amp;&amp; extendedCapabilities.TemporalReference.DateOfCreation.size() == 0) {
+					String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference/DateOfPublication, ExtendedCapabilities/TemporalReference/DateOfLastRevision or ExtendedCapabilities/TemporalReference/DateOfCreation'];
+					throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+				} else if (extendedCapabilities.TemporalReference.DateOfPublication.size() != 0 &amp;&amp; (extendedCapabilities.TemporalReference.DateOfPublication.text() =~ regex) == false) {
+					String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference/DateOfPublication'];
+					throw new TranslatableAssertionError('TR.dataNotValid', assertParams);
+				} else if (extendedCapabilities.TemporalReference.DateOfLastRevision.size() != 0 &amp;&amp; (extendedCapabilities.TemporalReference.DateOfLastRevision.text() =~ regex) == false) {
+					String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference/DateOfLastRevision'];
+					throw new TranslatableAssertionError('TR.dataNotValid', assertParams);
+				} else if (extendedCapabilities.TemporalReference.DateOfCreation.size() != 0 &amp;&amp; (extendedCapabilities.TemporalReference.DateOfCreation.text() =~ regex) == false) {
+					String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference/DateOfCreation'];
+					throw new TranslatableAssertionError('TR.dataNotValid', assertParams);
+				}
+			}
+		} catch (NullPointerException e) {
+
+		}
+
+
+		try {
 			if (extendedCapabilities.Conformity.Specification.size() == 0) {
 				String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Specification'];
 				throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
@@ -284,6 +305,7 @@ def scenario = testRunner.testCase.testSuite.project.getPropertyValue( "extended
 
 if(scenario == 2){
 	// ServiceIdentification mandatory elements
+	def OperationsMetadata = capabilities.OperationsMetadata;
 	def serviceIdentification = capabilities.ServiceIdentification;
 	if(serviceIdentification.size() != 1){
 		String[] assertParams = ['element', '/Capabilities/ServiceIdentification'];
@@ -310,6 +332,30 @@ if(scenario == 2){
 	}else if(serviceIdentification.Abstract.text().toUpperCase() == 'NONE'){
 		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/Abstract'];
 		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
+	}
+
+
+	if(OperationsMetadata.Operation.DCP.HTTP.size() != 0){
+		def regEx1 = /(http|ftp|https):\/\/([\w+?\.\w+])+([a-zA-Z0-9\~\!\@\#\$\%\^\&amp;\*\(\)_\-\=\+\\\/\?\.\:\;\'\,]*)?/
+		def GetURLReplaced = OperationsMetadata.Operation.DCP.HTTP.Get.'@xlink:href'.toString().replaceAll(regEx1, '');
+		if(OperationsMetadata.Operation.DCP.HTTP.Get.'@xlink:href'.size() == 0){
+			String[] assertParams = ['element', '/OperationsMetadata/Operation/DCP/HTTP/Get/@xlink:href'];
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+		}else if(GetURLReplaced.size() != 0){
+			String[] assertParams = ['element', '/OperationsMetadata/Operation/DCP/HTTP/Get/@xlink:href'];
+			throw new TranslatableAssertionError('TR.OperationsMetadataURLNotWellFormed', assertParams);
+		}
+
+		def PostURLReplaced = OperationsMetadata.Operation.DCP.HTTP.Post.'@xlink:href'.toString().replaceAll(regEx1, '');
+		if(OperationsMetadata.Operation.DCP.HTTP.Post.'@xlink:href'.size() == 0){
+			String[] assertParams = ['element', '/OperationsMetadata/Operation/DCP/HTTP/Post/@xlink:href'];
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+		}else if(PostURLReplaced.size() != 0){
+			String[] assertParams = ['element', '/OperationsMetadata/Operation/DCP/HTTP/Post/@xlink:href'];
+			throw new TranslatableAssertionError('TR.OperationsMetadataURLNotWellFormed', assertParams);
+		}
+
+
 	}
 
 	if(serviceIdentification.Fees.size() == 0){
@@ -344,11 +390,11 @@ if(scenario == 2){
 	if(serviceProvider.ProviderName.size() != 1){
 		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ProviderName'];
 		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-	}else if(serviceIdentification.ProviderName.text().length() == 0){
-		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/ProviderName'];
+	}else if(serviceProvider.ProviderName.text().length() == 0){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ProviderName'];
 		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}else if(serviceIdentification.ProviderName.text().toUpperCase() == 'NONE'){
-		String[] assertParams = ['element', '/Capabilities/ServiceIdentification/ProviderName'];
+	}else if(serviceProvider.ProviderName.text().toUpperCase() == 'NONE'){
+		String[] assertParams = ['element', '/Capabilities/ServiceProvider/ProviderName'];
 		throw new TranslatableAssertionError('TR.noneTextNotValid', assertParams);
 	}
 
