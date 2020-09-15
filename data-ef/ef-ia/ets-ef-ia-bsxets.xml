@@ -209,18 +209,19 @@ let $messages :=
 					else ()
 
 		return
-			if (name($feature) = 'ef:ObservingCapability' and not(exists($envDom))) then
-				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
-			else if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and not(exists($envDom))) then
+			
+			if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and not(exists($envDom))) then
 				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
-			else if (name($feature) = 'ef:ObservingCapability' and count($envDom) > 1) then
-				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (name($feature) = 'ef:ObservingCapability' and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
 			else if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
-			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_urls) > 0) then
-				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (name($feature) = 'ef:ObservingCapability' and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_urls) > 0) then
 				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
 			else ()
 
 return
