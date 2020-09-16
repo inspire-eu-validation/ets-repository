@@ -120,6 +120,8 @@ let $messages :=
 		else if (count($feature/ef:geometry) = 0 and exists($feature/ef:representativePoint) and count($representative_invalid_urls) > 0) then
 			local:addMessage('TR.brokenLinkEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'Representative Point', 'value': string-join($representative_invalid_urls, ',')}) 
 
+		else if(not(has-children($feature/ef:geometry)) and not(exists($feature/ef:geometry/@xlink:href)) and not(has-children($feature/ef:representativePoint)) and not(exists($feature/ef:representativePoint/@xlink:href))) then
+			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry and the representativePoint elements of the EnvironmentalMonitoringFacility feature type are not both empty', 'additionalInfo':''})
 
 		else if(not(has-children($feature/ef:geometry)) and not(exists($feature/ef:geometry/@xlink:href)) and not(exists($feature/ef:representativePoint))) then
 			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry and the representativePoint elements of the EnvironmentalMonitoringFacility feature type are not both empty', 'additionalInfo':''})
