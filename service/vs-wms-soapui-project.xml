@@ -929,119 +929,27 @@ def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Opera
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
 
-def layersWithDefaultStyles = ['AD.Address': ['AD.Address.Default'], 
-'AU.AdministrativeUnit': ['AU.AdministrativeUnit.Default'], 
-'AU.AdministrativeBoundary': ['AU.AdministrativeBoundary.Default'], 
-'AU.Condominium': ['AU.Condominium.Default'], 
-'AU.Baseline': ['AU.Baseline.Default'], 
-'AU.MaritimeBoundary': ['AU.MaritimeBoundary.Default'], 
-'AU.ContiguousZone': ['AU.ContiguousZone.Default'], 
-'AU.ContinentalShelf': ['AU.ContinentalShelf.Default'], 
-'AU.ExclusiveEconomicZone': ['AU.ExclusiveEconomicZone.Default'], 
-'AU.InternalWaters': ['AU.InternalWaters.Default'], 
-'AU.TerritorialSea': ['AU.TerritorialSea.Default'], 
-'CP.CadastralParcel': ['CP.CadastralParcel.Default'], 
-'CP.CadastralZoning': ['CP.CadastralZoning.Default'], 
-'CP.CadastralBoundary': ['CP.CadastralBoundary.Default'], 
-'GN.GeographicalNames': ['GN.GeographicalNames.Default'], 
-'HY.PhysicalWaters.Waterbodies': ['HY.PhysicalWaters.Waterbodies.Default'], 
-'HY.PhysicalWaters.LandWaterBoundary': ['HY.PhysicalWaters.LandWaterBoundary.Default'], 
-'HY.PhysicalWaters.Catchments': ['HY.PhysicalWaters.Catchments.Default'], 
-'HY.Network': ['HY.Network.Default'], 
-'HY.PhysicalWaters.HydroPointOfInterest': ['HY.PhysicalWaters.HydroPointOfInterest.Default'], 
-'HY.PhysicalWaters.ManMadeObject': ['HY.PhysicalWaters.ManMadeObject.Default'], 
-'HY.PhysicalWaters.Wetland': ['HY.PhysicalWaters.Wetland.Default'], 
-'HY.PhysicalWaters.Shore': ['HY.PhysicalWaters.Shore.Default'], 
-'PS.ProtectedSite': ['PS.ProtectedSite.Default'], 
-'TN.CommonTransportElements.TransportNode': ['TN.CommonTransportElements.TransportNode.Default'], 
-'TN.CommonTransportElements.TransportLink': ['TN.CommonTransportElements.TransportLink.Default'], 
-'TN.CommonTransportElements.TransportArea': ['TN.CommonTransportElements.TransportArea.Default'], 
-'TN.RoadTransportNetwork.RoadLink': ['TN.RoadTransportNetwork.RoadLink.Default'], 
-'TN.RoadTransportNetwork.RoadServiceArea': ['TN.RoadTransportNetwork.RoadServiceArea.Default'], 
-'TN.RoadTransportNetwork.RoadArea': ['TN.RoadTransportNetwork.RoadArea.Default'], 
-'TN.RoadTransportNetwork.VehicleTrafficArea': ['TN.RoadTransportNetwork.VehicleTrafficArea.Default'], 
-'TN.RailTransportNetwork.RailwayLink': ['TN.RailTransportNetwork.RailwayLink.Default'], 
-'TN.RailTransportNetwork.RailwayStationArea': ['TN.RailTransportNetwork.RailwayStationArea.Default'], 
-'TN.RailTransportNetwork.RailwayYardArea': ['TN.RailTransportNetwork.RailwayYardArea.Default'], 
-'TN.RailTransportNetwork.RailwayArea': ['TN.RailTransportNetwork.RailwayArea.Default'], 
-'TN.WaterTransportNetwork.WaterwayLink': ['TN.WaterTransportNetwork.WaterwayLink.Default'], 
-'TN.WaterTransportNetwork.FairwayArea': ['TN.WaterTransportNetwork.FairwayArea.Default'], 
-'TN.WaterTransportNetwork.PortArea': ['TN.WaterTransportNetwork.PortArea.Default'], 
-'TN.AirTransportNetwork.AirLink': ['TN.AirTransportNetwork.AirLink.Default'], 
-'TN.AirTransportNetwork.AerodromeArea': ['TN.AirTransportNetwork.AerodromeArea.Default'], 
-'TN.AirTransportNetwork.RunwayArea': ['TN.AirTransportNetwork.RunwayArea.Default'], 
-'TN.AirTransportNetwork.AirSpaceArea': ['TN.AirTransportNetwork.AirSpaceArea.Default'], 
-'TN.AirTransportNetwork.ApronArea': ['TN.AirTransportNetwork.ApronArea.Default'], 
-'TN.AirTransportNetwork.TaxiwayArea': ['TN.AirTransportNetwork.TaxiwayArea.Default'], 
-'TN.CableTransportNetwork.CablewayLink': ['TN.CableTransportNetwork.CablewayLink.Default'], 
-'EL.BreakLine': ['EL.BreakLine.Default'], 
-'EL.ContourLine': ['EL.ContourLine.Default'], 
-'EL.IsolatedArea': ['EL.IsolatedArea.Default'], 
-'EL.SpotElevation': ['EL.SpotElevation.Default'], 
-'EL.VoidArea': ['EL.VoidArea.Default'], 
-'EL.GridCoverage': ['EL.GridCoverage.Default'], 
-'EL.TIN': ['EL.TIN.Default'], 
-'LC.LandCoverPoints': ['LC.LandCoverPoints.Default'], 
-'LC.LandCoverSurfaces': ['LC.LandCoverSurfaces.Default'], 
-'LC.LandCoverRaster': ['LC.LandCoverRaster.Default'], 
-'OI. OrthoimageCoverage': ['OI. OrthoimageCoverage.Default'], 
-'OI.MosaicElement': ['OI.MosaicElement.Default'], 
-'AF.AgriculturalHolding': ['AF.AgriculturalHolding'], 
-'AF.AquacultureHolding': ['AF.AquacultureHolding'], 
-'AF.Site': ['AF.Site'], 
-'AF.AbstractInstallation': ['AF.AbstractInstallation'], 
-'AF.Plot': ['AF.Plot'], 
-'AF.AgriBuilding': ['AF.AgriBuilding'], 
-'AM.AirQualityManagementZone': ['AM.AirQualityManagementZone.Default'], 
-'AM.AnimalHealthRestrictionZone': ['AM.AnimalHealthRestrictionZone.Default'], 
-'AM.AreaForDisposalOfWaste': ['AM.AreaForDisposalOfWaste.Default'], 
-'AM.BathingWaters': ['AM.BathingWaters.Default'], 
-'AM.CoastalZoneManagementArea': ['AM.CoastalZoneManagementArea.Default'], 
-'AM.DesignatedWaters': ['AM.DesignatedWaters.Default'], 
-'AM.DrinkingWaterProtectionArea': ['AM.DrinkingWaterProtectionArea.Default'], 
-'AM.FloodUnitOfManagement': ['AM.FloodUnitOfManagement.Default'], 
-'AM.ForestManagementArea': ['AM.ForestManagementArea.Default'], 
-'AM.MarineRegion': ['AM.MarineRegion.Default'], 
-'AM.NitrateVulnerableZone': ['AM.NitrateVulnerableZone.Default'], 
-'AM.NoiseRestrictionZone': ['AM.NoiseRestrictionZone.Default'], 
-'AM.PlantHealthProtectionZone': ['AM.PlantHealthProtectionZone.Default'], 
-'AM.ProspectingAndMiningPermitArea': ['AM.ProspectingAndMiningPermitArea.Default'], 
-'AM.RegulatedFairwayAtSeaOrLargeInlandWater': ['AM.RegulatedFairwayAtSeaOrLargeInlandWater.Default'], 
-'AM.RestrictedZonesAroundContaminatedSites': ['AM.RestrictedZonesAroundContaminatedSites.Default'], 
-'AM.RiverBasinDistrict': ['AM.RiverBasinDistrict.Default'], 
-'AM.SensitiveArea': ['AM.SensitiveArea.Default'], 
-'AM.WaterBodyForWFD': ['AM.WaterBodyForWFD'], 
-'BR.Bio-geographicalRegions': ['BR.Bio-geographicalRegions.Default'], 
-'BU.Building': ['BU.Building.default'], 
-'ER.FossilFuelResource': ['ER.FossilFuelResource.Default'], 
-'ER.RenewableAndWasteResource': ['ER.RenewableAndWasteResource.Default'], 
-'EF.EnvironmentalMonitoringFacilities': ['EF.EnvironmentalMonitoringFacilities.Default'], 
-'EF.EnvironmentalMonitoringNetwork': ['EF.EnvironmentalMonitoringNetwork.Default'], 
-'EF.EnvironmentalMonitoringProgramme': ['EF.EnvironmentalMonitoringProgramme.Default'], 
-'HB.Habitat': ['HB.Habitat.Default'], 
-'HB.HabitatDistribution': ['HB.HabitatDistribution.Default'], 
-'HH.HealthStatisticalData': ['HH.HealthStatisticalData.Default'], 
-'HH.Event': ['HH.Event.Default'], 
-'LandUse.ExistingLandUse': ['LandUse.ExistingLandUse.Default'], 
-'LandUse.SpatialPlan': ['LandUse.SpatialPlan.Default'], 
-'LandUse.ZoningElement': ['LandUse.ZoningElement.Default'], 
-'LandUse.SupplementaryRegulation': ['LandUse.SupplementaryRegulation.Default'], 
-'PF.ProductionSite': ['PF.ProductionSite'], 
-'PF.ProductionFacility': ['PF.ProductionFacility'], 
-'PF.ProductionInstallation': ['PF.ProductionInstallation'], 
-'PF.ProductionInstallationPart': ['PF.ProductionInstallationPart'], 
-'PF.ProductionPlot': ['PF.ProductionPlot'], 
-'PF.ProductionBuilding': ['PF.ProductionBuilding'], 
-'SO.SoilBody': ['SO.SoilBody.Default'], 
-'SO.SoilObservedProfile': ['SO.SoilObservedProfile.Default'], 
-'SO.SoilSite': ['SO.SoilSite.Default'], 
-'SD.SpeciesDistribution': ['SD.SpeciesDistribution.Default'], 
-'SU.VectorStatisticalUnits': ['SU.VectorStatisticalUnits'], 
-'SU.StatisticalGridCell': ['SU.StatisticalGridCell'], 
-'US.EnvironmentalManagementInstallation': ['US.EnvironmentalManagementInstallation.Default']];
+
+def register = new XmlSlurper().parse("https://inspire.ec.europa.eu/layer/layer.en.xml");
+
+def layersWithDefaultStyles = [:];
+
+def layersWithoutDefault = ['AF.AgriculturalHolding','AF.AquacultureHolding','AF.Site','AF.AbstractInstallation','AF.Plot','AF.AgriBuilding','AM.WaterBodyForWFD','PF.ProductionSite','PF.ProductionFacility','PF.ProductionInstallation','PF.ProductionInstallationPart','PF.ProductionPlot','PF.ProductionBuilding','SU.VectorStatisticalUnits','SU.StatisticalGridCell']
+
+
+register.containeditems.layer.each{layer ->
+
+	if (layer.layerName.label.toString() in layersWithoutDefault)
+		layersWithDefaultStyles[layer.layerName.label.toString()] = layer.layerName.label.toString();
+	else 
+		layersWithDefaultStyles[layer.layerName.label.toString()] = layer.layerName.label.toString() + '.Default';
+}
 
 def layers = capabilities.Capability.depthFirst().findAll{it.name()=='Layer' &amp;&amp; it.Name.size() == 1};
 layers.each{layer ->
+	log.info('Incoming layer name: ' + layer.Name.toString());
+	log.info('Contains layer: ' + layersWithDefaultStyles.containsKey(layer.Name.toString()));
+	
 	if(layersWithDefaultStyles.containsKey(layer.Name.toString())){
 		def inheritedPropertyStyle = [];
 		def layerParent = layer.parent();
@@ -1053,12 +961,15 @@ layers.each{layer ->
 		}
 		def providedDefaultStyle = false;
 		layer.Style.each{style ->
+			log.info('Style name: ' + style.Name.toString());
 			if(style.Name.toString() in layersWithDefaultStyles[layer.Name.toString()]){
+				log.info('Is true 1 ');
 				providedDefaultStyle = true;
 			}
 		}
 		for(i = 0; i &lt; inheritedPropertyStyle.size(); i++){
 			if(inheritedPropertyStyle[i] in layersWithDefaultStyles[layer.Name.toString()]){
+				log.info('Is true 2 ');
 				providedDefaultStyle = true;
 			}
 		}
