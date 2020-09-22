@@ -1,3 +1,5 @@
+declare namespace bu-base='http://inspire.ec.europa.eu/schemas/bu-base/4.0';
+declare namespace bu-core2d='http://inspire.ec.europa.eu/schemas/bu-core2d/4.0';
 declare namespace au3='urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0';
 declare namespace ad3='urn:x-inspire:specification:gmlas:Addresses:3.0';
 declare namespace cp3='urn:x-inspire:specification:gmlas:CadastralParcels:3.0'; 
