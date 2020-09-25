@@ -85,8 +85,8 @@ let $messages :=
 		else ()
 return
 
-(if ($messages and not($messages/@ref = ('TR.manual.reviewConstraintObservation'))) then 'FAILED' 
-else if($messages and $messages/@ref = ('TR.manual.reviewConstraintObservation')) then 'PASSED_MANUAL' 
+(if ($messages and $messages/@ref = ('TR.constraintViolation')) then 'FAILED' 
+else if ($messages and $messages/@ref = ('TR.manual.reviewConstraintObservation')) then 'PASSED_MANUAL' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
@@ -94,6 +94,7 @@ $messages)
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.manual.reviewConstraintObservation"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDe0afc1eb-3da8-4068-ad72-9ecea4d3421a">
