@@ -158,8 +158,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/bu-ia/code-li
 let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:BuildingPart | self::bu-core3d:Building | self::bu-core3d:BuildingPart ]
 let $property_string := 'CurrentUseValue'
 let $messages := 
-	for $feature in $features_selected
-		let $envDom := $feature/bu-base:currentUse/bu-base:CurrentUse/bu-base:currentUse
+	for $feature in $features_selected/bu-base:currentUse/bu-base:CurrentUse
+		let $envDom := $feature/bu-base:currentUse
 		let $urls := 
 			for $x in $envDom/@xlink:href
 				return
@@ -178,14 +178,14 @@ let $messages :=
 					else ()
 
 	return
-		if (exists($feature/bu-base:currentUse/bu-base:CurrentUse) and not(exists($envDom))) then
-			local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
-		else if (exists($feature/bu-base:currentUse/bu-base:CurrentUse) and count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
-		else if (exists($feature/bu-base:currentUse/bu-base:CurrentUse) and not(count($envDom) = count($envDom/@xlink:href))) then
-			local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-		else if ((exists($feature/bu-base:currentUse/bu-base:CurrentUse)) and (count($invalid_urls) > 0)) then
-			local:addMessage('TR.brokenLinkBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		if (exists($feature) and not(exists($envDom))) then
+			local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+		else if (exists($feature) and count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+		else if (exists($feature) and not(count($envDom) = count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if ((exists($feature)) and (count($invalid_urls) > 0)) then
+			local:addMessage('TR.brokenLinkBuildings', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
 
 let $messages_parts :=
@@ -199,8 +199,8 @@ let $messages_parts :=
 					$this_feature/bu-base:parts/bu-core2d:BuildingPart
 				else ()
 
-	for $feature in $this_features
-		let $envDom := $feature/bu-base:currentUse/bu-base:CurrentUse/bu-base:currentUse
+	for $feature in $this_features/bu-base:currentUse/bu-base:CurrentUse
+		let $envDom := $feature/bu-base:currentUse
 		let $urls := 
 			for $x in $envDom/@xlink:href
 				return
@@ -219,14 +219,14 @@ let $messages_parts :=
 					else ()
 
 	return
-		if (exists($feature/bu-base:currentUse/bu-base:CurrentUse) and not(exists($envDom))) then
-			local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
-		else if (exists($feature/bu-base:currentUse/bu-base:CurrentUse) and count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
-		else if (exists($feature/bu-base:currentUse/bu-base:CurrentUse) and not(count($envDom) = count($envDom/@xlink:href))) then
-			local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-		else if ((exists($feature/bu-base:currentUse/bu-base:CurrentUse)) and (count($invalid_urls) > 0)) then
-			local:addMessage('TR.brokenLinkBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		if (exists($feature) and not(exists($envDom))) then
+			local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+		else if (exists($feature) and count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+		else if (exists($feature) and not(count($envDom) = count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if ((exists($feature)) and (count($invalid_urls) > 0)) then
+			local:addMessage('TR.brokenLinkBuildings', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
 
 
