@@ -357,6 +357,627 @@ $combined_messages)
 										<translationTemplate ref="TR.disallowedCodeListValueBuildings"/>
 									</translationTemplates>
 								</TestAssertion>
+								<TestAssertion id="EID19e39782-c446-4414-8494-a6f8287bbeb9">
+									<label>bu-as.a.5: verticalGeometryReference</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II, III and IV of the Implementing Rule. To pass this test verify that any instance of an attribute:
+<ul>
+<li>takes only values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'none'.</li>
+<li>takes only a value explicitly specified in the INSPIRE code list register or shall take a value that is narrower (i.e. more specific) than those explicitly specified in the application schema when the code list‘s extensibility is 'narrower'.</li>
+<li>takes values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'open' or if a value is not one of the values listed in the code list register check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule and that all extensions conform to the requirements (This last check is a manual test).</li>
+</ul>
+<br/><br/>The following checks are performed for every feature in the dataset, for the not extensible codelists:
+<ul><li>Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#verticalGeometryReference'> verticalGeometryReference</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#validValue2'>valid value</a>. If the check fails report disallowedCodeListValue.</li></ul><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.3</a>]]></description>
+									<parent ref="EID8080cf98-fe7d-49cf-80fa-d8ba506f2d38"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codelist := 'http://inspire.ec.europa.eu/codelist/ElevationReferenceValue'
+let $codelisturl := 'https://inspire.ec.europa.eu/codelist/ElevationReferenceValue/ElevationReferenceValue.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
+let $property_string := 'verticalGeometryReferenceValue'
+let $features_selected1 := $features[self::bu-core2d:Building]
+let $features_selected2 := $features[self::bu-core2d:Building | self::bu-core2d:BuildingPart]
+let $features_selected3 := $features[self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+
+let $messages1 := 
+
+	for $feature in $features_selected1/bu-core2d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:verticalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+
+let $messages2 := 
+
+	for $feature in $features_selected2/bu-core2d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:verticalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages2_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected2
+			return
+				if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core2d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:verticalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+let $messages3 := 
+
+	for $feature in $features_selected3/bu-core3d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:verticalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected3
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:verticalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+let $combined_messages := ($messages1, $messages2, $messages2_parts, $messages3, $messages3_parts)
+
+return
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
+										<translationTemplate ref="TR.missingAttributeBuildings"/>
+										<translationTemplate ref="TR.disallowedCodeListValueBuildings"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDe74a6dc9-45c7-4358-968e-b936af0b882e">
+									<label>bu-as.a.6: verticalGeometryReference3DBottom</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II, III and IV of the Implementing Rule. To pass this test verify that any instance of an attribute:
+<ul>
+<li>takes only values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'none'.</li>
+<li>takes only a value explicitly specified in the INSPIRE code list register or shall take a value that is narrower (i.e. more specific) than those explicitly specified in the application schema when the code list‘s extensibility is 'narrower'.</li>
+<li>takes values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'open' or if a value is not one of the values listed in the code list register check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule and that all extensions conform to the requirements (This last check is a manual test).</li>
+</ul>
+<br/><br/>The following checks are performed for every feature in the dataset, for the not extensible codelists:
+<ul><li>Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#verticalGeometryReference3DBottom'>verticalGeometryReference3DBottom</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#validValue2'>valid value</a>. If the check fails report disallowedCodeListValue.</li></ul><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.3</a>]]></description>
+									<parent ref="EID8080cf98-fe7d-49cf-80fa-d8ba506f2d38"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codelist := 'http://inspire.ec.europa.eu/codelist/ElevationReferenceValue'
+let $codelisturl := 'https://inspire.ec.europa.eu/codelist/ElevationReferenceValue/ElevationReferenceValue.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
+let $property_string := 'verticalGeometryReference3DBottomValue'
+let $features_selected := $features[self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+
+let $messages3DLoD1 := 
+
+	for $feature in $features_selected/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DBottom
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3DLoD1_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DBottom 
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3DLoD2 := 
+
+	for $feature in $features_selected/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DBottom
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3DLoD2_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DBottom 
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3DLoD3 := 
+
+	for $feature in $features_selected/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DBottom
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3DLoD3_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DBottom 
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3DLoD4 := 
+
+	for $feature in $features_selected/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DBottom
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3DLoD4_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DBottom 
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $combined_messages := ($messages3DLoD1, $messages3DLoD1_parts, $messages3DLoD2, $messages3DLoD2_parts, $messages3DLoD3, $messages3DLoD3_parts, $messages3DLoD4, $messages3DLoD4_parts)
+
+return
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
+										<translationTemplate ref="TR.disallowedCodeListValueBuildings"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDac0449ab-cdf2-4244-9a2f-1a83c6f1d4e3">
+									<label>bu-as.a.7: verticalGeometryReference3DTop</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II, III and IV of the Implementing Rule. To pass this test verify that any instance of an attribute:
+<ul>
+<li>takes only values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'none'.</li>
+<li>takes only a value explicitly specified in the INSPIRE code list register or shall take a value that is narrower (i.e. more specific) than those explicitly specified in the application schema when the code list‘s extensibility is 'narrower'.</li>
+<li>takes values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'open' or if a value is not one of the values listed in the code list register check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule and that all extensions conform to the requirements (This last check is a manual test).</li>
+</ul>
+<br/><br/>The following checks are performed for every feature in the dataset, for the not extensible codelists:
+<ul><li>Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#verticalGeometryReference3DTop'>verticalGeometryReference3DTop</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#validValue2'>valid value</a>. If the check fails report disallowedCodeListValue.</li></ul><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.3</a>]]></description>
+									<parent ref="EID8080cf98-fe7d-49cf-80fa-d8ba506f2d38"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codelist := 'http://inspire.ec.europa.eu/codelist/ElevationReferenceValue'
+let $codelisturl := 'https://inspire.ec.europa.eu/codelist/ElevationReferenceValue/ElevationReferenceValue.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
+let $property_string := 'verticalGeometryReference3DTopValue'
+let $features_selected := $features[self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+
+let $messages := 
+
+	for $feature in $features_selected/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DTop
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1
+		let $envDom := $feature/bu-core3d:verticalGeometryReference3DTop
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})	
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+let $combined_messages := ($messages, $messages_parts)
+
+return
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
+										<translationTemplate ref="TR.disallowedCodeListValueBuildings"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDeb9cf787-7fbb-4629-80ff-e189496c0646">
+									<label>bu-as.a.8: status</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II, III and IV of the Implementing Rule. To pass this test verify that any instance of an attribute:
+<ul>
+<li>takes only values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'none'.</li>
+<li>takes only a value explicitly specified in the INSPIRE code list register or shall take a value that is narrower (i.e. more specific) than those explicitly specified in the application schema when the code list‘s extensibility is 'narrower'.</li>
+<li>takes values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'open' or if a value is not one of the values listed in the code list register check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule and that all extensions conform to the requirements (This last check is a manual test).</li>
+</ul>
+<br/><br/>The following checks are performed for every feature in the dataset, for the not extensible codelists:
+<ul><li>Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#status'>status</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#validValue3'>valid value</a>. If the check fails report disallowedCodeListValue.</li></ul><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.3</a>]]></description>
+									<parent ref="EID8080cf98-fe7d-49cf-80fa-d8ba506f2d38"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codelist := 'http://inspire.ec.europa.eu/codelist/HeightStatusValue'
+let $codelisturl := 'https://inspire.ec.europa.eu/codelist/HeightStatusValue/HeightStatusValue.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
+let $property_string := 'statusValue'
+let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:BuildingPart | self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+
+let $messages := 
+
+	for $feature in $features_selected/bu-base:heightAboveGround/bu-base:HeightAboveGround
+		let $envDom := $feature/bu-base:status
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-base:heightAboveGround/bu-base:HeightAboveGround
+		let $envDom := $feature/bu-base:status
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $combined_messages := ($messages, $messages_parts)
+
+return
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementBuildings"/>
+										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
+										<translationTemplate ref="TR.disallowedCodeListValueBuildings"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID1599d047-e953-476f-a8a3-655cc58c8392">
+									<label>bu-as.a.9: horizontalGeometryReference</label>
+									<description><![CDATA[When an attribute has a code list as its type, verify that the values comply with the definitions and include the values set out in Annex II, III and IV of the Implementing Rule. To pass this test verify that any instance of an attribute:
+<ul>
+<li>takes only values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'none'.</li>
+<li>takes only a value explicitly specified in the INSPIRE code list register or shall take a value that is narrower (i.e. more specific) than those explicitly specified in the application schema when the code list‘s extensibility is 'narrower'.</li>
+<li>takes values explicitly specified in the INSPIRE code list register when the code list‘s extensibility is 'open' or if a value is not one of the values listed in the code list register check that any extensions do not overlap with the code lists that are defined in Annexes II, III and IV of the Implementing Rule and that all extensions conform to the requirements (This last check is a manual test).</li>
+</ul>
+<br/><br/>The following checks are performed for every feature in the dataset, for the not extensible codelists:
+<ul><li>Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#horizontalGeometryReference'> horizontalGeometryReference</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values#validValue2'>valid value</a>. If the check fails report disallowedCodeListValue.</li></ul><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.3</a>]]></description>
+									<parent ref="EID8080cf98-fe7d-49cf-80fa-d8ba506f2d38"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $codelist := 'http://inspire.ec.europa.eu/codelist/HorizontalGeometryReferenceValue'
+let $codelisturl := 'https://inspire.ec.europa.eu/codelist/HorizontalGeometryReferenceValue/HorizontalGeometryReferenceValue.en.xml'
+let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
+let $property_string := 'horizontalGeometryReferenceValue'
+let $features_selected1 := $features[self::bu-core2d:Building]
+let $features_selected2 := $features[self::bu-core2d:Building | self::bu-core2d:BuildingPart]
+let $features_selected3 := $features[self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+let $features_selected4 := $features[self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+
+let $messages1 := 
+
+	for $feature in $features_selected1/bu-core2d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:horizontalGeometryReference
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+
+let $messages2 := 
+
+	for $feature in $features_selected2/bu-core2d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:horizontalGeometryReference
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages2_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected2
+			return
+				if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core2d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:horizontalGeometryReference
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+let $messages3 := 
+
+	for $feature in $features_selected3/bu-core3d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:horizontalGeometryReference
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages3_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected3
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:horizontalGeometryReference
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (exists($envDom) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages4_3DLoD1 := 
+
+	for $feature in $features_selected4/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1
+		let $envDom := $feature/bu-core3d:horizontalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages4_3DLoD1_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected4
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1
+		let $envDom := $feature/bu-core3d:horizontalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+let $messages4_3DLoD2 := 
+
+	for $feature in $features_selected4/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2
+		let $envDom := $feature/bu-core3d:horizontalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+
+let $messages4_3DLoD2_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected4
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2
+		let $envDom := $feature/bu-core3d:horizontalGeometryReference
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+				local:addMessage('TR.disallowedCodeListValueBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+			else ()
+
+let $combined_messages := ($messages1, $messages2, $messages2_parts, $messages3, $messages3_parts, $messages4_3DLoD1, $messages4_3DLoD1_parts, $messages4_3DLoD2, $messages4_3DLoD2_parts)
+
+return
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementBuildings"/>
+										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
+										<translationTemplate ref="TR.missingAttributeBuildings"/>
+										<translationTemplate ref="TR.disallowedCodeListValueBuildings"/>
+									</translationTemplates>
+								</TestAssertion>
 							</testAssertions>
 						</TestStep>
 					</testSteps>
