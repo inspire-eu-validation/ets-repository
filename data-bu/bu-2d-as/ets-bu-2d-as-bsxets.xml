@@ -66,7 +66,7 @@ Pre-requisite conformance classes:
 <ul>
 <li>singleReferenceGeometry: Check that exactly one geometry2D attribute is a reference geometry, i.e. a geometry2D with a <a href='https://github.com/inspire-eu-validation/data-bu/blob/master/bu-2d-as/constraints.md#referenceGeometry'>referenceGeometry</a> attribute set to “true” (OCL: "inv: self.geometry2D->select(referenceGeometry=true)->size() = 1"). The check applies to both Building and BuildingPart feature types.</li>
 <ul><li>Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-2d-as/constraints#singleReferenceGeometry'> singleReferenceGeometry</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-2d-as/constraints#validValue1'>valid value</a>. If the check fails report disallowedCodeListValue.</li></ul><br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-2d-as/constraints" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings2D, A.1.3</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-2d-as/constraints" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.3</a>]]></description>
 									<parent ref="EIDd8803772-b966-45b0-b207-21807d4c9ca1"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -87,8 +87,6 @@ let $parentMessages :=
 				local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint':"The geometry2D with a referenceGeometry attribure set to 'true'", 'additionalInfo':''}) 
 			else ()
 
-		
-
 let $childParentMessages := 
 	for $feature in $features_selected
 		let $dummy := local:log('Feature name: ' || name($feature))
@@ -103,7 +101,6 @@ let $childParentMessages :=
 			if((count($parent) = 0 and exists($feature/bu-base:parts/bu-core2d:BuildingPart) and name($feature) = 'bu-core2d:Building') or (name($feature) = 'bu-core2d:BuildingPart' and count($parent) = 0)) then 
 				local:addMessage('TR.missingElementBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:BuildingGeometry2D'}) 
 			else ()
-
 
 let $childMessages :=
 	for $feature in $features_selected
@@ -124,22 +121,18 @@ let $childMessages :=
 					local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint':"The geometry2D with a referenceGeometry attribure set to 'true'" ,'additionalInfo':''}) 
 				else()
 
-
-
 let $combined_messages := ($parentMessages, $childParentMessages, $childMessages)
 
 return
 (if ($combined_messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
 $combined_messages)
-
-
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElementBuildings"/>
 										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
-										<translationTemplate ref="TR.disallowedCodeListValueBuildings"/>
+										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID0a89df09-837d-44b2-ae52-5e6e263f2b1d">
@@ -148,7 +141,7 @@ $combined_messages)
 <ul>
 <li>Building parts shall be 2D: Check that the <a href='https://github.com/inspire-eu-validation/data-bu/blob/master/bu-2d-as/constraints.md#parts'>parts</a> of the building is represented using the <a href='https://github.com/inspire-eu-validation/data-bu/blob/master/bu-2d-as/constraints.md#BuildingPart'>BuildingPart</a> type of the Buildings2D package (OCL: "inv: self.parts->oclIsKindOf(Buildings2D::BuildingPart)")</li>
 <ul><li>Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-2d-as/constraints#singleReferenceGeometry'> singleReferenceGeometry</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-2d-as/constraints#validValue1'>valid value</a>. If the check fails report disallowedCodeListValue.</li></ul><br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-2d-as/constraints" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings2D, A.1.3</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-2d-as/constraints" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.3</a>]]></description>
 									<parent ref="EIDd8803772-b966-45b0-b207-21807d4c9ca1"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -214,13 +207,10 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.missingElementBuildings"/>
-										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
-										<translationTemplate ref="TR.disallowedCodeListValueBuildings"/>
+										<translationTemplate ref="TR.brokenLinkBuildings"/>
+										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
 								</TestAssertion>
-
-
 							</testAssertions>
 						</TestStep>
 					</testSteps>
