@@ -1125,6 +1125,72 @@ $messages)
 						</TestStep>
 					</testSteps>
 				</TestCase>
+				<TestCase id="EID00a91630-3c55-4cb3-bc16-e6ace636ede7">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EIDf447f3c8-b290-49dd-885e-6990faec8756"/>
+					<testSteps>
+						<TestStep id="EID47689cc7-ee94-4af8-8bb6-f68c94e81398">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID00a91630-3c55-4cb3-bc16-e6ace636ede7"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID4932fab3-6d6d-4142-8b81-4520291eabe9">
+									<label>bu-as.b.1: percentageSum</label>
+									<description><![CDATA[Check that the total of all percentages (percentage element of the CurrentUse data type) are less or equal to 100. (OCL: "inv: self.percentage.sum()<=100")<br/><br/>Verify that the OCL constraints that are specified in the UML model of the application schema are met, i.e. validate features against the constraints. For unmet constraints report constraintViolation.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.7</a>]]></description>
+									<parent ref="EID47689cc7-ee94-4af8-8bb6-f68c94e81398"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $property_string := 'percentageSum'
+let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:BuildingPart | self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+
+let $messages := 
+
+		for $feature in $features_selected
+			let $multiplicity_messages:= 
+				for $this_feature in $feature/*/bu-base:CurrentUse
+
+					let $envDom := $this_feature/bu-base:percentage
+
+					return
+						if (not(exists($envDom))) then
+							local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+						else if (count($envDom) > 1) then
+							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
+						else()
+			let $percentage_messages:=
+				let $percentages := for $this_feature in $feature/*/bu-base:CurrentUse
+						return $this_feature/bu-base:percentage
+				return if (sum($percentages) > 100) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the total of all percentages are less or equal to 100.', 'additionalInfo': ''})
+					else()
+			return if ($multiplicity_messages) then
+			 		$multiplicity_messages
+			 	else if ($percentage_messages) then
+			 		$percentage_messages
+			 	else()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementBuildings"/>
+										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
 			</testCases>
 		</TestModule>
 	</testModules>
