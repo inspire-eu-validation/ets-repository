@@ -1002,12 +1002,13 @@ let $messages :=
 
 	for $feature in $features_selected
 		let $envDom := $feature/bu-base:buildingNature
-
 		return
-			if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
-				local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+		(for $link in distinct-values($envDom/@xlink:href)
+		return
+			if ( not($link = $valid_href)) then
+				local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($link), 'codelist': $codelist, 'count': count($feature/bu-base:buildingNature/@xlink:href = $envDom/@xlink:href)})
 			else ()
-
+		)
 
 let $messages_parts := 
 	let $this_features :=
@@ -1021,12 +1022,13 @@ let $messages_parts :=
 
 	for $feature in $this_features
 		let $envDom := $feature/bu-base:buildingNature
-
+		return
+		(for $link in distinct-values($envDom/@xlink:href)
 		return
 			if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
-				local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
+				local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist, 'count': count($feature/bu-base:buildingNature/@xlink:href = $envDom/@xlink:href)})
 			else ()
-
+		)
 
 let $combined_messages := ($messages, $messages_parts)
 
@@ -1110,8 +1112,8 @@ return
 else if($combined_messages/@ref = ('TR.manual.reviewCodeListValue') and not($combined_messages/@ref != ('TR.manual.reviewCodeListValue'))) then 'PASSED_MANUAL' 
 else if($combined_messages and $combined_messages/@ref != ('TR.manual.reviewCodeListValue')) then 'FAILED' 
 else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
