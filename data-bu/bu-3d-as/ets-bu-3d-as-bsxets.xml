@@ -110,7 +110,7 @@ let $messages :=
 		if(count($valid_ids) = 0 and count($valid_urls) = 0 and (exists($feature/bu-base:parts) and not(exists($feature/bu-base:parts/bu-core3d:BuildingPart)))) then
 			let $a := 'aaa'
 			return 
-				if(not(exists($feature/bu-core3d:geometry3DLoD1)) and not(exists($feature/bu-core3d:geometry3DLoD2)) and  not(exists($feature/bu-core3d:geometry3DLoD3)) and not(exists($feature/bu-core3d:geometry3DLoD4))) then
+				if(not(exists($feature/bu-core3d:geometry3DLoD1)) and not(exists($feature/bu-core3d:geometry3DLoD2)) and not(exists($feature/bu-core3d:geometry3DLoD3)) and not(exists($feature/bu-core3d:geometry3DLoD4))) then
 					local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint':'If a Building does not have any BuildingParts, at least the geometry3DLoD1 or geometry3DLoD2 or geometry3DLoD3 or geometry3DLoD4 attributes is provided, for the Building feature type', 'additionalInfo':''}) 
 				else if (count($feature/bu-core3d:geometry3DLoD1) > 1) then
 					local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD1', 'multiplicity': 1, 'count': count($feature/bu-core3d:geometry3DLoD1)}) 
@@ -179,12 +179,19 @@ let $messages :=
 						if (not(substring($x, 2) = $gml_ids)) then ()
 						else $x
 					else ()
+	let $dummy := local:log("Count: " || count($valid_urls))
 	return
 		if(count($valid_ids) = 0 and count($valid_urls) = 0 and (exists($feature/bu-base:parts) and not(exists($feature/bu-base:parts/bu-core3d:BuildingPart)))) then
 			local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint':'The parts of the building is represented using the BuildingPart type of the Buildings3D package', 'additionalInfo':''}) 
+		else if (count($valid_urls) != 0) then
+			let $aaa := 'aaa'
+			for $url in $valid_urls
+				return local:addMessage('TR.manual.reviewConstraintURL', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:parts', 'value': $url}) 
 		else()
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and not($messages/@ref = ('TR.manual.reviewConstraintURL'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.manual.reviewConstraintURL')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
