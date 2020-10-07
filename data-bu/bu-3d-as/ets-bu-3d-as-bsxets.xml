@@ -94,7 +94,7 @@ let $messages :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then ()
 					else $url
 		let $ids := 
-			for $x in $feature/bu-base:parts
+			for $x in $feature/bu-base:parts/@xlink:href
 				return
 					if (starts-with($x, '#')) then $x
 					else ()
@@ -152,6 +152,9 @@ the attributes and association roles set out in the Annexes.</li>
 let $features_selected := $features[self::bu-core3d:Building]
 let $gml_ids := $features[self::bu-core3d:BuildingParts]/@*:id
 let $messages :=
+    let $dummy := 
+        for $id in $gml_ids
+			return local:log("BuildingParts IDs: "|| $id)
 	for $feature in $features_selected
 		let $urls := 
 			for $x in $feature/bu-base:parts/@xlink:href
@@ -167,7 +170,7 @@ let $messages :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then ()
 					else $url
 		let $ids := 
-			for $x in $feature/bu-base:parts
+			for $x in $feature/bu-base:parts/@xlink:href
 				return
 					if (starts-with($x, '#')) then $x
 					else ()
