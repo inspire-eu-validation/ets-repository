@@ -40,7 +40,7 @@ Pre-requisite conformance classes:
 		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
 	</supportedTestObjectTypes>
 	<dependencies>
-		<executableTestSuite ref="EID4f7e4a81-3bab-4058-b528-afec8d6e980d"/>
+		<executableTestSuite ref="EIDc435378c-52c4-4c82-8b8b-80890720afd2"/>
 	</dependencies>
 	<testModules>
 		<TestModule id="EID435dfa47-b083-488f-bce4-5d5f61aded0f">
@@ -64,7 +64,7 @@ Pre-requisite conformance classes:
 									<label>bu-3d-as.a.1: GeometryWhenNoParts</label>
 									<description><![CDATA[The following checks are performed for every feature in the dataset.
 <ul>
-<li>GeometryWhenNoParts: Check that if a Building does not have any BuildingParts, at least the <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#g3DLoD1'>geometry3DLoD1</a> or <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#g3DLoD2'>geometry3DLoD2</a> or <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#g3DLoD3'>geometry3DLoD3</a> or <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#g3DLoD4'>geometry3DLoD4</a> attributes is provided, for the Building feature type.</li>
+<li>GeometryWhenNoParts: Check that if a Building does not have any BuildingPart, at least the <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#g3DLoD1'>geometry3DLoD1</a> or <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#g3DLoD2'>geometry3DLoD2</a> or <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#g3DLoD3'>geometry3DLoD3</a> or <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#g3DLoD4'>geometry3DLoD4</a> attributes is provided, for the Building feature type.</li>
 <ul>
 <li>Verify that the OCL constraints that are specified in the UML model of the application schema are met, i.e. validate features against the constraints. For unmet constraints report <a href='http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/constraints#constraintViolation'>constraintViolation</a>.</li></ul><br/><br/>
 Relevant requirements:
@@ -77,7 +77,7 @@ the attributes and association roles set out in the Annexes.</li>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $features_selected := $features[self::bu-core3d:Building]
-let $gml_ids := $features[self::bu-core3d:BuildingParts]/@*:id
+let $gml_ids := $features[self::bu-core3d:BuildingPart]/@*:id
 let $messages :=
 	for $feature in $features_selected
 		let $urls := 
@@ -111,7 +111,7 @@ let $messages :=
 			let $a := 'aaa'
 			return 
 				if(not(exists($feature/bu-core3d:geometry3DLoD1)) and not(exists($feature/bu-core3d:geometry3DLoD2)) and not(exists($feature/bu-core3d:geometry3DLoD3)) and not(exists($feature/bu-core3d:geometry3DLoD4))) then
-					local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint':'If a Building does not have any BuildingParts, at least the geometry3DLoD1 or geometry3DLoD2 or geometry3DLoD3 or geometry3DLoD4 attributes is provided, for the Building feature type', 'additionalInfo':''}) 
+					local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint':'If a Building does not have any BuildingPart, at least the geometry3DLoD1 or geometry3DLoD2 or geometry3DLoD3 or geometry3DLoD4 attributes is provided, for the Building feature type', 'additionalInfo':''}) 
 				else if (count($feature/bu-core3d:geometry3DLoD1) > 1) then
 					local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD1', 'multiplicity': 1, 'count': count($feature/bu-core3d:geometry3DLoD1)}) 
 				else if (count($feature/bu-core3d:geometry3DLoD2) > 1) then
@@ -150,11 +150,8 @@ the attributes and association roles set out in the Annexes.</li>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $features_selected := $features[self::bu-core3d:Building]
-let $gml_ids := $features[self::bu-core3d:BuildingParts]/@*:id
+let $gml_ids := $features[self::bu-core3d:BuildingPart]/@*:id
 let $messages :=
-    let $dummy := 
-        for $id in $gml_ids
-			return local:log("BuildingParts IDs: "|| $id)
 	for $feature in $features_selected
 		let $urls := 
 			for $x in $feature/bu-base:parts/@xlink:href
@@ -182,7 +179,6 @@ let $messages :=
 						if (not(substring($x, 2) = $gml_ids)) then ()
 						else $x
 					else ()
-	let $dummy := local:log("Count: " || count($valid_urls))
 	return
 		if(count($valid_ids) = 0 and count($valid_urls) = 0 and (exists($feature/bu-base:parts) and not(exists($feature/bu-base:parts/bu-core3d:BuildingPart)))) then
 			local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint':'The parts of the building is represented using the BuildingPart type of the Buildings3D package', 'additionalInfo':''}) 
@@ -219,16 +215,21 @@ the attributes and association roles set out in the Annexes.</li>
 									<parent ref="EID2f97c63b-3c8c-4260-b9d5-1ac0170c9ef4"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features_selected := $features[self::bu-core3d:Building | self::bu-core3d:BuildingParts]
+let $features_selected := $features[self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+let $buildingPartIDs := $features[self::bu-core3d:BuildingPart]/@*:id
 let $messages :=
 	for $feature in $features_selected
+
 		let $element := 
 			if(name($feature) = 'bu-core3d:Building') then
-				$feature/bu-base:parts/bu-core3d:BuildingPart
-			else 
-				$feature
+				let $parts := $feature/bu-base:parts
+					return 
+						if (exists($feature/bu-base:parts/@xlink:href) and substring($feature/bu-base:parts/@xlink:href, 2) = $buildingPartIDs) then 
+							$features[self::bu-core3d:BuildingPart][@*:id = substring($feature/bu-base:parts/@xlink:href, 2)]
+						else $feature/bu-base:parts/bu-core3d:BuildingPart	
+			else $feature
 		return
-			if (((exists($feature/bu-base:parts) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingParts') and count($element/bu-core3d:geometry3DLoD1) = 0 and count($element/bu-core3d:geometry3DLoD2) = 0 and count($element/bu-core3d:geometry3DLoD3) = 0 and count($element/bu-core3d:geometry3DLoD4) = 0) then
+			if (((exists($feature/bu-base:parts) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingPart') and count($element/bu-core3d:geometry3DLoD1) = 0 and count($element/bu-core3d:geometry3DLoD2) = 0 and count($element/bu-core3d:geometry3DLoD3) = 0 and count($element/bu-core3d:geometry3DLoD4) = 0) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one of the geometry3DLoD1 or geometry3DLoD2 or geometry3DLoD3 or geometry3DLoD4 attributes is provided, for the BuildingPart feature type.', 'additionalInfo' : '' })
 			else if (count($element/bu-core3d:geometry3DLoD1) > 1) then
 				local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD1', 'multiplicity': 1, 'count': count($element/bu-core3d:geometry3DLoD1)}) 
@@ -267,19 +268,22 @@ the attributes and association roles set out in the Annexes.</li>
 									<parent ref="EID2f97c63b-3c8c-4260-b9d5-1ac0170c9ef4"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features_selected := $features[self::bu-core3d:Building | self::bu-core3d:BuildingParts]
+let $features_selected := $features[self::bu-core3d:Building | self::bu-core3d:BuildingPart]
+let $buildingPartIDs := $features[self::bu-core3d:BuildingPart]/@*:id
+
 let $messages :=
 	for $feature in $features_selected
-		let $element :=
-			if (name($feature) = 'bu-core3d:Building') then
-				let $buildingParts := $feature/bu-base:parts/bu-core3d:BuildingPart
-				return 
-					if (exists($buildingParts)) then $buildingParts
-					else $feature
+		let $element := 
+			if(name($feature) = 'bu-core3d:Building') then
+				let $parts := $feature/bu-base:parts
+					return 
+						if (exists($feature/bu-base:parts/@xlink:href) and substring($feature/bu-base:parts/@xlink:href, 2) = $buildingPartIDs) then 
+							$features[self::bu-core3d:BuildingPart][@*:id = substring($feature/bu-base:parts/@xlink:href, 2)]
+						else $feature/bu-base:parts/bu-core3d:BuildingPart	
 			else $feature
 
 		return 
-		if(((exists($feature/bu-base:parts) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingParts') and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometrySolid)) and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometrySolid)) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid)) and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid))) then
+		if(((exists($feature/bu-base:parts) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingPart') and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometrySolid)) and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometrySolid)) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid)) and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid))) then
 			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'The geometryMultiSurface or the geometrySolid attribute is provided.', 'additionalInfo' : '' })
 		else if(count($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface) > 1) then
 			local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface)}) 
@@ -325,15 +329,15 @@ the attributes and association roles set out in the Annexes.</li>
 									<parent ref="EID2f97c63b-3c8c-4260-b9d5-1ac0170c9ef4"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features_selected := $features[self::bu-core3d:Building | self::bu-core3d:BuildingParts]
+let $features_selected := $features[self::bu-core3d:Building | self::bu-core3d:BuildingPart]
 let $messages :=
 	for $feature in $features_selected
 		let $invalid_values := ('http://inspire.ec.europa.eu/codelist/HorizontalGeometryReferenceValue/entrancePoint', 'http://inspire.ec.europa.eu/codelist/HorizontalGeometryReferenceValue/pointInsideBuilding', 'http://inspire.ec.europa.eu/codelist/HorizontalGeometryReferenceValue/pointInsideCadastralParcel')
 		let $element :=
 			if (name($feature) = 'bu-core3d:Building') then
-				let $buildingParts := $feature/bu-base:parts/bu-core3d:BuildingPart
+				let $buildingPart := $feature/bu-base:parts/bu-core3d:BuildingPart
 				return 
-					if (exists($buildingParts)) then $buildingParts
+					if (exists($buildingPart)) then $buildingPart
 					else $feature
 			else $feature
 
@@ -356,6 +360,39 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
 										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EIDc41d0f8d-5e76-4cb0-8184-ff20252f16a0">
+					<label>Buildings3D theme-specific requirements</label>
+					<description>Verify that, by way of derogation from article 12(1), the value domain of spatial properties used in the Buildings 3D package is not restricted to simple feature.</description>
+					<parent ref="EID435dfa47-b083-488f-bce4-5d5f61aded0f"/>
+					<testSteps>
+						<TestStep id="EID5b1debae-e91a-44c5-84d7-a7c97fe82528">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDc41d0f8d-5e76-4cb0-8184-ff20252f16a0"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDc2594c38-fc84-41a3-aaed-d51f73e38398">
+									<label>bu-3d-as.b.1: Buildings3D theme-specific requirements</label>
+									<description><![CDATA[Exclude the Simple features test case of the INSPIRE GML application schemas Conformance class.<br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 12 (1): The value domain of spatial properties defined in this Regulation shall be restricted to the Simple Feature spatial schema as defined in Herring, John R. (ed.), OpenGIS® Implementation Standard for Geographic information – Simple feature access – Part 1: Common architecture, version 1.2.1, Open Geospatial Consortium, 2011, unless specified otherwise for a specific spatial data theme or type.</li>
+</ul>
+<br/><br/>Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/specific-req" target="_blank">Abstract Test Case 'Buildings3D theme-specific requirements'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.7</a>]]></description>
+									<parent ref="EID5b1debae-e91a-44c5-84d7-a7c97fe82528"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>'PASSED'</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
