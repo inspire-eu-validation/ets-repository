@@ -783,9 +783,8 @@ a.equals(
 );</scriptText></con:configuration></con:assertion><con:assertion type="XQuery Match" id="81bdd847-687d-4597-ba58-99963ff3635a" name="Alternate link types and CRS combinations are unique"><con:configuration><path><![CDATA[<etfTranslate what='TR.uniqueAlternateLinkTypes'>
 {
 
-    let $sortedValues := for $entry in //*:entry
-    order by $entry/*:category[1]/@term, $entry/*:link[@rel = 'alternate'][1]/@type
-    return concat('CRS ', $entry/*:category[1]/@term, ' with type ', $entry/*:link[@rel = 'alternate'][1]/@type, '   ')
+    let $sortedValues := for $entry in //*:entry/*:link[@rel = 'alternate'] 
+		return concat('CRS ', $entry/*:category[1]/@term, ' with type ', $entry/*:link[@rel = 'alternate'][1]/@type, '   ')
     
     let $duplicates := $sortedValues[let $pos := position() return . = $sortedValues[$pos+1]]
     let $duplicateCount := count( $duplicates )
