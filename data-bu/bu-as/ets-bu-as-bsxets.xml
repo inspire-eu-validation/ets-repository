@@ -264,7 +264,7 @@ Relevant requirements:
 <li>IR Requirement Article 6 (3): Where,  for  anattribute  whose  type  is  a  code  list  as  referred  to  in  points  (b),  (c)  or  (d)  of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register</li>
 <li>IR Requirement Article 6 (4): Attributes or association roles of spatial object types or data types whose type is a code list may only take values that are allowed according to the specification of the code list.</li>
 </ul><br/><br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">, A.1.6</a>]]></description>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/code-list-values" target="_blank">Abstract Test Case 'Code list values'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.6</a>]]></description>
 									<parent ref="EID8080cf98-fe7d-49cf-80fa-d8ba506f2d38"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
@@ -1313,7 +1313,7 @@ let $messages :=
 
 		for $feature in $features_selected
 			let $multiplicity_messages:= 
-				for $this_feature in $feature/*/bu-base:CurrentUse
+				for $this_feature in $feature/bu-base:currentUse/bu-base:CurrentUse
 
 					let $envDom := $this_feature/bu-base:percentage
 
@@ -1323,14 +1323,37 @@ let $messages :=
 						else if (count($envDom) > 1) then
 							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
 						else()
+			let $this_features :=
+				for $this_feature in $features_selected
+					return
+						if (name($this_feature) = 'bu-core3d:Building') then
+							$this_feature/bu-base:parts/bu-core3d:BuildingPart
+						else if (name($this_feature) = 'bu-core2d:Building') then
+							$this_feature/bu-base:parts/bu-core2d:BuildingPart
+						else ()
+			let $multiplicity_messages_parts:= 
+				for $this_feature in $this_features/bu-base:currentUse/bu-base:CurrentUse
+
+					let $envDom := $this_feature/bu-base:percentage
+
+					return
+						if (not(exists($envDom))) then
+							local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+						else if (count($envDom) > 1) then
+							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
+						else()			
 			let $percentage_messages:=
-				let $percentages := for $this_feature in $feature/*/bu-base:CurrentUse
+				let $percentages := for $this_feature in $feature/bu-base:currentUse/bu-base:CurrentUse
 						return $this_feature/bu-base:percentage
-				return if (sum($percentages) > 100) then
+				let $percentages_parts:= for $this_feature in $this_features/bu-base:currentUse/bu-base:CurrentUse
+						return $this_feature/bu-base:percentage
+				return if ((sum($percentages) + sum($percentages_parts)) > 100) then
 						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the total of all percentages are less or equal to 100.', 'additionalInfo': ''})
 					else()
 			return if ($multiplicity_messages) then
 			 		$multiplicity_messages
+			 	else if ($multiplicity_messages_parts) then
+			 		$multiplicity_messages_parts
 			 	else if ($percentage_messages) then
 			 		$percentage_messages
 			 	else()
