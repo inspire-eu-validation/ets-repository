@@ -1362,35 +1362,152 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-as/constra
 									<expression>
 
 let $property_string := 'atLeastOneEvent'
-let $property_stringb := 'begin'
+let $property_stringb := 'beginning'
 let $property_stringe := 'end'
 let $property_stringa := 'anyPoint'
 let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:BuildingPart | self::bu-core3d:Building | self::bu-core3d:BuildingPart]
 
-let $messages := 
+let $messagesdoc := 
 
-		for $feature in $features_selected
-				for $this_feature in $feature/*/bu-base:DateOfEvent
+	for $feature in $features_selected/bu-base:dateOfConstruction/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if ((not(exists($envDomb)) or $envDomb = '') and (not(exists($envDome)) or $envDome = '') and (not(exists($envDoma)) or $envDoma = '')) then
+							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'At least one of the attributes beginning, end or anyPoint is supplied', 'additionalInfo': ''})
+			else()
 
-					let $envDomb := $this_feature/bu-base:beginning
-					let $envDome := $this_feature/bu-base:end
-					let $envDoma := $this_feature/bu-base:anyPoint
 
-					return
-						if (count($envDomb) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
-						else if (count($envDome) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
-						else if (count($envDoma) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
-						else if ((not(exists($envDomb)) or $envDomb = '') and (not(exists($envDome)) or $envDome = '') and (not(exists($envDoma)) or $envDoma = '')) then
-							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'At least one of the attributes beginning, end or anyPoint is supplied', 'additionalInfo': ''})
-						else()
+let $messagesdoc_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-base:dateOfConstruction/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if ((not(exists($envDomb)) or $envDomb = '') and (not(exists($envDome)) or $envDome = '') and (not(exists($envDoma)) or $envDoma = '')) then
+							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'At least one of the attributes beginning, end or anyPoint is supplied', 'additionalInfo': ''})
+			else()
+
+let $messagesdod := 
+
+	for $feature in $features_selected/bu-base:dateOfDemolition/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if ((not(exists($envDomb)) or $envDomb = '') and (not(exists($envDome)) or $envDome = '') and (not(exists($envDoma)) or $envDoma = '')) then
+							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'At least one of the attributes beginning, end or anyPoint is supplied', 'additionalInfo': ''})
+			else()
+
+
+let $messagesdod_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-base:dateOfDemolition/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if ((not(exists($envDomb)) or $envDomb = '') and (not(exists($envDome)) or $envDome = '') and (not(exists($envDoma)) or $envDoma = '')) then
+							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'At least one of the attributes beginning, end or anyPoint is supplied', 'additionalInfo': ''})
+			else()
+
+
+let $messagesdor := 
+
+	for $feature in $features_selected/bu-base:dateOfRenovation/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if ((not(exists($envDomb)) or $envDomb = '') and (not(exists($envDome)) or $envDome = '') and (not(exists($envDoma)) or $envDoma = '')) then
+							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'At least one of the attributes beginning, end or anyPoint is supplied', 'additionalInfo': ''})
+			else()
+
+
+let $messagesdor_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-base:dateOfRenovation/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if ((not(exists($envDomb)) or $envDomb = '') and (not(exists($envDome)) or $envDome = '') and (not(exists($envDoma)) or $envDoma = '')) then
+							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'At least one of the attributes beginning, end or anyPoint is supplied', 'additionalInfo': ''})
+			else()
+
+
+
+let $combined_messages := ($messagesdoc, $messagesdoc_parts, $messagesdod, $messagesdod_parts, $messagesdor, $messagesdor_parts)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -1417,68 +1534,382 @@ let $property_stringe := 'end'
 let $property_stringa := 'anyPoint'
 let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:BuildingPart | self::bu-core3d:Building | self::bu-core3d:BuildingPart]
 
-let $messages := 
 
-		for $feature in $features_selected
-				for $this_feature in $feature/*/bu-base:DateOfEvent
+let $messagesdoc := 
 
-					let $envDomb := $this_feature/bu-base:beginning
-					let $envDome := $this_feature/bu-base:end
-					let $envDoma := $this_feature/bu-base:anyPoint
-					let $dateb := if ((count($this_feature/bu-base:beginning) = 1) and 
-									($this_feature/bu-base:beginning castable as xs:dateTime)) then
-									xs:dateTime($this_feature/bu-base:beginning)
-								else if ((count($this_feature/bu-base:beginning) = 1) and 
-									($this_feature/bu-base:beginning castable as xs:date)) then
-									dateTime(xs:date($this_feature/bu-base:beginning), xs:time("00:00:00Z"))
-								else()
-					let $datee := if ((count($this_feature/bu-base:end) = 1) and 
-									($this_feature/bu-base:end castable as xs:dateTime)) then
-									xs:dateTime($this_feature/bu-base:end)
-								else if ((count($this_feature/bu-base:end) = 1) and 
-									($this_feature/bu-base:end castable as xs:date)) then
-									dateTime(xs:date($this_feature/bu-base:end), xs:time("00:00:00Z"))
-								else()
-					let $datea := if ((count($this_feature/bu-base:anyPoint) = 1) and 
-									($this_feature/bu-base:anyPoint castable as xs:dateTime)) then
-									xs:dateTime($this_feature/bu-base:anyPoint)
-								else if ((count($this_feature/bu-base:anyPoint) = 1) and 
-									($this_feature/bu-base:anyPoint castable as xs:date)) then
-									dateTime(xs:date($this_feature/bu-base:anyPoint), xs:time("00:00:00Z"))
-								else()
-					return
-						if (count($envDomb) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
-						else if (count($envDome) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
-						else if (count($envDoma) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
-						else if (exists($envDomb) and exists($envDoma) and exists($envDome) and not(empty($dateb) or empty($datea) or empty($datee))) then
-							(if (($dateb > $datee) or ($dateb > $datea) or ($datea > $datee)) then
-								local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
-							else()
-							)
-						else if (exists($envDomb) and exists($envDoma) and not(empty($dateb) or empty($datea))) then
-							(if ($dateb > $datea) then
-									local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
-							else()
-							)	
-						else if (exists($envDoma) and exists($envDome) and not(empty($datea) or empty($datee))) then
-							(if ($datea > $datee) then
-									local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
-							else()
-							)
-						else if (exists($envDomb) and exists($envDome) and not(empty($dateb) or empty($datee))) then
-							( if ($dateb > $datee) then
-								local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
-								else()
-							)
-						else()
+	for $feature in $features_selected/bu-base:dateOfConstruction/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		let $dateb := if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:beginning)
+					else if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:beginning), xs:time("00:00:00Z"))
+					else()
+		let $datee := if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:end)
+					else if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:end), xs:time("00:00:00Z"))
+					else()
+		let $datea := if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:anyPoint)
+					else if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:anyPoint), xs:time("00:00:00Z"))
+					else()
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if (exists($envDomb) and exists($envDoma) and exists($envDome) and not(empty($dateb) or empty($datea) or empty($datee))) then
+				(if (($dateb > $datee) or ($dateb > $datea) or ($datea > $datee)) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDoma) and not(empty($dateb) or empty($datea))) then
+				(if ($dateb > $datea) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)	
+			else if (exists($envDoma) and exists($envDome) and not(empty($datea) or empty($datee))) then
+				(if ($datea > $datee) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDome) and not(empty($dateb) or empty($datee))) then
+				( if ($dateb > $datee) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+					else()
+				)
+			else()
+
+
+let $messagesdoc_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-base:dateOfConstruction/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		let $dateb := if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:beginning)
+					else if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:beginning), xs:time("00:00:00Z"))
+					else()
+		let $datee := if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:end)
+					else if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:end), xs:time("00:00:00Z"))
+					else()
+		let $datea := if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:anyPoint)
+					else if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:anyPoint), xs:time("00:00:00Z"))
+					else()
+
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if (exists($envDomb) and exists($envDoma) and exists($envDome) and not(empty($dateb) or empty($datea) or empty($datee))) then
+				(if (($dateb > $datee) or ($dateb > $datea) or ($datea > $datee)) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDoma) and not(empty($dateb) or empty($datea))) then
+				(if ($dateb > $datea) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)	
+			else if (exists($envDoma) and exists($envDome) and not(empty($datea) or empty($datee))) then
+				(if ($datea > $datee) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDome) and not(empty($dateb) or empty($datee))) then
+				( if ($dateb > $datee) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+					else()
+				)
+			else()
+
+let $messagesdod := 
+
+	for $feature in $features_selected/bu-base:dateOfDemolition/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		let $dateb := if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:beginning)
+					else if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:beginning), xs:time("00:00:00Z"))
+					else()
+		let $datee := if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:end)
+					else if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:end), xs:time("00:00:00Z"))
+					else()
+		let $datea := if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:anyPoint)
+					else if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:anyPoint), xs:time("00:00:00Z"))
+					else()
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if (exists($envDomb) and exists($envDoma) and exists($envDome) and not(empty($dateb) or empty($datea) or empty($datee))) then
+				(if (($dateb > $datee) or ($dateb > $datea) or ($datea > $datee)) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDoma) and not(empty($dateb) or empty($datea))) then
+				(if ($dateb > $datea) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)	
+			else if (exists($envDoma) and exists($envDome) and not(empty($datea) or empty($datee))) then
+				(if ($datea > $datee) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDome) and not(empty($dateb) or empty($datee))) then
+				( if ($dateb > $datee) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+					else()
+				)
+			else()
+
+
+let $messagesdod_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-base:dateOfDemolition/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		let $dateb := if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:beginning)
+					else if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:beginning), xs:time("00:00:00Z"))
+					else()
+		let $datee := if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:end)
+					else if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:end), xs:time("00:00:00Z"))
+					else()
+		let $datea := if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:anyPoint)
+					else if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:anyPoint), xs:time("00:00:00Z"))
+					else()
+
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if (exists($envDomb) and exists($envDoma) and exists($envDome) and not(empty($dateb) or empty($datea) or empty($datee))) then
+				(if (($dateb > $datee) or ($dateb > $datea) or ($datea > $datee)) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDoma) and not(empty($dateb) or empty($datea))) then
+				(if ($dateb > $datea) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)	
+			else if (exists($envDoma) and exists($envDome) and not(empty($datea) or empty($datee))) then
+				(if ($datea > $datee) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDome) and not(empty($dateb) or empty($datee))) then
+				( if ($dateb > $datee) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+					else()
+				)
+			else()
+
+
+let $messagesdor := 
+
+	for $feature in $features_selected/bu-base:dateOfRenovation/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		let $dateb := if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:beginning)
+					else if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:beginning), xs:time("00:00:00Z"))
+					else()
+		let $datee := if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:end)
+					else if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:end), xs:time("00:00:00Z"))
+					else()
+		let $datea := if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:anyPoint)
+					else if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:anyPoint), xs:time("00:00:00Z"))
+					else()
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if (exists($envDomb) and exists($envDoma) and exists($envDome) and not(empty($dateb) or empty($datea) or empty($datee))) then
+				(if (($dateb > $datee) or ($dateb > $datea) or ($datea > $datee)) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDoma) and not(empty($dateb) or empty($datea))) then
+				(if ($dateb > $datea) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)	
+			else if (exists($envDoma) and exists($envDome) and not(empty($datea) or empty($datee))) then
+				(if ($datea > $datee) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDome) and not(empty($dateb) or empty($datee))) then
+				( if ($dateb > $datee) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+					else()
+				)
+			else()
+
+
+let $messagesdor_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-base:dateOfRenovation/bu-base:DateOfEvent
+		let $envDomb := $feature/bu-base:beginning
+		let $envDome := $feature/bu-base:end
+		let $envDoma := $feature/bu-base:anyPoint
+		let $dateb := if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:beginning)
+					else if ((count($feature/bu-base:beginning) = 1) and 
+						($feature/bu-base:beginning castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:beginning), xs:time("00:00:00Z"))
+					else()
+		let $datee := if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:end)
+					else if ((count($feature/bu-base:end) = 1) and 
+						($feature/bu-base:end castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:end), xs:time("00:00:00Z"))
+					else()
+		let $datea := if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:dateTime)) then
+						xs:dateTime($feature/bu-base:anyPoint)
+					else if ((count($feature/bu-base:anyPoint) = 1) and 
+						($feature/bu-base:anyPoint castable as xs:date)) then
+						dateTime(xs:date($feature/bu-base:anyPoint), xs:time("00:00:00Z"))
+					else()
+
+		return
+			if (count($envDomb) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringb, 'multiplicity': 1, 'count': count($envDomb)})
+			else if (count($envDome) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringe, 'multiplicity': 1, 'count': count($envDome)})
+			else if (count($envDoma) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringa, 'multiplicity': 1, 'count': count($envDoma)})
+			else if (exists($envDomb) and exists($envDoma) and exists($envDome) and not(empty($dateb) or empty($datea) or empty($datee))) then
+				(if (($dateb > $datee) or ($dateb > $datea) or ($datea > $datee)) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDoma) and not(empty($dateb) or empty($datea))) then
+				(if ($dateb > $datea) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)	
+			else if (exists($envDoma) and exists($envDome) and not(empty($datea) or empty($datee))) then
+				(if ($datea > $datee) then
+						local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+				else()
+				)
+			else if (exists($envDomb) and exists($envDome) and not(empty($dateb) or empty($datee))) then
+				( if ($dateb > $datee) then
+					local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The beginning attribute shall not be after the anyPoint attribute and the end attribute, and the anyPoint attribute shall not be after the end attribute', 'additionalInfo': ''})
+					else()
+				)
+			else()
+
+
+
+let $combined_messages := ($messagesdoc, $messagesdoc_parts, $messagesdod, $messagesdod_parts, $messagesdor, $messagesdor_parts)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
 
 
 
