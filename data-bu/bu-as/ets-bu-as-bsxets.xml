@@ -1391,7 +1391,6 @@ return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
-
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -1481,6 +1480,8 @@ return
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 
+
+
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -1506,26 +1507,52 @@ let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:B
 
 let $messages := 
 
-		for $feature in $features_selected
-				for $this_feature in $feature/*/bu-base:HeightAboveGround
+	for $feature in $features_selected/bu-base:heightAboveGround/bu-base:HeightAboveGround
+		let $envDom := $feature/bu-base:value
 
-					let $envDom := $this_feature/bu-base:value
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@uom))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if ($envDom/@uom != 'm') then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The value of HeightAboveGround is in meters', 'additionalInfo': ''})
+			else ()
 
-					return
-						if (not(exists($envDom))) then
-							local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
-						else if (count($envDom) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
-						else if (not(count($envDom) = count($envDom/@uom))) then
-							local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-						else if ($envDom/@uom != 'm') then
-							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The value of HeightAboveGround is in meters', 'additionalInfo': ''})
-						else()
+
+let $messages_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/bu-base:heightAboveGround/bu-base:HeightAboveGround
+		let $envDom := $feature/bu-base:value
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@uom))) then
+				local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if ($envDom/@uom != 'm') then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The value of HeightAboveGround is in meters', 'additionalInfo': ''})
+			else ()
+
+
+let $combined_messages := ($messages, $messages_parts)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -1554,31 +1581,56 @@ let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:B
 
 let $messages := 
 
-		for $feature in $features_selected
-				for $this_feature in $feature/*/bu-base:BuildingGeometry2D
+	for $feature in $features_selected/*:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:geometry
 
-					let $envDom := $this_feature/bu-base:geometry
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not (exists($envDom/gml:Point) or exists($envDom/gml:Surface) or exists($envDom/gml:MultiSurface))) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The geometry is of type GM_Point or GM_Surface or GM_MultiSurface', 'additionalInfo': ''})
+			else ()
 
-					return
-						if (not(exists($envDom))) then
-							local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
-						else if (count($envDom) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
-						else if (not (exists($envDom/gml:Point) or exists($envDom/gml:Surface) or exists($envDom/gml:MultiSurface))) then
-							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The geometry is of type GM_Point or GM_Surface or GM_MultiSurface', 'additionalInfo': ''})
-						else()
+
+let $messages_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/*:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:geometry
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not (exists($envDom/gml:Point) or exists($envDom/gml:Surface) or exists($envDom/gml:MultiSurface))) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The geometry is of type GM_Point or GM_Surface or GM_MultiSurface', 'additionalInfo': ''})
+			else ()
+
+
+let $combined_messages := ($messages, $messages_parts)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
+
 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElementBuildings"/>
 										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
-										<translationTemplate ref="TR.missingAttributeBuildings"/>
+										
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -1600,24 +1652,50 @@ let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:B
 
 let $messages := 
 
-		for $feature in $features_selected
-				for $this_feature in $feature/*/bu-base:BuildingGeometry2D
+	for $feature in $features_selected/*:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:horizontalGeometryEstimatedAccuracy
 
-					let $envDom := $this_feature/bu-base:horizontalGeometryEstimatedAccuracy
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((exists($envDom/@uom) and $envDom/@uom != 'm')) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The value of horizontalGeometryEstimatedAccuracy is given in meters', 'additionalInfo': ''})
+			else ()
 
-					return
-						if (not(exists($envDom))) then
-							local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
-						else if (count($envDom) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
-						else if ((exists($envDom/@uom) and $envDom/@uom != 'm')) then
-							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The value of horizontalGeometryEstimatedAccuracy is given in meters', 'additionalInfo': ''})
-						else()
+
+let $messages_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/*:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:horizontalGeometryEstimatedAccuracy
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((exists($envDom/@uom) and $envDom/@uom != 'm')) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The value of horizontalGeometryEstimatedAccuracy is given in meters', 'additionalInfo': ''})
+			else ()
+
+
+let $combined_messages := ($messages, $messages_parts)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
+
+
 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
@@ -1645,29 +1723,49 @@ let $features_selected := $features[self::bu-core2d:Building | self::bu-core2d:B
 
 let $messages := 
 
-		for $feature in $features_selected
-				for $this_feature in $feature/*/bu-base:BuildingGeometry2D
+	for $feature in $features_selected/*:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:verticalGeometryEstimatedAccuracy
 
-					let $envDom := $this_feature/bu-base:verticalGeometryEstimatedAccuracy
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((exists($envDom/@uom) and $envDom/@uom != 'm')) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The value of verticalGeometryEstimatedAccuracy is given in meters', 'additionalInfo': ''})
+			else ()
 
-					return
-						if (count($envDom) > 1) then
-							local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
-						else if (not(count($envDom) = count($envDom/@uom))) then
-							local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-						else if ((exists($envDom/@uom) and $envDom/@uom != 'm')) then
-							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The value of verticalGeometryEstimatedAccuracy is given in meters', 'additionalInfo': ''})
-						else()
+
+let $messages_parts := 
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'bu-core3d:Building') then
+					$this_feature/bu-base:parts/bu-core3d:BuildingPart
+				else if (name($this_feature) = 'bu-core2d:Building') then
+					$this_feature/bu-base:parts/bu-core2d:BuildingPart
+				else ()
+
+	for $feature in $this_features/*:geometry2D/bu-base:BuildingGeometry2D
+		let $envDom := $feature/bu-base:verticalGeometryEstimatedAccuracy
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((exists($envDom/@uom) and $envDom/@uom != 'm')) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'constraint': 'The value of verticalGeometryEstimatedAccuracy is given in meters', 'additionalInfo': ''})
+			else ()
+
+
+let $combined_messages := ($messages, $messages_parts)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)
+(if ($combined_messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
+$combined_messages)
+
 
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.missingElementBuildings"/>
 										<translationTemplate ref="TR.wrongMultiplicityBuildings"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
