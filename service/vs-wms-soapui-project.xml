@@ -816,7 +816,6 @@ layers.each{layer ->
 def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
-def usedParent = [];
 def authorityURL = capabilities.Capability.depthFirst().findAll{it.name()=='AuthorityURL' && it.parent().name()=='Layer'};
 authorityURL.each{authority ->
 	if(authority.@name.toString().length() == 0){
@@ -827,29 +826,31 @@ authorityURL.each{authority ->
 	}
 }
 def layers = capabilities.Capability.depthFirst().findAll{it.name()=='Layer'};
-layers.each{ layer ->
-	def inheritedProperty = [];
-	if(layer.name() == 'Layer' && layer.AuthorityURL.@name.size() != 0){
-		inheritedProperty << layer.AuthorityURL.@name;
-	}
-	def parentLayer = layer.parent();
-	while(parentLayer.name() == 'Layer'){
+def inheritedProperty = [];
+def identifierValues = [];
 
-		if (!(parentLayer in usedParent)){
-			usedParent << parentLayer;
-			
-			if(!(parentLayer.AuthorityURL.@name in inheritedProperty) ){
-				inheritedProperty << parentLayer.AuthorityURL.@name;
-			}
-			else{
-				throw new TranslatableAssertionError("TR.authorityURLnameAlreadyDefined");
-			}
-		}
-		parentLayer = parentLayer.parent();
+layers.each{ layer ->
+
+	if(layer.parent().name() != 'Layer'){
+		inheritedProperty = [];
+		identifierValues = [];
 	}
-	layer.Identifier.each{ identifier ->
-		if(!(identifier.@authority in inheritedProperty)){
-			throw new TranslatableAssertionError("TR.unavailableAuthorityURL");
+	
+	if(layer.AuthorityURL.@name.size() != 0 && layer.AuthorityURL.@name in inheritedProperty)
+		throw new TranslatableAssertionError("TR.authorityURLnameAlreadyDefined");
+
+	if(layer.AuthorityURL.@name.size() != 0 && !(layer.AuthorityURL.@name in inheritedProperty))
+		inheritedProperty << layer.AuthorityURL.@name;
+	
+	if(layer.Identifier.size() != 0){
+		layer.Identifier.each{ identifier ->
+			if(!(identifier.@authority in inheritedProperty))
+				throw new TranslatableAssertionError("TR.unavailableAuthorityURL");
+			if (identifier.toString() in identifierValues){
+				throw new TranslatableAssertionError("TR.notUniqueLayerAuthorityIdentifier");		
+			}else {
+				identifierValues << identifier.toString()
+			}
 		}
 	}
 }
