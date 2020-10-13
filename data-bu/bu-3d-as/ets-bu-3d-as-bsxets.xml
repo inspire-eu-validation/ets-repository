@@ -203,7 +203,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/cons
 									<parent ref="EID2f97c63b-3c8c-4260-b9d5-1ac0170c9ef4"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features_selected := $features[self::bu-core3d:BuildingPart]
+let $features_selected := $features[self::bu-core3d:BuildingPart | self::bu-core3d:Building]
 let $buildingPartIDs := $features[self::bu-core3d:BuildingPart]/@*:id
 let $messages :=
 	for $feature in $features_selected
@@ -267,7 +267,7 @@ let $messages :=
 			else $feature
 
 		return 
-		if(((exists($feature/bu-base:parts) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingPart') and ((not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometrySolid))) or (not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometryMultiSurface))and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometrySolid))) or (not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid))) or (not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface))and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid))))) then
+		if(((exists($feature/bu-base:parts) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingPart') and ((exists($element/bu-core3d:geometry3DLoD1) and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometrySolid))) and (exists($element/bu-core3d:geometry3DLoD2) and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometrySolid))) and (exists($element/bu-core3d:geometry3DLoD3) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid))) and (exists($element/bu-core3d:geometry3DLoD4) and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid)))))then
 			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'The geometryMultiSurface or the geometrySolid attribute is provided.', 'additionalInfo' : '' })
 		else if(count($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface) > 1) then
 			local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface)}) 
