@@ -1,5 +1,6 @@
 declare namespace bu-base='http://inspire.ec.europa.eu/schemas/bu-base/4.0';
 declare namespace bu-core2d='http://inspire.ec.europa.eu/schemas/bu-core2d/4.0';
+declare namespace ef='http://inspire.ec.europa.eu/schemas/ef/4.0';
 declare namespace nz-core	='http://inspire.ec.europa.eu/schemas/nz-core/4.0'; 
 declare namespace elu='http://inspire.ec.europa.eu/schemas/elu/4.0';
 declare namespace gmlcov='http://www.opengis.net/gmlcov/1.0';
