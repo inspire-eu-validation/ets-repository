@@ -555,8 +555,8 @@ let $messages :=
 		let $urls := 
 			for $x in $feature/nz-core:exposedElement/@xlink:href
 				return
-					if (starts-with($x, '#')) then ()
-					else $x						
+					if (starts-with(string($x), '#')) then ()
+					else string($x)						
 		let $map := local:check-resource-uris($urls, 30, true())
 		let $valid_urls := 
 			for $href in $urls
@@ -568,15 +568,15 @@ let $messages :=
 		let $ids := 
 			for $x in $feature/nz-core:exposedElement/@xlink:href
 				return
-					if (starts-with($x, '#')) then $x
+					if (starts-with(string($x), '#')) then string($x)
 					else ()
 
 		let $valid_ids :=
 			for $x in $ids
 				return
-					if (starts-with($x, '#')) then
-						if (not(substring($x, 2) = $features_exposed)) then ()
-						else $x
+					if (starts-with(string($x), '#')) then
+						if (not(substring(string($x), 2) = $features_exposed)) then ()
+						else string($x)
 					else ()
 
 
