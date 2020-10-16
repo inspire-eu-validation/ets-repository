@@ -101,7 +101,7 @@ let $childParentMessages :=
 
 		return
 			if((count($parent) = 0 and exists($feature/bu-base:parts/bu-core2d:BuildingPart) and name($feature) = 'bu-core2d:Building') or (name($feature) = 'bu-core2d:BuildingPart' and count($parent) = 0)) then 
-				local:addMessage('TR.missingElementBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:BuildingGeometry2D'}) 
+				local:addMessage('TR.missingElementBuildings', map {'filename': local:filename($parent/../..), 'featureType':local-name($parent/../..), 'gmlid': string($parent/../../@*:id), 'property': 'bu-base:BuildingGeometry2D'}) 
 			else ()
 
 let $childMessages :=
@@ -116,11 +116,11 @@ let $childMessages :=
 		for $child in $parent
 			return 
 				if(count($child/bu-base:referenceGeometry) = 0) then 
-					local:addMessage('TR.missingElementBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:referenceGeometry'}) 
+					local:addMessage('TR.missingElementBuildings', map {'filename': local:filename($parent/../..), 'featureType':local-name($parent/../..), 'gmlid': string($parent/../../@*:id), 'property': 'bu-base:referenceGeometry'}) 
 				else if (count($child/bu-base:referenceGeometry) > 1) then
-					local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:referenceGeometry', 'multiplicity': 1, 'count': count($child/bu-base:referenceGeometry)}) 
+					local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($parent/../..), 'featureType':local-name($parent/../..), 'gmlid': string($parent/../../@*:id), 'property': 'bu-base:referenceGeometry', 'multiplicity': 1, 'count': count($child/bu-base:referenceGeometry)}) 
 				else if ($child/bu-base:referenceGeometry != 'true') then
-					local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint':"The geometry2D with a referenceGeometry attribure set to 'true'" ,'additionalInfo':''}) 
+					local:addMessage('TR.constraintViolation', map {'filename': local:filename($parent/../..), 'featureType':local-name($parent/../..), 'gmlid': string($parent/../../@*:id), 'constraint':"The geometry2D with a referenceGeometry attribure set to 'true'" ,'additionalInfo':''}) 
 				else()
 
 let $combined_messages := ($parentMessages, $childParentMessages, $childMessages)
