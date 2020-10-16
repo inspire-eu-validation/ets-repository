@@ -214,12 +214,46 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-as/constra
 let $property_stringc := 'COD'
 let $property_stringp := 'pathology'
 let $features_selected := $features[self::hh:Disease]
+let $gml_ids := $features//@gml:id
+
 
 let $messages := 
 
 		for $feature in $features_selected
 			let $envDomc := $feature/hh:COD
 			let $envDomp := $feature/hh:pathology
+			let $urlsc := 
+				for $x in $envDomc/@xlink:href
+					return
+					if (starts-with($x, '#')) then
+						()
+					else
+						$x
+			let $mapc := local:check-resource-uris($urlsc, 30, true())
+			let $invalid_urlsc :=
+				for $href in $urlsc
+					let $url := string($href)
+					let $validuri := map:get($mapc, $url)
+					return
+						if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+							$url
+						else ()
+			let $urlsp := 
+				for $x in $envDomp/@xlink:href
+					return
+					if (starts-with($x, '#')) then
+						()
+					else
+						$x
+			let $mapp := local:check-resource-uris($urlsc, 30, true())
+			let $invalid_urlsp :=
+				for $href in $urlsp
+					let $url := string($href)
+					let $validuri := map:get($mapc, $url)
+					return
+						if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+							$url
+						else ()
 
 					return						
 						if (count($envDomp) > 1) then
@@ -230,8 +264,12 @@ let $messages :=
 							local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringp, 'attribute': 'xlink:href'})
 						else if (not(count($envDomc) = count($envDomc/@xlink:href))) then
 							local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringc, 'attribute': 'xlink:href'})
-						else if (not(exists($envDomc/@xlink:href)) and not(exists($envDomp/@xlink:href))) then
+						else if (not(exists($envDomc/@xlink:href)) and not(exists($envDomc/@xlink:href))) then
 							local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one of pathology and COD attributes must not be empty', 'additionalInfo':''})
+						else if (count($invalid_urlsc) > 0) then
+							local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringc, 'value': string-join($invalid_urlsc, ',')})
+						else if (count($invalid_urlsp) > 0) then
+							local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringp, 'value': string-join($invalid_urlsp, ',')})
 						else()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -244,6 +282,7 @@ $messages)
 										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
 										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
 										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
