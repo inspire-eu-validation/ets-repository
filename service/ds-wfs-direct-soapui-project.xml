@@ -164,9 +164,65 @@ a.equals("/*:WFS_Capabilities/@version", "Capabilities version", "2.0.0");</scri
           <con:encoding>UTF-8</con:encoding>
           <con:endpoint>${#Project#endpt.GetCapabilities.Get}</con:endpoint>
           <con:request/>
-          <con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="e5ffedd2-dbba-45ff-9fc7-0ff804501a51"/><con:assertion type="Valid HTTP Status Codes" id="e11365e2-a2d0-4c80-8831-9880ea455af5" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="8882b4e8-2fcd-4716-92f3-cd4d9f4d3615" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="68a7abcd-c568-45be-9f43-5245dd47f3a6" name="xsi:schemaLocation attribute exists"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+          <con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="e5ffedd2-dbba-45ff-9fc7-0ff804501a51"/><con:assertion type="Valid HTTP Status Codes" id="e11365e2-a2d0-4c80-8831-9880ea455af5" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="8882b4e8-2fcd-4716-92f3-cd4d9f4d3615" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="a282cd1d-abbc-49fd-aef0-c97cbd8b42ca" name="Response validates agains schema"><con:configuration><scriptText>import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Schema;
+import javax.xml.validation.Validator
+import javax.xml.XMLConstants;
+import java.io.*;
+import org.xml.sax.SAXException;
+import de.interactive_instruments.etf.suim.*;
+import com.eviware.soapui.support.XmlHolder;
+import javax.xml.transform.Source;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("/*:WFS_Capabilities/@*:schemaLocation", "TR.missingSchemaLocation");</scriptText></con:configuration></con:assertion><con:assertion type="Simple Schema Validator" name="Response validates against schema" id="f19a8f8e-9649-4910-9073-e15c0ae2a7f9"><con:configuration><pathToXSD>xsi:schemaLocation</pathToXSD></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+
+XmlHolder xml = new XmlHolder(messageExchange.responseContentAsXml);
+def xmlText = xml.getXml();
+def xsds = ["http://schemas.opengis.net/wfs/2.0/wfs.xsd", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0/inspire_dls.xsd"];
+
+if(xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation") != null){
+	def xsd = xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation");
+	validateFile(xmlText, xsd);
+}else{
+	xsds.each{ xsd ->
+	   validateFile(xmlText, xsd);
+	}
+}
+
+
+public boolean validateFile(String xml, String strSchemaLocation)
+{
+    Source xmlFile = null;
+    try {
+        URL schemaFile = new URL(strSchemaLocation);
+        xmlFile = new StreamSource(createFile(xml));
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = schemaFactory.newSchema(schemaFile);
+        Validator validator = schema.newValidator();
+        validator.validate(xmlFile);
+        
+    } catch (SAXException e) {
+        String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
+	     throw new TranslatableAssertionError('TR.XmlNotValidAgainstSchemaLocation', assertParams);
+        
+    } catch (IOException ioe) {
+        System.out.println("IOException");
+        
+    }
+    
+}
+
+
+
+public File createFile(String file) throws IOException {
+
+    File tempFile = File.createTempFile("temporaryfile",".xml")
+    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+    writer.write(file);
+    writer.close()
+    return tempFile;
+}
+</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
           <con:jmsPropertyConfig/>
           <con:parameters>
 
@@ -366,7 +422,7 @@ a.equals("/*:WFS_Capabilities/fes:Filter_Capabilities/fes:Conformance/fes:Constr
 
 
 
- <con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>excludeFeatureTypes, srsnamelist, blacklisted.outputFormats, authUser, authPwd, authMethod, FirstFeature, FirstFeatureId, GetFeatureURL, featureTypeList, datasetIdentifiersList, featureTypeList, FirstFeatureTypeName, testIntensive, endpt.GetFeature.Get, endpt.DescribeFeatureType.Get, endpt.GetFeature.Post, endpt.DescribeFeatureType.Post, endpt.GetPropertyValue.Get, endpt.GetPropertyValue.Post, endpt.ListStoredQueries.Get, endpt.ListStoredQueries.Post, endpt.DescribeStoredQueries.Get, endpt.DescribeStoredQueries.Post, etf.translation.template.collection.id, etf.tag.ids, etf.author, etf.version, etf.last.editor, etf.reference, etf.creation.date</con:value></con:property><con:property><con:name>authMethod</con:name><con:value>basic</con:value></con:property><con:property><con:name>FirstFeatureTypeName</con:name><con:value/></con:property><con:property><con:name>testIntensive</con:name><con:value/></con:property><con:property><con:name>endpt.GetCapabilities.Get</con:name><con:value/></con:property><con:property><con:name>endpt.GetFeature.Get</con:name><con:value/></con:property><con:property><con:name>endpt.DescribeFeatureType.Get</con:name><con:value/></con:property><con:property><con:name>endpt.GetFeature.Post</con:name><con:value/></con:property><con:property><con:name>endpt.DescribeFeatureType.Post</con:name><con:value/></con:property><con:property><con:name>endpt.GetPropertyValue.Get</con:name><con:value/></con:property><con:property><con:name>endpt.GetPropertyValue.Post</con:name><con:value/></con:property><con:property><con:name>endpt.ListStoredQueries.Get</con:name><con:value/></con:property><con:property><con:name>endpt.ListStoredQueries.Post</con:name><con:value/></con:property><con:property><con:name>endpt.DescribeStoredQueries.Get</con:name><con:value/></con:property><con:property><con:name>endpt.DescribeStoredQueries.Post</con:name><con:value/></con:property><con:property><con:name>blacklisted.outputFormats</con:name><con:value>text/xml; subtype=gml/3.1.1, application/gml+xml; version=3.1</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EIDe51620af-bcf5-4719-ab0e-ef6226a572fa</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EIDfadd4929-fa60-4781-b658-703bbfe3f4eb</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>interactive instruments GmbH</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>1.0.4</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/ets-repository/tree/master/service/ds-wfs-direct-soapui-project.xml</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2017-05-15T00:00:00</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EID9b6ef734-981e-4d60-aa81-d6730a1c6389</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2020-05-295T09:47:00</con:value></con:property><con:property><con:name>etf.dependency.ids</con:name><con:value>EID6e960f9c-8617-31fe-bf02-e8b7dab5e754</con:value></con:property><con:property><con:name>serviceEndpoint</con:name><con:value/></con:property></con:properties>
+ <con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>excludeFeatureTypes, srsnamelist, blacklisted.outputFormats, authUser, authPwd, authMethod, FirstFeature, FirstFeatureId, GetFeatureURL, featureTypeList, datasetIdentifiersList, featureTypeList, FirstFeatureTypeName, testIntensive, endpt.GetFeature.Get, endpt.DescribeFeatureType.Get, endpt.GetFeature.Post, endpt.DescribeFeatureType.Post, endpt.GetPropertyValue.Get, endpt.GetPropertyValue.Post, endpt.ListStoredQueries.Get, endpt.ListStoredQueries.Post, endpt.DescribeStoredQueries.Get, endpt.DescribeStoredQueries.Post, etf.translation.template.collection.id, etf.tag.ids, etf.author, etf.version, etf.last.editor, etf.reference, etf.creation.date</con:value></con:property><con:property><con:name>authMethod</con:name><con:value>basic</con:value></con:property><con:property><con:name>FirstFeatureTypeName</con:name><con:value/></con:property><con:property><con:name>testIntensive</con:name><con:value/></con:property><con:property><con:name>endpt.GetCapabilities.Get</con:name><con:value/></con:property><con:property><con:name>endpt.GetFeature.Get</con:name><con:value/></con:property><con:property><con:name>endpt.DescribeFeatureType.Get</con:name><con:value/></con:property><con:property><con:name>endpt.GetFeature.Post</con:name><con:value/></con:property><con:property><con:name>endpt.DescribeFeatureType.Post</con:name><con:value/></con:property><con:property><con:name>endpt.GetPropertyValue.Get</con:name><con:value/></con:property><con:property><con:name>endpt.GetPropertyValue.Post</con:name><con:value/></con:property><con:property><con:name>endpt.ListStoredQueries.Get</con:name><con:value/></con:property><con:property><con:name>endpt.ListStoredQueries.Post</con:name><con:value/></con:property><con:property><con:name>endpt.DescribeStoredQueries.Get</con:name><con:value/></con:property><con:property><con:name>endpt.DescribeStoredQueries.Post</con:name><con:value/></con:property><con:property><con:name>blacklisted.outputFormats</con:name><con:value>text/xml; subtype=gml/3.1.1, application/gml+xml; version=3.1</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EIDe51620af-bcf5-4719-ab0e-ef6226a572fa</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EIDfadd4929-fa60-4781-b658-703bbfe3f4eb</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>interactive instruments GmbH</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>1.0.5</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/ets-repository/tree/master/service/ds-wfs-direct-soapui-project.xml</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2017-05-15T00:00:00</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EID9b6ef734-981e-4d60-aa81-d6730a1c6389</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2020-10-19T13:20:00</con:value></con:property><con:property><con:name>etf.dependency.ids</con:name><con:value>EID95a1b6fc-2b55-3d43-9502-3b8b605bda10</con:value></con:property><con:property><con:name>serviceEndpoint</con:name><con:value/></con:property></con:properties>
  <con:afterLoadScript>
  </con:afterLoadScript>
  <con:wssContainer/>
