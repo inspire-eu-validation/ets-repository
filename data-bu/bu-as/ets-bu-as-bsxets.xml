@@ -1267,7 +1267,9 @@ let $messages :=
 						else()
 				let $percentage_messages:=
 					let $percentages := for $this_feature in $feature/bu-base:currentUse/bu-base:CurrentUse
-							return $this_feature/bu-base:percentage
+							return if ($this_feature/bu-base:percentage castable as xs:double) then
+									$this_feature/bu-base:percentage
+								else (0)
 					let $this_features_parts :=
 						for $this_feature in $feature
 							return
@@ -1277,7 +1279,9 @@ let $messages :=
 									$this_feature/bu-base:parts/bu-core2d:BuildingPart
 								else ()
 					let $percentages_parts:= for $this_feature in $this_features_parts/bu-base:currentUse/bu-base:CurrentUse
-							return $this_feature/bu-base:percentage
+							return if ($this_feature/bu-base:percentage castable as xs:double) then
+									$this_feature/bu-base:percentage
+								else (0)
 					return if ((sum($percentages)+ sum($percentages_parts)) > 100) then
 							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the total of all percentages are less or equal to 100.', 'additionalInfo': ''})
 						else()
