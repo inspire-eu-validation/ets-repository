@@ -130,7 +130,7 @@ let $messages_parts :=
 
 	return
 		if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLinkBuildings', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+			local:addMessage('TR.brokenLinkBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
 let $combined_messages := ($messages, $messages_parts)
 
@@ -220,13 +220,13 @@ let $messages_parts :=
 
 	return
 		if (exists($feature) and not(exists($envDom))) then
-			local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			local:addMessage('TR.missingElementBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
 		else if (exists($feature) and count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			local:addMessage('TR.wrongMultiplicityBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 		else if (exists($feature) and not(count($envDom) = count($envDom/@xlink:href))) then
-			local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			local:addMessage('TR.missingAttributeBuildings',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 		else if ((exists($feature)) and (count($invalid_urls) > 0)) then
-			local:addMessage('TR.brokenLinkBuildings', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+			local:addMessage('TR.brokenLinkBuildings', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
 
 
