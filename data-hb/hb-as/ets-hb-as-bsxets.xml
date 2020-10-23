@@ -436,7 +436,8 @@ let $features_selected := $features[self::hb:Habitat]
 let $urls := 
 		for $x in $features_selected/hb:habitat/hb:HabitatTypeCoverType/hb:referenceHabitatTypeScheme/@xlink:href
 				return $x		
-
+let $filename := for $x in $features_selected
+			return local:filename($x)	
 let $map := local:check-resource-uris($urls, 30, true())
 let $valid_urls :=
 	for $href in $urls
@@ -456,7 +457,7 @@ let $found :=
 				true()
 			else ()
 let $messages := (if (not(true() = $found)) then
-					local:addMessage('TR.constraintViolationHB', map { 'filename': '', 'constraint': 'At least one habitat type according to a (pan-european) referenceHabitatTypeScheme listed in the ReferenceHabitatTypeSchemeValue code list is available', 'additionalInfo': ''})
+					local:addMessage('TR.constraintViolationHB', map { 'filename': distinct-values($filename), 'constraint': 'At least one habitat type according to a (pan-european) referenceHabitatTypeScheme listed in the ReferenceHabitatTypeSchemeValue code list is available', 'additionalInfo': ''})
 				else())
 
 return
