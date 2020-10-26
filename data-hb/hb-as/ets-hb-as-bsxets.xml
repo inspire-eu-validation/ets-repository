@@ -315,7 +315,7 @@ let $messages :=
 			local:addMessage('TR.wrongMultiplicityHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
 		else if (exists($envDom/..) and not($envDom/@xlink:href)) then
 			local:addMessage('TR.missingAttributeHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id),'attribute':'@xlink:href', 'property': $property_string}) 
-		else if (exists($envDom/..) and not(starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) and not(starts-with($envDom/@xlink:href, 'https://eunis.eea.europa.eu/species/'))) then
+		else if (exists($envDom/..) and not(starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) and not(starts-with($envDom/@xlink:href, 'https://eunis.eea.europa.eu/species/')) and not($envDom/@xlink:href = $invalid_urls)) then
 			local:addMessage('TR.manual.disallowedCodeListValueHB',  map {'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $natureCodelist}) 
 		else if($envDom/@xlink:href = $invalid_urls) then
 			let $dummy := "aaa"
@@ -324,7 +324,7 @@ let $messages :=
 						local:addMessage('TR.disallowedCodeListValueHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $euCodelist}) 
 					else if (starts-with($envDom/@xlink:href, 'https://eunis.eea.europa.eu/species/')) then
 						local:addMessage('TR.disallowedCodeListValueHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $eunisCodelist}) 
-					else ()
+					else (local:addMessage('TR.brokenLinkHabitatBio', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}))
 		else ()
 
 
@@ -343,6 +343,7 @@ $messages)
 										<translationTemplate ref="TR.missingAttributeHabitatBio"/>
 										<translationTemplate ref="TR.disallowedCodeListValueHabitatBio"/>
 										<translationTemplate ref="TR.manual.disallowedCodeListValueHB"/>
+										<translationTemplate ref="TR.brokenLinkHabitatBio"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID96b51bdc-c3eb-4978-8935-2dbab2f99036">
