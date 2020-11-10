@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDd1d0409d-d60f-4c95-8efd-83149b47f10f" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-lc/lc-gml</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: GML application schemas, Land Cover</label>
+	<description><![CDATA[This test suite examines the GML encoding of spatial objects specified in the INSPIRE GML application schema 'Land Cover'. Both currently approved GML application schema versions (3.0 and 4.0) are tested.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-gml" target="_blank">Conformance Class 'GML application schemas, Land Cover'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
+	<reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-10-30T12:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-10-30T12:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID09820daf-62b2-4fa3-a95f-56a0d2b7c4d8"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID6b3a2bae-1f92-4931-b8fc-ac3cbeda9bde">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDd1d0409d-d60f-4c95-8efd-83149b47f10f"/>
+			<testCases>
+				<TestCase id="EIDa6707723-0be1-4e1f-9984-75d571910508">
+					<label>Basic test</label>
+					<description>Verify that the spatial data set contains at least one Land Cover feature.</description>
+					<parent ref="EID6b3a2bae-1f92-4931-b8fc-ac3cbeda9bde"/>
+					<testSteps>
+						<TestStep id="EID11595a12-ee1c-44e8-80f6-a4d64f2b23f1">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDa6707723-0be1-4e1f-9984-75d571910508"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID9670ff79-c27c-4191-a43d-106c0b6d0fa2">
+									<label>lc-gml.a.1: Land Cover feature in dataset</label>
+									<description><![CDATA[Check that the set of features in the spatial data set is not empty.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_LC_v3.0.pdf">INSPIRE Data Specification on Land Cover, A.1.1, (A.6.1)</a>]]></description>
+									<parent ref="EID11595a12-ee1c-44e8-80f6-a4d64f2b23f1"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $featuresFromAppSchema := $features[self::lcv:LandCoverDataset || self::lcr:LandCoverGridCoverage]
+return
+ (if ($featuresFromAppSchema) then 'PASSED' else 'FAILED',
+  if (not($featuresFromAppSchema)) then local:addMessage('TR.noFeature', map { 'theme': 'Land Cover' }) else ())
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noFeature"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
