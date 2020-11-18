@@ -839,17 +839,23 @@ layers.each{ layer ->
 	if(layer.AuthorityURL.@name.size() != 0 && layer.AuthorityURL.@name in inheritedProperty)
 		throw new TranslatableAssertionError("TR.authorityURLnameAlreadyDefined");
 
-	if(layer.AuthorityURL.@name.size() != 0 && !(layer.AuthorityURL.@name in inheritedProperty))
-		inheritedProperty << layer.AuthorityURL.@name;
-	
-	if(layer.Identifier.size() != 0){
+		if (!(parentLayer in usedParent)){
+			usedParent << parentLayer;
+			if(parentLayer.hasProperty("AuthorityURL")){
+				if(!(parentLayer.AuthorityURL.@name in inheritedProperty) ){
+					inheritedProperty << parentLayer.AuthorityURL.@name;
+				}
+				else{
+					throw new TranslatableAssertionError("TR.authorityURLnameAlreadyDefined");
+				}
+			}
+		}
+		parentLayer = parentLayer.parent();
+	}
+	if(layer.hasProperty("Identifier")){
 		layer.Identifier.each{ identifier ->
-			if(!(identifier.@authority in inheritedProperty))
+			if(!(identifier.@authority in inheritedProperty)){
 				throw new TranslatableAssertionError("TR.unavailableAuthorityURL");
-			if (identifier.toString() in identifierValues){
-				throw new TranslatableAssertionError("TR.notUniqueLayerAuthorityIdentifier");		
-			}else {
-				identifierValues << identifier.toString()
 			}
 		}
 	}
