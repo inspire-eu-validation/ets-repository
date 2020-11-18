@@ -816,7 +816,6 @@ layers.each{layer ->
 def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
-def usedParent = [];
 def authorityURL = capabilities.Capability.depthFirst().findAll{it.name()=='AuthorityURL' && it.parent().name()=='Layer'};
 authorityURL.each{authority ->
 	if(authority.@name.toString().length() == 0){
@@ -827,13 +826,18 @@ authorityURL.each{authority ->
 	}
 }
 def layers = capabilities.Capability.depthFirst().findAll{it.name()=='Layer'};
+def inheritedProperty = [];
+def identifierValues = [];
+
 layers.each{ layer ->
-	def inheritedProperty = [];
-	if(layer.name() == 'Layer' && layer.AuthorityURL.@name.size() != 0){
-		inheritedProperty << layer.AuthorityURL.@name;
+
+	if(layer.parent().name() != 'Layer'){
+		inheritedProperty = [];
+		identifierValues = [];
 	}
-	def parentLayer = layer.parent();
-	while(parentLayer.name() == 'Layer'){
+	
+	if(layer.AuthorityURL.@name.size() != 0 && layer.AuthorityURL.@name in inheritedProperty)
+		throw new TranslatableAssertionError("TR.authorityURLnameAlreadyDefined");
 
 		if (!(parentLayer in usedParent)){
 			usedParent << parentLayer;
