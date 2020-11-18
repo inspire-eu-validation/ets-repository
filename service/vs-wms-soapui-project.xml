@@ -837,19 +837,22 @@ layers.each{ layer ->
 
 		if (!(parentLayer in usedParent)){
 			usedParent << parentLayer;
-			
-			if(!(parentLayer.AuthorityURL.@name in inheritedProperty) ){
-				inheritedProperty << parentLayer.AuthorityURL.@name;
-			}
-			else{
-				throw new TranslatableAssertionError("TR.authorityURLnameAlreadyDefined");
+			if(parentLayer.hasProperty("AuthorityURL")){
+				if(!(parentLayer.AuthorityURL.@name in inheritedProperty) ){
+					inheritedProperty << parentLayer.AuthorityURL.@name;
+				}
+				else{
+					throw new TranslatableAssertionError("TR.authorityURLnameAlreadyDefined");
+				}
 			}
 		}
 		parentLayer = parentLayer.parent();
 	}
-	layer.Identifier.each{ identifier ->
-		if(!(identifier.@authority in inheritedProperty)){
-			throw new TranslatableAssertionError("TR.unavailableAuthorityURL");
+	if(layer.hasProperty("Identifier")){
+		layer.Identifier.each{ identifier ->
+			if(!(identifier.@authority in inheritedProperty)){
+				throw new TranslatableAssertionError("TR.unavailableAuthorityURL");
+			}
 		}
 	}
 }
