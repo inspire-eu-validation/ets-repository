@@ -38,6 +38,7 @@ declare namespace us-net-sw='http://inspire.ec.europa.eu/schemas/us-net-sw/4.0';
 declare namespace us-net-th='http://inspire.ec.europa.eu/schemas/us-net-th/4.0';
 declare namespace us-net-wa='http://inspire.ec.europa.eu/schemas/us-net-wa/4.0';
 declare namespace us-govserv='http://inspire.ec.europa.eu/schemas/us-govserv/4.0';
+declare namespace us-emf='http://inspire.ec.europa.eu/schemas/us-emf/4.0';
 declare namespace bu-core3d='http://inspire.ec.europa.eu/schemas/bu-core3d/4.0';
 declare namespace net='http://inspire.ec.europa.eu/schemas/net/4.0';
 declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3'; 
