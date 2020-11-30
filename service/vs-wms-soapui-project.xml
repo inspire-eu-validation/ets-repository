@@ -817,6 +817,7 @@ def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Opera
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
 def authorityURL = capabilities.Capability.depthFirst().findAll{it.name()=='AuthorityURL' && it.parent().name()=='Layer'};
+def usedParent = [];
 authorityURL.each{authority ->
 	if(authority.@name.toString().length() == 0){
 		throw new TranslatableAssertionError("TR.missingAuthorityURLname");
@@ -827,18 +828,18 @@ authorityURL.each{authority ->
 }
 def layers = capabilities.Capability.depthFirst().findAll{it.name()=='Layer'};
 def inheritedProperty = [];
-def identifierValues = [];
 
 layers.each{ layer ->
 
 	if(layer.parent().name() != 'Layer'){
 		inheritedProperty = [];
-		identifierValues = [];
 	}
 	
 	if(layer.AuthorityURL.@name.size() != 0 && layer.AuthorityURL.@name in inheritedProperty)
 		throw new TranslatableAssertionError("TR.authorityURLnameAlreadyDefined");
 
+	def parentLayer = layer.parent();
+	while(parentLayer.name() == 'Layer'){
 		if (!(parentLayer in usedParent)){
 			usedParent << parentLayer;
 			if(parentLayer.hasProperty("AuthorityURL")){
