@@ -245,6 +245,152 @@ $messages)
 						</TestStep>
 					</testSteps>
 				</TestCase>
+				<TestCase id="EIDf14b2ddf-2edd-4cf6-939d-c9c06e9d256d">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID68bd69e4-a393-4ba2-a1c2-9142817ada67"/>
+					<testSteps>
+						<TestStep id="EID236d53ea-1f3c-455d-a6d8-dd668c95288c">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDf14b2ddf-2edd-4cf6-939d-c9c06e9d256d"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDdec3b368-7070-4ec1-8d36-4f30d00ab9f6">
+									<label>us-net-as.b.1: UtilityLinkSets objects</label>
+									<description><![CDATA[Check that all <a href= http://inspire.ec.europa.eu/id/ats/data-us/master/us-net-as/constraints#UtilityLinkSets>UtilityLinkSets objects</a> have an external object identifier.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-us/master/us-net-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_US_v3.0.pdf">INSPIRE Data Specification on Utility and Government Services, A.1.7</a>]]></description>
+									<parent ref="EID236d53ea-1f3c-455d-a6d8-dd668c95288c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $property_string := 'UtilityLinkSets objects'
+let $features_selected := $features[ self::us-net-el:ElectricityCable || self::us-net-common:Pipe || self::us-net-ogc:OilGasChemicalsPipe || self::us-net-sw:SewerPipe || self::us-net-th:ThermalPipe || self::us-net-wa:WaterPipe || self::us-net-common:Duct]
+
+let $messages := 
+
+	for $feature in $features_selected
+		let $envDom := $feature/net:inspireId
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityUtilGovServ',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and not(exists($envDom/base:identifier))) then
+				local:addMessage('TR.constraintViolationUGS', map { 'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'all UtilityLinkSets objects have an external object identifier', 'additionalInfo': ''}) 
+			else ()
+
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityUtilGovServ"/>
+										<translationTemplate ref="TR.constraintViolationUGS"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID013f12c1-32c3-426b-baac-e058a2088bec">
+									<label>us-net-as.b.2: UtilityNode objects</label>
+									<description><![CDATA[Check that all <a href= http://inspire.ec.europa.eu/id/ats/data-us/master/us-net-as/constraints#UtilityNode>UtilityNode objects</a> have an external object identifier.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-us/master/us-net-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_US_v3.0.pdf">INSPIRE Data Specification on Utility and Government Services, A.1.7</a>]]></description>
+									<parent ref="EID236d53ea-1f3c-455d-a6d8-dd668c95288c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $property_string := 'UtilityNode objects'
+let $features_selected := $features[us-net-common:Appurtenance]
+
+let $messages := 
+
+	for $feature in $features_selected
+		let $envDom := $feature/net:inspireId
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityUtilGovServ',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and not(exists($envDom/base:identifier))) then
+				local:addMessage('TR.constraintViolationUGS', map { 'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'all UtilityNode objects have an external object identifier', 'additionalInfo': ''}) 
+			else ()
+
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityUtilGovServ"/>
+										<translationTemplate ref="TR.constraintViolationUGS"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID09709b946-df6a-454b-8929-f1eae0a62227">
+									<label>us-net-as.b.3: utilityDeliveryType</label>
+									<description><![CDATA[Check that the multiplicity of the <a href= http://inspire.ec.europa.eu/id/ats/data-us/master/us-net-as/constraints#utilityDeliveryType>utilityDeliveryType</a> attribute is 0 for the "Duct" feature type.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-us/master/us-net-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_US_v3.0.pdf">INSPIRE Data Specification on Utility and Government Services, A.1.7</a>]]></description>
+									<parent ref="EID236d53ea-1f3c-455d-a6d8-dd668c95288c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $property_string := 'utilityDeliveryType'
+let $features_selected := $features[us-net-common:Duct]
+
+let $messages := 
+
+	for $feature in $features_selected
+		let $envDom := $feature/us-net-common:utilityDeliveryType
+
+		return
+			if (count($envDom) > 0) then
+				local:addMessage('TR.constraintViolationUGS', map { 'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'the multiplicity of the utilityDeliveryType attribute is 0', 'additionalInfo': ''}) 
+			else ()
+
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.constraintViolationUGS"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID992e0a27-e795-4786-8212-fc4ac50d6cd6">
+									<label>us-net-as.b.4: Utility links</label>
+									<description><![CDATA[Check that all utility link sets are composed of links and/or link sequences that all belong to the same network.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-us/master/us-net-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_US_v3.0.pdf">INSPIRE Data Specification on Utility and Government Services, A.1.7</a>]]></description>
+									<parent ref="EID236d53ea-1f3c-455d-a6d8-dd668c95288c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>NOT_APPLICABLE</expression>
+									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
 			</testCases>
 		</TestModule>
 	</testModules>
