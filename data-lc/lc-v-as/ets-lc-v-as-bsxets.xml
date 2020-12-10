@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDe0c5fb24-9216-40b1-951e-6188b4c43c6c" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-lc/lc-v-as</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Application schema, Land Cover Vector</label>
+	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-v-as" target="_blank">Conformance Class 'Application Schema, Land Cover Vector'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-gml" target="_blank">Conformance Class 'GML application schemas, Land Cover'</a></li></ul>]]></description>
+	<reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-11-03T11:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-11-03T11:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID320f0a12-0155-4a95-b331-cbfc501482d5"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID6495f817-cfa0-4bb9-9f45-811c59a4d691"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID6bec6e3b-bb44-4e8b-911a-c2146fe4138a">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDe0c5fb24-9216-40b1-951e-6188b4c43c6c"/>
+			<testCases>
+				<TestCase id="EID329f7469-2276-47fc-adef-8b61bc20378d">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID6bec6e3b-bb44-4e8b-911a-c2146fe4138a"/>
+					<testSteps>
+						<TestStep id="EID53683b4c-9646-4673-841d-ba9e446f759c">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID329f7469-2276-47fc-adef-8b61bc20378d"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+							<TestAssertion id="EIDc9970d40-8d6c-4034-a3cb-ab364ef6d7de">
+									<label>lc-v-as.a.1: LandCoverUnit geometry</label>
+									<description><![CDATA[Check that the sum of all <a href = 'http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-v-as/constraints#geometries'>geometries</a> of the LandCoverUnit feature types are points or surfaces (OCL: inv:self.geometry->forAll(l | l.oclIsKindOf(GM_Surface) or l.oclIsKindOf(GM_Point))).<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-v-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_LC_v3.0.pdf">INSPIRE Data Specification on Land Cover, A.1.6</a>]]></description>
+									<parent ref="EID53683b4c-9646-4673-841d-ba9e446f759c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $property_stringp := 'Point'
+let $property_strings := 'Surface'
+let $property_string := 'LandCoverUnit geometry'
+let $features_selected_lcu := $features[self::lcv:LandCoverUnit]
+let $features_selected_lcd := $features[self::lcv:LandCoverDataset]
+
+let $messages_lcu := 
+
+	for $feature in $features_selected_lcu/lcv:geometry
+		let $envDomp := $feature/gml:Point
+		let $envDoms := $feature/gml:Surface
+
+		return
+			if (count($envDoms) > 1) then
+				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'property': $property_strings, 'multiplicity': '0 or 1', 'count': count($envDoms)})
+			else if (count($envDomp) > 1) then
+				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'property': $property_stringp, 'multiplicity': '0 or 1', 'count': count($envDomp)})
+			else if (not (exists($envDomp) or exists($envDoms))) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'property': $property_string, 'constraint': 'The geometries of the LandCoverUnit feature types are points or surfaces', 'additionalInfo': ''})
+			else ()
+
+let $messages_lcd := 
+
+	for $feature in $features_selected_lcd/lcv:member/lcv:LandCoverUnit/lcv:geometry
+		let $envDomp := $feature/gml:Point
+		let $envDoms := $feature/gml:Surface
+
+		return
+			if (count($envDoms) > 1) then
+				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'property': $property_strings, 'multiplicity': '0 or 1', 'count': count($envDoms)})
+			else if (count($envDomp) > 1) then
+				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'property': $property_stringp, 'multiplicity': '0 or 1', 'count': count($envDomp)})
+			else if (not (exists($envDomp) or exists($envDoms))) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'property': $property_string, 'constraint': 'The geometries of the LandCoverUnit feature types are points or surfaces', 'additionalInfo': ''})
+			else ()
+
+let $messages := ($messages_lcu, $messages_lcd)
+
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityLandCover"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID2761280b-a491-4b31-a83f-abcb83df124e">
+									<label>lc-v-as.a.2: coveredPercentage</label>
+									<description><![CDATA[Check that the sum of all <a href = 'http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-v-as/constraints#coveredPercentage'>coveredPercentage</a> attributes attached to each LandCoverObservation are lower or equal to 100 (OCL: inv:mosaic.coveredPercentage.sum() <= 100).<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-v-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_LC_v3.0.pdf">INSPIRE Data Specification on Land Cover, A.1.6</a>]]></description>
+									<parent ref="EID53683b4c-9646-4673-841d-ba9e446f759c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $property_string := 'coveredPercentage'
+let $features_selected_lcu := $features[self::lcv:LandCoverUnit]
+let $features_selected_lcd := $features[self::lcv:LandCoverDataset]
+
+let $messages_lcu := 
+
+		for $feature in $features_selected_lcu
+			let $multiplicity_messages:= 
+				for $this_feature in $feature/lcv:landCoverObservation/lcv:LandCoverObservation/lcv:mosaic/lcv:LandCoverValue
+
+					let $envDom := $this_feature/lcv:coveredPercentage
+
+					return
+						if (not(exists($envDom))) then
+							local:addMessage('TR.missingElementLandCover',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+						else if (count($envDom) > 1) then
+							local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
+						else()
+				let $percentage_messages:=
+					let $percentages := for $this_feature in $feature/lcv:landCoverObservation/lcv:LandCoverObservation/lcv:mosaic/lcv:LandCoverValue
+							return if ($this_feature/lcv:coveredPercentage castable as xs:double) then
+									$this_feature/lcv:coveredPercentage
+								else (0)
+					return if (sum($percentages) > 100) then
+							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the total of all percentages are less or equal to 100.', 'additionalInfo': ''})
+						else()
+			return if ($multiplicity_messages) then
+			 		$multiplicity_messages
+			 	else if ($percentage_messages) then
+			 		$percentage_messages
+			 	else()
+
+let $messages_lcd := 
+
+		for $feature in $features_selected_lcd
+			let $multiplicity_messages:= 
+				for $this_feature in $feature/lcv:member/lcv:LandCoverUnit/lcv:landCoverObservation/lcv:LandCoverObservation/lcv:mosaic/lcv:LandCoverValue
+
+					let $envDom := $this_feature/lcv:coveredPercentage
+
+					return
+						if (not(exists($envDom))) then
+							local:addMessage('TR.missingElementLandCover',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+						else if (count($envDom) > 1) then
+							local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
+						else()
+				let $percentage_messages:=
+					let $percentages := for $this_feature in $feature/lcv:member/lcv:LandCoverUnit/lcv:landCoverObservation/lcv:LandCoverObservation/lcv:mosaic/lcv:LandCoverValue
+							return if ($this_feature/lcv:coveredPercentage castable as xs:double) then
+									$this_feature/lcv:coveredPercentage
+								else (0)
+					return if (sum($percentages) > 100) then
+							local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the total of all percentages are less or equal to 100.', 'additionalInfo': ''})
+						else()
+			return if ($multiplicity_messages) then
+			 		$multiplicity_messages
+			 	else if ($percentage_messages) then
+			 		$percentage_messages
+			 	else()
+
+let $messages := ($messages_lcu, $messages_lcd)
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementLandCover"/>
+										<translationTemplate ref="TR.wrongMultiplicityLandCover"/>
+										<translationTemplate ref="TR.missingAttributeLandCover"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
