@@ -103,7 +103,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pf/master/pf-as/code-li
 				else if(not(exists($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttributePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 				else if(not($envDom/@xlink:href = $valid_href)) then
-					local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($feature/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
+					local:addMessage('TR.manual.reviewCodeListValuePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($feature/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
 				else ()
 
 	let $features_selected_PI := $features[self::pf:ProductionInstallation]
@@ -120,7 +120,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pf/master/pf-as/code-li
 				else if(not(exists($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttributePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 				else if(not($envDom/@xlink:href = $valid_href)) then
-					local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($feature/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
+					local:addMessage('TR.manual.reviewCodeListValuePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($feature/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
 				else ()
 
 	let $features_selected_PF := $features[self::pf:ProductionFacility]
@@ -137,15 +137,15 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pf/master/pf-as/code-li
 				else if(not(exists($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttributePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 				else if(not($envDom/@xlink:href = $valid_href)) then
-					local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($feature/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
+					local:addMessage('TR.manual.reviewCodeListValuePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($feature/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
 				else ()
 
 	let $combined_messages := ($messages_PIP, $messages_PI, $messages_PF)
 
 	return
-	(if ($combined_messages and not($combined_messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
-	else if($combined_messages/@ref = ('TR.manual.reviewCodeListValue') and not($combined_messages/@ref != ('TR.manual.reviewCodeListValue'))) then 'PASSED_MANUAL' 
-	else if($combined_messages and $combined_messages/@ref != ('TR.manual.reviewCodeListValue')) then 'FAILED' 
+	(if ($combined_messages and not($combined_messages/@ref = ('TR.manual.reviewCodeListValuePIF'))) then 'FAILED' 
+	else if($combined_messages/@ref = ('TR.manual.reviewCodeListValuePIF') and not($combined_messages/@ref != ('TR.manual.reviewCodeListValuePIF'))) then 'PASSED_MANUAL' 
+	else if($combined_messages and $combined_messages/@ref != ('TR.manual.reviewCodeListValuePIF')) then 'FAILED' 
 	else 'PASSED',
 	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($combined_messages//etf:argument[@token='id']/text()))),
 	$combined_messages)
@@ -154,8 +154,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pf/master/pf-as/code-li
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElementPIF"/>
 										<translationTemplate ref="TR.wrongMultiplicityPIF"/>
-										<translationTemplate ref="TR.missingAttributeRiskZone"/>
-										<translationTemplate ref="TR.manual.reviewCodeListValue"/>
+										<translationTemplate ref="TR.missingAttributePIF"/>
+										<translationTemplate ref="TR.manual.reviewCodeListValuePIF"/>
 									</translationTemplates>
 								</TestAssertion>																
 							</testAssertions>
@@ -268,9 +268,9 @@ $combined_messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.missingElementBuildings"/>
 										<translationTemplate ref="TR.wrongMultiplicityPIF"/>
 										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.brokenLinkPIF"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
