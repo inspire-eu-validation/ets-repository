@@ -188,7 +188,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/pf-as/constra
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
-let $property_string := 'geometry'
+let $property_geometry := 'geometry'
+let $property_building := 'building'
 let $features_selected_pb := $features[self::pf:ProductionBuilding]
 
 let $messages_pb := 
@@ -214,13 +215,13 @@ let $messages_pb :=
 					else ()
 		return
 			if (count($geometry) > 1) then
-				local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($geometry)})
+				local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_geometry, 'multiplicity': 1, 'count': count($geometry)})
 			else if(not(exists($building)) and not(exists($geometry))) then
-				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the geometry is provided for the ProductionBuilding feature type if the building property is empty', 'additionalInfo': ''})
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_building, 'constraint': 'the geometry is provided for the ProductionBuilding feature type if the building property is empty', 'additionalInfo': ''})
 			else if(exists($building) and not(exists($building/@xlink:href)) and not(has-children($building)) and not(exists($geometry))) then
-				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the geometry is provided for the ProductionBuilding feature type if the building property is empty', 'additionalInfo': ''})
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_building, 'constraint': 'the geometry is provided for the ProductionBuilding feature type if the building property is empty', 'additionalInfo': ''})
 			else if(exists($building) and exists($building/@xlink:href) and not(count($invalid_urls) = 0) and not(exists($geometry))) then
-				local:addMessage('TR.brokenLinkPIF', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+				local:addMessage('TR.brokenLinkPIF', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_building, 'value': string-join($invalid_urls, ',')}) 
 			else ()
 
 let $features_selected_pf := $features[self::pf:ProductionFacility]
@@ -247,13 +248,13 @@ let $messages_pf :=
 					else ()
 		return
 			if (count($geometry) > 1) then
-				local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($geometry)})
+				local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_geometry, 'multiplicity': 1, 'count': count($geometry)})
 			else if(not(exists($building)) and not(exists($geometry))) then
-				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the geometry is provided for the ProductionBuilding feature type if the building property is empty', 'additionalInfo': ''})
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_building, 'constraint': 'the geometry is provided for the ProductionBuilding feature type if the building property is empty', 'additionalInfo': ''})
 			else if(exists($building) and not(exists($building/@xlink:href)) and not(has-children($building)) and not(exists($geometry))) then
-				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'the geometry is provided for the ProductionBuilding feature type if the building property is empty', 'additionalInfo': ''})
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_building, 'constraint': 'the geometry is provided for the ProductionBuilding feature type if the building property is empty', 'additionalInfo': ''})
 			else if(exists($building) and exists($building/@xlink:href) and not(count($invalid_urls) = 0) and not(exists($geometry))) then
-			local:addMessage('TR.brokenLinkPIF', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+			local:addMessage('TR.brokenLinkPIF', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_building, 'value': string-join($invalid_urls, ',')}) 
 			else ()
 
 let $combined_messages := ($messages_pb, $messages_pf)
