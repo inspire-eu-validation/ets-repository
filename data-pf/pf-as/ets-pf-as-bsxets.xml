@@ -178,7 +178,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pf/master/pf-as/code-li
 							<testAssertions>
 								<TestAssertion id="EIDcd5eb847-70f0-4842-a442-a2c0270311d3">
 									<label>pf-as.b.1: Geometry is provided if building is not present</label>
-									<description><![CDATA[Check that the <a href= 'http://inspire.ec.europa.eu/id/ats/data-bu/master/pf-as/constraints#value'>geometry</a> is of type GM_Point or GM_Surface or GM_MultiSurface.<br/><br/>
+									<description><![CDATA[Check that the <a href="https://github.com/inspire-eu-validation/data-pf/blob/master/pf-as/constraints.md#geometry">geometry</a> is provided for the ProductionBuilding feature type if the <a href="https://github.com/inspire-eu-validation/data-pf/blob/master/pf-as/constraints.md#building">building</a> property is empty. (i.e. Geometry must be provided only in case that not linkage with a building schema entity was stablished).<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
@@ -225,9 +225,9 @@ let $messages_pb :=
 
 let $features_selected_pf := $features[self::pf:ProductionFacility]
 let $messages_pf := 
-	for $feature in $features_selected_pf
-		let $geometry := $feature/pf:groupedBuilding/pf:ProductionBuilding/pf:geometry
-		let $building := $feature/pf:groupedBuilding/pf:ProductionBuilding/pf:building
+	for $feature in $features_selected_pf/pf:groupedBuilding/pf:ProductionBuilding
+		let $geometry := $feature/pf:geometry
+		let $building := $feature/pf:building
 		
 		let $urls := 
 		for $x in $building/@xlink:href
