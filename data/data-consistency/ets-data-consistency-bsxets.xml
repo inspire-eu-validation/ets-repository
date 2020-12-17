@@ -142,6 +142,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/master/data-consistency
 						 <parent ref="EID72a3ee32-8582-4f67-80a0-435f636f8cf3"/>
 						 <expectedResult>NOT_APPLICABLE</expectedResult>
 						 <expression>
+try{
 let $featuresWithErrors := $features[*[self::*:validFrom and not(@xsi:nil='true')] and *[self::*:validTo and not(@xsi:nil='true')] and xs:dateTime(*:validFrom/text()) >= xs:dateTime(*:validTo/text())][position() le $limitErrors]
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
@@ -152,6 +153,18 @@ return
    let $end := $feature/*[self::*:validTo][1]/text()
    return
      local:addMessage('TR.endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'begin': $begin, 'end': $end, 'propertyBegin': 'validFrom', 'propertyEnd': 'validTo' }))
+}catch *{
+let $featuresWithErrors := $features[*[self::*:validFrom and not(@xsi:nil='true')] and *[self::*:validTo and not(@xsi:nil='true')] and xs:date(*:validFrom/text()) >= xs:date(*:validTo/text())][position() le $limitErrors]
+return
+(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
+ for $feature in $featuresWithErrors
+   order by $feature/@gml:id
+   let $begin := $feature/*[self::*:validFrom][1]/text()
+   let $end := $feature/*[self::*:validTo][1]/text()
+   return
+     local:addMessage('TR.endTooEarly', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'begin': $begin, 'end': $end, 'propertyBegin': 'validFrom', 'propertyEnd': 'validTo' }))
+}
 									</expression>
 						 <testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 						 <translationTemplates>
