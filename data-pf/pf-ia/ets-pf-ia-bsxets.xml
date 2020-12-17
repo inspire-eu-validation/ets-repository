@@ -511,8 +511,8 @@ let $messages :=
 				else ()
 
 	return
-		if (count($envDom) > 1) then 
-			local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count':count($envDom)})
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkPIF', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
 		else if (count($invalid_element_reference) > 0) then
 				local:addMessage('TR.missingReferencedElementPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
 		else ()
@@ -569,8 +569,8 @@ let $messages :=
 				else ()
 
 	return
-		if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLinkPIF', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		if (count($envDom) > 1) then 
+			local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count':count($envDom)})
 		else if(count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLinkPIF', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
 		else if (count($invalid_element_reference) > 0) then
