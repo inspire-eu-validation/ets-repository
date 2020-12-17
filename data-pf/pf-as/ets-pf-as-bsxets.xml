@@ -87,64 +87,65 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pf/master/pf-as/code-li
 	let $codelist := 'http://inspire.ec.europa.eu/codelist/PollutionAbatementTechniqueValue'
 	let $codelisturl := 'https://inspire.ec.europa.eu/codelist/PollutionAbatementTechniqueValue/PollutionAbatementTechniqueValue.en.xml'
 	let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
-	let $property_string := 'PollutionAbatementTechniqueValue'
+	let $property_string := 'technique'
 
 
 	let $features_selected_PIP := $features[self::pf:ProductionInstallationPart]
+	let $features_selected_PI := $features[self::pf:ProductionInstallation]
+	let $features_selected_PF := $features[self::pf:ProductionFacility]
+	let $list_PIP := $features_selected_PIP/pf:technique/@xlink:href
+	let $list_PI := $features_selected_PI/pf:groupedInstallationPart/pf:ProductionInstallationPart/pf:technique/@xlink:href
+	let $list_PF := $features_selected_PF/pf:groupedInstallation/pf:ProductionInstallation/pf:groupedInstallationPart/pf:ProductionInstallationPart/pf:technique/@xlink:href
+	let $list := ( $list_PIP, $list_PI, $list_PF )
+
 	let $messages_PIP :=
 		for $feature in $features_selected_PIP
-			let $envDoms := $feature/pf:technique
+			let $envDom := $feature/pf:technique
+			let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 			return
-				if(not(exists($envDoms))) then
-					local:addMessage('TR.missingElementPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'pf:technique'}) 
-				else
-					for $envDom in $envDoms
-						return
-							if (count($envDom) > 1) then 
-								local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'pf:technique', 'multiplicity': '1', 'count': $envDom}) 
-							else if(not(exists($envDom/@xlink:href))) then
-								local:addMessage('TR.missingAttributePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-							else if(not($envDom/@xlink:href = $valid_href)) then
-								local:addMessage('TR.manual.reviewCodeListValuePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($features_selected_PIP/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
-							else ()
+				if (not(exists($envDom))) then
+					local:addMessage('TR.missingElementPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+				else if (count($envDom) > 1) then
+					local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': '1', 'count': count($envDom)})
+				else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+					local:addMessage('TR.reviewCodeListValuePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($iterlist)-1 }) 
+				else ()
 
-	let $features_selected_PI := $features[self::pf:ProductionInstallation]
-	let $ProductionInstallationPart_id := $features[self::pf:ProductionInstallationPart]/@*:id
 	let $messages_PI :=
 		for $feature in $features_selected_PI/pf:groupedInstallationPart/pf:ProductionInstallationPart
-			let $envDoms := $feature/pf:technique
+			let $envDom := $feature/pf:technique
+			let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 			return
-				if(not(exists($envDoms))) then
-					local:addMessage('TR.missingElementPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': 'pf:technique'}) 
-				else
-					for $envDom in $envDoms
-						return
-							if (count($envDom) > 1) then 
-								local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': 'pf:technique', 'multiplicity': '1', 'count': $envDom}) 
-							else if(not(exists($envDom/@xlink:href))) then
-								local:addMessage('TR.missingAttributePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-							else if(not($envDom/@xlink:href = $valid_href)) then
-								local:addMessage('TR.manual.reviewCodeListValuePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($features_selected_PI/pf:groupedInstallationPart/pf:ProductionInstallationPart/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
-							else ()
+				if (not(exists($envDom))) then
+					local:addMessage('TR.missingElementPIF',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string}) 
+				else if (count($envDom) > 1) then
+					local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '1', 'count': count($envDom)})
+				else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+					local:addMessage('TR.reviewCodeListValuePIF',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($iterlist)-1 }) 
+				else ()
 
-	let $features_selected_PF := $features[self::pf:ProductionFacility]
-	let $ProductionInstallationPart_id := $features[self::pf:ProductionInstallation]/@*:id
+	
 	let $messages_PF :=
 		for $feature in $features_selected_PF/pf:groupedInstallation/pf:ProductionInstallation/pf:groupedInstallationPart/pf:ProductionInstallationPart
-			let $envDoms := $feature/pf:technique
+			let $envDom := $feature/pf:technique
+			let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 			return
-				if(not(exists($envDoms))) then
-					local:addMessage('TR.missingElementPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': 'pf:technique'}) 
-				else
-					for $envDom in $envDoms
-						return
-							if (count($envDom) > 1) then 
-								local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': 'pf:technique', 'multiplicity': '1', 'count': $envDom}) 
-							else if(not(exists($envDom/@xlink:href))) then
-								local:addMessage('TR.missingAttributePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-							else if(not($envDom/@xlink:href = $valid_href)) then
-								local:addMessage('TR.manual.reviewCodeListValuePIF',  map {'filename': local:filename($feature), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($features_selected_PF/pf:groupedInstallation/pf:ProductionInstallation/pf:groupedInstallationPart/pf:ProductionInstallationPart/pf:technique/@xlink:href = $envDom/@xlink:href)}) 
-							else ()
+				if (not(exists($envDom))) then
+					local:addMessage('TR.missingElementPIF',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string}) 
+				else if (count($envDom) > 1) then
+					local:addMessage('TR.wrongMultiplicityPIF',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'multiplicity': '1', 'count': count($envDom)})
+				else if (exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then
+					local:addMessage('TR.reviewCodeListValuePIF',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($iterlist)-1 }) 
+				else ()
 
 	let $combined_messages := ($messages_PIP, $messages_PI, $messages_PF)
 
