@@ -14,11 +14,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds" target="_b
 <br/><br/>
 Pre-requisite conformance classes: none]]></description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.3</version>
+		<version>1.0.4</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-05-28T12:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-01-14T14:40:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -244,27 +244,25 @@ let $messages :=
 		else if (count($validSdsKeywordAnchors) = 0 and count($sdsCategoryCharacterStrings) = 0) then
 			local:addMessage('TR.SpatialDataServiceCategoryNotFound', map { 'filename': local:filename($record), 'id': $rid})		
 		else
-			let $emptyKeywordsText :=
-				(for $keyword in $keywordElements
+			let $validElements := 
+				for $keyword in $keywordElements
 					return
-						if (fn:exists($keyword/gco:CharacterString) and not(string-length($keyword/gco:CharacterString/text()) != 0)) then $keyword
-						else if(fn:exists($keyword/gmx:Anchor) and not(string-length($keyword/gmx:Anchor/text()) != 0)) then $keyword
-						else ())
-			let $totalAnchor :=
-				(for $keyword in $keywordElements
-					return $keyword/gmx:Anchor/@xlink:href)
-			let $invalidAnchor :=
-				(for $keyword in $keywordElements
+						if (exists($keyword/gmx:Anchor) and ($keyword/gmx:Anchor/@xlink:href = $validCategoriesUrl)) then $keyword/gmx:Anchor/@xlink:href
+						else if (exists($keyword/gco:CharacterString) and ($keyword/gco:CharacterString = $validCategories)) then $keyword/gco:CharacterString
+						else if(exists($keyword/gmx:Anchor) and (string-length($keyword/gmx:Anchor/text()) != 0)) then $keyword/gmx:Anchor/text()
+						else ()
+			let $invalidElements := 
+				for $keyword in $keywordElements
 					return
-						if (not($keyword/gmx:Anchor/@xlink:href = $validCategoriesUrl)) then $keyword/gmx:Anchor/@xlink:href
-						else ())
+						if (exists($keyword/gmx:Anchor) and not($keyword/gmx:Anchor/@xlink:href = $validCategoriesUrl)) then $keyword/gmx:Anchor/@xlink:href
+						else if (exists($keyword/gco:CharacterString) and ($keyword/gco:CharacterString != $validCategories)) then $keyword/gco:CharacterString
+						else if(exists($keyword/gmx:Anchor) and (string-length($keyword/gmx:Anchor/text()) = 0)) then $keyword/gmx:Anchor/text()
+						else ()
 			return
-				if (not(count($emptyKeywordsText) = 0)) then
-					local:addMessage('TR.missingValidKeywordElement', map { 'filename': local:filename($record), 'id': $rid, 'found':count($emptyKeywordsText)})
-				else if (count($invalidAnchor) = count($totalAnchor)) then
-					(for $Anchor in $invalidAnchor
+				if (count($validElements) = 0) then
+					(for $element in $invalidElements
 						return 
-							local:addMessage('TR.missingValidKeywordAnchor', map { 'filename': local:filename($record), 'id': $rid, 'anchor': string($Anchor)}))
+							local:addMessage('TR.missingValidKeyword', map { 'filename': local:filename($record), 'id': $rid, 'found': string($element)}))
 				else()
 	)[position() le $limitErrors]
 return
