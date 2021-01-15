@@ -1,0 +1,1055 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDa4bf4091-b26d-4e13-ab94-4d26ea10a625" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-lu/lu-ia</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Information accessibility, Land Use</label>
+	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia" target="_blank">Conformance class: 'Information accessibility, Land Use'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li></ul>]]></description>
+  <reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-07-02T15:30:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-07-02T15:30:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID15a1a053-e359-4e99-a1b5-d7f8e646ed05"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID0e4e3b8c-1aea-4bab-a8f5-a1780164e5fb">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDa4bf4091-b26d-4e13-ab94-4d26ea10a625"/>
+			<testCases>
+				<TestCase id="EIDb7b28f1b-1600-4738-bcc5-35aedebb5a5c">
+					<label>Code list</label>
+					<description>Verify that code lists extensions can be accessed.</description>
+					<parent ref="EID0e4e3b8c-1aea-4bab-a8f5-a1780164e5fb"/>
+					<testSteps>
+						<TestStep id="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDb7b28f1b-1600-4738-bcc5-35aedebb5a5c"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDfb93c048-2653-445a-bf0e-cf432e61b5e2">
+									<label>lu-ia.a.1.a: LandUseClassificationValue(orderedlist)</label>
+									<description><![CDATA[Verify that any code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features//*
+let $gml_ids := $features//@gml:id
+let $property_string := 'LandUseClassificationValue'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/lunom:orderedList/@xlink:href
+			return
+			if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+				()
+			else
+				$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+			let $url := string($href)
+			let $validuri := map:get($map, $url)
+			return
+				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+					$url
+				else ()
+
+	return
+		if (not((count($feature/lunom:orderedList) = count($feature/lunom:orderedList/@xlink:href)))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID162262d7-578b-4a21-af0c-e7c62795317c">
+									<label>lu-ia.a.1.b: LandUseClassificationValue(specificValue)</label>
+									<description><![CDATA[Verify that any code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features//*
+let $gml_ids := $features//@gml:id
+let $property_string := 'LandUseClassificationValue'
+let $messages :=
+	for $feature in $features_selected
+	let $urlssv := 
+		for $x in $feature/lunom:specificValue/@xlink:href
+			return
+			if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+				()
+			else
+				$x		
+	let $mapsv := local:check-resource-uris($urlssv, 30, true())
+	let $invalid_urlssv :=
+		for $hrefsv in $urlssv
+			let $urlsv := string($hrefsv)
+			let $validurisv := map:get($mapsv, $urlsv)
+			return
+				if ($validurisv = 'notHTTP' or starts-with($validurisv, 'EXCEPTION') or $validurisv = 'idNotFound' or matches($validurisv,'^\d{3}$')) then
+					$urlsv
+				else ()
+	return
+		if (not((count($feature/lunom:specificValue) = count($feature/lunom:specificValue/@xlink:href)))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($feature/lunom:specificValue) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'PlanTypeNameValue', 'multiplicity': 1, 'count': count($feature/lunom:specificValue)})
+		else if(count($invalid_urlssv) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlssv, ',')})
+		else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID8956b39a-bde3-446c-b72e-24ddf45251bd">
+									<label>lu-ia.a.1.c: LandUseClassificationValue(specificLandUse)</label>
+									<description><![CDATA[Verify that any code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:ZoningElement | self::elu:ExistingLandUseObject]
+let $gml_ids := $features//@gml:id
+let $property_string := 'LandUseClassificationValue'
+let $messages :=
+	for $feature in $features_selected
+	let $urlsslu := 
+		for $x in $feature/*:specificLandUse/@xlink:href
+			return
+			if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+				()
+			else
+				$x
+	let $mapslu := local:check-resource-uris($urlsslu, 30, true())
+	let $invalid_urlsslu :=
+		for $hrefslu in $urlsslu
+			let $urlslu := string($hrefslu)
+			let $validurislu := map:get($mapslu, $urlslu)
+			return
+				if ($validurislu = 'notHTTP' or starts-with($validurislu, 'EXCEPTION') or $validurislu = 'idNotFound' or matches($validurislu,'^\d{3}$')) then
+					$urlslu
+				else ()
+	return
+		if(count($invalid_urlsslu) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urlsslu, ',')}) 
+		else (
+		)
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDaab1fa13-b19a-44c3-8ca4-1e97b8cf05f5">
+									<label>lu-ia.a.2: PlanTypeNameValue</label>
+									<description><![CDATA[Verify that any PlanTypeNameValue code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:SpatialPlan]
+let $gml_ids := $features//@gml:id
+let $property_string := 'PlanTypeNameValue'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:planTypeName/@xlink:href
+		return
+		if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	return
+		if(not($feature/plu:planTypeName)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($feature/plu:planTypeName) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'PlanTypeNameValue', 'multiplicity': 1, 'count': count($feature/plu:planTypeName)})
+		else if (not((count($feature/plu:planTypeName)) = count($feature/plu:planTypeName/@xlink:href))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID07f43240-5f26-4e4c-9d1e-3317e8e16450">
+									<label>lu-ia.a.3: SpecificSupplementaryRegulationValue</label>
+									<description><![CDATA[Verify that any SpecificSupplementaryRegulationValue code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:SupplementaryRegulation]
+let $gml_ids := $features//@gml:id
+let $property_string := 'SpecificSupplementaryRegulationValue'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:specificSupplementaryRegulation/@xlink:href
+		return
+		if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	return
+		if (not($feature/plu:specificSupplementaryRegulation)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingElement"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID8db02d8b-c998-4f95-a2c8-7d00fafd9006">
+									<label>lu-ia.a.4: SupplementaryRegulationValue</label>
+									<description><![CDATA[Verify that any SupplementaryRegulationValue code list is publicly accessible via HTTP. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>]]></description>
+									<parent ref="EIDd514c20f-cab8-48e2-86d8-1be761bd0a25"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:SupplementaryRegulation]
+let $gml_ids := $features//@gml:id
+let $property_string := 'SupplementaryRegulationValue'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:supplementaryRegulation/@xlink:href
+		return
+		if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	return
+		if (not($feature/plu:supplementaryRegulation)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (not((count($feature/plu:supplementaryRegulation)) = count($feature/plu:supplementaryRegulation/@xlink:href))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+									</translationTemplates>
+								</TestAssertion>
+
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+
+				<TestCase id="EIDd1a6cc17-afd9-4f1e-8f31-bd862e515f57">
+					<label>Feature references</label>
+					<description>Verify that referenced features can be retrieved.</description>
+					<parent ref="EID0e4e3b8c-1aea-4bab-a8f5-a1780164e5fb"/>
+					<testSteps>
+						<TestStep id="EID5f509e8a-5edc-47a2-af43-701be4becf9c">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDd1a6cc17-afd9-4f1e-8f31-bd862e515f57"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID1c9e6ef8-e67d-4d78-90ab-cfd52a8b29c7">
+									<label>lu-ia.b.1: ExistingLandUseDataSet.member</label>
+									<description><![CDATA[Verify that any ExistingLandUseDataSet.member reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::elu:ExistingLandUseDataSet]
+let $gml_ids := $features//@gml:id
+let $property_string := 'ExistingLandUseDataSet.member'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/elu:member/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/elu:member/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+
+		if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+
+							<TestAssertion id="EID919d4004-6136-4961-9c11-9a7b9ff9cd90">
+									<label>lu-ia.b.2: ExistingLandUseObject.dataset</label>
+									<description><![CDATA[Verify that any ExistingLandUseObject.dataset reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::elu:ExistingLandUseObject]
+let $gml_ids := $features//@gml:id
+let $property_string := 'ExistingLandUseObject.dataset'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/elu:dataset/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/elu:dataset/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+		let $missing_urls :=
+		for $x in $feature/elu:dataset
+		return
+			if (not (exists($x/@xlink:href))) then
+				$x
+			else ()
+	return
+		if (not($feature/elu:dataset)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($feature/elu:dataset) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/elu:dataset)})
+		else if (count ($missing_urls) > 0) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'}) 
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+									</translationTemplates>
+								</TestAssertion>
+
+								<TestAssertion id="EID1b01802f-6f07-495d-865b-8e363eb0d950">
+									<label>lu-ia.b.3: SpatialPlan.member</label>
+									<description><![CDATA[Verify that any SpatialPlan.member reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:SpatialPlan]
+let $gml_ids := $features//@gml:id
+let $property_string := 'SpatialPlan.member'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:member/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/plu:member/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+									</translationTemplates>
+								</TestAssertion>
+
+								<TestAssertion id="EID964ae906-7a92-4af9-ad7b-d4e34463db73">
+									<label>lu-ia.b.4: SpatialPlan.officialDocument</label>
+									<description><![CDATA[Verify that any SpatialPlan.officialDocument reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:SpatialPlan]
+let $gml_ids := $features//@gml:id
+let $property_string := 'SpatialPlan.officialDocument'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:officialDocument/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/plu:officialDocument/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (not($feature/plu:officialDocument)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($invalid_urls) > 0 and count($feature/plu:officialDocument/@nilReason) = 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0 and count($feature/plu:officialDocument/@nilReason) = 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+									</translationTemplates>
+								</TestAssertion>
+
+								<TestAssertion id="EID9569d9d4-e87c-41b8-b818-916d26478d7e">
+									<label>lu-ia.b.5: SpatialPlan.restriction</label>
+									<description><![CDATA[Verify that any SpatialPlan.restriction reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:SpatialPlan]
+let $gml_ids := $features//@gml:id
+let $property_string := 'SpatialPlan.restriction'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:restriction/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/plu:restriction/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+									</translationTemplates>
+								</TestAssertion>
+
+
+
+								<TestAssertion id="EID4712e46d-086f-4f06-92b6-c7fb48b65fbf">
+									<label>lu-ia.b.6: ZoningElement.plan</label>
+									<description><![CDATA[Verify that any ZoningElement.plan reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:ZoningElement]
+let $gml_ids := $features//@gml:id
+let $property_string := 'ZoningElement.plan'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:plan/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/plu:plan/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	let $missing_urls :=
+		for $x in $feature/plu:plan
+		return
+			if (not (exists($x/@xlink:href))) then
+				$x
+			else ()
+	return
+		if (not($feature/plu:plan)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($feature/plu:plan) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/plu:plan)}) 
+		else if (count ($missing_urls) > 0) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+									</translationTemplates>
+								</TestAssertion>
+
+
+
+								<TestAssertion id="EID1476d69b-d6fb-4dd2-b2b9-c0b0f75c925f">
+									<label>lu-ia.b.7: ZoningElement.officialDocument</label>
+									<description><![CDATA[Verify that any ZoningElement.officialDocument reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:ZoningElement]
+let $gml_ids := $features//@gml:id
+let $property_string := 'ZoningElement.officialDocument'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:officialDocument/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/plu:officialDocument/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (not($feature/plu:officialDocument)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($invalid_urls) > 0 and count($feature/plu:officialDocument/@nilReason) = 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0 and count($feature/plu:officialDocument/@nilReason) = 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+									</translationTemplates>
+								</TestAssertion>
+
+
+
+								<TestAssertion id="EID5763cc7f-7061-45ad-baad-820dc8e6c73e">
+									<label>lu-ia.b.8: SupplementaryRegulation.plan</label>
+									<description><![CDATA[Verify that any SupplementaryRegulation.plan reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:SupplementaryRegulation]
+let $gml_ids := $features//@gml:id
+let $property_string := 'SupplementaryRegulation.plan'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:plan/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/plu:plan/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	let $missing_urls :=
+		for $x in $feature/plu:plan
+		return
+			if (not (exists($x/@xlink:href))) then
+				$x
+			else ()
+	return
+		if (not($feature/plu:plan)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($feature/plu:plan) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/plu:plan)}) 
+		else if (count ($missing_urls) > 0) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+									</translationTemplates>
+								</TestAssertion>
+
+
+
+								<TestAssertion id="EID3e45790e-bd4b-41c3-ab18-e661d0743278">
+									<label>lu-ia.b.9: SupplementaryRegulation.officialDocument</label>
+									<description><![CDATA[Verify that any SupplementaryRegulation.officialDocument reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::plu:SupplementaryRegulation]
+let $gml_ids := $features//@gml:id
+let $property_string := 'SupplementaryRegulation.officialDocument'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/plu:officialDocument/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/plu:officialDocument/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (not($feature/plu:officialDocument)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($invalid_urls) > 0 and count($feature/plu:officialDocument/@nilReason) = 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0 and count($feature/plu:officialDocument/@nilReason) = 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+									</translationTemplates>
+								</TestAssertion>
+
+
+
+
+								<TestAssertion id="EIDee584c44-d244-49f0-bb6c-c7f2c2becbbd">
+									<label>lu-ia.b.10: SampledExistingLandUseDataSet.member</label>
+									<description><![CDATA[Verify that any SampledExistingLandUseDataSet.member reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::selu:SampledExistingLandUseDataSet]
+let $gml_ids := $features//@gml:id
+let $property_string := 'SampledExistingLandUseDataSet.member'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/selu:member/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/selu:member/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+									</translationTemplates>
+								</TestAssertion>
+
+
+
+								<TestAssertion id="EID903052d3-861b-4d09-be7a-28da56aef184">
+									<label>lu-ia.b.11: ExistingLandUseSample.dataset</label>
+									<description><![CDATA[Verify that any ExistingLandUseSample.dataset reference is publicly accessible via HTTP. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a 'gml:id' attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lu/master/lu-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>]]></description>
+									<parent ref="EID5f509e8a-5edc-47a2-af43-701be4becf9c"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::selu:ExistingLandUseSample]
+let $gml_ids := $features//@gml:id
+let $property_string := 'ExistingLandUseSample.dataset'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/selu:dataset/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/selu:dataset/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+		let $missing_urls :=
+		for $x in $feature/selu:dataset
+		return
+			if (not (exists($x/@xlink:href))) then
+				$x
+			else ()
+	return
+		if (not($feature/selu:dataset)) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($feature/selu:dataset) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/selu:dataset)}) 
+		else if (count ($missing_urls) > 0) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkLandUse',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_element_reference) > 0) then
+			local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkLandUse"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.notXMLresponse"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
