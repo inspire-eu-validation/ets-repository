@@ -1,3 +1,12 @@
+declare namespace pf='http://inspire.ec.europa.eu/schemas/pf/4.0';
+declare namespace nz-core	='http://inspire.ec.europa.eu/schemas/nz-core/4.0'; 
+declare namespace elu='http://inspire.ec.europa.eu/schemas/elu/4.0';
+declare namespace gelu='http://inspire.ec.europa.eu/schemas/gelu/4.0';
+declare namespace plu='http://inspire.ec.europa.eu/schemas/plu/4.0';
+declare namespace selu='http://inspire.ec.europa.eu/schemas/selu/4.0';
+declare namespace lunom='http://inspire.ec.europa.eu/schemas/lunom/4.0';
+declare namespace am='http://inspire.ec.europa.eu/schemas/am/4.0';
+declare namespace base2='http://inspire.ec.europa.eu/schemas/base2/2.0';
 declare namespace au3='urn:x-inspire:specification:gmlas:AdministrativeUnits:3.0';
 declare namespace ad3='urn:x-inspire:specification:gmlas:Addresses:3.0';
 declare namespace cp3='urn:x-inspire:specification:gmlas:CadastralParcels:3.0'; 
