@@ -1,3 +1,4 @@
+declare namespace pf='http://inspire.ec.europa.eu/schemas/pf/4.0';
 declare namespace nz-core	='http://inspire.ec.europa.eu/schemas/nz-core/4.0'; 
 declare namespace elu='http://inspire.ec.europa.eu/schemas/elu/4.0';
 declare namespace gmlcov='http://www.opengis.net/gmlcov/1.0';
