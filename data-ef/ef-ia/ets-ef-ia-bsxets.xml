@@ -1,0 +1,1521 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDc043fc5e-723e-4982-a10c-feb352c934fb" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-ef/ef-ia</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Information accessibility, Environmental Monitoring Facilities</label>
+	<description><![CDATA[This test suite examines a data set against the themespecific requirements related to the accessibility of resources referenced by the data.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia" target="_blank">Conformance Class 'Information accessibility, Environmental Monitoring Facilities'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
+</ul>]]></description>
+	<reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-09-09T14:45:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-09-09T14:45:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDbe54594f-cae7-4b22-aca7-54c74fdab1a7"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EIDe1b2b373-1273-478a-9996-a98817f4f198">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDc043fc5e-723e-4982-a10c-feb352c934fb"/>
+			<testCases>
+				<TestCase id="EID2092542a-52eb-4da5-9630-c613bbcb8141">
+					<label>Code lists</label>
+					<description>Verify that code lists extensions can be accessed.</description>
+					<parent ref="EIDe1b2b373-1273-478a-9996-a98817f4f198"/>
+					<testSteps>
+						<TestStep id="EID238ed5be-6c01-4568-b30a-988d1e9201a9">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID2092542a-52eb-4da5-9630-c613bbcb8141"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID5e070104-57f5-4fcf-ab23-6f7b205cea8a">
+									<label>ef-ia.a.1: MeasurementRegimeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.6.1</a>]]></description>
+									<parent ref="EID238ed5be-6c01-4568-b30a-988d1e9201a9"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility]
+let $property_string := 'MeasurementRegimeValue'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:measurementRegime
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+	return
+		if (not(exists($feature/ef:measurementRegime))) then
+			local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($feature/ef:measurementRegime) > 1) then
+			local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($feature/ef:measurementRegime)}) 
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementEnvFacilities"/>
+										<translationTemplate ref="TR.wrongMultiplicityEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID300120e4-dd6e-45e9-965a-4729928b9e95">
+									<label>ef-ia.a.2: MediaMonitoredValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.6.1</a>]]></description>
+									<parent ref="EID238ed5be-6c01-4568-b30a-988d1e9201a9"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:EnvironmentalMonitoringProgramme]
+let $property_string := 'MediaMonitoredValue'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:mediaMonitored
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+	return
+		if (not(exists($feature/ef:mediaMonitored))) then
+			local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (exists($feature/ef:mediaMonitored) and not(count($envDom) = count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttributeEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementEnvFacilities"/>
+										<translationTemplate ref="TR.missingAttributeEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID1bac3b17-9872-4968-bd73-f24c5dba1398">
+									<label>ef-ia.a.3: ProcessTypeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.6.1</a>]]></description>
+									<parent ref="EID238ed5be-6c01-4568-b30a-988d1e9201a9"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:ObservingCapability]
+let $property_string := 'ProcessTypeValue'
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'ef:ObservingCapability') then
+					$this_feature
+				else if(name($this_feature) = 'ef:EnvironmentalMonitoringFacility' or name($this_feature) = 'ef:EnvironmentalMonitoringNetwork' ) then
+					$this_feature/ef:observingCapability/ef:ObservingCapability
+				else ()
+			
+	for $feature in $this_features
+
+		let $envDom := $feature/ef:processType
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+		return
+			
+			if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (name($feature) = 'ef:ObservingCapability' and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+			else if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (name($feature) = 'ef:ObservingCapability' and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementEnvFacilities"/>
+										<translationTemplate ref="TR.wrongMultiplicityEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID64c107a7-64b2-4ab1-9395-ba3f30cdbdb1">
+									<label>ef-ia.a.4: PurposeOfCollectionValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.6.1</a>]]></description>
+									<parent ref="EID238ed5be-6c01-4568-b30a-988d1e9201a9"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:EnvironmentalMonitoringProgramme]
+let $property_string := 'PurposeOfCollectionValue'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:purpose
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDe5d62ce0-638c-4662-9427-6fae78008c5a">
+									<label>ef-ia.a.5: ResultAcquisitionSourceValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.6.1</a>]]></description>
+									<parent ref="EID238ed5be-6c01-4568-b30a-988d1e9201a9"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility]
+let $property_string := 'ResultAcquisitionSourceValue'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:resultAcquisitionSource
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID6d3af947-25ad-4eef-85ea-26184687b498">
+									<label>ef-ia.a.6: ResultNatureValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.6.1</a>]]></description>
+									<parent ref="EID238ed5be-6c01-4568-b30a-988d1e9201a9"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:ObservingCapability]
+let $property_string := 'ResultNatureValue'
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'ef:ObservingCapability') then
+					$this_feature
+				else if(name($this_feature) = 'ef:EnvironmentalMonitoringFacility' or name($this_feature) = 'ef:EnvironmentalMonitoringNetwork' ) then
+					$this_feature/ef:observingCapability/ef:ObservingCapability
+				else ()
+			
+	for $feature in $this_features
+
+		let $envDom := $feature/ef:resultNature
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+		return
+			
+			if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (name($feature) = 'ef:ObservingCapability' and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+			else if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (name($feature) = 'ef:ObservingCapability' and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementEnvFacilities"/>
+										<translationTemplate ref="TR.wrongMultiplicityEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDbebf399e-6fb3-425e-9655-ccb30f6ce8f2">
+									<label>ef-ia.a.7: SpecialisedEMFTypeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.6.1</a>]]></description>
+									<parent ref="EID238ed5be-6c01-4568-b30a-988d1e9201a9"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility]
+let $property_string := 'SpecialisedEMFTypeValue'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:specialisedEMFType
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+	return
+		if (count($feature/ef:specialisedEMFType) > 1) then
+			local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($feature/ef:specialisedEMFType)}) 
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EIDe5da2a5c-76fa-4e54-a4ae-b649aee79048">
+					<label>Feature references</label>
+					<description>Verify that referenced features can be retrieved.</description>
+					<parent ref="EIDe1b2b373-1273-478a-9996-a98817f4f198"/>
+					<testSteps>
+						<TestStep id="EID909fc225-349c-46d8-b258-ba0a9b755c99">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDe5da2a5c-76fa-4e54-a4ae-b649aee79048"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID01a2ad79-81a8-4fd8-98a8-50824dfa8d66">
+									<label>ef-ia.b.1: involvedIn</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork]
+let $gml_ids := $features//@gml:id
+let $property_string := 'involvedIn'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:involvedIn
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID6f85d9d7-b5b8-4b5d-8db0-27d15a07acf9">
+									<label>ef-ia.b.2: hasObservation</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork]
+let $gml_ids := $features//@gml:id
+let $property_string := 'hasObservation'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:hasObservation
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID60521ea2-771f-459b-9b91-9a2c179bb603">
+									<label>ef-ia.b.3: observingCapability</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:EnvironmentalMonitoringProgramme]
+let $gml_ids := $features//@gml:id
+let $property_string := 'observingCapability'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:observingCapability
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID09ce6877-52fb-4f40-ba7b-59613e260145">
+									<label>ef-ia.b.4: broader</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:EnvironmentalMonitoringProgramme]
+let $gml_ids := $features//@gml:id
+let $property_string := 'broader'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:broader
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if (count($feature/ef:broader) > 1) then
+			local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': '0 or 1', 'count': count($feature/ef:broader)})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID146d5304-b9ff-4e05-ac3a-d8138078fe0a">
+									<label>ef-ia.b.5: narrower</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:EnvironmentalMonitoringProgramme]
+let $gml_ids := $features//@gml:id
+let $property_string := 'narrower'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:narrower
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDdefa66b2-db57-415d-ada2-a5bb9c84f73c">
+									<label>ef-ia.b.6: supersedes</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:EnvironmentalMonitoringProgramme]
+let $gml_ids := $features//@gml:id
+let $property_string := 'supersedes'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:supersedes
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDaae54152-fc57-4bfb-ad02-79645927accf">
+									<label>ef-ia.b.7: supersededBy</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:EnvironmentalMonitoringProgramme]
+let $gml_ids := $features//@gml:id
+let $property_string := 'supersededBy'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:supersededBy
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDfa22e175-84cf-4a07-8fcc-dfd7a149d77f">
+									<label>ef-ia.b.8: setUpFor</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringActivity]
+let $gml_ids := $features//@gml:id
+let $property_string := 'setUpFor'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:setUpFor
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID884ac01b-3c30-465f-ab8e-803cb9acde9d">
+									<label>ef-ia.b.9: uses</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringActivity]
+let $gml_ids := $features//@gml:id
+let $property_string := 'uses'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:uses
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID7d52b935-99b9-4c21-a2ba-bc198117eb12">
+									<label>ef-ia.b.10: relatedTo</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility]
+let $gml_ids := $features//@gml:id
+let $property_string := 'relatedTo'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:relatedTo
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID7b82b147-1fd2-4742-a50f-531d267879c4">
+									<label>ef-ia.b.11: belongsTo</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility]
+let $gml_ids := $features//@gml:id
+let $property_string := 'belongsTo'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:belongsTo
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID5be51024-b779-4b6a-aa6a-7642b43c7c9e">
+									<label>ef-ia.b.12: contains</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringNetwork]
+let $gml_ids := $features//@gml:id
+let $property_string := 'contains'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:contains
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID8221704b-aed1-45ac-b247-90c89cf05be9">
+									<label>ef-ia.b.13: triggers</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringProgramme]
+let $gml_ids := $features//@gml:id
+let $property_string := 'triggers'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/ef:triggers
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID1877ccbb-3a38-4aad-8cf6-459c3b337d3f">
+									<label>ef-ia.b.14: observedProperty</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:ObservingCapability]
+let $gml_ids := $features//@gml:id
+let $property_string := 'observedProperty'
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'ef:ObservingCapability') then
+					$this_feature
+				else if(name($this_feature) = 'ef:EnvironmentalMonitoringFacility' or name($this_feature) = 'ef:EnvironmentalMonitoringNetwork' ) then
+					$this_feature/ef:observingCapability/ef:ObservingCapability
+				else ()
+			
+	for $feature in $this_features
+
+		let $envDom := $feature/ef:observedProperty
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			
+			if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (name($feature) = 'ef:ObservingCapability' and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+			else if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (name($feature) = 'ef:ObservingCapability' and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and exists($feature/ef:observedProperty) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if ( name($feature) = 'ef:ObservingCapability' and exists($feature/ef:observedProperty) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementEnvFacilities"/>
+										<translationTemplate ref="TR.wrongMultiplicityEnvFacilities"/>
+										<translationTemplate ref="TR.missingAttributeEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID5827b3e6-a321-4e45-80bf-918c6f2880b3">
+									<label>ef-ia.b.15: featureOfInterest</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:ObservingCapability]
+let $gml_ids := $features//@gml:id
+let $property_string := 'featureOfInterest'
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'ef:ObservingCapability') then
+					$this_feature
+				else if(name($this_feature) = 'ef:EnvironmentalMonitoringFacility' or name($this_feature) = 'ef:EnvironmentalMonitoringNetwork' ) then
+					$this_feature/ef:observingCapability/ef:ObservingCapability
+				else ()
+			
+	for $feature in $this_features
+
+		let $envDom := $feature/ef:featureOfInterest
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			
+			if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (name($feature) = 'ef:ObservingCapability' and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicityEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID7fb8eb0a-e64f-48fd-ac72-10cf7e30545f">
+									<label>ef-ia.b.16: procedure</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EF_v3.0.pdf">INSPIRE Data Specification on Environmental Monitoring Facilities, A.1.4</a>]]></description>
+									<parent ref="EID909fc225-349c-46d8-b258-ba0a9b755c99"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork | self::ef:ObservingCapability]
+let $gml_ids := $features//@gml:id
+let $property_string := 'procedure'
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'ef:ObservingCapability') then
+					$this_feature
+				else if(name($this_feature) = 'ef:EnvironmentalMonitoringFacility' or name($this_feature) = 'ef:EnvironmentalMonitoringNetwork' ) then
+					$this_feature/ef:observingCapability/ef:ObservingCapability
+				else ()
+			
+	for $feature in $this_features
+
+		let $envDom := $feature/ef:procedure
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			
+			if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (name($feature) = 'ef:ObservingCapability' and not(exists($envDom))) then
+				local:addMessage('TR.missingElementEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+			else if((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (name($feature) = 'ef:ObservingCapability' and count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and exists($feature/ef:observedProperty) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeEnvFacilities',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if ( name($feature) = 'ef:ObservingCapability' and exists($feature/ef:observedProperty) and not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeEnvFacilities',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if ((name($feature/../..) = 'ef:EnvironmentalMonitoringFacility' or name($feature/../..) = 'ef:EnvironmentalMonitoringNetwork') and count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else if(name($feature) = 'ef:ObservingCapability' and count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementEnvFacilities', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementEnvFacilities"/>
+										<translationTemplate ref="TR.wrongMultiplicityEnvFacilities"/>
+										<translationTemplate ref="TR.missingAttributeEnvFacilities"/>
+										<translationTemplate ref="TR.brokenLinkEnvFacilities"/>
+										<translationTemplate ref="TR.missingReferencedElementEnvFacilities"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
