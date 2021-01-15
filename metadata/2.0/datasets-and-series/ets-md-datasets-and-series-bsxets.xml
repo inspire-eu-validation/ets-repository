@@ -257,11 +257,17 @@ let $messages :=
 			return
 			if(matches($x/text(), $regex_integer)) then ()
 			else $x
-		let $invalidDistance :=
+
+        let $invalidDistance :=
 			for $x in $record/gmd:identificationInfo[1]/*/gmd:spatialResolution/gmd:MD_Resolution/gmd:distance/gco:Distance
-			return
-			if(xs:double($x/text())) then ()
-			else $x
+				return
+					try {
+						if(xs:double($x/text())) then ()
+						else $x
+					}catch err:FORG0001 {
+						$x
+					}
+
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		return
 		if (($countResolutions &gt; 0) and ($countScale = 0) and ($countDistance = 0)) then
@@ -507,7 +513,7 @@ let $messages :=
         return   
         if (count($lineageStatement) != 1) then
             local:addMessage('TR.wrongNumberOfLineageStatements',  map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($lineageStatement)) })
-        else if (not($lineageStatement) or not(string-length($lineageStatement/gco:CharacterString/text()) != 0 or string-length($lineageStatement/gmx:Anchor/text()) != 0)) then
+        else if (not($lineageStatement) or not(string-length($lineageStatement/gco:CharacterString) != 0 or string-length($lineageStatement/gmx:Anchor) != 0)) then
             local:addMessage('TR.emptyLineageStatement',  map { 'filename': local:filename($record), 'id': $rid })
         else ()         
     )[position() le $limitErrors] 
