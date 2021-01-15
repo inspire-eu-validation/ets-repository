@@ -1,3 +1,4 @@
+declare namespace ef='http://inspire.ec.europa.eu/schemas/ef/4.0';
 declare namespace pf='http://inspire.ec.europa.eu/schemas/pf/4.0';
 declare namespace nz-core	='http://inspire.ec.europa.eu/schemas/nz-core/4.0'; 
 declare namespace elu='http://inspire.ec.europa.eu/schemas/elu/4.0';
