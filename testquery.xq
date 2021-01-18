@@ -48,7 +48,6 @@ declare namespace tn-c='http://inspire.ec.europa.eu/schemas/tn-c/4.0';
 declare namespace tn-ra='http://inspire.ec.europa.eu/schemas/tn-ra/4.0';
 declare namespace tn-ro='http://inspire.ec.europa.eu/schemas/tn-ro/4.0';
 declare namespace tn-w='http://inspire.ec.europa.eu/schemas/tn-w/4.0';
-declare namespace hh='http://inspire.ec.europa.eu/schemas/hh/4.0';
 declare namespace us-net-common='http://inspire.ec.europa.eu/schemas/us-net-common/4.0';
 declare namespace us-net-el='http://inspire.ec.europa.eu/schemas/us-net-el/4.0';
 declare namespace us-net-ogc='http://inspire.ec.europa.eu/schemas/us-net-ogc/4.0';
