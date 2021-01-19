@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDe3d08307-45ad-4797-9074-ced0147797b5" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-nz/nz-ia</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Information accessibility, Natural Risk Zones</label>
+	<description><![CDATA[This test suite examines requirements associated with the Information accessibility.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia" target="_blank">Conformance Class 'Information accessibility, Natural Risk Zones'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance class: 'Information accessibility'</a></li></ul>]]></description>
+  <reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-08-03T14:30:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-08-31T14:30:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID00d4d7af-152b-4644-aeda-c8983df4535f"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EIDa1872ff4-eb0c-4990-9c10-922c04a5fcae">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDe3d08307-45ad-4797-9074-ced0147797b5"/>
+			<testCases>
+				<TestCase id="EID78a8def0-0848-461f-85fa-52dc0ef6d552">
+					<label>Code lists</label>
+					<description>Verify that code lists extensions can be accessed.</description>
+					<parent ref="EIDa1872ff4-eb0c-4990-9c10-922c04a5fcae"/>
+					<testSteps>
+						<TestStep id="EID10d55af4-9f6a-45d2-a462-8a31b6394b59">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID78a8def0-0848-461f-85fa-52dc0ef6d552"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID946853c9-f945-4b3a-982e-f23590f2d2e8">
+									<label>nz-ia.a.1: ExposedElementCategoryValue</label>
+									<description><![CDATA[Check that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list vanzed property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. Otherwise report brokenLink.<br/><br/>
+This data theme currently has the following extensible code list:
+<ul><li>
+ExposedElementCategoryValue : http://inspire.ec.europa.eu/codelist/ExposedElementCategoryValue</ul></li><br/><br/>
+
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia/code-list" target="_blank">Abstract Test Case 'Code List'</a>, <a href="https://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.6.3</a>]]></description>
+									<parent ref="EID10d55af4-9f6a-45d2-a462-8a31b6394b59"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:ExposedElement|self::nz-core:ExposedElementCoverage]
+let $property_string := 'ExposedElementCategoryValue'
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'nz-core:ExposedElement') then
+					$this_feature/nz-core:assessmentOfVulnerability
+				else $this_feature
+	for $actual_feature in $this_features
+	
+		let $feature := 
+			if (name($actual_feature) = 'nz-core:assessmentOfVulnerability') then
+				$actual_feature/nz-core:VulnerabilityAssessment
+			else $actual_feature
+
+	let $urls := 
+		for $x in $feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:exposedElementCategory/@xlink:href
+			return
+			if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+				()
+			else
+				$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+			let $url := string($href)
+			let $validuri := map:get($map, $url)
+			return
+				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+					$url
+				else ()
+
+	return
+		if (not(exists($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification))) then ()
+		else if (not($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:exposedElementCategory)) then
+			local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property':'nz-core:exposedElementCategory'}) 
+		else if (count($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:exposedElementCategory) != 1) then
+			local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($actual_feature), 'id': string($actual_feature/../@*:id), 'element': 'nz-core:exposedElementCategory'}) 
+		else if (not(exists($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:exposedElementCategory/@xlink:href))) then
+			local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.missingAttributeRiskZone"/>
+										<translationTemplate ref="TR.brokenLinkNaturalRiskZones"/>
+									</translationTemplates>
+								</TestAssertion>
+
+								<TestAssertion id="EID19a06a7c-87a9-45eb-846a-b7ad0db0dbb6">
+									<label>nz-ia.a.2: SpecificExposedElementTypeValue</label>
+									<description><![CDATA[Check that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list vanzed property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. Otherwise report brokenLink.<br/><br/>
+This data theme currently has the following extensible code list:
+<ul><li>
+SpecificExposedElementTypeValue : http://inspire.ec.europa.eu/codelist/SpecificExposedElementTypeValue</ul></li><br/><br/>
+
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia/code-list" target="_blank">Abstract Test Case 'Code List'</a>, <a href="https://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.6.3</a>]]></description>
+									<parent ref="EID10d55af4-9f6a-45d2-a462-8a31b6394b59"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:ExposedElement|self::nz-core:ExposedElementCoverage]
+let $property_string := 'SpecificExposedElementTypeValue'
+let $messages :=
+
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'nz-core:ExposedElement') then
+					$this_feature/nz-core:assessmentOfVulnerability
+				else $this_feature
+
+	for $actual_feature in $this_features
+	
+		let $feature := 
+			if (name($actual_feature) = 'nz-core:assessmentOfVulnerability') then
+				$actual_feature/nz-core:VulnerabilityAssessment
+			else $actual_feature
+
+	let $urls := 
+		for $x in $feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:specificExposedElementType/@xlink:href
+			return
+			if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+				()
+			else
+				$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+			let $url := string($href)
+			let $validuri := map:get($map, $url)
+			return
+				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+					$url
+				else ()
+
+	return
+		if (not(exists($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:specificExposedElementType))) then
+			local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature),'featureType':local-name($actual_feature/..), 'gmlid':string($actual_feature/../@*:id), 'property':'nz-core:specificExposedElementType'}) 
+		else if (count($feature/nz-core:typeOfElement/nz-core:ExposedElementClassification/nz-core:specificExposedElementType) != 1) then
+			local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($actual_feature), 'id': string($actual_feature/../@*:id), 'element': 'nz-core:specificExposedElementType'}) 
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.missingAttributeRiskZone"/>
+										<translationTemplate ref="TR.brokenLinkNaturalRiskZones"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDc2fb6ed9-379a-427d-a08f-5856ae7c20f1">
+									<label>nz-ia.a.3: NaturalHazardCategoryValue</label>
+									<description><![CDATA[Check that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list vanzed property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. Otherwise report brokenLink.<br/><br/>
+This data theme currently has the following extensible code list:
+<ul><li>
+NaturalHazardCategoryValue : http://inspire.ec.europa.eu/codelist/NaturalHazardCategoryValue</ul></li><br/><br/>
+
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia/code-list" target="_blank">Abstract Test Case 'Code List'</a>, <a href="https://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.6.3</a>]]></description>
+									<parent ref="EID10d55af4-9f6a-45d2-a462-8a31b6394b59"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:ObservedEvent|self::nz-core:HazardArea|self::nz-core:RiskZone|self::nz-core:ExposedElement]
+let $property_string := 'NaturalHazardCategoryValue'
+let $messages :=
+
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'nz-core:ObservedEvent') then
+					$this_feature/nz-core:typeOfHazard
+				else if (name($this_feature) = 'nz-core:HazardArea') then
+					$this_feature/nz-core:typeOfHazard
+				else if (name($this_feature) = 'nz-core:RiskZone') then
+					$this_feature/nz-core:sourceOfRisk
+				else if (name($this_feature) = 'nz-core:ExposedElement') then
+					$this_feature/nz-core:assessmentOfVulnerability
+				else ()
+
+	for $actual_feature in $this_features
+	
+		let $feature := 
+			if (name($actual_feature) = 'nz-core:assessmentOfVulnerability') then
+				$actual_feature/nz-core:VulnerabilityAssessment/nz-core:sourceOfVulnerability
+			else $actual_feature
+		let $urls := 
+			for $x in $feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+		return
+			if (name($feature) = 'nz-core:sourceOfVulnerability' and not(exists($feature/nz-core:NaturalHazardClassification))) then ()
+			else if (not(exists($feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory))) then
+				local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature),'featureType':local-name($actual_feature/..), 'gmlid':string($actual_feature/../@*:id), 'property':'nz-core:hazardCategory'}) 
+			else if (count($feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory) != 1) then
+				local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($actual_feature), 'id': string($actual_feature/../@*:id), 'element': 'nz-core:hazardCategory'}) 
+			else if (not(exists($feature/nz-core:NaturalHazardClassification/nz-core:hazardCategory/@xlink:href))) then
+				local:addMessage('TR.missingAttributeRiskZone',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if(count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.missingAttributeRiskZone"/>
+										<translationTemplate ref="TR.brokenLinkNaturalRiskZones"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID66745790-5452-41c7-a193-8ed37d280bb7">
+									<label>nz-ia.a.4: SpecificHazardTypeValue</label>
+									<description><![CDATA[Check that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list vanzed property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. Otherwise report brokenLink.<br/><br/>
+This data theme currently has the following extensible code list:
+<ul><li>
+SpecificHazardTypeValue : http://inspire.ec.europa.eu/codelist/SpecificHazardTypeValue</ul></li><br/><br/>
+
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia/code-list" target="_blank">Abstract Test Case 'Code List'</a>, <a href="https://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.6.3</a>]]></description>
+									<parent ref="EID10d55af4-9f6a-45d2-a462-8a31b6394b59"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:ObservedEvent|self::nz-core:HazardArea|self::nz-core:RiskZone|self::nz-core:ExposedElement]
+let $property_string := 'SpecificHazardTypeValue'
+let $messages :=
+	let $this_features :=
+		for $this_feature in $features_selected
+			return
+				if (name($this_feature) = 'nz-core:ObservedEvent') then
+					$this_feature/nz-core:typeOfHazard
+				else if (name($this_feature) = 'nz-core:HazardArea') then
+					$this_feature/nz-core:typeOfHazard
+				else if (name($this_feature) = 'nz-core:RiskZone') then
+					$this_feature/nz-core:sourceOfRisk
+				else if (name($this_feature) = 'nz-core:ExposedElement') then
+					$this_feature/nz-core:assessmentOfVulnerability
+				else ()
+
+	for $actual_feature in $this_features
+	
+		let $feature := 
+			if (name($actual_feature) = 'nz-core:assessmentOfVulnerability') then
+				$actual_feature/nz-core:VulnerabilityAssessment/nz-core:sourceOfVulnerability
+			else $actual_feature
+
+	let $urls := 
+		for $x in $feature/nz-core:NaturalHazardClassification/nz-core:specificHazardType/@xlink:href
+			return
+			if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+				()
+			else
+				$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+			let $url := string($href)
+			let $validuri := map:get($map, $url)
+			return
+				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+					$url
+				else ()
+
+	return
+		if (not(exists($feature/nz-core:NaturalHazardClassification/nz-core:specificHazardType))) then
+			local:addMessage('TR.missingElementNaturalRiskZone',  map {'filename': local:filename($actual_feature),'featureType':local-name($actual_feature/..), 'gmlid':string($actual_feature/../@*:id), 'property':'nz-core:specificHazardType'}) 
+		else if (count($feature/nz-core:NaturalHazardClassification/nz-core:specificHazardType) != 1) then
+			local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($actual_feature), 'id': string($actual_feature/../@*:id), 'element': 'nz-core:specificHazardType'}) 
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($actual_feature), 'featureType':local-name($actual_feature/..), 'gmlid': string($actual_feature/../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.missingAttributeRiskZone"/>
+										<translationTemplate ref="TR.brokenLinkNaturalRiskZones"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+
+				<TestCase id="EIDd8b35694-d212-4b09-9b64-162ffc062e6e">
+					<label>Feature references</label>
+					<description>Verify that referenced features can be retrieved.</description>
+					<parent ref="EIDa1872ff4-eb0c-4990-9c10-922c04a5fcae"/>
+					<testSteps>
+						<TestStep id="EIDb94557e9-aef4-43eb-a92e-50046882fbcd">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDd8b35694-d212-4b09-9b64-162ffc062e6e"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+
+
+								<TestAssertion id="EIDc8a65b75-00cc-4c83-a0d9-dc16fc025148">
+									<label>nz-ia.b.1: RiskZone.exposedElement</label>
+									<description><![CDATA[Check that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a gml:id attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document. Otherwise report brokenLink.<br/><br/>
+									This data theme currently has the following association role:
+<ul><li>RiskZone.exposedElement: ExposedElement or ExposedElementCoverage</ul></li></br></br>
+
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="https://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2</a>]]></description>
+									<parent ref="EIDb94557e9-aef4-43eb-a92e-50046882fbcd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:RiskZone]
+let $gml_ids := $features//@gml:id
+let $property_string := 'RiskZone.exposedElement'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/nz-core:exposedElement/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/nz-core:exposedElement/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (count($feature/nz-core:exposedElement) = 0) then
+			local:addMessage('TR.missingElementNaturalRiskZone', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'nz-core:exposedElement'}) 
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if ((count($invalid_element_reference) > 0) and  (count($feature/nz-core:exposedElement/@nilReason) = 0)) then
+			local:addMessage('TR.missingReferencedElementNaturalRiskZones',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+										<translationTemplate ref="TR.brokenLinkNaturalRiskZones"/>
+									</translationTemplates>
+								</TestAssertion>
+
+								<TestAssertion id="EID993e9bea-2013-4bd5-b032-6ada55279f53">
+									<label>nz-ia.b.2: RiskZone.source</label>
+									<description><![CDATA[Check that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a gml:id attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document. Otherwise report brokenLink.<br/><br/>
+									This data theme currently has the following association role:
+<ul><li>RiskZone.source: HazardArea or HazardCoverage</ul></li></br></br>
+
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="https://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2</a>]]></description>
+									<parent ref="EIDb94557e9-aef4-43eb-a92e-50046882fbcd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:RiskZone]
+let $gml_ids := $features//@gml:id
+let $property_string := 'RiskZone.source'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/nz-core:source/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/nz-core:source/@xlink:href 
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (count($feature/nz-core:source) = 0) then
+			local:addMessage('TR.missingElementNaturalRiskZone', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'nz-core:source'}) 
+		else if (count($feature/nz-core:source) != 1) then
+			local:addMessage('TR.wrongMultiplicitySpatialRepresentation', map {'filename': local:filename($feature), 'id': string($feature/@*:id), 'element': 'nz-core:source'}) 
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if ((count($invalid_element_reference) > 0) and  (count($feature/nz-core:source/@nilReason) = 0)) then
+			local:addMessage('TR.missingReferencedElementNaturalRiskZones',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementNaturalRiskZone"/>
+										<translationTemplate ref="TR.wrongMultiplicitySpatialRepresentation"/>
+										<translationTemplate ref="TR.brokenLinkNaturalRiskZones"/>
+										<translationTemplate ref="TR.missingReferencedElementNaturalRiskZones"/>
+									</translationTemplates>
+								</TestAssertion>
+								
+								<TestAssertion id="EIDa5c0f1ec-f848-469a-8076-1720c987cb05">
+									<label>nz-ia.b.3: HazardArea.source</label>
+									<description><![CDATA[Check that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a gml:id attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document. Otherwise report brokenLink.<br/><br/>
+									This data theme currently has the following association role:
+<ul><li>HazardArea.source: ObservedEvent or ObservedEventCoverage</ul></li></br></br>
+
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="https://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2</a>]]></description>
+									<parent ref="EIDb94557e9-aef4-43eb-a92e-50046882fbcd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:HazardArea]
+let $gml_ids := $features//@gml:id
+let $property_string := 'HazardArea.source'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/nz-core:source/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/nz-core:source/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if ((count($invalid_element_reference) > 0) and (count($feature/nz-core:source/@nilReason) = 0)) then
+			local:addMessage('TR.missingReferencedElementNaturalRiskZones',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingReferencedElementNaturalRiskZones"/>
+										<translationTemplate ref="TR.brokenLinkNaturalRiskZones"/>
+									</translationTemplates>
+								</TestAssertion>
+							
+								<TestAssertion id="EID8ae2f99e-b18f-427e-b05d-ea8551443aff">
+									<label>nz-ia.b.4: ObservedEvent.isMonitoredBy</label>
+									<description><![CDATA[Check that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a gml:id attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document. Otherwise report brokenLink.<br/><br/>
+									This data theme currently has the following association role:
+<ul><li>ObservedEvent.isMonitoredBy: EnvironmentalMonitoringProgramme</ul></li></br></br>
+
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="https://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_NZ_v3.0.pdf">INSPIRE Data Specification on Natural Risk Zones, A.4.2</a>]]></description>
+									<parent ref="EIDb94557e9-aef4-43eb-a92e-50046882fbcd"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::nz-core:ObservedEvent]
+let $gml_ids := $features//@gml:id
+let $property_string := 'ObservedEvent.isMonitoredBy'
+let $messages :=
+	for $feature in $features_selected
+	let $urls := 
+		for $x in $feature/nz-core:isMonitoredBy/@xlink:href
+		return
+		if (starts-with($x, '#')) then
+			()
+		else
+			$x
+	let $map := local:check-resource-uris($urls, 30, true())
+	let $invalid_urls :=
+		for $href in $urls
+		let $url := string($href)
+		let $validuri := map:get($map, $url)
+		return
+			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+				$url
+			else ()
+	let $invalid_element_reference :=
+		for $x in $feature/nz-core:isMonitoredBy/@xlink:href 
+		return
+		if (starts-with($x, '#')) then
+			if (not(substring($x, 2) = $gml_ids)) then
+				$x
+			else ()
+		else ()
+	return
+		if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkNaturalRiskZones',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if ((count($invalid_element_reference) > 0) and (count($feature/nz-core:isMonitoredBy/@nilReason) = 0)) then
+			local:addMessage('TR.missingReferencedElementNaturalRiskZones',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingReferencedElementNaturalRiskZones"/>
+										<translationTemplate ref="TR.brokenLinkNaturalRiskZones"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>

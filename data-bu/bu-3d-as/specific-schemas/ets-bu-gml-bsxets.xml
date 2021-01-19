@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID94fdd1a9-68bf-4a0a-aa89-76659436a676" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-bu/bu-gml</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: GML application schemas, Buildings (for Buildings3D)</label>
+	<description><![CDATA[This test suite examines the GML encoding of spatial objects specified in the INSPIRE GML application schema 'Buildings'. Both currently approved GML application schema versions (3.0 and 4.0) are tested. It is dedicated only to the 3D Building application schema.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-gml" target="_blank">Conformance Class 'GML application schemas, Buildings'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
+	<reference>../../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-09-22T11:30:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-09-22T11:30:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID6242ed25-8553-4836-9814-ce8dcc188501"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EIDc435378c-52c4-4c82-8b8b-80890720afd2"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID5c12aa19-a91f-43d7-a575-2360fb3230f7">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID94fdd1a9-68bf-4a0a-aa89-76659436a676"/>
+			<testCases>
+				<TestCase id="EID535e2fe7-5d10-4fe6-b8b7-8bf501ce3334">
+					<label>Basic test</label>
+					<description>Verify that the spatial data set contains at least one Buildings feature.</description>
+					<parent ref="EID5c12aa19-a91f-43d7-a575-2360fb3230f7"/>
+					<testSteps>
+						<TestStep id="EID871766f9-c55c-4a44-8f37-13096e1e829e">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID535e2fe7-5d10-4fe6-b8b7-8bf501ce3334"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID17d5e6a4-73a5-45fe-aca0-cd5981e855a6">
+									<label>bu-gml.a.1: Buildings feature in dataset</label>
+									<description><![CDATA[Check that the set of features in the spatial data set is not empty.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BU_v3.0.pdf">INSPIRE Data Specification on Buildings, A.1.1, (A.6.1)</a>]]></description>
+									<parent ref="EID871766f9-c55c-4a44-8f37-13096e1e829e"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $featuresFromAppSchema := $features[self::bu-core2d:Building || self::bu-core3d:Building]
+return
+ (if ($featuresFromAppSchema) then 'PASSED' else 'FAILED',
+  if (not($featuresFromAppSchema)) then local:addMessage('TR.noFeature', map { 'theme': 'Buildings' }) else ())
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noFeature"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
