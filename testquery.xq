@@ -39,6 +39,7 @@ declare namespace gn='http://inspire.ec.europa.eu/schemas/gn/4.0';
 declare namespace ge='http://inspire.ec.europa.eu/schemas/ge-core/4.0';
 declare namespace ge_gp='http://inspire.ec.europa.eu/schemas/ge_gp/4.0';
 declare namespace ge_hg='http://inspire.ec.europa.eu/schemas/ge_hg/4.0';
+declare namespace sams="http://www.opengis.net/samplingSpatial/2.0";
 declare namespace lcn='http://inspire.ec.europa.eu/schemas/lcn/4.0';
 declare namespace lcr='http://inspire.ec.europa.eu/schemas/lcr/4.0';
 declare namespace lcv='http://inspire.ec.europa.eu/schemas/lcv/4.0';
