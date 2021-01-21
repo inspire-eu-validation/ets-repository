@@ -114,12 +114,11 @@ let $messages :=
 			else if (exists($envDom) and exists($envDom/@xlink:href) and ($envDom/@xlink:href = $invalid_urls)) then
 				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ',')})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge_hg:aquiferType/@xlink:href = $envDom/@xlink:href)}))
+				(local:addMessage('TR.disallowedCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
 			else ()
 
 return
-(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute','TR.brokenLink'))) then 'FAILED' 
-else if($messages and $messages/@ref = ('TR.manual.reviewCodeListValue')) then 'PASSED_MANUAL' 
+(if ($messages) then 'FAILED' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
@@ -131,7 +130,7 @@ $messages)
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
 										<translationTemplate ref="TR.brokenLink"/>
-										<translationTemplate ref="TR.manual.reviewCodeListValue"/>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID4e4fa22a-5d7a-4b67-81ce-b1f39d084777">
@@ -189,12 +188,11 @@ let $messages :=
 			else if (exists($envDom) and exists($envDom/@xlink:href) and ($envDom/@xlink:href = $invalid_urls)) then
 				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ',')})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($features_selected/ge_hg:conditionOfGroundWaterBody/@xlink:href = $envDom/@xlink:href)})
+				local:addMessage('TR.disallowedCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
 			else ()
 
 return
-(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute','TR.brokenLink'))) then 'FAILED' 
-else if($messages and $messages/@ref = ('TR.manual.reviewCodeListValue')) then 'PASSED_MANUAL' 
+(if ($messages) then 'FAILED' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
@@ -206,7 +204,7 @@ $messages)
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
 										<translationTemplate ref="TR.brokenLink"/>
-										<translationTemplate ref="TR.manual.reviewCodeListValue"/>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID1095f7dc-f46d-4360-a293-5914e6dbef59">
