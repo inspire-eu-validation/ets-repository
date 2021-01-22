@@ -502,12 +502,12 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/EventProcessValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/EventProcessValue/EventProcessValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'eventProcess'
-let $features_selected := $features[self::ge:eventProcess]
+let $features_selected := $features[self::ge:GeologicEvent]
 
 let $messages := 
 
 	for $feature in $features_selected
-		let $envDom := $feature/ge:anthropogenicGeomorphologicFeatureType
+		let $envDom := $feature/ge:eventProcess
 
 		let $urls := 
 		for $x in $envDom/@xlink:href
@@ -521,11 +521,14 @@ let $messages :=
 			return
 				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
 				else ()
+
+		let $dummy:= local:log("EnvDom: " || $envDom)
+
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})	
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge:anthropogenicGeomorphologicFeatureType/@xlink:href = $envDom/@xlink:href)}))
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge:eventProcess/@xlink:href = $envDom/@xlink:href)}))
 			else ()
 
 return
