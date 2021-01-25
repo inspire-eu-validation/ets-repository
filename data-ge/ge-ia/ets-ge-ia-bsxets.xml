@@ -130,7 +130,7 @@ let $features_selected := $features[self::ge:GeologicUnit|self::ge:ShearDisplace
 let $property_string := 'ThematicClassificationValue'
 let $messages := 
 	for $feature in $features_selected
-		let $envDom := $feature/ge:themeClassification/ge:ThematicClass/ge:themeClassification
+		let $envDom := $feature/ge:themeClass/ge:ThematicClass/ge:themeClassification
 		let $urls := 
 			for $x in $envDom/@xlink:href
 				return
@@ -149,11 +149,11 @@ let $messages :=
 					else ()
 
 	return
-		if (not(exists($feature/ge:themeClassification/ge:ThematicClass/ge:themeClassification))) then
+		if (not(exists($feature/ge:themeClass/ge:ThematicClass/ge:themeClassification))) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
-		else if (count($feature/ge:themeClassification/ge:ThematicClass/ge:themeClassification) > 1) then
-			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/ge:themeClassification/ge:ThematicClass/ge:themeClassification)}) 
-		else if (not(exists($feature/ge:themeClassification/ge:ThematicClass/ge:themeClassification/@xlink:href))) then
+		else if (count($feature/ge:themeClass/ge:ThematicClass/ge:themeClassification) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/ge:themeClass/ge:ThematicClass/ge:themeClassification)}) 
+		else if (not(exists($feature/ge:themeClass/ge:ThematicClass/ge:themeClassification/@xlink:href))) then
 			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
 		else if(count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
@@ -667,7 +667,7 @@ $messages)
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID3af855b9-4c40-45a4-abee-4950c35c415e">
-									<label>ge-ia.b.9: environmentalMonitoringFacilityelement</label>
+									<label>ge-ia.b.9: environmentalMonitoringFacility</label>
 									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
 Relevant requirements:
 <ul>
@@ -679,10 +679,10 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-ia/feature
 									<expression>
 let $features_selected := $features[self::ge_hg:ActiveWell]
 let $gml_ids := $features//@gml:id
-let $property_string := 'environmentalMonitoringFacilityelement'
+let $property_string := 'environmentalMonitoringFacility'
 let $messages :=
 	for $feature in $features_selected
-		let $envDom := $feature/ge_hg:environmentalMonitoringFacilityelement
+		let $envDom := $feature/ge_hg:environmentalMonitoringFacility
 		let $urls := 
 			for $x in $envDom/@xlink:href
 			return
@@ -706,8 +706,8 @@ let $messages :=
 					else ()
 				else ()
 		return
-			if (count($feature/ge_hg:environmentalMonitoringFacilityelement) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/ge_hg:environmentalMonitoringFacilityelement)}) 
+			if (count($feature/ge_hg:environmentalMonitoringFacility) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/ge_hg:environmentalMonitoringFacility)}) 
 			else if (count($invalid_urls) > 0) then
 				local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 			else if (count($invalid_element_reference) > 0) then
