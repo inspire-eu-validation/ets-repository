@@ -319,7 +319,7 @@ let $messages :=
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
 			else if (count($envDom) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge:role/@xlink:href = $envDom/@xlink:href)}))
 			else ()
@@ -387,7 +387,7 @@ let $messages :=
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
 			else if (count($envDom) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
 				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
@@ -522,14 +522,16 @@ let $messages :=
 				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
 				else ()
 
-		let $dummy:= local:log("EnvDom: " || $envDom)
-
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})	
-			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge:eventProcess/@xlink:href = $envDom/@xlink:href)}))
-			else ()
+			else 
+				for $element in $envDom
+				let $aaa := "aaa"
+					return 
+						if(exists($element) and exists($element/@xlink:href) and not($element/@xlink:href = $valid_href)) then 
+							(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($element/@xlink:href, ','), 'count': count($feature/ge:eventProcess/@xlink:href = $element/@xlink:href)}))
+						else ()
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement'))) then 'FAILED' 
