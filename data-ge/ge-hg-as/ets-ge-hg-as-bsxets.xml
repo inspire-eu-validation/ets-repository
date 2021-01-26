@@ -116,7 +116,8 @@ let $messages :=
 			else ()
 
 return
-(if ($messages) then 'FAILED' 
+(if ($messages and not($messages/@ref = ('TR.disallowedCodeListValue'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.disallowedCodeListValue')) then 'PASSED_MANUAL' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
@@ -188,7 +189,8 @@ let $messages :=
 			else ()
 
 return
-(if ($messages) then 'FAILED' 
+(if ($messages and not($messages/@ref = ('TR.disallowedCodeListValue'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.disallowedCodeListValue')) then 'PASSED_MANUAL' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
