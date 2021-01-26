@@ -25,6 +25,7 @@ declare namespace tn-c3='urn:x-inspire:specification:gmlas:CableTransportNetwork
 declare namespace tn-ra3='urn:x-inspire:specification:gmlas:RailwayTransportNetwork:3.0';
 declare namespace tn-ro3='urn:x-inspire:specification:gmlas:RoadTransportNetwork:3.0';
 declare namespace tn-w3='urn:x-inspire:specification:gmlas:WaterTransportNetwork:3.0';
+declare namespace br='http://inspire.ec.europa.eu/schemas/br/4.0';
 declare namespace bu-core3d3='http://inspire.jrc.ec.europa.eu/draft-schemas/bu-core3d/3.0';
 declare namespace net3='urn:x-inspire:specification:gmlas:Network:3.2'; 
 declare namespace base32='urn:x-inspire:specification:gmlas:BaseTypes:3.2'; 
