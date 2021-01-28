@@ -104,6 +104,11 @@ declare function local:check-resource-uri($uri as xs:string, $timeoutInS as xs:i
 			let $response := xquery:eval($query, map{ 'timeoutInS' : $timeoutInS, 'uri': $uri, 'redirect': $redirect }, map{ 'timeout': $timeoutInS })
 			return
 			if ($response/@status=('200','204')) then
+        let $dummy := 
+          for $element in $response/http:header
+            return 
+              local:log("Response header variable "|| $element/@name|| ": "|| $element/@value)
+
 			   let $contenttype := $response/http:header[lower-case(@name)='content-type']/@value
 		  		return
 		  		if ($contenttype) then $contenttype else 'application/octet-stream'
