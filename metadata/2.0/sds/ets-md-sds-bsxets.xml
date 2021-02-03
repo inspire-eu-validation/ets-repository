@@ -14,11 +14,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds" target="_b
 <br/><br/>
 Pre-requisite conformance classes: none]]></description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.2</version>
+		<version>1.0.3</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-02-13T16:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-05-28T12:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -99,12 +99,18 @@ let $messages :=
 			let $level := $record/gmd:hierarchyLevel/gmd:MD_ScopeCode
 			let $rid := $record/gmd:fileIdentifier/*/text()
 			let $levelname := $record/gmd:hierarchyLevelName
+			let $emptyLevelName :=
+				for $x in $record/gmd:hierarchyLevelName
+				return
+					if (not(string-length($x/gco:CharacterString/text()) != 0 or string-length($x/gmx:Anchor/text()) != 0)) then
+						$x
+					else()
 			return
 			if (count($level) != 1) then
 				local:addMessage('TR.wrongHierarchyLevelMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($level)) })
 			else if(count($levelname) = 0) then
 				local:addMessage('TR.wrongHierarchyLevelNameMultiplicity', map { 'filename': local:filename($record), 'id': $rid, 'count': string(count($levelname)) })
-            else if (not(string-length($levelname/gco:CharacterString/text()) != 0 or string-length($levelname/gmx:Anchor/text()) != 0)) then
+            else if (count($emptyLevelName) > 0) then
 				local:addMessage('TR.emptyHierarchyLevelName', map { 'filename': local:filename($record), 'id': $rid })
 			else()
 return
@@ -351,7 +357,7 @@ let $messages :=
 					local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
 				else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
 					try { 
-						let $root := local:switch-url-request($url)
+						let $root := local:get-document($url)
 						let $validCodes := ('dataset','series')
 						return
 						if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
