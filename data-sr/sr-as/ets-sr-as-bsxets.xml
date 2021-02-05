@@ -355,10 +355,12 @@ let $messages :=
 		else if(not($envDom/@xlink:href)) then
 			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
 		else if(not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater')) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the waterLevel element of the spatial object type Sea is meanHighWater', 'additionalInfo':''})
+			local:addMessage('TR.manualconstraintReviewSR', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'waterLevel', 'value': string($envDom/@xlink:href)})
 		else ()
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and not($messages/@ref = ('TR.manualconstraintReviewSR'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.manualconstraintReviewSR')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
@@ -366,7 +368,7 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.manualconstraintReviewSR"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDba3570a8-c9e3-4d1d-abdf-03f215909c41">
@@ -393,7 +395,7 @@ let $messages :=
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'waterLevel'}) 
 		else if(count($envDom) > 1) then
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
-		else if(not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
+		else if(exists($envDom/@xlink:href) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
 			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the waterLevel element of the spatial object type Coastline is meanHighWater or meanSeaLevel', 'additionalInfo':''})
 		else ()
 return
@@ -431,9 +433,9 @@ let $messages :=
 		if(count($envDom) > 1) then
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:geometry', 'multiplicity': 1, 'count': count($envDom)}) 
 		else if(not($envDom/@xlink:href)) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': '', 'additionalInfo':''})
+			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry element is represented as either a surface or a point', 'additionalInfo':''})
 		else if(not(exists($envDom/gml:Surface)) and not(exists($envDom/gml:Point))) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': '', 'additionalInfo':''})
+			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry element is represented as either a surface or a point', 'additionalInfo':''})
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -467,9 +469,9 @@ let $messages :=
 
 	return
 		if (not(exists($envDom))) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': '', 'additionalInfo':''})
+			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the extent element has multiplicity 1', 'additionalInfo':''})
 		else if(not($envDom/@xlink:href)) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': '', 'additionalInfo':''})
+			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the extent element has multiplicity 1', 'additionalInfo':''})
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -498,13 +500,55 @@ $messages)
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 							<testAssertions>
 								<TestAssertion id="EID096e31c7-2481-46a5-b3a1-6ef6b4489124">
-									<label>sr-as.c.1: specific-req</label>
+									<label>sr-as.c.1: specific-req.1</label>
 									<description><![CDATA[The following checks shall be manually performed for every feature in the dataset.<br/><br/>
 Relevant requirements:
 <ul>
 <li>The Sea spatial object type shall be used to describe identified, named areas of sea (or ocean). Artificial reporting units are excluded from this requirement.</li>
+<br/>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-rd/master/sr-as/specific-req" target="_blank">Abstract Test Case 'Sea Regions theme-specific requirements'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_SR_v3.0.pdf">INSPIRE Data Specification on Sea Regions, A.1.6</a>]]></description>
+									<parent ref="EID072cee6a-4221-4cf6-8963-330cd65fe720"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>NOT_APPLICABLE</expression>
+									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+								</TestAssertion>
+								<TestAssertion id="EIDab09e041-76a4-4d06-82b3-717cf3be27f2">
+									<label>sr-as.c.2: specific-req.2</label>
+									<description><![CDATA[The following checks shall be manually performed for every feature in the dataset.<br/><br/>
+Relevant requirements:
+<ul>
 <li>The low water level used to define an IntertidalArea shall be provided as a value of the lowWaterLevel attribute. The level shall be a low water level.</li>
+<br/>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-rd/master/sr-as/specific-req" target="_blank">Abstract Test Case 'Sea Regions theme-specific requirements'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_SR_v3.0.pdf">INSPIRE Data Specification on Sea Regions, A.1.6</a>]]></description>
+									<parent ref="EID072cee6a-4221-4cf6-8963-330cd65fe720"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>NOT_APPLICABLE</expression>
+									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+								</TestAssertion>
+								<TestAssertion id="EIDa9f56f41-c33b-4111-aeef-a15af343f323">
+									<label>sr-as.c.3: specific-req.3</label>
+									<description><![CDATA[The following checks shall be manually performed for every feature in the dataset.<br/><br/>
+Relevant requirements:
+<ul>
 <li>SeaAreas shall be represented as 2-dimensional geometries.</li>
+<br/>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-rd/master/sr-as/specific-req" target="_blank">Abstract Test Case 'Sea Regions theme-specific requirements'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_SR_v3.0.pdf">INSPIRE Data Specification on Sea Regions, A.1.6</a>]]></description>
+									<parent ref="EID072cee6a-4221-4cf6-8963-330cd65fe720"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>NOT_APPLICABLE</expression>
+									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+								</TestAssertion>
+								<TestAssertion id="EID70373566-5852-4d3a-96ba-50e3b8cd92b4">
+									<label>sr-as.c.4: specific-req.4</label>
+									<description><![CDATA[The following checks shall be manually performed for every feature in the dataset.<br/><br/>
+Relevant requirements:
+<ul>
 <li>The code lists defined in the spatial data theme Oceanographic Geographical Features shall be used to identify phenomena represented by MarineContour spatial object types.</li>
 <br/>
 <li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
@@ -514,6 +558,47 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-rd/master/sr-as/specifi
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>NOT_APPLICABLE</expression>
 									<testItemType ref="EIDb48eeaa3-6a74-414a-879c-1dc708017e11"/>
+								</TestAssertion>
+								<TestAssertion id="EIDb136e2bf-d279-47dd-baeb-4cf32fd63508">
+									<label>sr-as.c.5: specific-req.5</label>
+									<description><![CDATA[The following checks shall be manually performed for every feature in the dataset.<br/><br/>
+Relevant requirements:
+<ul>
+<li>The MarineExtent of a Sea spatial object shall have a waterlevel value equal to “MeanHighWater”, unless there is no appreciable change in the Sea extent due to tides, in which case a value of “MeanSeaLevel” may be used.</li>
+<br/>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-rd/master/sr-as/specific-req" target="_blank">Abstract Test Case 'Sea Regions theme-specific requirements'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_SR_v3.0.pdf">INSPIRE Data Specification on Sea Regions, A.1.6</a>]]></description>
+									<parent ref="EID072cee6a-4221-4cf6-8963-330cd65fe720"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[self::sr:Sea]
+let $messages :=
+	for $feature in $features_selected
+
+	let $envDom := $feature/sr:extent/sr:MarineExtent/sr:waterLevel
+
+
+	return
+		if(count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
+		else if(not($envDom/@xlink:href)) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
+		else if(exists($envDom/@xlink:href) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
+			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the MarineExtent element of the spatial object type Sea is meanHighWater or meanSeaLevel', 'additionalInfo':''})
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)				
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.disallowedCodeListValue"/>
+									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
 						</TestStep>
