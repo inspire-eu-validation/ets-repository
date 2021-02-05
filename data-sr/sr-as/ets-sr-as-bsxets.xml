@@ -97,9 +97,9 @@ let $features_selected := $features[self::sr:MarineCirculationZone | self::sr:Se
 let $features_selected2 := $features[self::sr:Coastline | self::sr:Shoreline]
 let $messages :=
 	for $features in $features_selected
-	let $envDoms := $features/sr:extent/sr:MarineExtent/sr:waterLevel
+	let $envDoms := $features/sr:extent
 		for $feature in $envDoms
-			let $envDom := $feature/sr:extent/sr:MarineExtent/sr:waterLevel
+			let $envDom := $feature/sr:MarineExtent/sr:waterLevel
 			return
 				if (count($envDom) > 1) then 
 					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel','multiplicity': 1, 'count':count($envDom)}) 
@@ -346,19 +346,18 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-as/constra
 									<expression>
 let $features_selected := $features[self::sr:Sea]
 let $messages :=
-	for $feature in $features_selected
-
-	let $envDom := $feature/sr:extent/sr:MarineExtent/sr:waterLevel
-
-
-	return
-		if(count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
-		else if(exists($envDom) and not($envDom/@xlink:href)) then
-			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
-		else if(exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater')) then
-			local:addMessage('TR.manualconstraintReviewSR', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'waterLevel', 'value': string($envDom/@xlink:href)})
-		else ()
+	for $features in $features_selected
+		let $envDoms := $features/sr:extent
+		for $feature in $envDoms
+		let $envDom := $feature/sr:MarineExtent/sr:waterLevel
+		return
+			if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
+			else if(exists($envDom) and not($envDom/@xlink:href)) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
+			else if(exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater')) then
+				local:addMessage('TR.manualconstraintReviewSR', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'waterLevel', 'value': string($envDom/@xlink:href)})
+			else ()
 return
 (if ($messages and not($messages/@ref = ('TR.manualconstraintReviewSR'))) then 'FAILED' 
 else if($messages and $messages/@ref = ('TR.manualconstraintReviewSR')) then 'PASSED_MANUAL' 
@@ -388,18 +387,15 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-as/constra
 let $features_selected := $features[self::sr:Coastline]
 let $messages :=
 	for $feature in $features_selected
-
-	let $envDom := $feature/sr:waterLevel
-
-
-	return
-		if(not($envDom)) then
-			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'waterLevel'}) 
-		else if(count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
-		else if(not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the waterLevel element of the spatial object type Coastline is meanHighWater or meanSeaLevel', 'additionalInfo':''})
-		else ()
+		let $envDom := $feature/sr:waterLevel
+		return
+			if(not($envDom)) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'waterLevel'}) 
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
+			else if(not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the waterLevel element of the spatial object type Coastline is meanHighWater or meanSeaLevel', 'additionalInfo':''})
+			else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -427,18 +423,15 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-as/constra
 let $features_selected := $features[self::sr:SeaBedArea|self::sr:SeaSurfaceArea]
 let $messages :=
 	for $feature in $features_selected
-
-	let $envDom := $feature/sr:geometry
-
-
-	return
-		if(count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:geometry', 'multiplicity': 1, 'count': count($envDom)}) 
-		else if(exists($envDom) and not($envDom/@xlink:href)) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry element is represented as either a surface or a point', 'additionalInfo':''})
-		else if(exists($envDom) and not(exists($envDom/gml:Surface)) and not(exists($envDom/gml:Point))) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry element is represented as either a surface or a point', 'additionalInfo':''})
-		else ()
+		let $envDom := $feature/sr:geometry
+		return
+			if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:geometry', 'multiplicity': 1, 'count': count($envDom)}) 
+			else if(exists($envDom) and not($envDom/@xlink:href)) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry element is represented as either a surface or a point', 'additionalInfo':''})
+			else if(exists($envDom) and not(exists($envDom/gml:Surface)) and not(exists($envDom/gml:Point))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry element is represented as either a surface or a point', 'additionalInfo':''})
+			else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -465,16 +458,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-as/constra
 let $features_selected := $features[self::sr:MarineCirculationZone|self::sr:Sea]
 let $messages :=
 	for $feature in $features_selected
-
-	let $envDom := $feature/sr:extent
-
-
-	return
-		if (not(exists($envDom))) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the extent element has multiplicity 1', 'additionalInfo':''})
-		else if(exists($envDom) and not($envDom/@xlink:href)) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the extent element has multiplicity 1', 'additionalInfo':''})
-		else ()
+		let $envDom := $feature/sr:extent
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the extent element has multiplicity 1', 'additionalInfo':''})
+			else if(exists($envDom) and not($envDom/@xlink:href)) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the extent element has multiplicity 1', 'additionalInfo':''})
+			else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -576,16 +566,18 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-rd/master/sr-as/specifi
 									<expression>
 let $features_selected := $features[self::sr:Sea]
 let $messages :=
-	for $feature in $features_selected
-		let $envDom := $feature/sr:extent/sr:MarineExtent/sr:waterLevel
-		return
-			if(count($envDom) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
-			else if(exists($envDom) and not($envDom/@xlink:href)) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
-			else if(exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the MarineExtent element of the spatial object type Sea is meanHighWater or meanSeaLevel', 'additionalInfo':''})
-			else ()
+	for $features in $features_selected
+		let $envDoms := $features/sr:extent
+		for $feature in $envDoms
+			let $envDom := $feature/sr:MarineExtent/sr:waterLevel
+			return
+				if(count($envDom) > 1) then
+					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
+				else if(exists($envDom) and not($envDom/@xlink:href)) then
+					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
+				else if(exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
+					local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the MarineExtent element of the spatial object type Sea is meanHighWater or meanSeaLevel', 'additionalInfo':''})
+				else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
