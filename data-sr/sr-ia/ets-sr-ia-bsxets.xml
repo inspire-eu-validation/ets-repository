@@ -302,8 +302,8 @@ let $features_selected := $features[self::sr:Coastline|self::sr:Shoreline]
 let $property_string := 'ShoreTypeClassificationValue'
 let $messages := 
 
-	for $feature in $features_selected/sr:segment/sr:ShoreSegment
-		let $envDom := $feature/sr:shoreClassification
+	for $feature in $features_selected/sr:segment/sr:ShoreSegment/sr:shoreClassification
+	let $envDom := $feature
 		let $urls := 
 			for $x in $envDom/@xlink:href
 				return
@@ -311,7 +311,6 @@ let $messages :=
 					()
 				else
 					$x
-		let $dummy := local:log("URL : " || string($envDom/@xlink:href))
 		let $map := local:check-resource-uris($urls, 30, true())
 		let $invalid_urls :=
 			for $href in $urls
@@ -321,7 +320,6 @@ let $messages :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
-
 	return
 		if (count($envDom) > 1) then 
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'element': $property_string, 'multiplicity': '0 or 1', 'count':count($envDom)}) 
