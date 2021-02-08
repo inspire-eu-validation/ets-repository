@@ -298,11 +298,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-ia/code-li
 									<parent ref="EIDeffa5e33-edc0-451e-bbc6-ed6eaea207ae"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $features_selected := $features[ self::sr:Coastline |  self::sr:Shoreline ]
+let $features_selected := $features[self::sr:Coastline|self::sr:Shoreline]
 let $property_string := 'ShoreTypeClassificationValue'
 let $messages := 
 
-	for $feature in $features_selected/sr:ShoreSegment
+	for $feature in $features_selected/sr:segment/sr:ShoreSegment
 		let $envDom := $feature/sr:shoreClassification
 		let $urls := 
 			for $x in $envDom/@xlink:href
@@ -311,6 +311,7 @@ let $messages :=
 					()
 				else
 					$x
+		let $dummy := local:log("URL : " || string($envDom/@xlink:href))
 		let $map := local:check-resource-uris($urls, 30, true())
 		let $invalid_urls :=
 			for $href in $urls
