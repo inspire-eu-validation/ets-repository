@@ -354,11 +354,11 @@ let $messages :=
 			else if(exists($envDom) and not($envDom/@xlink:href)) then
 				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
 			else if(exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater')) then
-				local:addMessage('TR.manualconstraintReviewSR', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'waterLevel', 'value': string($envDom/@xlink:href)})
+				local:addMessage('TR.noTidalVariationCheck', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'waterLevel', 'value': string($envDom/@xlink:href)})
 			else ()
 return
-(if ($messages and not($messages/@ref = ('TR.manualconstraintReviewSR'))) then 'FAILED' 
-else if($messages and $messages/@ref = ('TR.manualconstraintReviewSR')) then 'PASSED_MANUAL' 
+(if ($messages and not($messages/@ref = ('TR.noTidalVariationCheck'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.noTidalVariationCheck')) then 'PASSED_MANUAL' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
@@ -367,7 +367,7 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.manualconstraintReviewSR"/>
+										<translationTemplate ref="TR.noTidalVariationCheck"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDba3570a8-c9e3-4d1d-abdf-03f215909c41">
@@ -565,25 +565,28 @@ let $messages :=
 	for $features in $features_selected
 		let $envDoms := $features/sr:extent
 		for $feature in $envDoms
-			let $envDom := $feature/sr:MarineExtent/sr:waterLevel
-			return
-				if(count($envDom) > 1) then
-					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
-				else if(exists($envDom) and not($envDom/@xlink:href)) then
-					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
-				else if(exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
-					local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the MarineExtent element of the spatial object type Sea is meanHighWater or meanSeaLevel', 'additionalInfo':''})
-				else ()
+		let $envDom := $feature/sr:MarineExtent/sr:waterLevel
+		return
+			if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
+			else if(exists($envDom) and not($envDom/@xlink:href)) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'attribute': '@xlink:href', 'property': 'waterLevel'}) 
+			else if(exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater')) then
+				local:addMessage('TR.noTidalVariationCheck', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'property': 'waterLevel', 'value': string($envDom/@xlink:href)})
+			else ()
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and not($messages/@ref = ('TR.noTidalVariationCheck'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.noTidalVariationCheck')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)				
+$messages)		
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
 										<translationTemplate ref="TR.constraintViolation"/>
+										<translationTemplate ref="TR.noTidalVariationCheck"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
