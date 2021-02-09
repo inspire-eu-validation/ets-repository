@@ -391,7 +391,7 @@ let $messages :=
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'waterLevel'}) 
 			else if(count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:waterLevel', 'multiplicity': 1, 'count': count($envDom)}) 
-			else if(not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
+			else if(exists($envDom/@xlink:href) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanHighWater') and exists($envDom) and not($envDom/@xlink:href = 'http://inspire.ec.europa.eu/codelist/WaterLevelValue/meanSeaLevel')) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the waterLevel element of the spatial object type Coastline is meanHighWater or meanSeaLevel', 'additionalInfo':''})
 			else ()
 return
