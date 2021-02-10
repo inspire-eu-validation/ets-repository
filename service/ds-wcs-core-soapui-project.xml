@@ -104,7 +104,64 @@ a.exists(
   'TR.manual.naturalLanguageFields'
 );
 </scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>AcceptVersions</con:name><con:value>${#Project#AcceptVersions}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>AcceptLanguages</con:name><con:value>${#TestCase#AcceptLanguages}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:properties><con:property><con:name>AcceptLanguages</con:name><con:value/></con:property></con:properties></con:testCase><con:testCase id="54921296-a157-4b98-8d05-21a1c6e5f87c" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at04-xml-schema-validation" searchProperties="true"><con:description><![CDATA[<p>Test that the XML capabilities document is schema valid.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at04-xml-schema-validation" target="_blank">XML schema validation</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="e087ca09-9e13-4104-bfc8-fd1c1569943c"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-xml-schema-valid" id="31471ae9-341e-468a-aa0a-83c6f83fc044" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="334293c8-de84-4391-a4bb-9deecfe0f347" name="http-request-xml-schema-valid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="09a763bf-d2e7-462b-98de-c9014dd15988" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Simple Schema Validator" id="a7dc0611-bb10-4716-ac6a-f8ebe89333f7" name="Simple Schema Validator"><con:configuration><pathToXSD>xsi:schemaLocation</pathToXSD></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>AcceptVersions</con:name><con:value>${#Project#AcceptVersions}</con:value><con:style>QUERY</con:style><con:default>${#Project#AcceptVersions}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="schema-validation" id="fc00bee3-6d13-4aa6-bdef-dab5dc3766a1"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.*
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at04-xml-schema-validation" target="_blank">XML schema validation</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="e087ca09-9e13-4104-bfc8-fd1c1569943c"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-xml-schema-valid" id="31471ae9-341e-468a-aa0a-83c6f83fc044" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="334293c8-de84-4391-a4bb-9deecfe0f347" name="http-request-xml-schema-valid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="09a763bf-d2e7-462b-98de-c9014dd15988" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion> <con:assertion type="GroovyScriptAssertion" id="c931c076-f135-47a0-a43b-97a8d980c834" name="Response validates agains schema"><con:configuration><scriptText>import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Schema;
+import javax.xml.validation.Validator
+import javax.xml.XMLConstants;
+import java.io.*;
+import org.xml.sax.SAXException;
+import de.interactive_instruments.etf.suim.*;
+import com.eviware.soapui.support.XmlHolder;
+import javax.xml.transform.Source;
+Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+
+XmlHolder xml = new XmlHolder(messageExchange.responseContentAsXml);
+def xmlText = xml.getXml();
+def xsds = ["http://schemas.opengis.net/wcs/2.1/gml/wcsAll.xsd", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0/inspire_dls.xsd"];
+
+if(xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation") != null){
+	def xsd = xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation");
+	validateFile(xmlText, xsd);
+}else{
+	xsds.each{ xsd ->
+	   validateFile(xmlText, xsd);
+	}
+}
+
+
+public boolean validateFile(String xml, String strSchemaLocation)
+{
+    Source xmlFile = null;
+    try {
+        URL schemaFile = new URL(strSchemaLocation);
+        xmlFile = new StreamSource(createFile(xml));
+        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        Schema schema = schemaFactory.newSchema(schemaFile);
+        Validator validator = schema.newValidator();
+        validator.validate(xmlFile);
+        
+    } catch (SAXException e) {
+        String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
+	     throw new TranslatableAssertionError('TR.XmlNotValidAgainstSchemaLocation', assertParams);
+        
+    } catch (IOException ioe) {
+        System.out.println("IOException");
+        
+    }
+    
+}
+
+
+
+public File createFile(String file) throws IOException {
+
+    File tempFile = File.createTempFile("temporaryfile",".xml")
+    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+    writer.write(file);
+    writer.close()
+    return tempFile;
+}</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>AcceptVersions</con:name><con:value>${#Project#AcceptVersions}</con:value><con:style>QUERY</con:style><con:default>${#Project#AcceptVersions}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="schema-validation" id="fc00bee3-6d13-4aa6-bdef-dab5dc3766a1"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.*
 
 def tsGetObservation = testRunner.testCase.testSuite.project.testSuites["Service_Metadata"].testCases["at04-xml-schema-validation"].getTestStepByName('http-request-xml-schema-valid');
 tsGetObservation.setDisabled(false);
