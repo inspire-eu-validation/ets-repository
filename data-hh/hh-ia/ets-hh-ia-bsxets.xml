@@ -1,0 +1,696 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID3743813e-6dda-4d25-8600-27bcc608a8c7" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-hh/hh-ia</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Information accessibility, Human Health and Safety</label>
+	<description><![CDATA[This test suite examines a data set against the themespecific requirements related to the accessibility of resources referenced by the data.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia" target="_blank">Conformance Class 'Information accessibility, Human Health and Safety'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
+</ul>]]></description>
+	<reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2020-10-14T08:30:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-10-14T08:30:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID2b11cc26-7f08-4215-a780-8ab6d2166c4e"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EIDd5c42acf-127a-4346-a1a1-728faae80333">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID3743813e-6dda-4d25-8600-27bcc608a8c7"/>
+			<testCases>
+			<TestCase id="EID5b94190b-c902-437a-a53b-a92828f45164">
+					<label>Code lists</label>
+					<description>Verify that code lists extensions can be accessed.</description>
+					<parent ref="EIDd5c42acf-127a-4346-a1a1-728faae80333"/>
+					<testSteps>
+						<TestStep id="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID5b94190b-c902-437a-a53b-a92828f45164"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID893bf298-510b-4984-8d28-9bad8da18d82">
+									<label>hh-ia.a.1: ChemicalValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:Biomarker]
+let $gml_ids := $features//@gml:id
+let $property_string := 'ChemicalValue'
+let $messages :=			
+	for $feature in $features_selected/hh:biomarkerName/hh:BiomarkerType
+
+		let $envDom := $feature/hh:chemical
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+		return
+
+
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDe6ea4bb6-0de4-4f7e-8878-638d85894e2b">
+									<label>hh-ia.a.2: DiseaseMeasureTypeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:Disease]
+let $gml_ids := $features//@gml:id
+let $property_string := 'DiseaseMeasureTypeValue'
+let $messages :=			
+	for $feature in $features_selected/hh:diseaseMeasure/hh:DiseaseMeasure
+
+		let $envDom := $feature/hh:diseaseMeasureType
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID6a13c03d-7e4a-4de6-99e8-6795b77d2522">
+									<label>hh-ia.a.3: EnvHealthDeterminantTypeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:EnvHealthDeterminantMeasure | self::hh:EnvHealthDeterminantStatisticalData]
+let $gml_ids := $features//@gml:id
+let $property_string := 'EnvHealthDeterminantTypeValue'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/hh:type
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDb25e24c3-53ce-41aa-9e74-f649c0a106ee">
+									<label>hh-ia.a.4: GeneralHealthTypeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:GeneralHealthStatistics]
+let $gml_ids := $features//@gml:id
+let $property_string := 'GeneralHealthTypeValue'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/hh:generalHealthName
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID268d4c78-0afc-49d5-bcc5-da4e013d0dd8">
+									<label>hh-ia.a.5: HealthServicesTypeValue </label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:HealthServicesStatistic]
+let $gml_ids := $features//@gml:id
+let $property_string := 'HealthServicesTypeValue'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/hh:healthServiceType
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID31b35af8-3eb7-4bd0-9978-754abe172855">
+									<label>hh-ia.a.6: MatrixValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:Biomarker]
+let $gml_ids := $features//@gml:id
+let $property_string := 'MatrixValue'
+let $messages :=			
+	for $feature in $features_selected/hh:biomarkerName/hh:BiomarkerType
+
+		let $envDom := $feature/hh:matrix
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDc615ba12-ab4c-47a6-ab0a-b5263d2318e5">
+									<label>hh-ia.a.7: StatisticalAggregationMethodValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:EnvHealthDeterminantStatisticalData]
+let $gml_ids := $features//@gml:id
+let $property_string := 'StatisticalAggregationMethodValue'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/hh:statisticalMethod
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EIDe64f8261-e918-4d98-ac30-d4672cd63537">
+					<label>Feature references</label>
+					<description>Verify that referenced features can be retrieved.</description>
+					<parent ref="EIDd5c42acf-127a-4346-a1a1-728faae80333"/>
+					<testSteps>
+						<TestStep id="EID38a4cea8-142d-426c-a99b-5bdd2f075455">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDe64f8261-e918-4d98-ac30-d4672cd63537"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDd40ccc5e-2221-4b9f-aace-42d7fe6dfe4b">
+									<label>hh-ia.b.1: describedBy</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.1.4</a>]]></description>
+									<parent ref="EID38a4cea8-142d-426c-a99b-5bdd2f075455"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:Biomarker]
+let $gml_ids := $features//@gml:id
+let $property_string := 'describedBy'
+let $messages :=			
+	for $feature in $features_selected/hh:refersTo/hh:BiomarkerThematicMetadata
+
+		let $envDom := $feature/hh:describedBy
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementHumanHealth', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+										<translationTemplate ref="TR.missingReferencedElementHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID41302c33-8908-42fd-93f5-820164500e33">
+									<label>hh-ia.b.2: aggregationUnit</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.1.4</a>]]></description>
+									<parent ref="EID38a4cea8-142d-426c-a99b-5bdd2f075455"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:Biomarker | self::hh:Disease | self::hh:GeneralHealthStatistics | self::hh:HealthServicesStatistic | self::hh:EnvHealthDeterminantStatisticalData]
+let $gml_ids := $features//@gml:id
+let $property_string := 'aggregationUnit'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/hh:aggregationUnit
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElementHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+										<translationTemplate ref="TR.missingReferencedElementHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
