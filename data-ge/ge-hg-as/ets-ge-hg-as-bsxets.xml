@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-hg-as" tar
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-gml" target="_blank">Conformance Class 'GML application schemas, Geology'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-01-20T16:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-01-20T16:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-02-22T11:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID08e3f9ed-f58a-4a46-a207-96d06f1c2d38"/>
 	</tags>
@@ -231,21 +231,26 @@ let $list := $features_selected/ge_hg:activityType/@xlink:href
 
 let $messages := 
 
+
 	for $feature in $features_selected
 		let $envDom := $feature/ge_hg:activityType
-		let $iterlist:= for $elem in $list
-				return if ($elem = $envDom/@xlink:href)
-					then $elem
-					else ()
 
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count':  count($iterlist)-1})
-			else ()
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else (
+					for $link in $envDom/@xlink:href
+						let $iterlist:= for $elem in $list
+							return if ($elem = $link)
+								then $elem
+								else ()
+						return if (not($link = $valid_href)) then (
+							local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count':  count($iterlist)-1})
+						)
+						else()
+			)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
