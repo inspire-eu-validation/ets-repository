@@ -83,6 +83,11 @@ let $features_selected := $features[self::pd:StatisticalDistribution]
 let $messages1 :=
     for $feature in $features_selected
 		let $envDom := $feature/pd:value/pd:StatisticalValue/pd:dimensions/pd:Dimensions/pd:thematic/pd:ClassificationItem
+        let $list := $features_selected/pd:value/pd:StatisticalValue/pd:dimensions/pd:Dimensions/pd:thematic/pd:ClassificationItem/pd:type/@xlink:href
+        let $iterlist:= for $elem in $list
+			return if ($elem = $envDom/pd:type/@xlink:href)
+				then $elem
+				else ()
         for $ClassificationItem in $envDom
             return
                 if(count($ClassificationItem/pd:type) = 0) then
@@ -92,12 +97,17 @@ let $messages1 :=
                 else if(not(exists($ClassificationItem/pd:type/@xlink:href))) then
                     local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
                 else if(not($ClassificationItem/pd:type/@xlink:href = $valid_href)) then
-                    local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($ClassificationItem/pd:type/@xlink:href), 'count': count(string($features_selected/pd:value/pd:StatisticalValue/pd:dimensions/pd:Dimensions/pd:thematic/pd:ClassificationItem/pd:type/@xlink:href) = string($envDom/pd:type/@xlink:href))}) 
+                    local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($ClassificationItem/pd:type/@xlink:href), 'count': count($iterlist)-1}) 
                 else ()
 
 let $messages2 :=
     for $feature in $features_selected
 		let $envDom := $feature/pd:classification/pd:Classification/pd:item/pd:ClassificationItem
+        let $list := $features_selected/pd:classification/pd:Classification/pd:item/pd:ClassificationItem/pd:type/@xlink:href
+        let $iterlist:= for $elem in $list
+			return if ($elem = $envDom/pd:type/@xlink:href)
+				then $elem
+				else ()
         for $ClassificationItem in $envDom
             return
                 if(count($ClassificationItem/pd:type) = 0) then
@@ -107,8 +117,8 @@ let $messages2 :=
                 else if(not(exists($ClassificationItem/pd:type/@xlink:href))) then
                     local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
                 else if(not($ClassificationItem/pd:type/@xlink:href = $valid_href)) then
-                    local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($ClassificationItem/pd:type/@xlink:href), 'count': count($features_selected/pd:classification/pd:Classification/pd:item/pd:ClassificationItem/pd:type/@xlink:href = $envDom/pd:type/@xlink:href)}) 
-                else ()
+                    local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($ClassificationItem/pd:type/@xlink:href), 'count': count($iterlist)-1}) 
+                            else ()
 
 let $combined_messages := ($messages1, $messages2)
 return
@@ -151,6 +161,11 @@ let $features_selected := $features[self::pd:StatisticalDistribution]
 let $messages :=
     for $feature in $features_selected
 		let $envDom := $feature/pd:measurementMethod
+        let $list := $features_selected/pd:measurementMethod/@xlink:href
+        let $iterlist:= for $elem in $list
+			return if ($elem = $envDom/@xlink:href)
+				then $elem
+				else ()
             return
                 if(count($envDom) = 0) then
                     local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'pd:measurementMethod'}) 
@@ -159,7 +174,7 @@ let $messages :=
                 else if(not(exists($envDom/@xlink:href))) then
                     local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
                 else if(not($envDom/@xlink:href = $valid_href)) then
-                    local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count(string($features_selected/pd:measurementMethod/@xlink:href) = string($envDom/@xlink:href))}) 
+                    local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($iterlist) - 1}) 
                 else ()
 return
 (if ($messages and not($messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
@@ -201,6 +216,11 @@ let $features_selected := $features[self::pd:StatisticalDistribution]
 let $messages :=
     for $feature in $features_selected
 		let $envDom := $feature/pd:generalStatus
+        let $list := $features_selected/pd:generalStatus/@xlink:href
+        let $iterlist:= for $elem in $list
+			return if ($elem = $envDom/@xlink:href)
+				then $elem
+				else ()
             return
                 if(count($envDom) = 0) then
                     local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'pd:generalStatus'}) 
@@ -209,8 +229,8 @@ let $messages :=
                 else if(not(exists($envDom/@xlink:href))) then
                     local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
                 else if(not($envDom/@xlink:href = $valid_href)) then
-                    local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count(string($features_selected/pd:generalStatus/@xlink:href) = string($envDom/@xlink:href))}) 
-                else ()
+                    local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'count': count($iterlist)-1}) 
+                 else ()
 return
 (if ($messages and not($messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
 else if($messages/@ref = ('TR.manual.reviewCodeListValue') and not($messages/@ref != ('TR.manual.reviewCodeListValue'))) then 'PASSED_MANUAL' 
@@ -250,17 +270,26 @@ let $features_selected := $features[self::pd:StatisticalDistribution]
 let $messages :=
     for $feature in $features_selected
 		let $envDom := $feature/pd:value/pd:StatisticalValue
-		    for $status in $envDom
+        let $list := $features_selected/pd:value/pd:StatisticalValue/pd:status/@xlink:href
+        let $iterlist:= for $elem in $list
+			return if ($elem = $envDom/pd:status/@xlink:href)
+				then $elem
+				else ()
+		    for $statisticalValue in $envDom
                 return
-                    if(count($status/pd:status) = 0) then
+                    if(count($statisticalValue/pd:status) = 0) then
                         local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'pd:status'}) 
-                    else if (count($status/pd:status) > 1) then 
+                    else if (count($statisticalValue/pd:status) > 1) then 
                         local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'id': string($feature/@*:id), 'element': 'pd:status'}) 
-                    else if(not(exists($status/pd:status/@xlink:href))) then
+                    else if(not(exists($statisticalValue/pd:status/@xlink:href))) then
                         local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-                    else if(not($status/pd:status/@xlink:href = $valid_href)) then
-                        local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($status/pd:status/@xlink:href), 'count': count(string($features_selected/pd:value/pd:StatisticalValue/pd:status/@xlink:href) = string($status/pd:status/@xlink:href))}) 
+                    else if (not($envDom/pd:status/@xlink:href = $valid_href)) then
+                        local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($statisticalValue/pd:status/@xlink:href), 'count': count($iterlist)-1}) 
                     else ()
+
+                    
+                    
+                    
 return
 (if ($messages and not($messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
 else if($messages/@ref = ('TR.manual.reviewCodeListValue') and not($messages/@ref != ('TR.manual.reviewCodeListValue'))) then 'PASSED_MANUAL' 
@@ -299,16 +328,22 @@ let $property_string := 'SpecialValue'
 let $features_selected := $features[self::pd:StatisticalDistribution]
 let $messages :=
     for $feature in $features_selected
+        let $list := $features_selected/pd:value/pd:StatisticalValue/pd:specialValue/@xlink:href
 		let $envDom := $feature/pd:value/pd:StatisticalValue
-            for $status in $envDom
+        let $iterlist:= for $elem in $list
+			return if ($elem = $envDom/pd:specialValue/@xlink:href)
+				then $elem
+				else ()
+            for $statisticalValue in $envDom
                 return
-                    if (count($status/pd:specialValue) > 1) then 
+                    if (count($statisticalValue/pd:specialValue) > 1) then 
                         local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'id': string($feature/@*:id), 'element': 'pd:specialValue'}) 
-                    else if(not(exists($status/pd:specialValue/@xlink:href))) then
+                    else if(not(exists($statisticalValue/pd:specialValue/@xlink:href))) then
                         local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-                    else if(not($status/pd:specialValue/@xlink:href = $valid_href)) then
-                        local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($status/pd:specialValue/@xlink:href), 'count': count(string($features_selected/pd:value/pd:StatisticalValue/pd:specialValue/@xlink:href) = string($status/pd:specialValue/@xlink:href))}) 
+                    else if (not($envDom/@xlink:href = $valid_href)) then
+                        local:addMessage('TR.manual.reviewCodeListValue',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($statisticalValue/pd:specialValue/@xlink:href), 'count': count($iterlist) - 1}) 
                     else ()
+
 return
 (if ($messages and not($messages/@ref = ('TR.manual.reviewCodeListValue'))) then 'FAILED' 
 else if($messages/@ref = ('TR.manual.reviewCodeListValue') and not($messages/@ref != ('TR.manual.reviewCodeListValue'))) then 'PASSED_MANUAL' 
