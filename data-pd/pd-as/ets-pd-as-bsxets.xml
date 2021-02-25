@@ -89,12 +89,12 @@ let $features_selected := $features[self::pd:StatisticalDistribution]
 let $messages1 :=
     for $feature in $features_selected
 		let $envDom := $feature/pd:value/pd:StatisticalValue/pd:dimensions/pd:Dimensions/pd:thematic/pd:ClassificationItem
-        let $list := $features_selected/pd:value/pd:StatisticalValue/pd:dimensions/pd:Dimensions/pd:thematic/pd:ClassificationItem/pd:type/@xlink:href
-        let $iterlist:= for $elem in $list
-			return if ($elem = $envDom/pd:type/@xlink:href)
-				then $elem
-				else ()
         for $ClassificationItem in $envDom
+			let $list := $features_selected/pd:value/pd:StatisticalValue/pd:dimensions/pd:Dimensions/pd:thematic/pd:ClassificationItem/pd:type/@xlink:href
+			let $iterlist:= for $elem in $list
+				return if ($elem = $ClassificationItem/pd:type/@xlink:href)
+					then $elem
+					else ()
             return
                 if(count($ClassificationItem/pd:type) = 0) then
                     local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'pd:type'}) 
@@ -109,17 +109,17 @@ let $messages1 :=
 let $messages2 :=
     for $feature in $features_selected
 		let $envDom := $feature/pd:classification/pd:Classification/pd:item/pd:ClassificationItem
-        let $list := $features_selected/pd:classification/pd:Classification/pd:item/pd:ClassificationItem/pd:type/@xlink:href
-        let $iterlist:= for $elem in $list
-			return if ($elem = $envDom/pd:type/@xlink:href)
-				then $elem
-				else ()
         for $ClassificationItem in $envDom
+			let $list := $features_selected/pd:classification/pd:Classification/pd:item/pd:ClassificationItem/pd:type/@xlink:href
+			let $iterlist:= for $elem in $list
+				return if ($elem = $ClassificationItem/pd:type/@xlink:href)
+					then $elem
+					else ()
             return
                 if(count($ClassificationItem/pd:type) = 0) then
                     local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'pd:type'}) 
                 else if (count($ClassificationItem/pd:type) > 1) then 
-                    local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'pd:type', 'multiplicity':'1', 'count':count($ClassificationItem/pd:type), 'multiplicity': '1', 'count':count()}) 
+                    local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'pd:type', 'multiplicity':'1', 'count':count($ClassificationItem/pd:type)}) 
                 else if(not(exists($ClassificationItem/pd:type/@xlink:href))) then
                     local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
                 else if(not($ClassificationItem/pd:type/@xlink:href = $valid_href)) then
