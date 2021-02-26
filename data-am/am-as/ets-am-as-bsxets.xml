@@ -5,7 +5,7 @@
 	<localPath>/auto</localPath>
 	<label>Conformance class: Application Schema, Area Management, Restriction/Regulation Zones and Reporting Units</label>
 	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
-<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/INSPIRE-MIF/helpdesk-validator/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
 Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-am/master/am-as" target="_blank">Conformance Class 'Application schema, Area Management, Restriction/Regulation Zones and Reporting Units'</a><br/><br/>
 Pre-requisite conformance classes:
@@ -229,21 +229,34 @@ let $features_selected := $features[self::am:ManagementRestrictionOrRegulationZo
 let $valid_href := 'http://inspire.ec.europa.eu/codelist/RelatedPartyRoleValue/authority'
 let $messages :=
 	for $feature in $features_selected
-	let $validCompetentAuth := 
-		for $x in $feature/am:competentAuthority/base2:RelatedParty/base2:role/@xlink:href
-		return
-			if($x = $valid_href) then
-				$x
-			else ()
+		let $invalidCompetentAuthRole := 
+			for $x in $feature/am:competentAuthority
+				return 
+					if(not(exists($x/base2:RelatedParty/base2:role)) and not(exists($x/@nilReason))) then $x
+					else ()
+				
+		let $missingHref :=			
+			for $x in $feature/am:competentAuthority/base2:RelatedParty/base2:role
+				return
+					if(exists($x/@xlink:href)) then ()
+					else $x		
+		
+		let $invalidCompetentAuth := 
+			for $x in $feature/am:competentAuthority 
+				where exists($x/base2:RelatedParty/base2:role/@xlink:href)
+					return
+						if($x/base2:RelatedParty/base2:role/@xlink:href = $valid_href) then ()
+						else $x
+
 	return
-		if(not($feature/am:competentAuthority)) then
+		if(count($feature/am:competentAuthority) = 0) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority'}) 
-		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role)) then
+		else if(count($invalidCompetentAuthRole) != 0) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role'}) 
-		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role/@xlink:href)) then
+		else if(count($missingHref) != 0) then
 			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role', 'attribute': 'xlink:href'}) 
-		else if(not($validCompetentAuth)) then
-     			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one am:competentAuthority with role authority (http://inspire.ec.europa.eu/codelist/RelatedPartyRoleValue/authority) shall be provided.', 'additionalInfo':''})
+		else if(count($invalidCompetentAuth) != 0) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'am:competentAuthority with role authority (http://inspire.ec.europa.eu/codelist/RelatedPartyRoleValue/authority) shall be provided.', 'additionalInfo':''})
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
