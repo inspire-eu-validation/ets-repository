@@ -13,11 +13,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-01-21T10:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-01-21T10:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-03-09T12:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID08e3f9ed-f58a-4a46-a207-96d06f1c2d38"/>
 	</tags>
@@ -74,8 +74,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-ia/code-li
 let $features_selected := $features[self::ge:GeologicUnit|self::ge:ShearDisplacementStructure|self::ge:Fold|self::ge:AnthropogenicGeomorphologicFeature | self::ge:NaturalGeomorphologicFeature]
 let $property_string := 'ThematicClassValue'
 let $messages := 
-	for $feature in $features_selected
-		let $envDom := $feature/ge:themeClass/ge:ThematicClass/ge:themeClass
+	for $feature in $features_selected/ge:themeClass/ge:ThematicClass
+		let $envDom := $feature/ge:themeClass
 		let $urls := 
 			for $x in $envDom/@xlink:href
 				return
@@ -94,14 +94,14 @@ let $messages :=
 					else ()
 
 	return
-		if (not(exists($feature/ge:themeClass/ge:ThematicClass/ge:themeClass))) then
-			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
-		else if (count($feature/ge:themeClass/ge:ThematicClass/ge:themeClass) > 1) then
-			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/ge:themeClass/ge:ThematicClass/ge:themeClass)}) 
-		else if (not(exists($feature/ge:themeClass/ge:ThematicClass/ge:themeClass/@xlink:href))) then
-			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+		if (not(exists($envDom))) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string}) 
+		else if (count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+		else if (not(exists($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
 		else if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -129,8 +129,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-ia/code-li
 let $features_selected := $features[self::ge:GeologicUnit|self::ge:ShearDisplacementStructure|self::ge:Fold|self::ge:AnthropogenicGeomorphologicFeature | self::ge:NaturalGeomorphologicFeature]
 let $property_string := 'ThematicClassificationValue'
 let $messages := 
-	for $feature in $features_selected
-		let $envDom := $feature/ge:themeClass/ge:ThematicClass/ge:themeClassification
+	for $feature in $features_selected/ge:themeClass/ge:ThematicClass
+		let $envDom := $feature/ge:themeClassification
 		let $urls := 
 			for $x in $envDom/@xlink:href
 				return
@@ -149,14 +149,14 @@ let $messages :=
 					else ()
 
 	return
-		if (not(exists($feature/ge:themeClass/ge:ThematicClass/ge:themeClassification))) then
-			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
-		else if (count($feature/ge:themeClass/ge:ThematicClass/ge:themeClassification) > 1) then
-			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($feature/ge:themeClass/ge:ThematicClass/ge:themeClassification)}) 
-		else if (not(exists($feature/ge:themeClass/ge:ThematicClass/ge:themeClassification/@xlink:href))) then
-			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+		if (not(exists($envDom))) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string}) 
+		else if (count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+		else if (not(exists($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
 		else if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
