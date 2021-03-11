@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-hg-as" tar
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-gml" target="_blank">Conformance Class 'GML application schemas, Geology'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-01-20T16:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-01-20T16:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-02-22T11:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID08e3f9ed-f58a-4a46-a207-96d06f1c2d38"/>
 	</tags>
@@ -116,9 +116,7 @@ let $messages :=
 			else ()
 
 return
-(if ($messages and not($messages/@ref = ('TR.disallowedCodeListValue'))) then 'FAILED' 
-else if($messages and $messages/@ref = ('TR.disallowedCodeListValue')) then 'PASSED_MANUAL' 
-else 'PASSED',
+(if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 
@@ -189,9 +187,7 @@ let $messages :=
 			else ()
 
 return
-(if ($messages and not($messages/@ref = ('TR.disallowedCodeListValue'))) then 'FAILED' 
-else if($messages and $messages/@ref = ('TR.disallowedCodeListValue')) then 'PASSED_MANUAL' 
-else 'PASSED',
+(if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 
@@ -231,32 +227,30 @@ let $codelisturl := 'https://inspire.ec.europa.eu/codelist/ActiveWellTypeValue/A
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'activityType'
 let $features_selected := $features[self::ge_hg:ActiveWell]
+let $list := $features_selected/ge_hg:activityType/@xlink:href
 
 let $messages := 
+
 
 	for $feature in $features_selected
 		let $envDom := $feature/ge_hg:activityType
 
-		let $urls := 
-		for $x in $envDom/@xlink:href
-			return $x
-
-	let $map := local:check-resource-uris($urls, 30, true())
-	let $invalid_urls :=
-		for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
-				else ()
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge_hg:activityType/@xlink:href = $envDom/@xlink:href)})
-			else ()
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else (
+					for $link in $envDom/@xlink:href
+						let $iterlist:= for $elem in $list
+							return if ($elem = $link)
+								then $elem
+								else ()
+						return if (not($link = $valid_href)) then (
+							local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count':  count($iterlist)-1})
+						)
+						else()
+			)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
@@ -299,24 +293,17 @@ let $codelisturl := 'https://inspire.ec.europa.eu/codelist/AquiferMediaTypeValue
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'mediaType'
 let $features_selected := $features[self::ge_hg:Aquifer]
+let $list := $features_selected/ge_hg:mediaType/@xlink:href
 
 let $messages := 
 
 	for $feature in $features_selected
 		let $envDom := $feature/ge_hg:mediaType
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 
-		let $urls := 
-		for $x in $envDom/@xlink:href
-			return $x
-
-	let $map := local:check-resource-uris($urls, 30, true())
-	let $invalid_urls :=
-		for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
-				else ()
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
@@ -325,7 +312,7 @@ let $messages :=
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
 				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge_hg:mediaType/@xlink:href = $envDom/@xlink:href)})
+				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1})
 			else ()
 
 return
@@ -370,31 +357,24 @@ let $codelisturl := 'https://inspire.ec.europa.eu/codelist/HydroGeochemicalRockT
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'hydroGeochemicalRockType'
 let $features_selected := $features[self::ge_hg:Aquifer]
+let $list := $features_selected/ge_hg:hydroGeochemicalRockType/@xlink:href
 
 let $messages := 
 
 	for $feature in $features_selected
 		let $envDom := $feature/ge_hg:hydroGeochemicalRockType
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 
-		let $urls := 
-		for $x in $envDom/@xlink:href
-			return $x
-
-	let $map := local:check-resource-uris($urls, 30, true())
-	let $invalid_urls :=
-		for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
-				else ()
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge_hg:hydroGeochemicalRockType/@xlink:href = $envDom/@xlink:href)})
+				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1})
 			else ()
 
 return
@@ -438,24 +418,18 @@ let $codelisturl := 'https://inspire.ec.europa.eu/codelist/NaturalObjectTypeValu
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'naturalObjectType'
 let $features_selected := $features[self::ge_hg:HydrogeologicalObjectNatural]
+let $list := $features_selected/ge_hg:naturalObjectType/@xlink:href
 
 let $messages := 
 
 	for $feature in $features_selected
 		let $envDom := $feature/ge_hg:naturalObjectType
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 
-		let $urls := 
-		for $x in $envDom/@xlink:href
-			return $x
 
-	let $map := local:check-resource-uris($urls, 30, true())
-	let $invalid_urls :=
-		for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
-				else ()
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
@@ -464,7 +438,7 @@ let $messages :=
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
 				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge_hg:naturalObjectType/@xlink:href = $envDom/@xlink:href)})
+				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1})
 			else ()
 
 return
@@ -509,31 +483,24 @@ let $codelisturl := 'https://inspire.ec.europa.eu/codelist/WaterPersistenceValue
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'waterPersistence'
 let $features_selected := $features[self::ge_hg:HydrogeologicalObjectNatural]
+let $list := $features_selected/ge_hg:waterPersistence/@xlink:href
 
 let $messages := 
 
 	for $feature in $features_selected
 		let $envDom := $feature/ge_hg:waterPersistence
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 
-		let $urls := 
-		for $x in $envDom/@xlink:href
-			return $x
-
-	let $map := local:check-resource-uris($urls, 30, true())
-	let $invalid_urls :=
-		for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
-				else ()
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge_hg:waterPersistence/@xlink:href = $envDom/@xlink:href)})
+				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1})
 			else ()
 
 return
@@ -577,31 +544,24 @@ let $codelisturl := 'https://inspire.ec.europa.eu/codelist/StatusCodeTypeValue/S
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'statusCode'
 let $features_selected := $features[self::ge_hg:ActiveWell]
+let $list := $features_selected/ge_hg:statusCode/@xlink:href
 
 let $messages := 
 
 	for $feature in $features_selected
 		let $envDom := $feature/ge_hg:statusCode
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 
-		let $urls := 
-		for $x in $envDom/@xlink:href
-			return $x
-
-	let $map := local:check-resource-uris($urls, 30, true())
-	let $invalid_urls :=
-		for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
-				else ()
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge_hg:statusCode/@xlink:href = $envDom/@xlink:href)})
+				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1})
 			else ()
 
 return
@@ -645,31 +605,25 @@ let $codelisturl := 'https://inspire.ec.europa.eu/codelist/WaterSalinityValue/Wa
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'mineralization'
 let $features_selected := $features[self::ge_hg:GroundWaterBody]
+let $list := $features_selected/ge_hg:mineralization/@xlink:href
 
 let $messages := 
 
 	for $feature in $features_selected
 		let $envDom := $feature/ge_hg:mineralization
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
 
-		let $urls := 
-		for $x in $envDom/@xlink:href
-			return $x
 
-	let $map := local:check-resource-uris($urls, 30, true())
-	let $invalid_urls :=
-		for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
-				else ()
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($feature/ge_hg:mineralization/@xlink:href = $envDom/@xlink:href)})
+				local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1 })
 			else ()
 
 return
