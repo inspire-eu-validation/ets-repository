@@ -1061,7 +1061,7 @@ let $messages :=
 			else
 				(for $res in $result
 				return
-				if(contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and $record/gmd:hierarchyLevel/*/@codeListValue = ('dataset','series')) then
+				if((contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and $record/gmd:hierarchyLevel/*/@codeListValue = ('dataset','series')) or (contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '976/2009') and $record/gmd:hierarchyLevel/*/@codeListValue = ('service'))) then
 					let $aaa := 'aaa'
 					return
 					if(not($res/gmd:specification/gmd:CI_Citation)) then
@@ -1084,7 +1084,7 @@ let $messages :=
 								local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 							else if (not($dateTypeCode)) then
 								local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-							else if (not($dateTypeCode/@codeListValue = ('publication'))) then
+							else if (not($dateTypeCode/@codeListValue)) then
 								local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 							else if (exists($date/gmd:CI_Date/gmd:date/gco:Date/text())) then
 								let $dummy := "aaa"
@@ -1129,7 +1129,7 @@ let $messages :=
 	 else
 	 	(for $res in $result
 		 return
-			if(contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and $record/gmd:hierarchyLevel/*/@codeListValue = ('dataset','series')) then
+			if((contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and $record/gmd:hierarchyLevel/*/@codeListValue = ('dataset','series')) or (contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '976/2009') and $record/gmd:hierarchyLevel/*/@codeListValue = ('service'))) then
 				let $pass := $res/gmd:pass
 				return
 				if ($pass) then
