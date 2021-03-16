@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID6b5cfe6b-f72a-4fec-8d77-036d9fb41dcd" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-el/el-cov-as</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Application schema, Elevation Grid Coverage</label>
+	<description><![CDATA[This test suite examines requirements associated with the application schema.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as" target="_blank">Conformance Class 'Application Schema, Elevation Grid Coverage'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-el/master/el-as" target="_blank">Conformance Class 'Application Schema, Elevation Base Types'</a></li></ul>]]></description>
+	<reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2021-02-17T09:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2020-02-17T09:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID2dc93016-36ba-4b93-88fd-7e47a9312c80"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID8756ae77-c118-4bfe-8133-2020ff344fb3"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID8105de22-3c7d-46fa-93c1-db50e2ad8de4">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID6b5cfe6b-f72a-4fec-8d77-036d9fb41dcd"/>
+			<testCases>
+				<TestCase id="EIDe2df8216-e3e4-4666-b749-087f6027470d">
+					<label>Constraints</label>
+					<description>Verify that the features provided in the dataset adhere to the constraints specified in the INSPIRE application schema.</description>
+					<parent ref="EID8105de22-3c7d-46fa-93c1-db50e2ad8de4"/>
+					<testSteps>
+						<TestStep id="EIDcbb11377-31ce-4afa-8047-55b17d998634">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDe2df8216-e3e4-4666-b749-087f6027470d"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDdaac9f86-200b-4d3d-963a-8d4c0f1d41a6">
+									<label>el-cov-as.a.1: dimension</label>
+									<description><![CDATA[Check that the grid <a href= http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/constraints#dimension>dimension</a> is 2 for an elevation grid coverage<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EL_v3.0.pdf">INSPIRE Data Specification on Elevation, A.1.6</a>]]></description>
+									<parent ref="EIDcbb11377-31ce-4afa-8047-55b17d998634"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $property_string := 'dimension'
+let $features_selected := $features[ self::el-cov:ElevationGridCoverage]
+
+let $messages := 
+
+	for $feature in $features_selected/gml:domainSet
+		let $envDom := $feature/gml:RectifiedGrid
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (exists($envDom) and (not(exists($envDom/@dimension)) or not($envDom/@dimension = '2'))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'constraint': 'the grid dimension is 2 for an elevation grid coverage', 'additionalInfo': ''}) 
+			else ()
+
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDe9f03ff8-cc46-4ef1-988a-83216f3feb19">
+									<label>el-cov-as.a.2: domainExtent</label>
+									<description><![CDATA[Check that the <a href= http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/constraints#domainExtent>domainExtent</a> is at least populated with a subtype of EX_GeographicExtent<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EL_v3.0.pdf">INSPIRE Data Specification on Elevation, A.1.6</a>]]></description>
+									<parent ref="EIDcbb11377-31ce-4afa-8047-55b17d998634"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $property_string := 'domainExtent'
+let $features_selected := $features[self::el-cov:ElevationGridCoverage]
+
+let $messages := 
+
+	for $feature in $features_selected/el-cov:domainExtent/gmd:EX_Extent
+		let $envDom := $feature/gmd:geographicElement
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'constraint': 'the domainExtent is at least populated with a subtype of EX_GeographicExtent', 'additionalInfo': ''}) 		
+			else ()
+
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID641cdf42-2c45-44ae-89b9-de56a8b96a4e">
+									<label>el-cov-as.a.3: origin CRS</label>
+									<description><![CDATA[Check that the <a href= http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/constraints#originCRS>coordinate reference system</a> used to reference the grid is provided<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EL_v3.0.pdf">INSPIRE Data Specification on Elevation, A.1.6</a>]]></description>
+									<parent ref="EIDcbb11377-31ce-4afa-8047-55b17d998634"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $property_string := 'origin CRS'
+let $features_selected := $features[self::el-cov:ElevationGridCoverage]
+
+let $messages := 
+
+	for $feature in $features_selected/gml:domainSet/gml:RectifiedGrid/gml:origin
+		let $envDom := $feature/gml:Point
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'element': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and (not(exists($envDom/@srsName)) or string-length($envDom/@srsName)=0)) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'constraint': 'the coordinate reference system used to reference the grid is provided', 'additionalInfo': ''}) 
+			else ()
+
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID81726cbd-c646-4181-9d13-403dddaa011a">
+									<label>el-cov-as.a.4: origin dimension</label>
+									<description><![CDATA[Check that the <a href= http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/constraints#origin>origin</a> of the grid is described in two dimensions<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EL_v3.0.pdf">INSPIRE Data Specification on Elevation, A.1.6</a>]]></description>
+									<parent ref="EIDcbb11377-31ce-4afa-8047-55b17d998634"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $property_string := 'origin dimension'
+let $features_selected := $features[self::el-cov:ElevationGridCoverage]
+
+let $messages := 
+
+		for $feature in $features_selected/gml:domainSet/gml:RectifiedGrid/gml:origin
+		let $envDom := $feature/gml:Point
+
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'element': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (exists($envDom) and (not(exists($envDom/@srsDimension)) or not($envDom/@srsDimension = '2'))) then
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'constraint': ' the origin of the grid is described in two dimensions', 'additionalInfo': ''}) 
+			else ()
+
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.constraintViolation"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID4f9520a2-0700-4665-8134-4353f4f5e4b7">
+					<label>Specific requirements</label>
+					<description>Verify that the following specific requirements are meet.</description>
+					<parent ref="EID8105de22-3c7d-46fa-93c1-db50e2ad8de4"/>
+					<testSteps>
+						<TestStep id="EIDe7d3293d-30bc-438c-9c58-bc61fabf76bb">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID4f9520a2-0700-4665-8134-4353f4f5e4b7"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID806f9181-05e9-4b76-aa6d-d0c19b35828b">
+									<label>el-cov-as.b.1: Grid Coverage</label>
+									<description>
+										<![CDATA[Check manually that the specific requirements are meet.<br/><br/>
+										Relevant requirements:
+										<ul><li>IR Requirement Annex III, Section 1.7.2 (1): By way of derogation from the requirement in Section 2.2 of Annex II, any grid compatible with one of the following coordinate reference systems may be used for making gridded Elevation data available: – two-dimensional geodetic coordinates (latitude and longitude) based on a datum specified in Section 1.2 of Annex II and using the parameters of the GRS80 ellipsoid; – plane coordinates using the ETRS89 Lambert Conformal Conic coordinate reference system; – plane coordinates using the ETRS89 Transverse Mercator coordinate reference system. The grid specified in 2.2.1 of Annex II shall not be used.</li>
+										<li>IR Requirement Annex III, Section 1.7.2 (2): The domainExtent attribute of every ElevationGridCoverage instance shall be at least populated with a subtype of the EX_GeographicExtent type.</li>
+										<li>IR Requirement Annex III, Section 1.7.2 (3): The elevation property values included within the range set of a single ElevationGridCoverage shall be referenced to one and only one vertical coordinate reference system.</li>
+										<li>IR Requirement Annex III, Section 1.7.2 (4): All the ElevationGridCoverage instances to which an aggregated ElevationGridCoverage instance refers, shall be consistent. This means that they shall share the same range type,  Coordinate Reference System and resolution. They shall also support grid alignment, i.e. the grid points in one ElevationGridCoverage instance line up with grid points of the other ElevationGridCoverage instances, so that grid cells do not partially overlap.</li>
+										<li>IR Requirement Annex III, Section 1.7.2 (5): The contributing footprints of any two ElevationGridCoverage instances referred to by the same aggregated ElevationGridCoverage instance shall be either adjacent or disjoint.</li>
+										<li>IR Requirement Annex III, Section 1.7.2 (6): The union of the contributing footprints of the ElevationGridCoverage instances referred to by the same aggregated ElevationGridCoverage instance shall determine   the geographic extent (domainExtent) of the aggregated ElevationGridCoverage instance.</li>
+										<li>IR Requirement Annex III, Section 1.7.2 (7): The ElevationGridCoverage package shall be restricted to two-dimensional geometries.</li>
+										<li>IR Requirement Annex III, Section 1.7.2 (8): Information about the acquisition dates of data contained in  elevation grid coverages shall be provided at least in one of the following ways:(a) by providing the metadata  element Temporal reference for each spatial object through the metadataattribute of the spatial object type ElevationGridCoverage. (b) by providing the metadata element Temporal reference required by Regulation(EC) No 1205/2008 as a temporal extent.</li></ul>
+										Source: <a href="http://inspire.ec.europa.eu/id/ats/data-el/master/el-cov-as/specific-req" target="_blank">Abstract Test Case 'Specific requirement', <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_EL_v3.0.pdf">INSPIRE Data Specification on Elevation, A.1.6</a>]]></description>
+									<parent ref="EIDe7d3293d-30bc-438c-9c58-bc61fabf76bb"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>'PASSED_MANUAL'</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
