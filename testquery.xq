@@ -45,6 +45,7 @@ declare namespace lcv='http://inspire.ec.europa.eu/schemas/lcv/4.0';
 declare namespace hb='http://inspire.ec.europa.eu/schemas/hb/4.0'; 
 declare namespace mu='http://inspire.ec.europa.eu/schemas/mu/3.0';
 declare namespace ps='http://inspire.ec.europa.eu/schemas/ps/4.0'; 
+declare namespace sr='http://inspire.ec.europa.eu/schemas/sr/4.0'; 
 declare namespace tn='http://inspire.ec.europa.eu/schemas/tn/4.0';
 declare namespace tn-a='http://inspire.ec.europa.eu/schemas/tn-a/4.0';
 declare namespace tn-c='http://inspire.ec.europa.eu/schemas/tn-c/4.0';
