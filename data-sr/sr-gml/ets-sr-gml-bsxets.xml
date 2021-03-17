@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EIDbfc36eb3-18f0-4284-9dae-6159f59866bc" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-sr/sr-gml</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: GML application schemas, Sea Regions</label>
+	<description><![CDATA[This test suite examines the GML encoding of spatial objects specified in the INSPIRE GML application schema 'Habitats and Biotopes'. Both currently approved GML application schema versions (3.0 and 4.0) are tested.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-gml" target="_blank">Conformance Class 'GML application schemas, Sea Regions'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
+	<reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2021-02-02T11:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2021-02-02T11:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID09820daf-62b2-4fa3-a95f-56a0d2b7c4d8"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EIDa35f06bd-0de0-467c-88ee-b3e37f3daf55">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EIDbfc36eb3-18f0-4284-9dae-6159f59866bc"/>
+			<testCases>
+				<TestCase id="EID05091b52-09bf-45be-b210-6d72f1c6a4c2">
+					<label>Basic test</label>
+					<description>Verify that the spatial data set contains at least one Sea Regions feature.</description>
+					<parent ref="EIDa35f06bd-0de0-467c-88ee-b3e37f3daf55"/>
+					<testSteps>
+						<TestStep id="EIDbf8ee789-9a35-4548-aca8-42e3b3fe7f73">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID05091b52-09bf-45be-b210-6d72f1c6a4c2"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDf9bbc545-0c85-422b-ae07-451398f981f2">
+									<label>sr-gml.a.1: Sea Regions feature in dataset</label>
+									<description><![CDATA[Check that the set of features in the spatial data set is not empty.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-gml/basic" target="_blank">Abstract Test Case 'Basic test'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_SR_v3.0.pdf">INSPIRE Data Specification on Sea Regions, A.1.1, (A.6.1)</a>]]></description>
+									<parent ref="EIDbf8ee789-9a35-4548-aca8-42e3b3fe7f73"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $featuresFromAppSchema := $features[self::sr:SeaArea | self::sr:Sea | self::sr:MarineCirculationZone | self::sr:InterTidalArea | self::sr:Shoreline | self::sr:Coastline | self::sr:MarineContour | self::sr:SeaBedArea | self::sr:SeaSurfaceArea ]
+return
+ (if ($featuresFromAppSchema) then 'PASSED' else 'FAILED',
+  if (not($featuresFromAppSchema)) then local:addMessage('TR.noFeature2', map { 'theme': 'Sea Regions' }) else ())
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.noFeature2"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
