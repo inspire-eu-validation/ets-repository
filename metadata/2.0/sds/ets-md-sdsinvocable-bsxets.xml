@@ -259,14 +259,23 @@ let $messages :=
 
 		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
 
-		let $titleElement := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor[@xlink:href = $validCC]
+		let $titleElement := $confResults/gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor[@xlink:href = $validCC]
+
+		let $wrongDateType :=
+			for $res in $confResults where $res/gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor[@xlink:href = $validCC]
+				return
+					if(not($res/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = ('publication', 'creation', 'revision'))) then
+						$res
+					else()
 		
 
 		return 	 
 		if (count($confResults) = 0) then
 			local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-		else if ( not( count($titleElement) = 1) ) then
+		else if (not(count($titleElement) = 1)) then
 			local:addMessage('TR.wrongMultiplicityForPurpose', map { 'filename': local:filename($record), 'id': $rid, 'count': count($titleElement) })
+		else if(not(count($wrongDateType) = 0)) then
+			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
 		else
 			(for $res in $confResults
 				let $titleElem := $res/gmd:specification/gmd:CI_Citation/gmd:title/gmx:Anchor
@@ -276,7 +285,7 @@ let $messages :=
 				return
 				if ( $titleElem/@xlink:href = $validCC ) then
 
-					if ( not($titleElem/text() = $validCategories) ) then
+					if (not($titleElem/text() = $validCategories)) then
 						local:addMessage('TR.ivalidCCCategory', map { 'filename': local:filename($record), 'id': $rid })				
 					else if ($confBoolean and not($confBoolean = $booleanValue)) then		
 						local:addMessage('TR.invalidConformityBoolean', map { 'filename': local:filename($record), 'id': $rid })
