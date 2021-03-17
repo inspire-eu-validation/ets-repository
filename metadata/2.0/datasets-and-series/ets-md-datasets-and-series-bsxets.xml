@@ -15,11 +15,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-se
 Pre-requisite conformance classes: Common Requirements]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.4</version>
+		<version>1.0.5</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-05-26T16:45:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-03-17T12:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -469,16 +469,16 @@ let $conformityTextLower := for $x in $conformityText return normalize-space(low
 let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()[contains(.,'1089/2010')]
+		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
         let $valid := 
-            (for $confResult in $confResults
+            (for $confResult in $confResults where $confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()[contains(.,'1089/2010')]
                 return
                 if (normalize-space(lower-case($confResult)) = $conformityTextLower) then
                     $confResult
                 else()
             )
 		return
-		if (count($valid) = 0 and not(count($confResults) = 0)) then
+		if (count($valid) = 0) then
 			local:addMessage('TR.wrongNumberOfSpecificationForPurpose', map { 'filename': local:filename($record), 'id': $rid })
 		else()
 	)[position() le $limitErrors]

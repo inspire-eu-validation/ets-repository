@@ -1061,7 +1061,7 @@ let $messages :=
 			else
 				(for $res in $result
 				return
-				if((contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and $record/gmd:hierarchyLevel/*/@codeListValue = ('dataset','series')) or (contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '976/2009') and $record/gmd:hierarchyLevel/*/@codeListValue = ('service'))) then
+				if((contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and ($record/gmd:hierarchyLevel/*/@codeListValue = ('dataset') or ($record/gmd:hierarchyLevel/*/@codeListValue = ('service') and $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:serviceType/*/text() = "other"))) or (contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '976/2009') and $record/gmd:hierarchyLevel/*/@codeListValue = ('service'))) then
 					let $aaa := 'aaa'
 					return
 					if(not($res/gmd:specification/gmd:CI_Citation)) then
@@ -1129,7 +1129,7 @@ let $messages :=
 	 else
 	 	(for $res in $result
 		 return
-			if((contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and $record/gmd:hierarchyLevel/*/@codeListValue = ('dataset','series')) or (contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '976/2009') and $record/gmd:hierarchyLevel/*/@codeListValue = ('service'))) then
+			if((contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and ($record/gmd:hierarchyLevel/*/@codeListValue = ('dataset') or ($record/gmd:hierarchyLevel/*/@codeListValue = ('service') and $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:serviceType/*/text() = "other"))) or (contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '976/2009') and $record/gmd:hierarchyLevel/*/@codeListValue = ('service'))) then
 				let $pass := $res/gmd:pass
 				return
 				if ($pass) then
@@ -1158,9 +1158,8 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-							
 							</testAssertions>
-							</TestStep>
+						</TestStep>
 					</testSteps>
 				</TestCase>
 			</testCases>
