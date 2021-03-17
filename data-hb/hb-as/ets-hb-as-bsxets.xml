@@ -298,9 +298,10 @@ let $natureCodelist := 'https://inspire.ec.europa.eu/codelist/NatureDirectivesCo
 let $features_selected := $features[self::hb:Habitat]
 let $property_string := 'referenceSpeciesId'
 let $messages :=
-	for $feature in $features_selected
+	for $feature in $features_selected/hb:habitatSpecies/hb:HabitatSpeciesType
+	let $envDom := $feature/hb:referenceSpeciesId
 	let $urls := 
-		for $x in $feature/hb:habitatSpecies/hb:HabitatSpeciesType/hb:referenceSpeciesId/@xlink:href
+		for $x in $envDom/@xlink:href
 			return $x
 
 	let $map := local:check-resource-uris($urls, 30, true())
@@ -312,25 +313,25 @@ let $messages :=
 				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
 				else ()
 				
-	let $envDom := $feature/hb:habitatSpecies/hb:HabitatSpeciesType/hb:referenceSpeciesId
+	
 
 	return
-		if (exists($feature/hb:habitatSpecies/hb:HabitatSpeciesType) and not(exists($envDom))) then
-			local:addMessage('TR.missingElementHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		if (not(exists($envDom))) then
+			local:addMessage('TR.missingElementHabitatBio',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string}) 
 		else if (count($envDom) > 1) then 
-			local:addMessage('TR.wrongMultiplicityHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
-		else if (exists($feature/hb:habitatSpecies/hb:HabitatSpeciesType) and not($envDom/@xlink:href)) then
-			local:addMessage('TR.missingAttributeHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id),'attribute':'@xlink:href', 'property': $property_string}) 
-		else if (exists($feature/hb:habitatSpecies/hb:HabitatSpeciesType) and not(starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) and not(starts-with($envDom/@xlink:href, 'https://eunis.eea.europa.eu/species/')) and not($envDom/@xlink:href = $invalid_urls)) then
+			local:addMessage('TR.wrongMultiplicityHabitatBio',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
+		else if (not(count($envDom)=count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttributeHabitatBio',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id),'attribute':'@xlink:href', 'property': $property_string}) 
+		else if (not(starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) and not(starts-with($envDom/@xlink:href, 'https://eunis.eea.europa.eu/species/')) and not($envDom/@xlink:href = $invalid_urls)) then
 			local:addMessage('TR.manual.disallowedCodeListValueHB',  map {'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $natureCodelist}) 
 		else if($envDom/@xlink:href = $invalid_urls) then
 			let $dummy := "aaa"
 				return 
 					if (starts-with($envDom/@xlink:href, 'http://www.eu-nomen.eu/portal/taxon.php?GUID=')) then
-						local:addMessage('TR.disallowedCodeListValueHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $euCodelist}) 
+						local:addMessage('TR.disallowedCodeListValueHabitatBio',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $euCodelist}) 
 					else if (starts-with($envDom/@xlink:href, 'https://eunis.eea.europa.eu/species/')) then
-						local:addMessage('TR.disallowedCodeListValueHabitatBio',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $eunisCodelist}) 
-					else (local:addMessage('TR.brokenLinkHabitatBio', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ',')}))
+						local:addMessage('TR.disallowedCodeListValueHabitatBio',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/../../@xlink:href), 'codelist': $eunisCodelist}) 
+					else (local:addMessage('TR.brokenLinkHabitatBio', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ',')}))
 		else ()
 
 
