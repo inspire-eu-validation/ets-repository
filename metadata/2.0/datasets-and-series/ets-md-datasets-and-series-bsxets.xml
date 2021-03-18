@@ -15,11 +15,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/datasets-and-se
 Pre-requisite conformance classes: Common Requirements]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.4</version>
+		<version>1.0.5</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-05-26T16:45:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-03-17T12:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -469,16 +469,33 @@ let $conformityTextLower := for $x in $conformityText return normalize-space(low
 let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
-		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()[contains(.,'1089/2010')]
+		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
         let $valid := 
             (for $confResult in $confResults
-                return
-                if (normalize-space(lower-case($confResult)) = $conformityTextLower) then
-                    $confResult
-                else()
-            )
+				return 
+					if (contains($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010')) then
+						let $dummy := local:log("Code list value: " || $confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text())
+						return
+						if (normalize-space(lower-case($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text())) = $conformityTextLower) then
+							$confResult
+						else()
+					else())
+
+		let $invalid_dateTypeCode := 
+			(for $confResult in $confResults
+				return
+					if (contains($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010')) then
+						let $dateTypeCode := $confResult/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+						let $dummy2 := local:log("Code list value: " || $dateTypeCode/@codeListValue)
+						return
+							if (not($dateTypeCode/@codeListValue = ('publication', 'creation', 'revision'))) then
+								$dateTypeCode
+							else()
+					else())
 		return
-		if (count($valid) = 0) then
+		if(count($invalid_dateTypeCode) != 0) then
+			local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+		else if (count($valid) = 0) then
 			local:addMessage('TR.wrongNumberOfSpecificationForPurpose', map { 'filename': local:filename($record), 'id': $rid })
 		else()
 	)[position() le $limitErrors]
