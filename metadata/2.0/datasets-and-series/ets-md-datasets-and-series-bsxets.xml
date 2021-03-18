@@ -471,24 +471,26 @@ let $messages :=
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $confResults := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
         let $valid := 
-            (for $confResult in $confResults
-			return 
-			 if (contains($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010')) then
-				let $dummy := local:log("Code list value: " || $confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text())
-                return
-                if (normalize-space(lower-case($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text())) = $conformityTextLower) then
-                    $confResult
-                else()
-			else())
-		for $confResult in $confResults
-			if (contains($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010')) then
-				let $dateTypeCode := $confResult/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
-				let $dummy2 := local:log("Code list value: " || $dateTypeCode/@codeListValue)
-				return
-					if(not($dateTypeCode/@codeListValue = ('publication', 'creation', 'revision'))) then
-						local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+            for $confResult in $confResults
+				return 
+					if (contains($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010')) then
+						let $dummy := local:log("Code list value: " || $confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text())
+						return
+						if (normalize-space(lower-case($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text())) = $conformityTextLower) then
+							$confResult
+						else()
 					else()
-			else()
+					
+		for $confResult in $confResults
+			return
+				if (contains($confResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010')) then
+					let $dateTypeCode := $confResult/gmd:specification/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+					let $dummy2 := local:log("Code list value: " || $dateTypeCode/@codeListValue)
+					return
+						if(not($dateTypeCode/@codeListValue = ('publication', 'creation', 'revision'))) then
+							local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+						else()
+				else()
 		return
 		if (count($valid) = 0) then
 			local:addMessage('TR.wrongNumberOfSpecificationForPurpose', map { 'filename': local:filename($record), 'id': $rid })
