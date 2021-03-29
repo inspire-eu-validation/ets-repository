@@ -199,10 +199,12 @@ let $messages :=
 				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_phenomenom, 'constraint': 'the acquisition time of the orthoimage coverage is provided', 'additionalInfo': ''})
 			else if (exists($phenomenom) and (exists($phenomenom/@xlink:href)) and not(count($invalid_urls_ph) = 0) and not (exists($mosaic))) then			
 				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_phenomenom, 'value': string-join($invalid_urls_ph, ',')}) 
-			else if (exists($mosaic) and not(exists($mosaic/@xlink:href)) and not(has-children($mosaic)) and (not(exists($phenomenom)) or (exists($phenomenom) and not(count($invalid_urls_ph) = 0)))) then
+			else if (exists($mosaic) and not(exists($mosaic/@xlink:href)) and not(has-children($mosaic)) and (not(exists($phenomenom)) or (exists($phenomenom) and not(exists($phenomenom/@xlink:href)) and not(has-children($phenomenom))))) then
 				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_mosaic, 'constraint': 'the acquisition time of the orthoimage coverage is provided', 'additionalInfo': ''})
-			else if (exists($mosaic) and exists($mosaic/@xlink:href) and not(count($invalid_urls_mo) = 0) and not(exists($phenomenom))) then
+			else if (exists($mosaic) and exists($mosaic/@xlink:href) and not(count($invalid_urls_mo) = 0) and not(exists($phenomenom)) or (exists($phenomenom) and not(exists($phenomenom/@xlink:href)) and not(has-children($phenomenom)))) then
 				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_mosaic, 'value': string-join($invalid_urls_mo, ',')}) 
+			else if (exists($phenomenom) and exists($phenomenom/@xlink:href) and not(count($invalid_urls_ph) = 0) and (exists($mosaic) and exists($mosaic/@xlink:href) and not(count($invalid_urls_mo) = 0))) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_mosaic, 'value': string-join($invalid_urls_ph, ',')})
 			else ()
 
 return
