@@ -1,3 +1,4 @@
+declare namespace act-core='http://inspire.ec.europa.eu/schemas/act-core/4.0';
 declare namespace af='http://inspire.ec.europa.eu/schemas/af/4.0';
 declare namespace bu-base='http://inspire.ec.europa.eu/schemas/bu-base/4.0';
 declare namespace bu-core2d='http://inspire.ec.europa.eu/schemas/bu-core2d/4.0';
