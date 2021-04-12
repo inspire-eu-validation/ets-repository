@@ -92,10 +92,16 @@ let $messages :=
 
 	for $feature in $features_selected/act-core:function/act-core:Function
 		let $envDom := $feature/act-core:activity
-		return (local:addMessage('TR.checkManuallyCodeListValue2', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ',')}))
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		 	else (local:addMessage('TR.checkManuallyCodeListValue2', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ',')}))
 
 return
-('PASSED_MANUAL' ,
+(if ($messages and ($messages/@ref = ('TR.missingElement','TR.missingAttribute'))) then 'FAILED' 
+else 'PASSED_MANUAL',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
