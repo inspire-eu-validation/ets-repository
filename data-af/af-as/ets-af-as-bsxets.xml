@@ -138,13 +138,19 @@ let $messages_i :=
 
 	for $feature in $features_selected/act-core:function/act-core:Function
 		let $envDom := $feature/act-core:input
-		return (local:addMessage('TR.checkManuallyCodeListValue2', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string_i, 'value': string-join($envDom/@xlink:href, ',')}))
+		return
+			if (exists($envDom/@xlink:href)) then
+				local:addMessage('TR.checkManuallyCodeListValue2', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string_i, 'value': string-join($envDom/@xlink:href, ',')})
+			else()
 
 let $messages_o := 
 
 	for $feature in $features_selected/act-core:function/act-core:Function
 		let $envDom := $feature/act-core:output
-		return (local:addMessage('TR.checkManuallyCodeListValue2', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string_o, 'value': string-join($envDom/@xlink:href, ',')}))
+		return 
+		if (exists($envDom/@xlink:href)) then
+			local:addMessage('TR.checkManuallyCodeListValue2', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string_o, 'value': string-join($envDom/@xlink:href, ',')})
+		else()
 
 
 let $messages := ($messages_i, $messages_o)
@@ -153,8 +159,6 @@ return
 ('PASSED_MANUAL' ,
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
-
-
 
 
 									</expression>
