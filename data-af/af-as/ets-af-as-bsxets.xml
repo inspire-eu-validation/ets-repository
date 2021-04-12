@@ -282,7 +282,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-af/master/af-as/code-li
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $codelist := 'http://inspire.ec.europa.eu/codelist/LivestockSpeciesValue'
-let $codelisturl := 'http://inspire.ec.europa.eu/codelist/LivestockSpeciesValue/LivestockSpeciesValue.en.xml'
+let $codelisturl := 'https://inspire.ec.europa.eu/codelist/LivestockSpeciesValue/LivestockSpeciesValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 
 let $property_string := 'livestock'
@@ -319,7 +319,7 @@ let $messages_s :=
 										else ()
 
 							return
-								if (not($envDom/@xlink:href = $valid_href)) then
+								if (not($link = $valid_href)) then
 									local:addMessage('TR.reviewCodeListValue',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($link), 'count': count($iterlist)-1})
 								else ()
 		return $submessages_s
