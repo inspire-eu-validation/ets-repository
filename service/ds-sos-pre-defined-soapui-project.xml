@@ -505,63 +505,99 @@ else if(defaultLanguage.size() != 1){
 	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
 }</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite id="1482d8b1-f609-431b-87d3-4188539447a3" name="XML_Schema"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="b64ff900-1960-4557-b719-aec26d63c324" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at4-15-extended-capabilities-xml-schema" searchProperties="true"><con:description><![CDATA[<p>Test that the capabilities document is schema valid according to INSPIRE online schema repository.</p>
 <p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-sos/1.0/sos-pre-defined/at4-15-extended-capabilities-xml-schema" target="_blank">Extended Capabilities XML Schema</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="23324f5b-8a12-4e6b-9ade-c9b5c038781a"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>a06790ce-5d08-4ad4-821f-f55839d4a698</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-xml-schema-valid" id="d1f92aa8-89cc-49e0-b24e-40b79ea35c25" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="6fdd0625-a86f-423c-9b19-2fe499067b92" name="http-request-xml-schema-valid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/> <con:assertion type="GroovyScriptAssertion" id="84d12d11-591e-4a11-bc41-39061b0e1465" name="Response validates agains schema"><con:configuration><scriptText>import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Schema;
-import javax.xml.validation.Validator
-import javax.xml.XMLConstants;
-import java.io.*;
-import org.xml.sax.SAXException;
-import de.interactive_instruments.etf.suim.*;
-import com.eviware.soapui.support.XmlHolder;
-import javax.xml.transform.Source;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-XmlHolder xml = new XmlHolder(messageExchange.responseContentAsXml);
-def xmlText = xml.getXml();
-def xsds = ["http://schemas.opengis.net/sos/2.0/sos.xsd", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0/inspire_dls.xsd"];
-
-if(xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation") != null){
-	def xsd = xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation");
-	validateFile(xmlText, xsd);
-}else{
-	xsds.each{ xsd ->
-	   validateFile(xmlText, xsd);
+	import javax.xml.validation.SchemaFactory;
+	import javax.xml.validation.Schema;
+	import javax.xml.validation.Validator
+	import javax.xml.XMLConstants;
+	import java.io.*;
+	import org.xml.sax.SAXException;
+	import de.interactive_instruments.etf.suim.*;
+	import com.eviware.soapui.support.XmlHolder;
+	import javax.xml.transform.Source;
+	Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+	
+	XmlHolder xml = new XmlHolder(messageExchange.responseContentAsXml);
+	def xmlText = xml.getXml();
+	def xsds = ["http://schemas.opengis.net/sos/2.0/sos.xsd", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0/inspire_dls.xsd"];
+	
+	if(xml.getNodeValue("/*:ExtendedCapabilities/@*:schemaLocation") != null){
+		xsds = xml.getNodeValue("/*:ExtendedCapabilities/@*:schemaLocation");
+		def splittedXsds = xsds.split(" ");
+		validationProccess(xmlText, splittedXsds);
+	}else{
+		validationProccess(xmlText, xsds);
 	}
-}
-
-
-public boolean validateFile(String xml, String strSchemaLocation)
-{
-    Source xmlFile = null;
-    try {
-        URL schemaFile = new URL(strSchemaLocation);
-        xmlFile = new StreamSource(createFile(xml));
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = schemaFactory.newSchema(schemaFile);
-        Validator validator = schema.newValidator();
-        validator.validate(xmlFile);
-        
-    } catch (SAXException e) {
-        String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
-	     throw new TranslatableAssertionError('TR.XmlNotValidAgainstSchemaLocation', assertParams);
-        
-    } catch (IOException ioe) {
-        System.out.println("IOException");
-        
-    }
-    
-}
-
-
-
-public File createFile(String file) throws IOException {
-
-    File tempFile = File.createTempFile("temporaryfile",".xml")
-    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-    writer.write(file);
-    writer.close()
-    return tempFile;
-}</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="check-xml-schema-valid" id="13c955a0-d504-4d0e-baee-2c9410c4eab9"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.*
+	
+	public void validationProccess(String xmlText, String[] xsds){
+		def errorMessages = [];
+		def isValid = false;
+		xsds.each{ xsd ->
+			errorMessages.add(hasValidSchema(xmlText, xsd))
+		}
+	
+		for (i = 0; i &lt; errorMessages.size() ; i++){
+			if(isValid == false &amp;&amp; errorMessages[i] == "valid"){
+				isValid = true;
+			}
+		}
+	
+		if(isValid == false){
+			xsds.each{ xsd ->
+				log.debug("xsd");
+				errorMessages.add(validateFile(xmlText, xsd))
+			}
+		}
+	}
+	
+	public boolean validateFile(String xml, String strSchemaLocation) {
+		Source xmlFile = null;
+	
+		try {
+			URL schemaFile = new URL(strSchemaLocation);
+			xmlFile = new StreamSource(createFile(xml));
+			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema schema = schemaFactory.newSchema(schemaFile);
+			Validator validator = schema.newValidator();
+			validator.validate(xmlFile);
+	
+		} catch (SAXException e) {
+			String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
+			throw new TranslatableAssertionError('TR.XmlNotValidAgainstSchemaLocation', assertParams);
+	
+		} catch (IOException ioe) {
+			System.out.println("IOException");    
+		} 
+	}
+	
+	public String hasValidSchema(String xml, String strSchemaLocation) {
+		Source xmlFile = null;
+		
+		try {
+			URL schemaFile = new URL(strSchemaLocation);
+			xmlFile = new StreamSource(createFile(xml));
+			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema schema = schemaFactory.newSchema(schemaFile);
+			Validator validator = schema.newValidator();
+			validator.validate(xmlFile);
+			return "valid";
+	
+		} catch (SAXException e) {
+			String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
+			return "invalid";
+	
+		} catch (IOException ioe) {
+			System.out.println("IOException");
+			return "invalid";
+		}  
+	}
+	
+	public File createFile(String file) throws IOException {
+		File tempFile = File.createTempFile("temporaryfile",".xml")
+		BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+		writer.write(file);
+		writer.close()
+		return tempFile;
+	}</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>version</con:name><con:value>${#Project#version}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="check-xml-schema-valid" id="13c955a0-d504-4d0e-baee-2c9410c4eab9"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.*
 
 def tsGetObservation = testRunner.testCase.testSuite.project.testSuites["XML_Schema"].testCases["at4-15-extended-capabilities-xml-schema"].getTestStepByName('http-request-xml-schema-valid');
 tsGetObservation.setDisabled(false);
