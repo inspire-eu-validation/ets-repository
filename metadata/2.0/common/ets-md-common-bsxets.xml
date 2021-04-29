@@ -15,11 +15,11 @@ There is a general limitation in all assertions that polymorphism and containmen
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target="_blank">Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-		<version>1.0.8</version>
+		<version>1.0.11</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-05-29T11:30:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-03-17T14:40:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae"/>
 	</tags>
@@ -571,11 +571,11 @@ let $messages :=
 		else if($timePeriod) then
 			if (not($beginPosition/@indeterminatePosition) and not(matches($beginPosition/text(), $regex))) then
 				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
-			else if ($beginPosition/@indeterminatePosition and not($beginPosition/@indeterminatePosition = 'unknown')) then
+			else if ($beginPosition/@indeterminatePosition and not($beginPosition/@indeterminatePosition = 'unknown' or $beginPosition/@indeterminatePosition = 'before' or $beginPosition/@indeterminatePosition = 'now' or $beginPosition/@indeterminatePosition = 'after')) then
 				local:addMessage('TR.wrongIndeterminatePosition', map { 'filename': local:filename($record), 'id': $rid })
 			else if (not($endPosition/@indeterminatePosition) and not(matches($endPosition/text(), $regex))) then
 				local:addMessage('TR.wrongDateFormat', map { 'filename': local:filename($record), 'id': $rid })
-			else if ($endPosition/@indeterminatePosition and not($endPosition/@indeterminatePosition = 'unknown' or $endPosition/@indeterminatePosition = 'now')) then
+			else if ($endPosition/@indeterminatePosition and not($endPosition/@indeterminatePosition = 'unknown' or $endPosition/@indeterminatePosition = 'now' or $endPosition/@indeterminatePosition = 'before' or $endPosition/@indeterminatePosition = 'after')) then
 				local:addMessage('TR.wrongIndeterminatePosition', map { 'filename': local:filename($record), 'id': $rid })
 			else ()
 		else
@@ -1051,46 +1051,50 @@ let $levels := ('dataset', 'series', 'service')
 let $recordsToInspect := $records[gmd:hierarchyLevel/*/@codeListValue = $levels]
 let $messages := 
 	(for $record in $recordsToInspect
-	let $rid := $record/gmd:fileIdentifier/*/text()
-	let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
-	return 
-	if (not($result)) then
-		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-	else if (not($result/gmd:specification/gmd:CI_Citation)) then
-		local:addMessage('TR.missingCitationSection', map { 'filename': local:filename($record), 'id': $rid })
-	else
-	 	(for $res in $result
-		return
-		if(not($res/gmd:specification/gmd:CI_Citation)) then
-			local:addMessage('TR.noCitationForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-		else
-		for $citation in $res/gmd:specification/gmd:CI_Citation
-			let $title := $citation/gmd:title
-			let $date := $citation/gmd:date
-			let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
-			return
-			if (not($title) or not(string-length($title/gco:CharacterString) != 0 or string-length($title/gmx:Anchor) != 0)) then
-				local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-			else if ($title/gmd:PT_FreeText) then
-				for $localisedCharacterString in $title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString
+		let $rid := $record/gmd:fileIdentifier/*/text()
+		let $result := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+		return 
+			if (not($result)) then
+				local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
+			else if (not($result/gmd:specification/gmd:CI_Citation)) then
+				local:addMessage('TR.missingCitationSection', map { 'filename': local:filename($record), 'id': $rid })
+			else
+				(for $res in $result
+				return
+				if((contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and ($record/gmd:hierarchyLevel/*/@codeListValue = ('dataset') or ($record/gmd:hierarchyLevel/*/@codeListValue = ('service') and $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:serviceType/*/text() = "other"))) or (contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '976/2009') and $record/gmd:hierarchyLevel/*/@codeListValue = ('service'))) then
+					let $aaa := 'aaa'
 					return
-					if (string-length($localisedCharacterString) = 0) then
-					local:addMessage('TR.emptyFreeText', map{'filename': local:filename($record), 'id': $rid, 'path': '/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/$citation/gmd:title/gmd:PT_FreeText'})
-					else ()
-			else if (not($date)) then
-				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($dateTypeCode)) then
-				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($dateTypeCode/@codeListValue = ('publication'))) then
-				local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
-			else if (exists($date/gmd:CI_Date/gmd:date/gco:Date/text())) then
-				let $dummy := "aaa"
-				for $dat in $date/gmd:CI_Date/gmd:date/gco:Date/text()
-					return
-					if (not(matches($dat, $regexDate))) then	
-						local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid})
-					else ()
-			else ())
+					if(not($res/gmd:specification/gmd:CI_Citation)) then
+						local:addMessage('TR.noCitationForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+					else
+						for $citation in $res/gmd:specification/gmd:CI_Citation
+							let $title := $citation/gmd:title
+							let $date := $citation/gmd:date
+							let $dateTypeCode := $citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode
+							return
+							if (not($title) or not(string-length($title/gco:CharacterString) != 0 or string-length($title/gmx:Anchor) != 0)) then
+								local:addMessage('TR.noTitleForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+							else if ($title/gmd:PT_FreeText) then
+								for $localisedCharacterString in $title/gmd:PT_FreeText/gmd:textGroup/gmd:LocalisedCharacterString
+									return
+									if (string-length($localisedCharacterString) = 0) then
+										local:addMessage('TR.emptyFreeText', map{'filename': local:filename($record), 'id': $rid, 'path': '/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation/$citation/gmd:title/gmd:PT_FreeText'})
+									else ()
+							else if (not($date)) then
+								local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+							else if (not($dateTypeCode)) then
+								local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+							else if (not($dateTypeCode/@codeListValue = ('publication', 'creation', 'revision'))) then
+								local:addMessage('TR.noDateTypeForSpecification', map { 'filename': local:filename($record), 'id': $rid })
+							else if (exists($date/gmd:CI_Date/gmd:date/gco:Date/text())) then
+								let $dummy := "aaa"
+								for $dat in $date/gmd:CI_Date/gmd:date/gco:Date/text()
+									return
+									if (not(matches($dat, $regexDate))) then	
+										local:addMessage('TR.invalidDateFormat', map { 'filename': local:filename($record), 'id': $rid})
+									else ()
+							else()
+				else ())
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -1124,21 +1128,23 @@ let $messages :=
 		local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
 	 else
 	 	(for $res in $result
-		let $pass := $res/gmd:pass
-		return
-		if ($pass) then
-			if($pass/gco:Boolean) then
-				if (not($pass/gco:Boolean/text() = 'true' or $pass/gco:Boolean/text() = 'false')) then
+		 return
+			if((contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '1089/2010') and ($record/gmd:hierarchyLevel/*/@codeListValue = ('dataset') or ($record/gmd:hierarchyLevel/*/@codeListValue = ('service') and $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:serviceType/*/text() = "other"))) or (contains($res/gmd:specification/gmd:CI_Citation/gmd:title/*/text(), '976/2009') and $record/gmd:hierarchyLevel/*/@codeListValue = ('service'))) then
+				let $pass := $res/gmd:pass
+				return
+				if ($pass) then
+					if($pass/gco:Boolean) then
+						if (not($pass/gco:Boolean/text() = 'true' or $pass/gco:Boolean/text() = 'false')) then
+							local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+						else ()
+					else if (not($pass/@gco:nilReason)) then
+						local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+					else if (not($pass/@gco:nilReason = 'unknown')) then
+						local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
+					else ()
+				else 
 					local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
-				else ()
-			else if (not($pass/@gco:nilReason)) then
-				local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
-			else if (not($pass/@gco:nilReason = 'unknown')) then
-				local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
-			else ()
-		else 
-			local:addMessage('TR.declareNoConformityEvaluationAsUnknown', map { 'filename': local:filename($record), 'id': $rid })
-		)
+			else())
 	)[position() le $limitErrors]
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -1152,9 +1158,8 @@ return
 										<translationTemplate ref="TR.recordsWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
-							
 							</testAssertions>
-							</TestStep>
+						</TestStep>
 					</testSteps>
 				</TestCase>
 			</testCases>
