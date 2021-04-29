@@ -13,11 +13,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-08-06T14:45:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-08-06T14:45:00Z</lastUpdateDate>
+	<lastUpdateDate>2020-03-05T13:15:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDce23680b-d081-400e-93b0-030ed193b78e"/>
 	</tags>
@@ -76,8 +76,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sd/master/sd-ia/code-li
 let $features_selected := $features[self::sd:SpeciesDistributionUnit]
 let $property_string := 'GeneralCountingUnitValue or Article17CountingUnitValue'
 let $messages :=
-	for $feature in $features_selected
-		let $envDom := $feature/sd:distributionInfo/sd:DistributionInfoType/sd:populationSize/sd:PopulationSizeType/sd:countingUnit
+	for $feature in $features_selected/sd:distributionInfo/sd:DistributionInfoType/sd:populationSize/sd:PopulationSizeType
+		let $envDom := $feature/sd:countingUnit
 		let $urls := 
 			for $x in $envDom/@xlink:href
 				return
@@ -95,14 +95,14 @@ let $messages :=
 						$url
 					else ()
 	return
-		if (exists($feature/sd:distributionInfo/sd:DistributionInfoType/sd:populationSize/sd:PopulationSizeType) and not(exists($envDom))) then
-			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string}) 
-		else if (exists($feature/sd:distributionInfo/sd:DistributionInfoType/sd:populationSize/sd:PopulationSizeType) and count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
-		else if (exists($feature/sd:distributionInfo/sd:DistributionInfoType/sd:populationSize/sd:PopulationSizeType) and not(count($envDom) = count($envDom/@xlink:href))) then
-			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-		else if(exists($feature/sd:distributionInfo/sd:DistributionInfoType/sd:populationSize/sd:PopulationSizeType) and count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
+		if (not(exists($envDom))) then
+			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string}) 
+		else if (count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+		else if (not(count($envDom) = count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -128,8 +128,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sd/master/sd-ia/code-li
 let $property_string := 'LocalSpeciesNameCodeValue'
 let $features_selected := $features[self::sd:SpeciesDistributionUnit]
 let $messages :=
-	for $feature in $features_selected
-		let $envDom := $feature/sd:speciesName/sd:SpeciesNameType/sd:localSpeciesId
+	for $feature in $features_selected/sd:speciesName/sd:SpeciesNameType
+		let $envDom := $feature/sd:localSpeciesId
 
 		let $urls := 
 			for $x in $envDom/@xlink:href
@@ -150,11 +150,11 @@ let $messages :=
 
 	return
 		if (count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
 		else if (not((count($envDom) = count($envDom/@xlink:href) + count($envDom/@nilReason)))) then
-			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			local:addMessage('TR.missingAttributeSpeciesDistribution',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 		else if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
+			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
 		else ()
 
 return
@@ -180,8 +180,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sd/master/sd-ia/code-li
 let $property_string := 'OccurrenceCategoryValue'
 let $features_selected := $features[self::sd:SpeciesDistributionUnit]
 let $messages :=
-	for $feature in $features_selected
-		let $envDom := $feature/sd:distributionInfo/sd:DistributionInfoType/sd:occurrenceCategory
+	for $feature in $features_selected/sd:distributionInfo/sd:DistributionInfoType
+		let $envDom := $feature/sd:occurrenceCategory
 
 		let $urls := 
 			for $x in $envDom/@xlink:href
@@ -200,14 +200,14 @@ let $messages :=
 						$url
 					else ()
 	return
-		if (exists($feature/sd:distributionInfo/sd:DistributionInfoType) and not(exists($envDom))) then
-			local:addMessage('TR.missingElementSpeciesInformation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string}) 
+		if (not(exists($envDom))) then
+			local:addMessage('TR.missingElementSpeciesInformation', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string}) 
 		else if (count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
-		else if (exists($feature/sd:distributionInfo/sd:DistributionInfoType) and count($envDom/@xlink:href) != 1) then
-			local:addMessage('TR.missingAttributeSpeciesDistribution', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-		else if(exists($feature/sd:distributionInfo/sd:DistributionInfoType) and count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+		else if (count($envDom/@xlink:href) != 1) then
+			local:addMessage('TR.missingAttributeSpeciesDistribution', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
 		else ()
 
 return
@@ -234,8 +234,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sd/master/sd-ia/code-li
 let $property_string := 'PopulationTypeValue'
 let $features_selected := $features[self::sd:SpeciesDistributionUnit]
 let $messages :=
-	for $feature in $features_selected
-		let $envDom := $feature/sd:distributionInfo/sd:DistributionInfoType/sd:populationType
+	for $feature in $features_selected/sd:distributionInfo/sd:DistributionInfoType
+		let $envDom := $feature/sd:populationType
 
 		let $urls := 
 			for $x in $envDom/@xlink:href
@@ -255,9 +255,9 @@ let $messages :=
 					else ()
 	return
 		if (count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
 		else if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
+			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
 		else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -281,8 +281,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sd/master/sd-ia/code-li
 let $property_string := 'ResidencyStatusValue'
 let $features_selected := $features[self::sd:SpeciesDistributionUnit]
 let $messages :=
-	for $feature in $features_selected
-		let $envDom := $feature/sd:distributionInfo/sd:DistributionInfoType/sd:residencyStatus
+	for $feature in $features_selected/sd:distributionInfo/sd:DistributionInfoType
+		let $envDom := $feature/sd:residencyStatus
 
 		let $urls := 
 			for $x in $envDom/@xlink:href
@@ -302,9 +302,9 @@ let $messages :=
 					else ()
 	return
 		if (count($envDom) > 1) then
-			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+			local:addMessage('TR.wrongMultiplicitySpeciesDistribution',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
 		else if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
+			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)}) 
 		else ()
 
 return
@@ -348,9 +348,10 @@ let $features_selected := $features[self::sd:SpeciesDistributionDataSet]
 let $gml_ids := $features//@gml:id
 let $property_string := 'SpeciesDistributionDataSet.member'
 let $messages :=
-	for $feature in $features_selected/sd:member
+	for $feature in $features_selected
+		let $envDom := $feature/sd:member
 		let $urls := 
-			for $x in $feature/@xlink:href
+			for $x in $envDom/@xlink:href
 			return
 				if (starts-with($x, '#')) then ()
 				else $x
@@ -364,7 +365,7 @@ let $messages :=
 				else ()
 
 		let $invalid_element_reference :=
-			for $x in $feature/@xlink:href
+			for $x in $envDom/@xlink:href
 			return
 				if (starts-with($x, '#')) then
 					if (not(substring($x, 2) = $gml_ids)) then
@@ -372,7 +373,11 @@ let $messages :=
 					else ()
 				else ()
 		return
-			if (count($invalid_urls) > 0) then
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementSpeciesInformation', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string}) 
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeSpeciesDistribution', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls) > 0) then
 				local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 			else if (count($invalid_element_reference) > 0) then
 				local:addMessage('TR.missingReferencedElementSpecieDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
@@ -384,6 +389,8 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElementSpeciesInformation"/>
+										<translationTemplate ref="TR.missingAttributeSpeciesDistribution"/>
 										<translationTemplate ref="TR.brokenLink"/>
 										<translationTemplate ref="TR.missingReferencedElementSpecieDistribution"/>
 									</translationTemplates>
@@ -401,11 +408,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sd/master/sd-ia/feature
 									<expression>
 let $features_selected := $features[self::sd:SpeciesDistributionDataSet]
 let $gml_ids := $features//@gml:id
-let $property_string := 'ExistingLandUseDataSet.member'
+let $property_string := 'SpeciesDistributionDataSet.documentBasis'
 let $messages :=
-	for $feature in $features_selected/sd:documentBasis
+	for $feature in $features_selected
+	let $envDom := $feature/sd:documentBasis
 	let $urls := 
-		for $x in $feature/@xlink:href
+		for $x in $envDom/@xlink:href
 		return
 			if (starts-with($x, '#')) then ()
 			else $x
@@ -418,16 +426,14 @@ let $messages :=
 			if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then $url
 			else ()
 	let $invalid_element_reference :=
-		for $x in $feature/@xlink:href
+		for $x in $envDom/@xlink:href
 		return
 		if (starts-with($x, '#')) then
 			if (not(substring($x, 2) = $gml_ids)) then $x
 			else ()
 		else ()
 	return
-		if (not(exists($feature))) then
-			local:addMessage('TR.missingElementSpeciesInformation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string}) 
-		else if (count($invalid_urls) > 0) then
+		if (count($invalid_urls) > 0) then
 			local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 		else if (count($invalid_element_reference) > 0) then
 			local:addMessage('TR.missingReferencedElementSpecieDistribution',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
@@ -439,7 +445,6 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.missingElementSpeciesInformation"/>
 										<translationTemplate ref="TR.brokenLink"/>
 										<translationTemplate ref="TR.missingReferencedElementSpecieDistribution"/>
 									</translationTemplates>
