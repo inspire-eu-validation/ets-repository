@@ -2410,269 +2410,134 @@ a.equals("/*:WFS_Capabilities/@version", "Capabilities version", "2.0.0");</scri
          </fes:Function>
       </fes:Functions>
    </fes:Filter_Capabilities>
-</wfs:WFS_Capabilities>]]></con:value>
-                </con:property>
-                <con:property>
-                    <con:name>service</con:name>
-                    <con:value>WFS</con:value>
-                </con:property>
-                <con:property>
-                    <con:name>version</con:name>
-                    <con:value>2.0.0</con:value>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.ShortDescription</con:name>
-                    <con:value/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.Author</con:name>
-                    <con:value>herrmann</con:value>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.CreationDate</con:name>
-                    <con:value>2014-01-13T12:24:44.124+01:00</con:value>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.Version</con:name>
-                    <con:value>1.0.0</con:value>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.AssociatedRequirements</con:name>
-                    <con:value/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.ExpectedResults</con:name>
-                    <con:value/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.Status</con:name>
-                    <con:value>IMPLEMENTED</con:value>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.LastUpdateDate</con:name>
-                    <con:value>2014-01-13T14:10:42.863+01:00</con:value>
-                </con:property>
-            </con:properties>
-            <con:reportParameters/>
-        </con:testCase>
-        <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="GetCapabilities is schema valid" searchProperties="true" id="fbb5f884-2f31-455d-b002-ecb9d21316d4">
-            <con:description>Validate Capabilites response against xsi:schemaLocation.</con:description>
-            <con:settings/>
-            <con:testStep name="GetCapabilities" type="httprequest" id="197fa9da-ac8e-4590-baf6-9158e64fa02f">
-                <con:settings/>
-                <con:config method="GET" name="GetCapabilities" timeout="0" xsi:type="con:HttpRequest" id="c375379a-22cf-4ffc-815c-dac5c42e9066"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    <con:settings>
-                        <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-                    </con:settings>
-                    <con:encoding>UTF-8</con:encoding>
-                    <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
-                    <con:request/>
-                    <con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="4fd8c644-0d75-44bc-854d-2fbc1ec5c4f6"/>
-                    <con:assertion type="Valid HTTP Status Codes" id="687b5ff0-ce72-4e65-969c-cf26edfe62a5" name="HTTP status code 200 is returned">
-                        <con:configuration>
-                            <codes>200</codes>
-                        </con:configuration>
-                    </con:assertion>
-                    <con:assertion type="Response SLA Assertion" id="7888b0f9-2dd3-43a0-9a39-b10e47fcce09" name="30 seconds timeout">
-                        <con:configuration>
-                            <SLA>30000</SLA>
-                        </con:configuration>
-                    </con:assertion>
-                    <con:assertion type="GroovyScriptAssertion" id="71fc0422-fa11-4bc8-8504-e04921eac0a6" name="Response validates agains schema">
-                        <con:configuration>
-                            <scriptText>import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Schema;
-import javax.xml.validation.Validator
-import javax.xml.XMLConstants;
-import java.io.*;
-import org.xml.sax.SAXException;
-import de.interactive_instruments.etf.suim.*;
-import com.eviware.soapui.support.XmlHolder;
-import javax.xml.transform.Source;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-XmlHolder xml = new XmlHolder(messageExchange.responseContentAsXml);
-def xmlText = xml.getXml();
-def xsds = ["http://schemas.opengis.net/wfs/2.0/wfs.xsd", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0/inspire_dls.xsd"];
-
-if(xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation") != null){
-	def xsd = xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation");
-	validateFile(xmlText, xsd);
-}else{
-	xsds.each{ xsd ->
-	   validateFile(xmlText, xsd);
-	}
-}
-
-
-public boolean validateFile(String xml, String strSchemaLocation)
-{
-    Source xmlFile = null;
-    try {
-        URL schemaFile = new URL(strSchemaLocation);
-        xmlFile = new StreamSource(createFile(xml));
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = schemaFactory.newSchema(schemaFile);
-        Validator validator = schema.newValidator();
-        validator.validate(xmlFile);
-        
-    } catch (SAXException e) {
-        String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
-	     throw new TranslatableAssertionError('TR.XmlNotValidAgainstSchemaLocation', assertParams);
-        
-    } catch (IOException ioe) {
-        System.out.println("IOException");
-        
-    }
-    
-}
+</wfs:WFS_Capabilities>]]></con:value></con:property><con:property><con:name>service</con:name><con:value>WFS</con:value></con:property><con:property><con:name>version</con:name><con:value>2.0.0</con:value></con:property><con:property><con:name>qaf.ShortDescription</con:name><con:value/></con:property><con:property><con:name>qaf.Author</con:name><con:value>herrmann</con:value></con:property><con:property><con:name>qaf.CreationDate</con:name><con:value>2014-01-13T12:24:44.124+01:00</con:value></con:property><con:property><con:name>qaf.Version</con:name><con:value>1.0.0</con:value></con:property><con:property><con:name>qaf.AssociatedRequirements</con:name><con:value/></con:property><con:property><con:name>qaf.ExpectedResults</con:name><con:value/></con:property><con:property><con:name>qaf.Status</con:name><con:value>IMPLEMENTED</con:value></con:property><con:property><con:name>qaf.LastUpdateDate</con:name><con:value>2014-01-13T14:10:42.863+01:00</con:value></con:property></con:properties><con:reportParameters/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="GetCapabilities is schema valid" searchProperties="true" id="fbb5f884-2f31-455d-b002-ecb9d21316d4"><con:description>Validate Capabilites response against xsi:schemaLocation.</con:description><con:settings/><con:testStep name="GetCapabilities" type="httprequest" id="197fa9da-ac8e-4590-baf6-9158e64fa02f">
+        <con:settings/>
+        <con:config method="GET" name="GetCapabilities" timeout="0" xsi:type="con:HttpRequest" id="c375379a-22cf-4ffc-815c-dac5c42e9066" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:settings>
+            <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+          </con:settings>
+          <con:encoding>UTF-8</con:encoding>
+          <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+          <con:request/>
+          <con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="4fd8c644-0d75-44bc-854d-2fbc1ec5c4f6"/><con:assertion type="Valid HTTP Status Codes" id="687b5ff0-ce72-4e65-969c-cf26edfe62a5" name="HTTP status code 200 is returned"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="7888b0f9-2dd3-43a0-9a39-b10e47fcce09" name="30 seconds timeout"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="71fc0422-fa11-4bc8-8504-e04921eac0a6" name="Response validates agains schema"><con:configuration><scriptText>import javax.xml.transform.stream.StreamSource;
+            import javax.xml.validation.SchemaFactory;
+            import javax.xml.validation.Schema;
+            import javax.xml.validation.Validator
+            import javax.xml.XMLConstants;
+            import java.io.*;
+            import org.xml.sax.SAXException;
+            import de.interactive_instruments.etf.suim.*;
+            import com.eviware.soapui.support.XmlHolder;
+            import javax.xml.transform.Source;
+            Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+            
+            XmlHolder xml = new XmlHolder(messageExchange.responseContentAsXml);
+            def xmlText = xml.getXml();
+            def xsds = ["http://schemas.opengis.net/wfs/2.0/wfs.xsd", "http://inspire.ec.europa.eu/schemas/inspire_dls/1.0/inspire_dls.xsd"];
+            
+            if(xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation") != null){
+                xsds = xml.getNodeValue("/*:WFS_Capabilities/@*:schemaLocation");
+                def splittedXsds = xsds.split(" ");
+                validationProccess(xmlText, splittedXsds);
+            }else{
+                validationProccess(xmlText, xsds);
+            }
+            
+            public void validationProccess(String xmlText, String[] xsds){
+                def errorMessages = [];
+                def isValid = false;
+                xsds.each{ xsd ->
+                    errorMessages.add(hasValidSchema(xmlText, xsd))
+                }
+            
+                for (i = 0; i &lt; errorMessages.size() ; i++){
+                    if(isValid == false &amp;&amp; errorMessages[i] == "valid"){
+                        isValid = true;
+                    }
+                }
+            
+                if(isValid == false){
+                    xsds.each{ xsd ->
+                        log.debug("xsd");
+                        errorMessages.add(validateFile(xmlText, xsd))
+                    }
+                }
+            }
+            
+            public boolean validateFile(String xml, String strSchemaLocation) {
+                Source xmlFile = null;
+            
+                try {
+                    URL schemaFile = new URL(strSchemaLocation);
+                    xmlFile = new StreamSource(createFile(xml));
+                    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    Schema schema = schemaFactory.newSchema(schemaFile);
+                    Validator validator = schema.newValidator();
+                    validator.validate(xmlFile);
+            
+                } catch (SAXException e) {
+                    String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
+                    throw new TranslatableAssertionError('TR.XmlNotValidAgainstSchemaLocation', assertParams);
+            
+                } catch (IOException ioe) {
+                    System.out.println("IOException");    
+                } 
+            }
+            
+            public String hasValidSchema(String xml, String strSchemaLocation) {
+                Source xmlFile = null;
+                
+                try {
+                    URL schemaFile = new URL(strSchemaLocation);
+                    xmlFile = new StreamSource(createFile(xml));
+                    SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    Schema schema = schemaFactory.newSchema(schemaFile);
+                    Validator validator = schema.newValidator();
+                    validator.validate(xmlFile);
+                    return "valid";
+            
+                } catch (SAXException e) {
+                    String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
+                    return "invalid";
+            
+                } catch (IOException ioe) {
+                    System.out.println("IOException");
+                    return "invalid";
+                }  
+            }
+            
+            public File createFile(String file) throws IOException {
+                File tempFile = File.createTempFile("temporaryfile",".xml")
+                BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+                writer.write(file);
+                writer.close()
+                return tempFile;
+            }
+</scriptText></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>Basic</con:selectedAuthProfile><con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+          <con:jmsPropertyConfig/>
+          <con:parameters>
 
 
-
-public File createFile(String file) throws IOException {
-
-    File tempFile = File.createTempFile("temporaryfile",".xml")
-    BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-    writer.write(file);
-    writer.close()
-    return tempFile;
-}
-                            </scriptText>
-                        </con:configuration>
-                    </con:assertion>
-                    <con:credentials>
-                        <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
-                        <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
-                        <con:authType>Global HTTP Settings</con:authType>
-                    </con:credentials>
-                    <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
-                    <con:jmsPropertyConfig/>
-                    <con:parameters>
-
-
-                        <con:parameter>
-                            <con:name>REQUEST</con:name>
-                            <con:value>GetCapabilities</con:value>
-                            <con:style>QUERY</con:style>
-                            <con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type>
-                            <con:default>GetCapabilities</con:default>
-                            <con:description xsi:nil="true"/>
-                        </con:parameter>
-                        <con:parameter>
-                            <con:name>SERVICE</con:name>
-                            <con:value>${#TestSuite#service}</con:value>
-                            <con:style>QUERY</con:style>
-                        </con:parameter>
-                        <con:parameter>
-                            <con:name>ACCEPTVERSIONS</con:name>
-                            <con:value>${#TestSuite#version}</con:value>
-                            <con:style>QUERY</con:style>
-                        </con:parameter>
-                        <con:parameter>
-                            <con:name>VERSION</con:name>
-                            <con:value>${#TestSuite#version}</con:value>
-                            <con:style>QUERY</con:style>
-                        </con:parameter>
-                    </con:parameters>
-                </con:config>
-            </con:testStep>
-            <con:properties>
-                <con:property>
-                    <con:name>qaf.ShortDescription</con:name>
-                    <con:value xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.Author</con:name>
-                    <con:value xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.CreationDate</con:name>
-                    <con:value xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.Version</con:name>
-                    <con:value xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.AssociatedRequirements</con:name>
-                    <con:value xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.ExpectedResults</con:name>
-                    <con:value xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.Status</con:name>
-                    <con:value xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </con:property>
-                <con:property>
-                    <con:name>qaf.LastUpdateDate</con:name>
-                    <con:value xsi:nil="true"
-                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </con:property>
-            </con:properties>
-            <con:reportParameters/>
-        </con:testCase>
-        <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Operation endpoints are available" searchProperties="true" id="85f7f7f5-ecab-4522-981d-a15f1dee45aa">
-            <con:description>Check if the endpoints from the Capabilites are accesable and if basic requirements are met to query the service. The first found FeatureType and the first found OutputFormat from the Capabilities are taken for one GetFeature and one DescribeFeatureType request. This test case will most likely fail if FeatureTypes or OutputFormats are listed in the (manually edited) Capabilities document which the underlying service implementation is not capabile to serve.  </con:description>
-            <con:settings/>
-            <con:testStep type="properties" name="Transfer_Properties" id="09b3677c-71dc-4e63-914f-88a9dd3001ed">
-                <con:settings/>
-                <con:config xsi:type="con:PropertiesStep" saveFirst="true" discardValuesOnSave="true"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    <con:properties>
-                        <con:property>
-                            <con:name>featureTypeName</con:name>
-                            <con:value xsi:nil="true"/>
-                        </con:property>
-                        <con:property>
-                            <con:name>outputFormat</con:name>
-                            <con:value xsi:nil="true"/>
-                        </con:property>
-                        <con:property>
-                            <con:name>featureTypeNamespace</con:name>
-                            <con:value xsi:nil="true"/>
-                        </con:property>
-                        <con:property>
-                            <con:name>featureTypeNamespacePrefix</con:name>
-                            <con:value xsi:nil="true"/>
-                        </con:property>
-                    </con:properties>
-                </con:config>
-            </con:testStep>
-            <con:testStep name="GetCapabilities" type="httprequest" id="3f1ec508-d9e5-4e8e-b2e7-8649fd8a739e">
-                <con:settings/>
-                <con:config method="GET" name="GetCapabilities" timeout="0" xsi:type="con:HttpRequest" id="9c7389bb-59db-40c1-b327-cb998ad46500"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-                    <con:description>Request Capabilities, expect a Capabilites document is returned which lists at least one usable FeatureType.</con:description>
-                    <con:settings>
-                        <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-                    </con:settings>
-                    <con:encoding>UTF-8</con:encoding>
-                    <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
-                    <con:request/>
-                    <con:assertion type="Response SLA Assertion" name="30 seconds timeout" id="88a3544e-3576-4ef2-99cc-2e22c839eebe">
-                        <con:configuration>
-                            <SLA>30000</SLA>
-                        </con:configuration>
-                    </con:assertion>
-                    <con:assertion type="Valid HTTP Status Codes" id="88f234f8-90c1-44e8-b828-8ae59911aa7f" name="HTTP status code is 200">
-                        <con:configuration>
-                            <codes>200</codes>
-                        </con:configuration>
-                    </con:assertion>
-                    <con:assertion type="GroovyScriptAssertion" id="cd7f7f76-814e-455f-98ab-be5c39010347" name="At least one FeatureType is listed">
-                        <con:configuration>
-                            <scriptText>import de.interactive_instruments.etf.suim.*
+            <con:parameter>
+              <con:name>REQUEST</con:name>
+              <con:value>GetCapabilities</con:value>
+              <con:style>QUERY</con:style>
+              <con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type>
+              <con:default>GetCapabilities</con:default>
+              <con:description xsi:nil="true"/>
+            </con:parameter>
+          <con:parameter><con:name>SERVICE</con:name><con:value>${#TestSuite#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>ACCEPTVERSIONS</con:name><con:value>${#TestSuite#version}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>VERSION</con:name><con:value>${#TestSuite#version}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters>
+        </con:config>
+      </con:testStep><con:properties><con:property><con:name>qaf.ShortDescription</con:name><con:value xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></con:property><con:property><con:name>qaf.Author</con:name><con:value xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></con:property><con:property><con:name>qaf.CreationDate</con:name><con:value xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></con:property><con:property><con:name>qaf.Version</con:name><con:value xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></con:property><con:property><con:name>qaf.AssociatedRequirements</con:name><con:value xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></con:property><con:property><con:name>qaf.ExpectedResults</con:name><con:value xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></con:property><con:property><con:name>qaf.Status</con:name><con:value xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></con:property><con:property><con:name>qaf.LastUpdateDate</con:name><con:value xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/></con:property></con:properties><con:reportParameters/></con:testCase><con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Operation endpoints are available" searchProperties="true" id="85f7f7f5-ecab-4522-981d-a15f1dee45aa"><con:description>Check if the endpoints from the Capabilites are accesable and if basic requirements are met to query the service. The first found FeatureType and the first found OutputFormat from the Capabilities are taken for one GetFeature and one DescribeFeatureType request. This test case will most likely fail if FeatureTypes or OutputFormats are listed in the (manually edited) Capabilities document which the underlying service implementation is not capabile to serve.  </con:description><con:settings/><con:testStep type="properties" name="Transfer_Properties" id="09b3677c-71dc-4e63-914f-88a9dd3001ed"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" discardValuesOnSave="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>featureTypeName</con:name><con:value xsi:nil="true"/></con:property><con:property><con:name>outputFormat</con:name><con:value xsi:nil="true"/></con:property><con:property><con:name>featureTypeNamespace</con:name><con:value xsi:nil="true"/></con:property><con:property><con:name>featureTypeNamespacePrefix</con:name><con:value xsi:nil="true"/></con:property></con:properties></con:config></con:testStep><con:testStep name="GetCapabilities" type="httprequest" id="3f1ec508-d9e5-4e8e-b2e7-8649fd8a739e">
+        <con:settings/>
+        <con:config method="GET" name="GetCapabilities" timeout="0" xsi:type="con:HttpRequest" id="9c7389bb-59db-40c1-b327-cb998ad46500" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <con:description>Request Capabilities, expect a Capabilites document is returned which lists at least one usable FeatureType.</con:description><con:settings>
+            <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+          </con:settings>
+          <con:encoding>UTF-8</con:encoding>
+          <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+          <con:request/>
+           <con:assertion type="Response SLA Assertion" name="30 seconds timeout" id="88a3544e-3576-4ef2-99cc-2e22c839eebe"><con:configuration><SLA>30000</SLA></con:configuration></con:assertion><con:assertion type="Valid HTTP Status Codes" id="88f234f8-90c1-44e8-b828-8ae59911aa7f" name="HTTP status code is 200"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="cd7f7f76-814e-455f-98ab-be5c39010347" name="At least one FeatureType is listed"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("//*:FeatureType[1]");</scriptText>
                         </con:configuration>
