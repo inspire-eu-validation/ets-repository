@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-v-as" targ
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-gml" target="_blank">Conformance Class 'GML application schemas, Land Cover'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-11-03T11:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-11-03T11:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-05-07T09:15:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID320f0a12-0155-4a95-b331-cbfc501482d5"/>
 	</tags>
@@ -71,40 +71,38 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-lc/master/lc-v-as/const
 									<parent ref="EID53683b4c-9646-4673-841d-ba9e446f759c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $property_stringp := 'Point'
-let $property_strings := 'Surface'
 let $property_string := 'LandCoverUnit geometry'
 let $features_selected_lcu := $features[self::lcv:LandCoverUnit]
 let $features_selected_lcd := $features[self::lcv:LandCoverDataset]
 
 let $messages_lcu := 
 
-	for $feature in $features_selected_lcu/lcv:geometry
-		let $envDomp := $feature/gml:Point
-		let $envDoms := $feature/gml:Surface
+	for $feature in $features_selected_lcu
+
+		let $envDom := $feature/lcv:geometry
 
 		return
-			if (count($envDoms) > 1) then
-				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'property': $property_strings, 'multiplicity': '0 or 1', 'count': count($envDoms)})
-			else if (count($envDomp) > 1) then
-				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'property': $property_stringp, 'multiplicity': '0 or 1', 'count': count($envDomp)})
-			else if (not (exists($envDomp) or exists($envDoms))) then
-				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'property': $property_string, 'constraint': 'The geometries of the LandCoverUnit feature types are points or surfaces', 'additionalInfo': ''})
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementLandCover',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not (exists($envDom/gml:Point) or exists($envDom/gml:Surface) or exists($envDom/gml:Polygon) or exists($envDom/gml:PolyhedralSurface) or exists($envDom/gml:TriangulatedSurface))) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'constraint': 'The geometries of the LandCoverUnit feature types are points or surfaces', 'additionalInfo': ''})
 			else ()
 
 let $messages_lcd := 
 
-	for $feature in $features_selected_lcd/lcv:member/lcv:LandCoverUnit/lcv:geometry
-		let $envDomp := $feature/gml:Point
-		let $envDoms := $feature/gml:Surface
+	for $feature in $features_selected_lcd/lcv:member/lcv:LandCoverUnit
+
+		let $envDom := $feature/lcv:geometry
 
 		return
-			if (count($envDoms) > 1) then
-				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'property': $property_strings, 'multiplicity': '0 or 1', 'count': count($envDoms)})
-			else if (count($envDomp) > 1) then
-				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'property': $property_stringp, 'multiplicity': '0 or 1', 'count': count($envDomp)})
-			else if (not (exists($envDomp) or exists($envDoms))) then
-				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'property': $property_string, 'constraint': 'The geometries of the LandCoverUnit feature types are points or surfaces', 'additionalInfo': ''})
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElementLandCover',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not (exists($envDom/gml:Point) or exists($envDom/gml:Surface) or exists($envDom/gml:Polygon) or exists($envDom/gml:PolyhedralSurface) or exists($envDom/gml:TriangulatedSurface))) then
+				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The geometries of the LandCoverUnit feature types are points or surfaces', 'additionalInfo': ''})
 			else ()
 
 let $messages := ($messages_lcu, $messages_lcd)
