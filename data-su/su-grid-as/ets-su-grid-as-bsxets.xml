@@ -10,7 +10,7 @@
 Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-br/master/su-grid-as" target="_blank">Conformance Class 'Application Schema, Statistical Units Grid'</a><br/><br/>
 Pre-requisite conformance classes:
-<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-gml" target="_blank">Conformance Class 'GML application schemas, Statistical Units'</a></li></ul>]]></description>
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-as" target="_blank">Conformance Class 'Application Schema, Statistical Units Base'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
 	<version>0.1.0</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
@@ -40,7 +40,7 @@ Pre-requisite conformance classes:
 		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
 	</supportedTestObjectTypes>
 	<dependencies>
-		<executableTestSuite ref="EID7d36c5e8-5bbe-4af6-9c37-3038f6282ae1"/>
+		<executableTestSuite ref="EID4a8fffca-2603-4a16-b8e4-6e2c659e50be"/>
 	</dependencies>
 	<testModules>
 		<TestModule id="EID9be16e89-ab2c-43e2-8b6c-acc81f5d15d9">
@@ -71,6 +71,10 @@ Pre-requisite conformance classes:
 									<expression>
 
 let $property_string := 'spatialRepresentation'
+let $property_stringc := 'code'
+let $property_stringgep := 'geographicalPosition'
+let $property_stringgeo := 'geometry'
+let $property_stringgrp := 'gridPosition'
 let $features_selected := $features[self::su-grid:StatisticalGridCell]
 
 
@@ -82,9 +86,25 @@ let $messages :=
 		let $envDomgrp := $feature/su-grid:gridPosition
 		
 		return
-			if (not(exists($envDomc/@xlink:href)) and not(exists($envDomgep/@xlink:href)) and not(exists($envDomgeo/@xlink:href)) and not(exists($envDomgrp/@xlink:href))) then
+			if (not(exists($envDomc))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringc})
+			else if (count($envDomc) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_stringc, 'multiplicity': 1, 'count': count($envDomc)})
+			else if (not(exists($envDomgep))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringgep})
+			else if (count($envDomgep) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_stringgep, 'multiplicity': 1, 'count': count($envDomgep)})
+			else if (not(exists($envDomgeo))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringgeo})
+			else if (count($envDomgeo) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_stringgeo, 'multiplicity': 1, 'count': count($envDomgeo)})
+			else if (count($envDomgrp) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_stringgrp, 'multiplicity': '0 or 1', 'count': count($envDomgrp)})
+			else if (not(has-children($envDomc)) and not(has-children($envDomgep)) and not(has-children($envDomgeo)) and not(has-children($envDomgrp))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': 'at least one of the attributes code, geographicalPosition, gridPosition or geometry is provided', 'additionalInfo': ''})
 			else ()
+
+
 						
 return
 (if ($messages) then 'FAILED' else 'PASSED',
