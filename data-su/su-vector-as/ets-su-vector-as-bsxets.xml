@@ -10,7 +10,7 @@
 Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
 Source: <a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as" target="_blank">Conformance Class 'Application Schema, Statistical Units Vector'</a><br/><br/>
 Pre-requisite conformance classes:
-<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-gml" target="_blank">Conformance Class 'GML application schemas, Statistical Units'</a></li></ul>]]></description>
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-as" target="_blank">Conformance Class 'Application Schema, Statistical Units Base'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
 	<version>0.1.0</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
@@ -40,7 +40,7 @@ Pre-requisite conformance classes:
 		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
 	</supportedTestObjectTypes>
 	<dependencies>
-		<executableTestSuite ref="EID7d36c5e8-5bbe-4af6-9c37-3038f6282ae1"/>
+		<executableTestSuite ref="EID4a8fffca-2603-4a16-b8e4-6e2c659e50be"/>
 	</dependencies>
 	<testModules>
 		<TestModule id="EID908f48b5-c729-4db5-b9e4-eddb0ffa14ed">
@@ -153,18 +153,18 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $property_string := 'AreaStatisticalUnits'
-let $features_selected := $features[self::su-vector:AreaStatisticalUnit]
+let $features_selected := $features[self::su-vector:VectorStatisticalUnit]
 let $messages :=
-	for $feature in $features_selected/su-vector:geometry
-		let $envDom := $feature/su-vector:VectorStatisticalUnitGeometry/su-vector:geometry/gml:MultiSurface
+	for $feature in $features_selected/su-vector:geometry/su-vector:VectorStatisticalUnitGeometry
+		let $envDom := $feature/su-vector:geometry/gml:MultiSurface
 		let $featurems :=  if (exists($envDom))
 						then $feature
 						else()
 		for $featurerg in $featurems/su-vector:geometryDescriptor/su-vector:GeometryDescriptor
 				let $envDomgt:= $featurerg/su-vector:geometryType			
 				return
-					if (not($envDomgt/@xlink:href = "http://inspire.ec.europa.eu/codelist/GeometryTypeValue/referenceGeometry")) then
-							local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/..), 'featureType': local-name($feature/..), 'gmlid': string($feature/../@gml:id), 'constraint': 'vector statistical units with a reference geometry instance of GM_MultiSurface are instances of the specialised class AreaStatisticalUnit', 'additionalInfo':''})
+					if ($envDomgt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/GeometryTypeValue/referenceGeometry') then
+							local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../..), 'featureType': local-name($feature/../..), 'gmlid': string($feature/../../@gml:id), 'constraint': 'vector statistical units with a reference geometry instance of GM_MultiSurface are instances of the specialised class AreaStatisticalUnit', 'additionalInfo':''})
 					else()
 
 return
@@ -188,17 +188,25 @@ $messages)
 									<parent ref="EID88fbb5db-75ee-44ed-9903-7469ec539567"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+let $property_stringms := 'MultiSurface'
+let $property_stringgt := 'geometryType'
 let $property_string := 'geometry'
 let $features_selected := $features[self::su-vector:AreaStatisticalUnit]
 let $messages :=
-	for $feature in $features_selected/su-vector:geometry/su-vector:VectorStatisticalUnitGeometry/su-vector:geometry
-		let $envDom := $feature/gml:MultiSurface
-		return
-			if (count($envDom) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../..), 'featureType':local-name($feature/../../..), 'gmlid': string($feature/../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
-			else if(not(exists($envDom))) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the reference geometry of an area statistical units is a GM_MultiSurface', 'additionalInfo':''})
-			else ()
+	for $feature in $features_selected/su-vector:geometry/su-vector:VectorStatisticalUnitGeometry
+		let $envDomms := $feature/su-vector:geometry/gml:MultiSurface
+
+		for $featurerg in $feature/su-vector:geometryDescriptor/su-vector:GeometryDescriptor
+				let $envDomgt:= $featurerg/su-vector:geometryType
+
+			return
+				if (count($envDomms) > 1) then
+					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringms, 'multiplicity': 1, 'count': count($envDomms)})
+				else if (count($envDomgt) > 1) then
+					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_stringgt, 'multiplicity': 1, 'count': count($envDomgt)})
+				else if (exists($envDomms) and not($envDomgt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/GeometryTypeValue/referenceGeometry')) then
+					local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../..), 'featureType': local-name($feature/../..), 'gmlid': string($feature/../../@gml:id), 'constraint': 'the reference geometry of an area statistical units is a GM_MultiSurface', 'additionalInfo':''})
+				else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -208,6 +216,7 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
 								</TestAssertion>
@@ -220,8 +229,6 @@ $messages)
 									<parent ref="EID88fbb5db-75ee-44ed-9903-7469ec539567"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $property_stringmds := "mostDetailedScale"
-let $property_stringlds := "leastDetailedScale"
 let $property_stringgt := "geometryType"
 let $features_selected := $features[self::su-vector:AreaStatisticalUnit]
 
@@ -233,15 +240,7 @@ let $messages :=
 		let $envDomgt := $feature/su-vector:geometryType
 		
 		return
-			if (not(exists($envDomgt))) then
-				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_stringgt})
-			else if (count($envDomgt) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_stringgt, 'multiplicity': 1, 'count': count($envDomgt)})
-			else if (count($envDommds) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_stringmds, 'multiplicity': '0 or 1', 'count': count($envDommds)})
-			else if (count($envDomlds) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_stringlds, 'multiplicity': '0 or 1', 'count': count($envDomlds)})
-			else if (($envDomgt = "http://inspire.ec.europa.eu/codelist/GeometryTypeValue/generalisedGeometry") and (not(exists($envDomlds)) or not(exists($envDommds)))) then
+			if (not ($envDomgt = "http://inspire.ec.europa.eu/codelist/GeometryTypeValue/generalisedGeometry") and (exists($envDomlds) or exists($envDommds))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'constraint': 'the mostDetailedScale and leastDetailedScale fields are provided only for geometry descriptors with a type generalisedGeometry', 'additionalInfo': ''})
 			else ()
 						
@@ -254,7 +253,6 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.constraintViolation"/>
 									</translationTemplates>
 								</TestAssertion>
