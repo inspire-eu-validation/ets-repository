@@ -63,7 +63,7 @@ Pre-requisite conformance classes:
 							<testAssertions>
 								<TestAssertion id="EID340cb9fb-701d-4785-8e22-5d87cc2fbaf1">
 									<label>so-as.a.1: FAOHorizonMaster</label>
-									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#FAOHorizonMaster'>FAOHorizonMaster</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue1'>valid value</a>. If the check fails report disallowedCodeListValue.<br/><br/>
+									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#FAOHorizonMaster'>FAOHorizonMaster</a> elements have a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue1'>valid value</a>.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): For the exchange and classification of spatial objects from data sets meeting the conditions laid
@@ -90,9 +90,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-li
 									<parent ref="EID38cabd7f-b5d9-4d2f-8665-7319ab84bb2c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'http://inspire.ec.europa.eu/codelist/FAOHorizonMasterValue'
-let $codelisturl := 'http://inspire.ec.europa.eu/codelist/FAOHorizonMasterValue/FAOHorizonMasterValue.en.xml'
-let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'FAOHorizonMaster'
 let $features_selected := $features[self::so:SoilHorizon]
 
@@ -107,12 +104,14 @@ let $messages :=
 					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 				else if (not(count($envDom) = count($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-				else if (not($envDom/@xlink:href = $valid_href)) then
-					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
-				else ()
+				else (
+					local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+				)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.checkManuallyCodeListValue2')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
@@ -121,12 +120,12 @@ $messages)
 										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.checkManuallyCodeListValue2"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDa913d5bd-ee11-42cd-af81-180b68da619d">
 									<label>so-as.a.2: FAOHorizonSubordinate</label>
-									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#FAOHorizonSubordinate'>FAOHorizonSubordinate</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue2'>valid value</a>. If the check fails report disallowedCodeListValue.<br/><br/>
+									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#FAOHorizonSubordinate'>FAOHorizonSubordinate</a> elements have a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue2'>valid value</a>.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): For the exchange and classification of spatial objects from data sets meeting the conditions laid
@@ -153,45 +152,35 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-li
 									<parent ref="EID38cabd7f-b5d9-4d2f-8665-7319ab84bb2c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'http://inspire.ec.europa.eu/codelist/FAOHorizonSubordinateValue'
-let $codelisturl := 'http://inspire.ec.europa.eu/codelist/FAOHorizonSubordinateValue/FAOHorizonSubordinateValue.en.xml'
-let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
-let $property_string := 'FAOHorizonMaster'
+let $property_string := 'FAOHorizonSubordinate'
 let $features_selected := $features[self::so:SoilHorizon]
-let $list := $features_selected/so:FAOHorizonNotation/so:FAOHorizonNotationType/so:FAOHorizonSubordinate/@xlink:href
 
 let $messages :=
 	for $feature in $features_selected/so:FAOHorizonNotation/so:FAOHorizonNotationType
 		let $envDom := $feature/so:FAOHorizonSubordinate
-
-
-			let $wrong_urls := for $link in $envDom/@xlink:href
-								return if (not($link = $valid_href)) then
-									$link
-								else()
 			return
 				if (not(count($envDom) = count($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})	
-				else if (count($wrong_urls) > 0) then
-					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($wrong_urls, ','), 'codelist': $codelist})
-				else ()
+				else (
+					local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+				)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and ($messages/@ref = ('TR.missingAttribute'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.checkManuallyCodeListValue2')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
-										<translationTemplate ref="TR.missingElement"/>
-										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.checkManuallyCodeListValue2"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDa9e46ae2-f8c3-434c-a61b-a33800c0d60b">
 									<label>so-as.a.3: FAOPrime</label>
-									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#FAOPrime'>FAOPrime</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue3'>valid value</a>. If the check fails report disallowedCodeListValue.<br/><br/>
+									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#FAOPrime'>FAOPrime</a> elements have a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue3'>valid value</a>.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): For the exchange and classification of spatial objects from data sets meeting the conditions laid
@@ -218,9 +207,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-li
 									<parent ref="EID38cabd7f-b5d9-4d2f-8665-7319ab84bb2c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'http://inspire.ec.europa.eu/codelist/FAOPrimeValue'
-let $codelisturl := 'http://inspire.ec.europa.eu/codelist/FAOPrimeValue/FAOPrimeValue.en.xml'
-let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'FAOPrime'
 let $features_selected := $features[self::so:SoilHorizon]
 
@@ -235,12 +221,14 @@ let $messages :=
 					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 				else if (not(count($envDom) = count($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-				else if (not($envDom/@xlink:href = $valid_href)) then
-					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
-				else ()
+				else (
+					local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+				)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.checkManuallyCodeListValue2')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
@@ -249,7 +237,7 @@ $messages)
 										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.checkManuallyCodeListValue2"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID6c515c34-90be-47a8-ab97-84b7831aecea">
@@ -500,7 +488,7 @@ $messages)
 								</TestAssertion>
 								<TestAssertion id="EID65359871-f5d5-4d58-86e6-cbc81ffd6497">
 									<label>so-as.a.8: qualifierPlace</label>
-									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#qualifierPlace'>qualifierPlace</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue8'>valid value</a>. If the check fails report disallowedCodeListValue.<br/><br/>
+									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#qualifierPlace'>qualifierPlace</a> elements have a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue8'>valid value</a>.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): For the exchange and classification of spatial objects from data sets meeting the conditions laid
@@ -527,9 +515,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-li
 									<parent ref="EID38cabd7f-b5d9-4d2f-8665-7319ab84bb2c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'http://inspire.ec.europa.eu/codelist/WRBQualifierPlaceValue'
-let $codelisturl := 'http://inspire.ec.europa.eu/codelist/WRBQualifierPlaceValue/WRBQualifierPlaceValue.en.xml'
-let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'qualifierPlace'
 let $features_selected := $features[self::so:ObservedSoilProfile | self::so:DerivedSoilProfile]
 
@@ -544,12 +529,14 @@ let $messages :=
 					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 				else if (not(count($envDom) = count($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-				else if (not($envDom/@xlink:href = $valid_href)) then
-					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
-				else ()
+				else (
+					local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+				)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.checkManuallyCodeListValue2')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
@@ -558,12 +545,12 @@ $messages)
 										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.checkManuallyCodeListValue2"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID0c181a40-0895-4382-b180-0bc63d2a1e75">
 									<label>so-as.a.9: WRBqualifier</label>
-									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#WRBqualifier'>WRBqualifier</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue9'>valid value</a>. If the check fails report disallowedCodeListValue.<br/><br/>
+									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#WRBqualifier'>WRBqualifier</a> elements have a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue9'>valid value</a>.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): For the exchange and classification of spatial objects from data sets meeting the conditions laid
@@ -590,9 +577,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-li
 									<parent ref="EID38cabd7f-b5d9-4d2f-8665-7319ab84bb2c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'http://inspire.ec.europa.eu/codelist/WRBQualifierValue'
-let $codelisturl := 'http://inspire.ec.europa.eu/codelist/WRBQualifierValue/WRBQualifierValue.en.xml'
-let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'WRBQualifier'
 let $features_selected := $features[self::so:ObservedSoilProfile | self::so:DerivedSoilProfile]
 
@@ -607,12 +591,14 @@ let $messages :=
 					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 				else if (not(count($envDom) = count($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-				else if (not($envDom/@xlink:href = $valid_href)) then
-					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
-				else ()
+				else (
+					local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+				)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.checkManuallyCodeListValue2')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
@@ -621,12 +607,12 @@ $messages)
 										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.checkManuallyCodeListValue2"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDfa9947e0-c02f-4447-9d5a-cf1bb5f11564">
 									<label>so-as.a.10: WRBReferenceSoilGroup</label>
-									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#WRBReferenceSoilGroup'>WRBReferenceSoilGroup</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue10'>valid value</a>. If the check fails report disallowedCodeListValue.<br/><br/>
+									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#WRBReferenceSoilGroup'>WRBReferenceSoilGroup</a> elements have a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue10'>valid value</a>. If the check fails report disallowedCodeListValue.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): For the exchange and classification of spatial objects from data sets meeting the conditions laid
@@ -653,9 +639,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-li
 									<parent ref="EID38cabd7f-b5d9-4d2f-8665-7319ab84bb2c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'http://inspire.ec.europa.eu/codelist/WRBReferenceSoilGroupValue'
-let $codelisturl := 'http://inspire.ec.europa.eu/codelist/WRBReferenceSoilGroupValue/WRBReferenceSoilGroupValue.en.xml'
-let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'WRBReferenceSoilGroup'
 let $features_selected := $features[self::so:ObservedSoilProfile | self::so:DerivedSoilProfile]
 
@@ -670,12 +653,14 @@ let $messages :=
 					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 				else if (not(count($envDom) = count($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-				else if (not($envDom/@xlink:href = $valid_href)) then
-					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href), 'codelist': $codelist})
-				else ()
+				else (
+					local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+				)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.checkManuallyCodeListValue2')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
@@ -684,12 +669,12 @@ $messages)
 										<translationTemplate ref="TR.missingElement"/>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.checkManuallyCodeListValue2"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDb41cdb39-f5b0-4f30-8265-cc1f900ab8ba">
 									<label>so-as.a.11: WRBspecifier</label>
-									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#WRBspecifier'>WRBspecifier</a> elements has a xlink:href attribute pointing to a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue11'>valid value</a>. If the check fails report disallowedCodeListValue.<br/><br/>
+									<description><![CDATA[Check that all the <a href = 'http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#WRBspecifier'>WRBspecifier</a> elements have a <a href='http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-list-values#validValue11'>valid value</a>.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 4 (1): For the exchange and classification of spatial objects from data sets meeting the conditions laid
@@ -716,9 +701,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-so/master/so-as/code-li
 									<parent ref="EID38cabd7f-b5d9-4d2f-8665-7319ab84bb2c"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $codelist := 'http://inspire.ec.europa.eu/codelist/WRBSpecifierValue'
-let $codelisturl := 'http://inspire.ec.europa.eu/codelist/WRBSpecifierValue/WRBSpecifierValue.en.xml'
-let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'WRBSpecifier'
 let $features_selected := $features[self::so:ObservedSoilProfile | self::so:DerivedSoilProfile]
 
@@ -726,23 +708,19 @@ let $features_selected := $features[self::so:ObservedSoilProfile | self::so:Deri
 let $messages :=
 	for $feature in $features_selected/so:WRBSoilName/so:WRBSoilNameType/so:WRBQualifierGroup/so:WRBQualifierGroupType
 		let $envDom := $feature/so:WRBspecifier
-
-		let $wrong_urls := for $link in $envDom/@xlink:href
-								return if (not($link = $valid_href)) then
-									$link
-								else()
-
 			return
 				if (count($envDom) > 2) then
 					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': '0 to 2', 'count': count($envDom)})
 				else if (not(count($envDom) = count($envDom/@xlink:href))) then
 					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-				else if (count($wrong_urls) > 0) then
-					local:addMessage('TR.disallowedCodeListValue',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($wrong_urls, ', '), 'codelist': $codelist})
-				else ()
+				else (
+					local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+				)
 
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and ($messages/@ref = ('TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.checkManuallyCodeListValue2')) then 'PASSED_MANUAL' 
+else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
 $messages)
 									</expression>
@@ -750,7 +728,7 @@ $messages)
 									<translationTemplates>
 										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingAttribute"/>
-										<translationTemplate ref="TR.disallowedCodeListValue"/>
+										<translationTemplate ref="TR.checkManuallyCodeListValue2"/>
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID498e468c-e308-4eb8-9da0-4be937311d64">
