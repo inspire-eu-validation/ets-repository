@@ -1060,7 +1060,7 @@ let $messages :=
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_stringlt, 'multiplicity': 1, 'count': count($envDomlt)})
 			else if (not(count($envDomlt) = count($envDomlt/@xlink:href))) then
 				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_stringlt, 'attribute': 'xlink:href'})
-			else if ($envDomlt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/LayerTypeValue/geogenic' and not(exists($envDomlgp) and exists($envDomlge) and exists($envDomlgps) and exists($envDomlrt))) or (not($envDomlt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/LayerTypeValue/geogenic') and (exists($envDomlgp) or exists($envDomlge) or exists($envDomlgps) or exists($envDomlrt))) then
+			else if (($envDomlt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/LayerTypeValue/geogenic' and not(exists($envDomlgp) and exists($envDomlge) and exists($envDomlgps) and exists($envDomlrt))) or (not($envDomlt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/LayerTypeValue/geogenic') and (exists($envDomlgp) or exists($envDomlge) or exists($envDomlgps) or exists($envDomlrt)))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'constraint': ' the attributes layerGenesisProcess, layerGenesisEnvironment, layerGenesisProcessState and layerRockType are only provided where the layerType is of the value “geogenic”', 'additionalInfo': ''}) 
 			
 			else()
