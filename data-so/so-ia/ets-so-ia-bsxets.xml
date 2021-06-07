@@ -736,7 +736,11 @@ let $messages :=
 					else ()
 				else ()
 		return
-			if (count($invalid_urls) > 0) then
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+			else if (count($invalid_urls) > 0) then
 				local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 			else if (count($invalid_element_reference) > 0) then
 				local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
@@ -747,7 +751,9 @@ local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($message
 $messages)									
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
-									<translationTemplates>
+									<translationTemplates>										
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.brokenLink"/>
 										<translationTemplate ref="TR.missingReferencedElement"/>
 									</translationTemplates>
