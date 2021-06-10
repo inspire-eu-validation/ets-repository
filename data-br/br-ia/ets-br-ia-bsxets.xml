@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID973da927-87eb-42b2-b549-477b9ee5d0bb" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-bu/bu-ia</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Information accessibility, Bio-geographical Regions</label>
+	<description><![CDATA[This test suite examines a data set against the themespecific requirements related to the accessibility of resources referenced by the data.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-br/master/br-ia" target="_blank">Conformance Class 'Information accessibility, Bio-geographical Regions'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
+</ul>]]></description>
+	<reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2021-01-27T10:00:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2021-01-27T10:00:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EIDb7bc5972-ca3a-4275-a9ba-c913d2b724a3"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID8a8ec34a-2ced-4152-98e0-228bcbb068c2">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID973da927-87eb-42b2-b549-477b9ee5d0bb"/>
+			<testCases>
+				<TestCase id="EIDdcaed30f-c6f1-4947-8e94-c3b628b3e514">
+					<label>Code lists</label>
+					<description>Verify that code lists extensions can be accessed.</description>
+					<parent ref="EID8a8ec34a-2ced-4152-98e0-228bcbb068c2"/>
+					<testSteps>
+						<TestStep id="EID890b338d-dd4f-4b92-ba28-b2c1cc4b5d2b">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDdcaed30f-c6f1-4947-8e94-c3b628b3e514"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID748a97c9-5263-4f06-bb53-49ef0c847bc2">
+									<label>br-ia.a.1: RegionClassificationSchemeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-br/master/br-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_BR_v3.0.pdf">INSPIRE Data Specification on Bio-geographical Regions, A.5.1</a>]]></description>
+									<parent ref="EID890b338d-dd4f-4b92-ba28-b2c1cc4b5d2b"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $features_selected := $features[ self::br:Bio-geographicalRegion ]
+let $property_string := 'RegionClassificationSchemeValue'
+let $messages := 
+
+	for $feature in $features_selected
+		let $envDom := $feature/br:regionClassificationScheme
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+	return
+		if (exists($feature) and not(exists($envDom))) then
+			local:addMessage('TR.missingElementBioReg',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+		else if (exists($feature) and count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicityBioReg',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+		else if (exists($feature) and not(count($envDom) = count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttributeBioReg',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLinkBioReg', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+
+return 
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementBioReg"/>
+										<translationTemplate ref="TR.wrongMultiplicityBioReg"/>
+										<translationTemplate ref="TR.missingAttributeBioReg"/>
+										<translationTemplate ref="TR.brokenLinkBioReg"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
