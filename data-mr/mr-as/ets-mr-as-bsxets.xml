@@ -1550,6 +1550,63 @@ $messages)
 						</TestStep>
 					</testSteps>
 				</TestCase>
+				<TestCase id="EID01b77339-1317-4fca-86c9-924c7a3ee484">
+					<label>Specific requirements</label>
+					<description>Verify that the following specific requirements are meet.</description>
+					<parent ref="EID8105de22-3c7d-46fa-93c1-db50e2ad8de4"/>
+					<testSteps>
+						<TestStep id="EIDaef4e005-d48d-449f-9069-90687d5feb2d">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID01b77339-1317-4fca-86c9-924c7a3ee484"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDe1e8e05a-55fc-4331-b3b4-0c32f1b6241c">
+									<label>mr-as.b.1: specification</label>
+									<description>
+										<![CDATA[Check whether all instances of MineralOccurrence spatial object type use for providing geometric properties the attribute Shape (GM_Object) defined by MappedFeature spatial object type (in Geology Data Specification).<br/><br/>
+										Relevant requirements:
+										<ul><li>IR Requirement Annex IV, Section 20.4: The type MappedFeature specified in Section 4.2.1.10 of Annex III shall be used to describe the geometric properties of MineralOccurrence spatial objects.</li></ul>
+										Source: <a href="http://inspire.ec.europa.eu/id/ats/data-mr/master/mr-as/specific-req" target="_blank">Abstract Test Case 'Specific requirement', <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_MR_v3.0.pdf">INSPIRE Data Specification on Mineral Resources, A.1.8</a>]]></description>
+									<parent ref="EIDaef4e005-d48d-449f-9069-90687d5feb2d"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $property_string := 'specification'
+let $features_selected_mo := $features[self::mr-core:MineralOccurrence]
+let $features_selected_mf := $features[self::ge:MappedFeature]
+let $links := for $link in $features_selected_mf/ge:specification/@xlink:href
+			return 
+				if (starts-with($link, '#')) then
+					substring($link,2)
+				else ()
+
+let $messages :=
+	for $feature in $features_selected_mo
+		let $envDom := $feature/@gml:id
+
+		return
+			if(not($envDom = $links)) then
+				local:addMessage('TR.missingGeometry',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id)})
+			else (
+			)
+
+
+return
+(if ($messages) then 'FAILED' 
+else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingGeometry"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
 			</testCases>
 		</TestModule>
 	</testModules>
