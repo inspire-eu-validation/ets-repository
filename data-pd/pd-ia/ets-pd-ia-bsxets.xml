@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExecutableTestSuite xmlns="http://www.interactive-instruments.de/etf/2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="EID81d6a9b3-508e-4164-9d66-449cdf383f90" xsi:schemaLocation="http://www.interactive-instruments.de/etf/2.0 https://resources.etf-validator.net/schema/v2/val/ignoreRef.xsd">
+	<itemHash>bQ==</itemHash>
+	<remoteResource>https://github.com/inspire-eu-validation/ets-repository/tree/master/data-pd/pd-ia</remoteResource>
+	<localPath>/auto</localPath>
+	<label>Conformance class: Information accessibility, Population Distribution</label>
+	<description><![CDATA[This test suite examines a data set against the themespecific requirements related to the accessibility of resources referenced by the data.<br/><br/>
+<b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>.<br/><br/>
+Known limitations are documented in the description of the applicable test case or test assertion. There is a general limitation in all assertions that extensions in additional application schemas are only supported, if the unqualified name of the feature type in the extension is the same as the name of the feature type in the INSPIRE application schema.<br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pd/master/pd-ia" target="_blank">Conformance Class 'Information accessibility, Population Distribution'</a><br/><br/>
+Pre-requisite conformance classes:
+<ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
+</ul>]]></description>
+	<reference>../../inspire-noggeo-bsxets.xq</reference>
+	<version>0.1.0</version>
+	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
+	<creationDate>2021-02-23T14:15:00Z</creationDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2021-02-23T14:15:00Z</lastUpdateDate>
+	<tags>
+		<tag ref="EID39e30ae4-08ed-4862-a36a-13c3b054abbe"/>
+	</tags>
+	<testDriver ref="EID4dddc9e2-1b21-40b7-af70-6a2d156ad130"/>
+	<translationTemplateBundle ref="EID70a263c0-0ad7-42f2-9d4d-0d8a4ca71b52"/>
+	<ParameterList name="ETF Standard Parameters for XML test objects">
+		<parameter name="files_to_test" required="true">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.filesToTest"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+		<parameter name="tests_to_execute" required="false">
+			<defaultValue>.*</defaultValue>
+			<description ref="TR.testsToExecute"/>
+			<allowedValues>.*</allowedValues>
+			<type>string</type>
+		</parameter>
+	</ParameterList>
+	<supportedTestObjectTypes>
+		<testObjectType ref="EIDe1d4a306-7a78-4a3b-ae2d-cf5f0810853e"/>
+	</supportedTestObjectTypes>
+	<dependencies>
+		<executableTestSuite ref="EID499937ea-0590-42d2-bd7a-1cafff35ecdb"/>
+	</dependencies>
+	<testModules>
+		<TestModule id="EID9db61dc4-3629-44a1-807b-7d925fe6d043">
+			<label>IGNORE</label>
+			<description>IGNORE</description>
+			<parent ref="EID81d6a9b3-508e-4164-9d66-449cdf383f90"/>
+			<testCases>
+				<TestCase id="EID120408db-f99c-434e-a7f7-7aae0f8fc075">
+					<label>Code lists</label>
+					<description>Verify that code lists extensions can be accessed.</description>
+					<parent ref="EID9db61dc4-3629-44a1-807b-7d925fe6d043"/>
+					<testSteps>
+						<TestStep id="EID53aa689f-1e14-4bb3-8e4e-4dcd642eb07f">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID120408db-f99c-434e-a7f7-7aae0f8fc075"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EIDe1055914-e62f-49e5-b2e1-ba72f3b8e7e0">
+									<label>pd-ia.a.1: ClassificationTypeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pd/master/pd-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_PD_v3.0.pdf">INSPIRE Data Specification on Population Distribution, A.5.1</a>]]></description>
+									<parent ref="EID53aa689f-1e14-4bb3-8e4e-4dcd642eb07f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::pd:StatisticalDistribution]
+let $property_string := 'ClassificationTypeValue'
+let $messages := 
+	for $feature in $features_selected/pd:classification/pd:Classification
+		let $envDom := $feature/pd:type
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+	return
+		if (not(exists($envDom))) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string}) 
+		else if (count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+		else if (not(count($envDom) = count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.brokenLink"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID3fb2f0fc-8927-45e3-8fc6-49b664262abd">
+									<label>pd-ia.a.2: VariableValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list valued property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document. <br/><br/>
+Relevant requirements:
+<ul><li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li></ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pd/master/pd-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_PD_v3.0.pdf">INSPIRE Data Specification on Population Distribution, A.5.1</a>]]></description>
+									<parent ref="EID53aa689f-1e14-4bb3-8e4e-4dcd642eb07f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::pd:StatisticalDistribution]
+let $property_string := 'VariableValue'
+let $messages := 
+	for $feature in $features_selected
+		let $envDom := $feature/pd:measure
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+
+	return
+		if (not(exists($envDom))) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
+		else if (count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+		else if (not(count($envDom) = count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if(count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.brokenLink"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EID07146b9c-37dd-40b6-9bf1-7276c50515e0">
+					<label>Feature references</label>
+					<description>Verify that referenced features can be retrieved.</description>
+					<parent ref="EID9db61dc4-3629-44a1-807b-7d925fe6d043"/>
+					<testSteps>
+						<TestStep id="EID56dced17-2403-4811-a7ee-bd2ae1cf8244">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EID07146b9c-37dd-40b6-9bf1-7276c50515e0"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID4fb918ab-ecc8-442c-8d7c-e9cc16a1e111">
+									<label>pd-ia.b.1: Dimensions.spatial</label>
+									<description><![CDATA[Verify that any feature reference in an association role is publicly accessible via HTTP, i.e. inspect all relevant properties. If a reference (@xlink:href) has a value that starts with "#", verify that an element with a `gml:id` attribute with the referenced identifier exists in the same document. If the reference starts with "http", verify that a HTTP GET request to the URI retrieves an XML document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-pd/master/pd-ia/features" target="_blank">Abstract Test Case 'Feature references'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_PD_v3.0.pdf">INSPIRE Data Specification on Population Distribution, A.1.4</a>]]></description>
+									<parent ref="EID56dced17-2403-4811-a7ee-bd2ae1cf8244"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::pd:StatisticalDistribution]
+let $gml_ids := $features//@gml:id
+let $property_string := 'Dimensions.spatial'
+let $messages := 
+	for $feature in $features_selected/pd:value/pd:StatisticalValue/pd:dimensions/pd:Dimensions
+		let $envDom := $feature/pd:spatial
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/') or starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+	return
+		if (not(exists($envDom))) then
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string}) 
+		else if (count($envDom) > 1) then
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
+		else if (not(count($envDom) = count($envDom/@xlink:href))) then
+			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+		else if (count($invalid_urls) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+		else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')}) 
+		else ()
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
+										<translationTemplate ref="TR.missingAttribute"/>
+										<translationTemplate ref="TR.brokenLink"/>
+										<translationTemplate ref="TR.missingReferencedElement"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+			</testCases>
+		</TestModule>
+	</testModules>
+</ExecutableTestSuite>
