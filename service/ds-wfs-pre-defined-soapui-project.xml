@@ -145,10 +145,10 @@ if (endpoint.getQuery()) {
                             for (q in queryParams) {
                                     def pair = q.split("=");
                                     if (pair.length > 1) {
-	                                    testStep.getHttpRequest().addProperty(pair[0]);
-	                                    testStep.getHttpRequest().setPropertyValue(pair[0], pair[1]);
-	                                    log.debug("Added non-standard query parameter for the Getcapabilities requests: " + pair[0] + "=" + pair[1])
-	                       		}
+                                       testStep.getHttpRequest().addProperty(pair[0]);
+                                       testStep.getHttpRequest().setPropertyValue(pair[0], pair[1]);
+                                       log.debug("Added non-standard query parameter for the Getcapabilities requests: " + pair[0] + "=" + pair[1])
+                              }
                             }
                         }
                     }
@@ -159,7 +159,7 @@ if (endpoint.getQuery()) {
 
 }
 
-</script>
+               </script>
             </con:config>
          </con:testStep>
          <con:properties />
@@ -202,10 +202,10 @@ if(!messageExchange.hasResponse()) {
 }
 
 if(messageExchange.responseContent.size()>7) {
-	final String xmlProlog = messageExchange.responseContent.substring(0,7);
-	if(!xmlProlog.trim().startsWith("&lt;")) {
-		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
-	}
+   final String xmlProlog = messageExchange.responseContent.substring(0,7);
+   if(!xmlProlog.trim().startsWith("&lt;")) {
+      throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
+   }
 }</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -2693,7 +2693,7 @@ a.exists("/*:WFS_Capabilities", "TR.missingCapabilitiesRootElement");</scriptTex
                   <con:sourceStep>GetCapabilities</con:sourceStep>
                   <con:sourcePath>if (exists(//*:FeatureType[1]/*:OutputFormats/*:Format))
 then //*:FeatureType[1]/*:OutputFormats/*:Format
-else  /*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name='GetFeature']/*:Parameter[@name='outputFormat']/*:AllowedValues/*:Value[1]</con:sourcePath>
+else /*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name='GetFeature']/*:Parameter[@name='outputFormat']/*:AllowedValues/*:Value[1]</con:sourcePath>
                   <con:targetType>outputFormat</con:targetType>
                   <con:targetStep>Transfer_Properties</con:targetStep>
                   <con:upgraded>true</con:upgraded>
@@ -2735,18 +2735,18 @@ ph.disableTestSteps(checkedOperations);
 XmlHolder capResp = ph.getTestStepResult("GetCapabilities");
 
 for(operation in operations) {
-	String getEndpt=Util.getHttpGetOnlineResourceForOperation(capResp, operation);
-	if(getEndpt!=null) {
-		def testStep = testRunner.testCase.getTestStepByName(operation)
-		if(testStep!=null) {
-			testStep.setDisabled(false);
-		}
-		Util.setProjectProperty(testRunner, "endpt."+operation+".Get", getEndpt);
-	}
-	String postEndpt=Util.getHttpPostOnlineResourceForOperation(capResp, operation);
-	if(postEndpt!=null) {
-		Util.setProjectProperty(testRunner, "endpt."+operation+".Post", postEndpt);
-	}
+   String getEndpt=Util.getHttpGetOnlineResourceForOperation(capResp, operation);
+   if(getEndpt!=null) {
+      def testStep = testRunner.testCase.getTestStepByName(operation)
+      if(testStep!=null) {
+         testStep.setDisabled(false);
+      }
+      Util.setProjectProperty(testRunner, "endpt."+operation+".Get", getEndpt);
+   }
+   String postEndpt=Util.getHttpPostOnlineResourceForOperation(capResp, operation);
+   if(postEndpt!=null) {
+      Util.setProjectProperty(testRunner, "endpt."+operation+".Post", postEndpt);
+   }
 }
 </script>
             </con:config>
@@ -3064,49 +3064,49 @@ def holder = new XmlHolder(messageExchange.responseContentAsXml)
 
 public class OutputFormat {
 
-	private String outputFormat;
-	private FormatType type;
+   private String outputFormat;
+   private FormatType type;
 
-	public OutputFormat() { }
+   public OutputFormat() { }
 
-	public OutputFormat(String outputFormat) {
+   public OutputFormat(String outputFormat) {
 
-		log.info(outputFormat);
+      log.info(outputFormat);
 
-		this.outputFormat = outputFormat;
-		this.type = FormatType.UNKNOWN;
+      this.outputFormat = outputFormat;
+      this.type = FormatType.UNKNOWN;
 
-		if(outputFormat.indexOf("xml")!=-1 ||
-			outputFormat.indexOf("gml")!=-1)
-		{
-			type=FormatType.XML;
-		}else if(outputFormat.indexOf("json")!=-1) {
-			type=FormatType.JSON;
-		}else if(outputFormat.indexOf("text")!=-1) {
-			type=FormatType.TEXT;
-		}
-	}
+      if(outputFormat.indexOf("xml")!=-1 ||
+         outputFormat.indexOf("gml")!=-1)
+      {
+         type=FormatType.XML;
+      }else if(outputFormat.indexOf("json")!=-1) {
+         type=FormatType.JSON;
+      }else if(outputFormat.indexOf("text")!=-1) {
+         type=FormatType.TEXT;
+      }
+   }
 
-	public boolean equals(OutputFormat outputFormat) {
-		return this.getFormat().equals(outputFormat.getFormat());
-	}
+   public boolean equals(OutputFormat outputFormat) {
+      return this.getFormat().equals(outputFormat.getFormat());
+   }
 
-	public String toString() {
-		return this.outputFormat;
-	}
+   public String toString() {
+      return this.outputFormat;
+   }
 
-	public String getFormat() {
-		return this.outputFormat;
-	}
+   public String getFormat() {
+      return this.outputFormat;
+   }
 
-	public boolean isParsable() {
-		// JSON is parsable as XML in SoapUI
-		return (type==FormatType.XML || FormatType.JSON);
-	}
+   public boolean isParsable() {
+      // JSON is parsable as XML in SoapUI
+      return (type==FormatType.XML || FormatType.JSON);
+   }
 
-	public boolean isText() {
-		return (type==FORMAT.TEXT);
-	}
+   public boolean isText() {
+      return (type==FORMAT.TEXT);
+   }
 
 }
 
@@ -3121,57 +3121,57 @@ String serviceTypeVersion;
 
 void initOutputFormats(final XmlHolder capabilitiesXML) {
 
-	final String operationNameXPath=
-		"/*:WFS_Capabilities/*:OperationsMetadata/*:Operation/@name";
+   final String operationNameXPath=
+      "/*:WFS_Capabilities/*:OperationsMetadata/*:Operation/@name";
 
-	serviceTypeVersion = capabilitiesXML.getNodeValue("/*:WFS_Capabilities/@version");
+   serviceTypeVersion = capabilitiesXML.getNodeValue("/*:WFS_Capabilities/@version");
 
 
-	for(operationName in capabilitiesXML.getNodeValues(operationNameXPath) ) {
+   for(operationName in capabilitiesXML.getNodeValues(operationNameXPath) ) {
 
-			try {
-				final List&lt;String> allOutputFormats =
-					getOperationParameterValues(capabilitiesXML,
-						operationName, "outputFormat");
-				log.info("Output: "+allOutputFormats);
-				final List&lt;OutputFormat> ofList = new ArrayList&lt;OutputFormat>();
-				for(String o in allOutputFormats.sort()) {
-					ofList.add(new OutputFormat(o));
-				}
-				outputFormats.put(operationName, ofList.toArray(new OutputFormat[0]));
-			}catch(Exception e){
-				//Operation does not Provide an outputFormat
-				log.info("Exc: "+operationName);
-			}
-	}
+         try {
+            final List&lt;String> allOutputFormats =
+               getOperationParameterValues(capabilitiesXML,
+                  operationName, "outputFormat");
+            log.info("Output: "+allOutputFormats);
+            final List&lt;OutputFormat> ofList = new ArrayList&lt;OutputFormat>();
+            for(String o in allOutputFormats.sort()) {
+               ofList.add(new OutputFormat(o));
+            }
+            outputFormats.put(operationName, ofList.toArray(new OutputFormat[0]));
+         }catch(Exception e){
+            //Operation does not Provide an outputFormat
+            log.info("Exc: "+operationName);
+         }
+   }
 }
 
-	String[] getOperationParameterValues(final XmlHolder capabilitiesXML,
-		final String operation,
-		final String parameter)
-	{
+   String[] getOperationParameterValues(final XmlHolder capabilitiesXML,
+      final String operation,
+      final String parameter)
+   {
 
-		final String operationXPath=
-			"/*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name=\""+
-			operation+"\"]";
+      final String operationXPath=
+         "/*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name=\""+
+         operation+"\"]";
 
-		String allowedValue="";
-		if(serviceTypeVersion=="2.0.0")
-			allowedValue = "/*:AllowedValues";
-		final String owsValueXPath="/*:Parameter[@name=\""+parameter+"\"]"+
-			allowedValue+"/*:Value";
+      String allowedValue="";
+      if(serviceTypeVersion=="2.0.0")
+         allowedValue = "/*:AllowedValues";
+      final String owsValueXPath="/*:Parameter[@name=\""+parameter+"\"]"+
+         allowedValue+"/*:Value";
 
-		String[] values = capabilitiesXML.getNodeValues(operationXPath+owsValueXPath);
-		log.info(operationXPath+owsValueXPath)
+      String[] values = capabilitiesXML.getNodeValues(operationXPath+owsValueXPath);
+      log.info(operationXPath+owsValueXPath)
 
-		if(values.size()==0) {
-			throw new Exception(this, "Unable to find \""+operation+"\"");
-		}
-		return values;
-	}
+      if(values.size()==0) {
+         throw new Exception(this, "Unable to find \""+operation+"\"");
+      }
+      return values;
+   }
 
 initOutputFormats(holder);
-</scriptText>
+                     </scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="b1e1e274-1698-4121-956a-9dfb828182be" name="Root element is WFS_Capabilties">
@@ -3234,22 +3234,22 @@ ph.getTestCase().setPropertyValue("AutoConfigurationCompleted", "false");
 String autoConfiguration = "failed"
 try {
 
-	cap.setCapabilities(ph.getTestStepResult('GetCapabilities'));
-	new ObjectSaver().save(cap);
-	autoConfiguration = "completed"
-	ph.getTestCase().setPropertyValue("AutoConfigurationCompleted", "true");
+   cap.setCapabilities(ph.getTestStepResult('GetCapabilities'));
+   new ObjectSaver().save(cap);
+   autoConfiguration = "completed"
+   ph.getTestCase().setPropertyValue("AutoConfigurationCompleted", "true");
 
 }catch(Exception e) {
-	log.error(e);
-	ph.getTestCase().setPropertyValue("AutoConfigurationCompleted",e.getMessage());
-	autoConfiguration = e.getMessage()
-	if(e instanceof TranslatableAssertionError) {
-		throw e;
-	}
+   log.error(e);
+   ph.getTestCase().setPropertyValue("AutoConfigurationCompleted",e.getMessage());
+   autoConfiguration = e.getMessage()
+   if(e instanceof TranslatableAssertionError) {
+      throw e;
+   }
 }
 
 assert "completed" == autoConfiguration, "Failed to initialize Executable Test Suite"
-</script>
+               </script>
             </con:config>
          </con:testStep>
          <con:testStep type="httprequest" name="Get Schema Definition" id="2911de8f-d001-415f-88d4-8d9da1be57fd">
@@ -3277,35 +3277,35 @@ String user = messageExchange.modelItem.testStep.testCase.testSuite.project.getP
 String passwd = messageExchange.modelItem.testStep.testCase.testSuite.project.getPropertyValue('authPwd')
 
 if(!SUtils.isNullOrEmpty(user)) {
-	credential = new Credentials(user, passwd)
+   credential = new Credentials(user, passwd)
 }
 */
 
 int getHttpResponseCode(String url, def credentials){
-	def connection = UriUtils.openConnection( new URI(UriUtils.ensureUrlEncodedParams(url)), credentials )
-	if (!(connection instanceof HttpURLConnection)) {
-		throw new IllegalArgumentException("Cannot open a HTTP connection for URL '"+url+"'");
-	}
-	connection.setConnectTimeout(11000);
-	connection.setReadTimeout(91000);
-	connection.setRequestMethod("GET");
-	return connection.getResponseCode()
+   def connection = UriUtils.openConnection( new URI(UriUtils.ensureUrlEncodedParams(url)), credentials )
+   if (!(connection instanceof HttpURLConnection)) {
+      throw new IllegalArgumentException("Cannot open a HTTP connection for URL '"+url+"'");
+   }
+   connection.setConnectTimeout(11000);
+   connection.setReadTimeout(91000);
+   connection.setRequestMethod("GET");
+   return connection.getResponseCode()
 }
 
 assert schemaLocations != null, "Response does not contain xsi:schemaLocation attribute!"
 
 if(schemaLocations!=null) {
-	for(schemaLocation in schemaLocations) {
-		log.info("Checking "+schemaLocation);
-		try {
-			int responseCode = getHttpResponseCode(schemaLocation,null);
-			if(200 &lt;= responseCode &amp;&amp; responseCode >= 400) {
-					throw new TranslatableAssertionError("TR.schemaNotAccessible", "url", schemaLocation, "code", String.valueOf(responseCode));
-			}
-		}catch(IllegalArgumentException e) {
-			throw new TranslatableAssertionError("TR.schemaNotAnUrl", "url", schemaLocation);
-		}
-	}
+   for(schemaLocation in schemaLocations) {
+      log.info("Checking "+schemaLocation);
+      try {
+         int responseCode = getHttpResponseCode(schemaLocation,null);
+         if(200 &lt;= responseCode &amp;&amp; responseCode >= 400) {
+               throw new TranslatableAssertionError("TR.schemaNotAccessible", "url", schemaLocation, "code", String.valueOf(responseCode));
+         }
+      }catch(IllegalArgumentException e) {
+         throw new TranslatableAssertionError("TR.schemaNotAnUrl", "url", schemaLocation);
+      }
+   }
 }
 </scriptText>
                   </con:configuration>
@@ -3643,7 +3643,7 @@ ProjectHelper ph = new ProjectHelper();
 String autoConfigurationCompleted = ph.getTestCase("AutoConfigure WFS").getPropertyValue("AutoConfigurationCompleted")
 
 if(!"true".equals(autoConfigurationCompleted)) {
-	throw new TranslatableAssertionError("TR.initializationAndBasicChecksFailed");
+   throw new TranslatableAssertionError("TR.initializationAndBasicChecksFailed");
 }</script>
             </con:config>
          </con:testStep>
@@ -6115,8 +6115,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValues(
-	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
-	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language"
+   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
+   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language"
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6171,8 +6171,8 @@ a.equalPathValues(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValues(
-	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
-	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language"
+   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
+   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language"
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6181,8 +6181,8 @@ a.equalPathValues(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValuesInStep(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
-	"Request GetCapabilities",
+   "/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
+   "Request GetCapabilities",
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6191,8 +6191,8 @@ a.equalPathValuesInStep(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValuesInStep(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
-	"Request GetCapabilities",
+   "/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
+   "Request GetCapabilities",
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6322,7 +6322,7 @@ a.existsNonEmptyText(
             <con:settings />
             <con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false">
-                  <con:name>SupportedLanguage codes	</con:name>
+                  <con:name>SupportedLanguage codes   </con:name>
                   <con:sourceType>ResponseAsXml</con:sourceType>
                   <con:sourceStep>Request GetCapabilities</con:sourceStep>
                   <con:sourcePath>declare namespace wfs='http://www.opengis.net/wfs/2.0';
@@ -6334,10 +6334,10 @@ declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1
 declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
 
 string-join(
-	(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language,
-	/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage/inspire_common:Language),
+   (/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language,
+   /*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage/inspire_common:Language),
 ',')
-</con:sourcePath>
+                  </con:sourcePath>
                   <con:targetType>supportedLanguageCodes</con:targetType>
                   <con:targetStep>Transfer_Properties</con:targetStep>
                   <con:upgraded>true</con:upgraded>
@@ -6451,8 +6451,8 @@ let $languages :=tokenize( '${#supportedLanguageCodes}', ',' )
 let $expectedLang :='${#responseLanguageCode}'
 for $language in $languages
 where not(
-	exists(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage[inspire_common:Language=$language])
-	or exists(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage[inspire_common:Language=$language])
+   exists(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage[inspire_common:Language=$language])
+   or exists(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage[inspire_common:Language=$language])
 )
 return (<name>Language</name>,<value>{$language}</value>)
 }
@@ -6680,8 +6680,8 @@ string-length(//inspire_dls:ExtendedCapabilities/inspire_common:MetadataUrl/insp
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.existsNonEmptyText(
-	"//inspire_dls:ExtendedCapabilities/inspire_common:MetadataDate",
-	"TR.capabilities.extended.inspire.missingElement"
+   "//inspire_dls:ExtendedCapabilities/inspire_common:MetadataDate",
+   "TR.capabilities.extended.inspire.missingElement"
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6690,7 +6690,7 @@ a.existsNonEmptyText(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
+   "//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
   "TR.missingSpatialDataSetIdentifierNamespace"
 )</scriptText>
                   </con:configuration>
@@ -6700,7 +6700,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
+   "//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
   "TR.capabilities.extended.inspire.missingElement"
 )</scriptText>
                   </con:configuration>
@@ -6710,8 +6710,8 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_common:MetadataPointOfContact",
-	"TR.capabilities.extended.inspire.missingElement"
+   "//inspire_dls:ExtendedCapabilities/inspire_common:MetadataPointOfContact",
+   "TR.capabilities.extended.inspire.missingElement"
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6720,7 +6720,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Keywords[ows:Keyword='infoFeatureAccessService']",
+   "/*:WFS_Capabilities/ows:ServiceIdentification/ows:Keywords[ows:Keyword='infoFeatureAccessService']",
   "TR.missingInfoFeatureAccessService"
 )</scriptText>
                   </con:configuration>
@@ -6730,7 +6730,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
+   "/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
   "TR.capabilities.ows.missingElement"
 )</scriptText>
                   </con:configuration>
@@ -6740,7 +6740,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
+   "/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
   "TR.capabilities.ows.missingElement"
 )</scriptText>
                   </con:configuration>
@@ -6750,8 +6750,8 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_common:ResourceType",
-	"TR.capabilities.extended.inspire.missingElement"
+   "//inspire_dls:ExtendedCapabilities/inspire_common:ResourceType",
+   "TR.capabilities.extended.inspire.missingElement"
 )</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6782,7 +6782,7 @@ a.equals(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.notExists(
-	"//*:FeatureType[string-length(ows:WGS84BoundingBox/ows:LowerCorner)=0]",
+   "//*:FeatureType[string-length(ows:WGS84BoundingBox/ows:LowerCorner)=0]",
   "TR.capabilities.ft.missingOwsWgs84BoundingBox"
 )</scriptText>
                   </con:configuration>
@@ -6812,7 +6812,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//ows:ServiceIdentification/ows:Fees",
+   "//ows:ServiceIdentification/ows:Fees",
   "TR.capabilities.ows.missingElement"
 )</scriptText>
                   </con:configuration>
@@ -6822,7 +6822,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//ows:ServiceIdentification/ows:AccessConstraints",
+   "//ows:ServiceIdentification/ows:AccessConstraints",
   "TR.capabilities.ows.missingElement"
 )</scriptText>
                   </con:configuration>
@@ -6832,7 +6832,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//ows:ServiceProvider/ows:ServiceContact/ows:ContactInfo",
+   "//ows:ServiceProvider/ows:ServiceContact/ows:ContactInfo",
   "TR.capabilities.ows.missingElement"
 )</scriptText>
                   </con:configuration>
@@ -6842,7 +6842,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//ows:ServiceProvider/ows:ProviderName",
+   "//ows:ServiceProvider/ows:ProviderName",
   "TR.capabilities.ows.missingElement"
 )</scriptText>
                   </con:configuration>
@@ -7041,7 +7041,7 @@ a.exists("//@*:schemaLocation", "TR.missingSchemaLocation");</scriptText>
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//gmd:MD_Metadata",
+   "//gmd:MD_Metadata",
   "TR.notIsoMetadata"
 )</scriptText>
                   </con:configuration>
@@ -7051,8 +7051,8 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn",
-  	"TR.metadata.operatesOn.missingElement"
+   "//gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn",
+   "TR.metadata.operatesOn.missingElement"
 )</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -7061,7 +7061,7 @@ a.exists(
                      <scriptText> import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.notExists(
-	"//gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn[empty(@xlink:href)]",
+   "//gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn[empty(@xlink:href)]",
   "TR.metadata.operatesOn.missingHref"
 )</scriptText>
                   </con:configuration>
@@ -7129,7 +7129,7 @@ for( url in metadataUrlNodes ) {
 }
 
 testRunner.gotoStepByName("Test end");
-</script>
+               </script>
             </con:config>
          </con:testStep>
          <con:testStep type="httprequest" name="Get Metadata from Service Metadata" id="da4394fa-c719-4018-8667-97114bf17cb1">
@@ -7157,7 +7157,7 @@ testRunner.gotoStepByName("Test end");
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//gmd:MD_Metadata",
+   "//gmd:MD_Metadata",
   "TR.notIsoMetadata"
 )</scriptText>
                   </con:configuration>
@@ -7167,7 +7167,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//gmd:MD_Metadata/gmd:fileIdentifier",
+   "//gmd:MD_Metadata/gmd:fileIdentifier",
   "TR.missingElement"
 )</scriptText>
                   </con:configuration>
@@ -7338,7 +7338,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[./*:Parameter/@name='CRS' and ./*:Parameter/@name='DataSetIdCode' and ./*:Parameter/@name='DataSetIdNamespace' and ./*:Parameter/@name='Language']", "TR.manual.missingInspireStoredQuery");
-</scriptText>
+                     </scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="ff6b4670-07ca-499c-8a04-2cad813b4671" name="Contains the recommended 'GetSpatialDataSet' identifier">
@@ -7355,7 +7355,7 @@ a.exists("/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[@id='http://
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"/*:DescribeStoredQueriesResponse",
+   "/*:DescribeStoredQueriesResponse",
   "missingStoredQueriesRootElement"
 )</scriptText>
                   </con:configuration>
@@ -7419,7 +7419,7 @@ declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
+   "//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
   "TR.missingSpatialDataSetIdentifierNamespace"
 )</scriptText>
                   </con:configuration>
@@ -7429,7 +7429,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
+   "//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
   "TR.capabilities.extended.inspire.missingElement"
 )
 
@@ -7490,8 +7490,8 @@ declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1
 declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
 
 string-join(
-	distinct-values((/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language,
-	/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage/inspire_common:Language)),
+   distinct-values((/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language,
+   /*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage/inspire_common:Language)),
 ',')</con:sourcePath>
                   <con:targetType>supportedLanguages</con:targetType>
                   <con:targetStep>Transfer_Properties</con:targetStep>
@@ -7542,15 +7542,15 @@ def spatialDataSetIdentifierNamespaces = ph.getTransferProperty("spatialDataSetI
 
 
 for( crs in supportedCrs ) {
-	for( language in supportedLanguages ) {
-		spatialDataSetIdentifierCodes.eachWithIndex{ dataSetIdCode, i ->
-			ph.setTransferProperty("crs", crs)
-			ph.setTransferProperty("language", language)
-			ph.setTransferProperty("dataSetIdCode", dataSetIdCode)
-			ph.setTransferProperty("dataSetIdNamespace", spatialDataSetIdentifierNamespaces[i])
-   			ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier")
-		}
-	}
+   for( language in supportedLanguages ) {
+      spatialDataSetIdentifierCodes.eachWithIndex{ dataSetIdCode, i ->
+         ph.setTransferProperty("crs", crs)
+         ph.setTransferProperty("language", language)
+         ph.setTransferProperty("dataSetIdCode", dataSetIdCode)
+         ph.setTransferProperty("dataSetIdNamespace", spatialDataSetIdentifierNamespaces[i])
+            ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier")
+      }
+   }
 }
 
 testRunner.gotoStepByName("End test");</script>
@@ -7610,7 +7610,7 @@ def node = xml.getDomNode("/*:FeatureCollection/*:boundedBy/gml:Envelope/@srsNam
 if (node != null){
    a.equals("/*:FeatureCollection/*:boundedBy/gml:Envelope/@srsName", "CRS", expectedCrs, "TR.unexpectedCRS");
 }
-</scriptText>
+                     </scriptText>
                   </con:configuration>
                </con:assertion>
                <con:credentials>
@@ -7817,44 +7817,44 @@ import com.eviware.soapui.model.testsuite.TestStepResult;
 
 // Get the "requirements" test step
 def requirements = project.getTestSuiteByName("TestSetup")?.
-	getTestCaseByName("Requirements")?.getTestStepByName("Requirements");
+   getTestCaseByName("Requirements")?.getTestStepByName("Requirements");
 
 log.info("Results: ");
 for( testSuiteR in runner?.getResults() ) {
-	for( testCaseR in testSuiteR?.getResults() ) {
-		for( testStepR in testCaseR?.getResults() ) {
+   for( testCaseR in testSuiteR?.getResults() ) {
+      for( testStepR in testCaseR?.getResults() ) {
 
-			if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
-				if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
-					testStepR.testStep.testRequest.assertionList.each{
-						// Extract ID which is seperated with a whitespace and a doublecolon
-						String assertionName = it.name;
-						if (assertionName.indexOf(": ") > -1) {
-							String id = assertionName?.substring( 0, assertionName.indexOf(": ") );
-							if(it.valid) {
-								log.info("Assertion "+assertionName+" passed");
-							}else if(it.failed) {
-								log.error("Assertion "+assertionName+" failed with error:");
-								log.error("  -   "+it.getErrors()[0].getMessage());
-								log.error("  -   Requirements:");
+         if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
+            if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
+               testStepR.testStep.testRequest.assertionList.each{
+                  // Extract ID which is seperated with a whitespace and a doublecolon
+                  String assertionName = it.name;
+                  if (assertionName.indexOf(": ") > -1) {
+                     String id = assertionName?.substring( 0, assertionName.indexOf(": ") );
+                     if(it.valid) {
+                        log.info("Assertion "+assertionName+" passed");
+                     }else if(it.failed) {
+                        log.error("Assertion "+assertionName+" failed with error:");
+                        log.error("  -   "+it.getErrors()[0].getMessage());
+                        log.error("  -   Requirements:");
 
-								// Todo: Save the requirements as an object in a map
-								requirements.getPropertyList().each {
-									log.info(it.getName())
-									if(it.getName().contains(id)) {
-										log.error("   -   "+it.getName()+" :" );
-										log.error("        "+it.getValue());
-									}
-								}
-							}else{
-								log.warn("Assertion "+assertionName+" is deactivated");
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+                        // Todo: Save the requirements as an object in a map
+                        requirements.getPropertyList().each {
+                           log.info(it.getName())
+                           if(it.getName().contains(id)) {
+                              log.error("   -   "+it.getName()+" :" );
+                              log.error("        "+it.getValue());
+                           }
+                        }
+                     }else{
+                        log.warn("Assertion "+assertionName+" is deactivated");
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
 }
 </con:afterRunScript>
    <con:sensitiveInformation />

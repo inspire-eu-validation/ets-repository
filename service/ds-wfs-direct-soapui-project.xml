@@ -165,7 +165,7 @@ if (endpoint.getQuery()) {
 
 }
 
-</script>
+          </script>
         </con:config>
       </con:testStep>
       <con:properties />
@@ -296,7 +296,7 @@ a.equals("/*:WFS_Capabilities/@version", "Capabilities version", "2.0.0");</scri
             <con:sourceType>ResponseAsXml</con:sourceType>
             <con:sourceStep>Get Capabilities</con:sourceStep>
             <con:sourcePath>/*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name='GetCapabilities']/*:DCP/*:HTTP/*:Get/@*:href
-</con:sourcePath>
+            </con:sourcePath>
             <con:targetType>endpt.GetCapabilities.Get</con:targetType>
             <con:targetStep>#Project#</con:targetStep>
             <con:upgraded>true</con:upgraded>
@@ -438,7 +438,7 @@ a.equals("/*:WFS_Capabilities/@version", "Capabilities version", "2.0.0");</scri
             <con:sourceType>ResponseAsXml</con:sourceType>
             <con:sourceStep>Get Capabilities with parameters</con:sourceStep>
             <con:sourcePath>/*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name='GetCapabilities']/*:DCP/*:HTTP/*:Get/@*:href
-</con:sourcePath>
+            </con:sourcePath>
             <con:targetType>endpt.GetCapabilities.Get</con:targetType>
             <con:targetStep>#Project#</con:targetStep>
             <con:upgraded>true</con:upgraded>
@@ -737,7 +737,7 @@ a.exists("/*:WFS_Capabilities", "TR.missingCapabilitiesRootElement");</scriptTex
             <con:sourceStep>GetCapabilities</con:sourceStep>
             <con:sourcePath>if (exists(//*:FeatureType[1]/*:OutputFormats/*:Format))
 then //*:FeatureType[1]/*:OutputFormats/*:Format
-else  /*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name='GetFeature']/*:Parameter[@name='outputFormat']/*:AllowedValues/*:Value[1]</con:sourcePath>
+else /*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name='GetFeature']/*:Parameter[@name='outputFormat']/*:AllowedValues/*:Value[1]</con:sourcePath>
             <con:targetType>outputFormat</con:targetType>
             <con:targetStep>Transfer_Properties</con:targetStep>
             <con:upgraded>true</con:upgraded>
@@ -780,16 +780,13 @@ ph.disableTestSteps(checkedOperations);
 XmlHolder capResp = ph.getTestStepResult("GetCapabilities");
 
 for(operation in operations) {
-	String getEndpt=Util.getHttpGetOnlineResourceForOperation(capResp, operation);
-	if(getEndpt!=null) {
-		def testStep = testRunner.testCase.getTestStepByName(operation)
-		if(testStep!=null) {
+	String getEndpt=Util.getHttpGetOnlineResourceForOperation(capResp, operation); if(getEndpt!=null) {
+		def testStep = testRunner.testCase.getTestStepByName(operation) if(testStep!=null) {
 			testStep.setDisabled(false);
 		}
 		Util.setProjectProperty(testRunner, "endpt."+operation+".Get", getEndpt);
 	}
-	String postEndpt=Util.getHttpPostOnlineResourceForOperation(capResp, operation);
-	if(postEndpt!=null) {
+	String postEndpt=Util.getHttpPostOnlineResourceForOperation(capResp, operation); if(postEndpt!=null) {
 		Util.setProjectProperty(testRunner, "endpt."+operation+".Post", postEndpt);
 	}
 }</script>
@@ -1485,9 +1482,7 @@ def requirements = project.getTestSuiteByName("TestSetup")?.
 log.info("Results: ");
 for( testSuiteR in runner?.getResults() ) {
 	for( testCaseR in testSuiteR?.getResults() ) {
-		for( testStepR in testCaseR?.getResults() ) {
-
-			if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
+		for( testStepR in testCaseR?.getResults() ) { if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
 				if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
 					testStepR.testStep.testRequest.assertionList.each{
 						// Extract ID which is seperated with a whitespace and a doublecolon
@@ -1519,6 +1514,6 @@ for( testSuiteR in runner?.getResults() ) {
 		}
 	}
 }
-</con:afterRunScript>
+  </con:afterRunScript>
   <con:sensitiveInformation />
 </con:soapui-project>
