@@ -13,11 +13,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-as" target
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-gml" target="_blank">Conformance Class 'GML application schemas, Environmental Monitoring Facilities'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-09-14T10:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-09-14T10:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-06-15T09:00:00Z</lastUpdateDate>
  	<tags>
 		<tag ref="EIDbe54594f-cae7-4b22-aca7-54c74fdab1a7"/>
 	</tags>
@@ -76,13 +76,16 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ef/master/ef-as/constra
 let $features_selected := $features[self::ef:EnvironmentalMonitoringFacility | self::ef:EnvironmentalMonitoringNetwork]
 let $messages :=
 	for $feature in $features_selected
+		let $results:= 
+			for $observation in $feature/ef:hasObservation
+				return
+					if (((exists ($observation/@xlink:href)) or (exists ($observation/@xsi:nil) and not($observation/@xsi:nil="true"))) and not(exists($feature/ef:observingCapability))) then
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Check that if observation(s) are attached to an EnvironmentalMonitoringFacility or an EnvironmentalMonitoringNetwork feature type this shall have an ObservingCapability attached to it', 'additionalInfo':''})
+					else if (((exists ($observation/@xlink:href)) or (exists ($observation/@xsi:nil) and not($observation/@xsi:nil="true"))) and (exists($feature/ef:observingCapability))) then
+						local:addMessage('TR.manual.reviewConstraintObservation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id)})
+					else ()
+		return $results
 
-		return
-		if (exists ($feature/ef:hasObservation) and not(exists($feature/ef:observingCapability))) then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'Check that if observation(s) are attached to an EnvironmentalMonitoringFacility or an EnvironmentalMonitoringNetwork feature type this shall have an ObservingCapability attached to it', 'additionalInfo':''})
-		else if (exists ($feature/ef:hasObservation) and (exists($feature/ef:observingCapability))) then
-			local:addMessage('TR.manual.reviewConstraintObservation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id)})
-		else ()
 return
 
 (if ($messages and $messages/@ref = ('TR.constraintViolation')) then 'FAILED' 
