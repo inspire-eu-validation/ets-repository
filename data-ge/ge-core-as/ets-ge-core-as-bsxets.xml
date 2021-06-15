@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-core-as" t
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-ge/master/ge-gml" target="_blank">Conformance Class 'GML application schemas, Geology'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-01-18T11:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-01-18T11:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-05-21T09:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID08e3f9ed-f58a-4a46-a207-96d06f1c2d38"/>
 	</tags>
@@ -85,12 +85,16 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/AnthropogenicGeomorpholog
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/AnthropogenicGeomorphologicFeatureTypeValue/AnthropogenicGeomorphologicFeatureTypeValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'anthropogenicGeomorphologicFeatureType'
-let $features_selected := $features[self::ge:AnthropogenicGeomorphologicFeature]
-let $list := $features_selected/ge:anthropogenicGeomorphologicFeatureType/@xlink:href
+let $features_selectedagf := $features[self::ge:AnthropogenicGeomorphologicFeature]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listagf := $features_selectedagf/ge:anthropogenicGeomorphologicFeatureType/@xlink:href
+let $listm := $features_selectedm/ge:specification/ge:AnthropogenicGeomorphologicFeature/ge:anthropogenicGeomorphologicFeatureType/@xlink:href
+let $list := ($listagf, $listm)
 
-let $messages := 
 
-	for $feature in $features_selected
+let $messagesagf := 
+
+	for $feature in $features_selectedagf
 		let $envDom := $feature/ge:anthropogenicGeomorphologicFeatureType
 
 		let $iterlist:= for $elem in $list
@@ -103,10 +107,34 @@ let $messages :=
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+let $messagesm := 
+
+	for $feature in $features_selectedm/ge:specification/ge:AnthropogenicGeomorphologicFeature
+		let $envDom := $feature/ge:anthropogenicGeomorphologicFeatureType
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+
+let $messages := ( $messagesagf, $messagesm )
+
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
@@ -157,21 +185,28 @@ let $messages :=
 	for $feature in $features_selected
 		let $envDom := $feature/ge:purpose
 
-		let $iterlist:= for $elem in $list
-				return if ($elem = $envDom/@xlink:href)
-					then $elem
-					else ()
+		
 		return
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
-			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
-				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
-			else ()
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else (
+					for $link in $envDom/@xlink:href
+						let $iterlist:= 
+							for $elem in $list
+								return if ($elem = $link)
+									then $elem
+									else ()
+						return
+							if (not($link = $valid_href)) then (
+								local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count': count($iterlist)-1})
+							)
+							else ()
+				)
 
 return
-(if ($messages and ($messages/@ref = ('TR.missingElement','TR.missingAttribute'))) then 'FAILED' 
+(if ($messages and ($messages/@ref = ('TR.missingElement', 'TR.missingAttribute'))) then 'FAILED' 
 else if($messages and $messages/@ref = ('TR.manual.reviewCodeListValue')) then 'PASSED_MANUAL' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -229,7 +264,7 @@ let $messages :=
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})	
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
@@ -275,12 +310,16 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/CompositionPartRoleValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/CompositionPartRoleValue/CompositionPartRoleValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'role'
-let $features_selected := $features[self::ge:GeologicUnit]
-let $list := $features_selected/ge:composition/ge:CompositionPart/ge:role/@xlink:href
+let $features_selectedgu := $features[self::ge:GeologicUnit]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listgu := $features_selectedgu/ge:composition/ge:CompositionPart/ge:role/@xlink:href
+let $listm := $features_selectedm/ge:specification/ge:GeologicUnit/ge:composition/ge:CompositionPart/ge:role/@xlink:href
+let $list := ($listgu, $listm)
 
-let $messages := 
 
-	for $feature in $features_selected/ge:composition/ge:CompositionPart
+let $messagesgu := 
+
+	for $feature in $features_selectedgu/ge:composition/ge:CompositionPart
 		let $envDom := $feature/ge:role
 
 		let $iterlist:= for $elem in $list
@@ -295,6 +334,26 @@ let $messages :=
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+let $messagesm := 
+
+	for $feature in $features_selectedm/ge:specification/ge:GeologicUnit/ge:composition/ge:CompositionPart
+		let $envDom := $feature/ge:role
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+let $messages := ($messagesgu, $messagesm)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity'))) then 'FAILED' 
@@ -336,12 +395,16 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/LithologyValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/LithologyValue/LithologyValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'material'
-let $features_selected := $features[self::ge:GeologicUnit]
-let $list := $features_selected/ge:composition/ge:CompositionPart/ge:material/@xlink:href
+let $features_selectedgu := $features[self::ge:GeologicUnit]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listgu := $features_selectedgu/ge:composition/ge:CompositionPart/ge:material/@xlink:href
+let $listm := $features_selectedm/ge:specification/ge:GeologicUnit/ge:composition/ge:CompositionPart/ge:material/@xlink:href
+let $list := ($listgu, $listm)
 
-let $messages := 
 
-	for $feature in $features_selected/ge:composition/ge:CompositionPart
+let $messagesgu := 
+
+	for $feature in $features_selectedgu/ge:composition/ge:CompositionPart
 		let $envDom := $feature/ge:material
 
 		let $iterlist:= for $elem in $list
@@ -358,6 +421,29 @@ let $messages :=
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+let $messagesm := 
+
+	for $feature in $features_selectedm/ge:specification/ge:GeologicUnit/ge:composition/ge:CompositionPart
+		let $envDom := $feature/ge:material
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+
+let $messages := ($messagesgu, $messagesm)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
@@ -399,12 +485,23 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/EventEnvironmentValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/EventEnvironmentValue/EventEnvironmentValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'eventEnvironment'
-let $features_selected := $features[self::ge:GeologicEvent]
-let $list := $features_selected/ge:composition/ge:CompositionPart/ge:eventEnvironment/@xlink:href
+let $features_selectedge := $features[self::ge:GeologicEvent]
+let $features_selectedgh := $features[self::ge:GeologicUnit | self::ge:ShearDisplacementStructure | self::ge:geologicHistory | self::ge:AnthropogenicGeomorphologicFeature | self::ge:NaturalGeomorphologicFeature]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listge := $features_selectedge/ge:eventEnvironment/@xlink:href
+let $listgh := $features_selectedgh/ge:geologicHistory/ge:GeologicEvent/ge:eventEnvironment/@xlink:href
+let $listm1 := $features_selectedm/ge:specification/ge:GeologicUnit/ge:geologicHistory/ge:GeologicEvent/ge:eventEnvironment/@xlink:href
+let $listm2 := $features_selectedm/ge:specification/ge:ShearDisplacementStructure/ge:geologicHistory/ge:GeologicEvent/ge:eventEnvironment/@xlink:href
+let $listm3 := $features_selectedm/ge:specification/ge:Fold/ge:geologicHistory/ge:GeologicEvent/ge:eventEnvironment/@xlink:href 
+let $listm4 := $features_selectedm/ge:specification/ge:AnthropogenicGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent/ge:eventEnvironment/@xlink:href
+let $listm5 := $features_selectedm/ge:specification/ge:specification/ge:NaturalGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent/ge:eventEnvironment/@xlink:href
+let $list := ($listge, $listgh, $listm1, $listm2, $listm3, $listm4, $listm5)
 
-let $messages := 
 
-	for $feature in $features_selected
+
+let $messagesge := 
+
+	for $feature in $features_selectedge
 		let $envDom := $feature/ge:eventEnvironment
 
 		let $iterlist:= for $elem in $list
@@ -419,6 +516,120 @@ let $messages :=
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+let $messagesgh := 
+
+	for $feature in $features_selectedgh/ge:geologicHistory/ge:GeologicEvent
+		let $envDom := $feature/ge:eventEnvironment
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})		
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+
+let $messagesm :=
+	for $features in $features_selectedm/ge:specification
+
+		let $messagesgu:=
+			for $feature in $features/ge:GeologicUnit/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventEnvironment
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})		
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagessds:=
+			for $feature in $features/ge:ShearDisplacementStructure/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventEnvironment
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})		
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesf:=
+			for $feature in $features/ge:Fold/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventEnvironment
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})		
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesagf:=
+			for $feature in $features/ge:AnthropogenicGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventEnvironment
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})		
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesngf:=
+			for $feature in $features/ge:NaturalGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventEnvironment
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})		
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		return ($messagesgu, $messagessds, $messagesf, $messagesagf, $messagesngf)
+
+
+let $messages := ($messagesge, $messagesgh, $messagesm)
+
+
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity'))) then 'FAILED' 
@@ -460,29 +671,176 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/EventProcessValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/EventProcessValue/EventProcessValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'eventProcess'
-let $features_selected := $features[self::ge:GeologicEvent]
-let $list := $features_selected/ge:eventProcess/@xlink:href
+let $features_selectedge := $features[self::ge:GeologicEvent]
+let $features_selectedgh := $features[self::ge:GeologicUnit | self::ge:ShearDisplacementStructure | self::ge:geologicHistory | self::ge:AnthropogenicGeomorphologicFeature | self::ge:NaturalGeomorphologicFeature]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listge := $features_selectedge/ge:eventProcess/@xlink:href
+let $listgh := $features_selectedgh/ge:geologicHistory/ge:GeologicEvent/ge:eventProcess/@xlink:href
+let $listm1 := $features_selectedm/ge:specification/ge:GeologicUnit/ge:geologicHistory/ge:GeologicEvent/ge:eventProcess/@xlink:href
+let $listm2 := $features_selectedm/ge:specification/ge:ShearDisplacementStructure/ge:geologicHistory/ge:GeologicEvent/ge:eventProcess/@xlink:href
+let $listm3 := $features_selectedm/ge:specification/ge:Fold/ge:geologicHistory/ge:GeologicEvent/ge:eventProcess/@xlink:href 
+let $listm4 := $features_selectedm/ge:specification/ge:AnthropogenicGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent/ge:eventProcess/@xlink:href
+let $listm5 := $features_selectedm/ge:specification/ge:specification/ge:NaturalGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent/ge:eventProcess/@xlink:href
+let $list := ($listge, $listgh, $listm1, $listm2, $listm3, $listm4, $listm5)
 
-let $messages := 
+let $messagesge := 
 
-	for $feature in $features_selected
+	for $feature in $features_selectedge
 		let $envDom := $feature/ge:eventProcess
 
-		let $iterlist:= for $elem in $list
-				return if ($elem = $envDom/@xlink:href)
-					then $elem
-					else ()
 
 		return
-			if(not(exists($envDom))) then
+			if (not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})	
-			else 
-				for $element in $envDom
-				let $aaa := "aaa"
-					return 
-						if(exists($element) and exists($element/@xlink:href) and not($element/@xlink:href = $valid_href)) then 
-							(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($element/@xlink:href, ','), 'count': count($iterlist)-1}))
-						else ()
+			else (
+				for $link in $envDom/@xlink:href
+						let $iterlist:= 
+							for $elem in $list
+								return if ($elem = $link)
+									then $elem
+									else ()
+						return
+							if (not($link = $valid_href)) then (
+								local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count': count($iterlist)-1})
+							)
+							else ()
+			)
+
+
+let $messagesgh := 
+
+	for $feature in $features_selectedgh/ge:geologicHistory/ge:GeologicEvent
+		let $envDom := $feature/ge:eventProcess
+
+		return
+			if (not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else (
+				for $link in $envDom/@xlink:href
+						let $iterlist:= 
+							for $elem in $list
+								return if ($elem = $link)
+									then $elem
+									else ()
+						return
+							if (not($link = $valid_href)) then (
+								local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count': count($iterlist)-1})
+							)
+							else ()
+			)
+
+
+let $messagesm :=
+	for $features in $features_selectedm/ge:specification
+
+		let $messagesgu:=
+			for $feature in $features/ge:GeologicUnit/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventProcess
+
+				return
+					if (not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else (
+						for $link in $envDom/@xlink:href
+							let $iterlist:= 
+								for $elem in $list
+									return if ($elem = $link)
+										then $elem
+										else ()
+							return
+								if (not($link = $valid_href)) then (
+									local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count': count($iterlist)-1})
+								)
+								else ()
+					)
+
+		let $messagessds:=
+			for $feature in $features/ge:ShearDisplacementStructure/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventProcess
+
+				return
+					if (not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else (
+						for $link in $envDom/@xlink:href
+							let $iterlist:= 
+								for $elem in $list
+									return if ($elem = $link)
+										then $elem
+										else ()
+							return
+								if (not($link = $valid_href)) then (
+									local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count': count($iterlist)-1})
+								)
+								else ()
+					)
+
+		let $messagesf:=
+			for $feature in $features/ge:Fold/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventProcess
+
+				return
+					if (not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else (
+						for $link in $envDom/@xlink:href
+							let $iterlist:= 
+								for $elem in $list
+									return if ($elem = $link)
+										then $elem
+										else ()
+							return
+								if (not($link = $valid_href)) then (
+									local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count': count($iterlist)-1})
+								)
+								else ()
+					)
+
+		let $messagesagf:=
+			for $feature in $features/ge:AnthropogenicGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventProcess
+
+				return
+					if (not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else (
+						for $link in $envDom/@xlink:href
+							let $iterlist:= 
+								for $elem in $list
+									return if ($elem = $link)
+										then $elem
+										else ()
+							return
+								if (not($link = $valid_href)) then (
+									local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count': count($iterlist)-1})
+								)
+								else ()
+					)
+
+		let $messagesngf:=
+			for $feature in $features/ge:NaturalGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent
+				let $envDom := $feature/ge:eventProcess
+
+				return
+					if (not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else (
+						for $link in $envDom/@xlink:href
+							let $iterlist:= 
+								for $elem in $list
+									return if ($elem = $link)
+										then $elem
+										else ()
+							return
+								if (not($link = $valid_href)) then (
+									local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($link, ','), 'count': count($iterlist)-1})
+								)
+								else ()
+					)
+
+		return ($messagesgu, $messagessds, $messagesf, $messagesagf, $messagesngf)
+
+let $messages := ($messagesge, $messagesgh, $messagesm)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement'))) then 'FAILED' 
@@ -523,12 +881,21 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/GeochronologicEraValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/GeochronologicEraValue/GeochronologicEraValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'olderNamedAge'
-let $features_selected := $features[self::ge:GeologicEvent]
-let $list := $features_selected/ge:olderNamedAge/@xlink:href
+let $features_selectedge := $features[self::ge:GeologicEvent]
+let $features_selectedgh := $features[self::ge:GeologicUnit | self::ge:ShearDisplacementStructure | self::ge:Fold | self::ge:AnthropogenicGeomorphologicFeature | self::ge:NaturalGeomorphologicFeature]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listge := $features_selectedge/ge:olderNamedAge/@xlink:href
+let $listgh := $features_selectedgh/ge:geologicHistory/ge:GeologicEvent/ge:olderNamedAge/@xlink:href
+let $listm1 := $features_selectedm/ge:specification/ge:GeologicUnit/ge:geologicHistory/ge:GeologicEvent/ge:olderNamedAge/@xlink:href
+let $listm2 := $features_selectedm/ge:specification/ge:ShearDisplacementStructure/ge:geologicHistory/ge:GeologicEvent/ge:olderNamedAge/@xlink:href
+let $listm3 := $features_selectedm/ge:specification/ge:Fold/ge:geologicHistory/ge:GeologicEvent/ge:olderNamedAge/@xlink:href
+let $listm4 := $features_selectedm/ge:specification/ge:AnthropogenicGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent/ge:olderNamedAge/@xlink:href
+let $listm5 := $features_selectedm/ge:specification/ge:NaturalGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent/ge:olderNamedAge/@xlink:href
+let $list := ($listge, $listgh, $listm1, $listm2, $listm3, $listm4, $listm5)
 
-let $messages := 
+let $messagesge := 
 
-	for $feature in $features_selected
+	for $feature in $features_selectedge
 		let $envDom := $feature/ge:olderNamedAge
 
 		let $iterlist:= for $elem in $list
@@ -543,6 +910,123 @@ let $messages :=
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+let $messagesgh := 
+
+	for $feature in $features_selectedgh/ge:geologicHistory/ge:GeologicEvent
+		let $envDom := $feature/ge:olderNamedAge
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+
+let $messagesm := 
+
+	for $features in $features_selectedm/ge:specification
+
+		let $messagesgu:=
+			for $feature in $features/ge:GeologicUnit/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:olderNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagessds:=
+			for $feature in $features/ge:ShearDisplacementStructure/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:olderNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesf:=
+			for $feature in $features/ge:Fold/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:olderNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesagf:=
+			for $feature in $features/ge:AnthropogenicGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:olderNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesngf:=
+			for $feature in $features/ge:NaturalGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:olderNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		return ($messagesgu, $messagessds, $messagesf, $messagesagf, $messagesngf)
+
+let $messages := ($messagesge, $messagesgh, $messagesm)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity'))) then 'FAILED' 
@@ -585,11 +1069,22 @@ let $codelisturl := 'https://inspire.ec.europa.eu/codelist/GeochronologicEraValu
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'youngerNamedAge'
 let $features_selected := $features[self::ge:GeologicEvent]
-let $list := $features_selected/ge:youngerNamedAge/@xlink:href
+let $features_selectedge := $features[self::ge:GeologicEvent]
+let $features_selectedgh := $features[self::ge:GeologicUnit | self::ge:ShearDisplacementStructure | self::ge:Fold | self::ge:AnthropogenicGeomorphologicFeature | self::ge:NaturalGeomorphologicFeature]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listge := $features_selectedge/ge:youngerNamedAge/@xlink:href
+let $listgh := $features_selectedgh/ge:geologicHistory/ge:GeologicEvent/ge:youngerNamedAge/@xlink:href
+let $listm1 := $features_selectedm/ge:specification/ge:GeologicUnit/ge:geologicHistory/ge:GeologicEvent/ge:youngerNamedAge/@xlink:href
+let $listm2 := $features_selectedm/ge:specification/ge:ShearDisplacementStructure/ge:geologicHistory/ge:GeologicEvent/ge:youngerNamedAge/@xlink:href
+let $listm3 := $features_selectedm/ge:specification/ge:Fold/ge:geologicHistory/ge:GeologicEvent/ge:youngerNamedAge/@xlink:href
+let $listm4 := $features_selectedm/ge:specification/ge:AnthropogenicGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent/ge:youngerNamedAge/@xlink:href
+let $listm5 := $features_selectedm/ge:specification/ge:NaturalGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent/ge:youngerNamedAge/@xlink:href
+let $list := ($listge, $listgh, $listm1, $listm2, $listm3, $listm4, $listm5)
 
-let $messages := 
 
-	for $feature in $features_selected
+let $messagesge := 
+
+	for $feature in $features_selectedge
 		let $envDom := $feature/ge:youngerNamedAge
 
 		let $iterlist:= for $elem in $list
@@ -604,6 +1099,128 @@ let $messages :=
 				else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 					(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 				else ()
+
+
+let $messagesgh := 
+
+	for $feature in $features_selectedgh/ge:geologicHistory/ge:GeologicEvent
+		let $envDom := $feature/ge:youngerNamedAge
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+
+let $messagesm := 
+
+	for $features in $features_selectedm/ge:specification
+
+		let $messagesgu:=
+			for $feature in $features/ge:GeologicUnit/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:youngerNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagessds:=
+			for $feature in $features/ge:ShearDisplacementStructure/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:youngerNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesf:=
+			for $feature in $features/ge:Fold/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:youngerNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesagf:=
+			for $feature in $features/ge:AnthropogenicGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:youngerNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		let $messagesngf:=
+			for $feature in $features/ge:NaturalGeomorphologicFeature/ge:geologicHistory/ge:GeologicEvent
+
+				let $envDom := $feature/ge:youngerNamedAge
+
+				let $iterlist:= for $elem in $list
+						return if ($elem = $envDom/@xlink:href)
+							then $elem
+							else ()
+				return
+					if(not(exists($envDom))) then
+						local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string})
+					else if (count($envDom) > 1) then
+						local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+					else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+						(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+					else ()
+
+		return ($messagesgu, $messagessds, $messagesf, $messagesagf, $messagesngf)
+
+let $messages := ($messagesge, $messagesgh, $messagesm)
+
+
+
+
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity'))) then 'FAILED' 
@@ -645,12 +1262,15 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/FaultTypeValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/FaultTypeValue/FaultTypeValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'faultType'
-let $features_selected := $features[self::ge:ShearDisplacementStructure]
-let $list := $features_selected/ge:faultType/@xlink:href
+let $features_selectedsds := $features[self::ge:ShearDisplacementStructure]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listsds := $features_selectedsds/ge:faultType/@xlink:href
+let $listm := $features_selectedm/ge:specification/ge:ShearDisplacementStructure/ge:faultType/@xlink:href 
+let $list := ($listsds, $listm)
 
-let $messages := 
+let $messagessds := 
 
-	for $feature in $features_selected
+	for $feature in $features_selectedsds
 		let $envDom := $feature/ge:faultType
 
 		let $iterlist:= for $elem in $list
@@ -661,12 +1281,35 @@ let $messages :=
 			if(not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
 			else if (count($envDom) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})	
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+
+let $messagesm := 
+
+	for $feature in $features_selectedm/ge:specification/ge:ShearDisplacementStructure
+		let $envDom := $feature/ge:faultType
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})	
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+let $messages := ($messagessds, $messagesm)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
@@ -709,12 +1352,15 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/FoldProfileTypeValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/FoldProfileTypeValue/FoldProfileTypeValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'profileType'
-let $features_selected := $features[self::ge:Fold]
-let $list := $features_selected/ge:profileType/@xlink:href
+let $features_selectedf := $features[self::ge:Fold]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listf := $features_selectedf/ge:profileType/@xlink:href
+let $listm := $features_selectedm/ge:specification/ge:Fold/ge:profileType/@xlink:href
+let $list := ($listf, $listm)
 
-let $messages := 
+let $messagesf := 
 
-	for $feature in $features_selected
+	for $feature in $features_selectedf
 		let $envDom := $feature/ge:profileType
 
 		let $iterlist:= for $elem in $list
@@ -730,8 +1376,29 @@ let $messages :=
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
 
+
+let $messagesm := 
+
+	for $feature in $features_selectedm/ge:specification/ge:Fold
+		let $envDom := $feature/ge:profileType
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+let $messages := ($messagesf, $messagesm)
+
 return
-(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
+(if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity'))) then 'FAILED' 
 else if($messages and $messages/@ref = ('TR.manual.reviewCodeListValue')) then 'PASSED_MANUAL' 
 else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
@@ -770,12 +1437,16 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/GeologicUnitTypeValue'
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/GeologicUnitTypeValue/GeologicUnitTypeValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'geologicUnitType'
-let $features_selected := $features[self::ge:GeologicUnit]
-let $list := $features_selected/ge:geologicUnitType/@xlink:href
+let $features_selectedgu := $features[self::ge:GeologicUnit]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listgu := $features_selectedgu/ge:geologicUnitType/@xlink:href
+let $listm := $features_selectedm/ge:specification/ge:GeologicUnit/ge:geologicUnitType/@xlink:href
+let $list := ($listgu, $listm)
 
-let $messages := 
 
-	for $feature in $features_selected
+let $messagesgu := 
+
+	for $feature in $features_selectedgu
 		let $envDom := $feature/ge:geologicUnitType
 
 		let $iterlist:= for $elem in $list
@@ -788,10 +1459,34 @@ let $messages :=
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+
+let $messagesm := 
+
+	for $feature in $features_selectedm/ge:specification/ge:GeologicUnit
+		let $envDom := $feature/ge:geologicUnitType
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+let $messages := ($messagesgu, $messagesm)
+
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
@@ -834,12 +1529,15 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/GeomorphologicActivityVal
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/GeomorphologicActivityValue/GeomorphologicActivityValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'activity'
-let $features_selected := $features[self::ge:NaturalGeomorphologicFeature]
-let $list := $features_selected/ge:activity/@xlink:href
+let $features_selectedngf := $features[self::ge:NaturalGeomorphologicFeature]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listngf := $features_selectedngf/ge:activity/@xlink:href
+let $listm := $features_selectedm/ge:specification/ge:NaturalGeomorphologicFeature/ge:activity/@xlink:href
+let $list := ($listngf, $listm)
 
-let $messages := 
+let $messagesngf := 
 
-	for $feature in $features_selected
+	for $feature in $features_selectedngf
 		let $envDom := $feature/ge:activity
 
 		let $iterlist:= for $elem in $list
@@ -850,10 +1548,32 @@ let $messages :=
 			if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+
+let $messagesm := 
+
+	for $feature in $features_selectedm/ge:specification/ge:NaturalGeomorphologicFeature
+		let $envDom := $feature/ge:activity
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': '0 or 1', 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+let $messages := ($messagesngf, $messagesm)
+
 
 return
 (if ($messages and ($messages/@ref = ('TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
@@ -895,12 +1615,15 @@ let $codelist := 'http://inspire.ec.europa.eu/codelist/NaturalGeomorphologicFeat
 let $codelisturl := 'https://inspire.ec.europa.eu/codelist/NaturalGeomorphologicFeatureTypeValue/NaturalGeomorphologicFeatureTypeValue.en.xml'
 let $valid_href := fn:doc($codelisturl)/*:codelist/*:containeditems/*:value/@id
 let $property_string := 'naturalGeomorphologicFeatureType'
-let $features_selected := $features[self::ge:NaturalGeomorphologicFeature]
-let $list := $features_selected/ge:naturalGeomorphologicFeatureType/@xlink:href
+let $features_selectedngf := $features[self::ge:NaturalGeomorphologicFeature]
+let $features_selectedm := $features[self::ge:MappedFeature | self::ge:MappedInterval]
+let $listngf := $features_selectedngf/ge:naturalGeomorphologicFeatureType/@xlink:href
+let $listm := $features_selectedm/ge:specification/ge:NaturalGeomorphologicFeature/ge:naturalGeomorphologicFeatureType/@xlink:href
+let $list := ($listngf, $listm)
 
-let $messages := 
+let $messagesngf := 
 
-	for $feature in $features_selected
+	for $feature in $features_selectedngf
 		let $envDom := $feature/ge:naturalGeomorphologicFeatureType
 
 		let $iterlist:= for $elem in $list
@@ -913,10 +1636,32 @@ let $messages :=
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
+
+let $messagesm := 
+
+	for $feature in $features_selectedm/ge:specification/ge:NaturalGeomorphologicFeature
+		let $envDom := $feature/ge:naturalGeomorphologicFeatureType
+
+		let $iterlist:= for $elem in $list
+				return if ($elem = $envDom/@xlink:href)
+					then $elem
+					else ()
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string})
+			else if (count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
+				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
+			else ()
+
+let $messages := ($messagesngf, $messagesm)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingElement','TR.wrongMultiplicity','TR.missingAttribute'))) then 'FAILED' 
@@ -977,7 +1722,7 @@ let $messages :=
 			else if (count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 			else if (not(count($envDom) = count($envDom/@xlink:href))) then
-				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})		
+				local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
 			else if(exists($envDom) and exists($envDom/@xlink:href) and not($envDom/@xlink:href = $valid_href)) then 
 				(local:addMessage('TR.manual.reviewCodeListValue', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($envDom/@xlink:href, ','), 'count': count($iterlist)-1}))
 			else ()
