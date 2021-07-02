@@ -129,7 +129,7 @@ if (endpoint.getQuery()) {
                             // first remove any other params
                             for (prop in testStep.getHttpRequest().getProperties()) {
                                     defaultParam = 0;
-                                    log.debug("HTTP param: " + prop.getKey())
+                                    log.debug("HTTP param: " + prop.getKey());
                                     for (d in defaultParamsGetCaps) {
                                     if (prop.getKey().toLowerCase() == d) {
                                         defaultParam = 1;
@@ -138,7 +138,7 @@ if (endpoint.getQuery()) {
                                 // if not a defaultParam, remove it
                                 if (defaultParam == 0) {
                                         testStep.getHttpRequest().removeProperty(prop.getKey());
-                                        log.debug("Removed non-standard query parameter from the request: " + prop.getKey())
+                                        log.debug("Removed non-standard query parameter from the request: " + prop.getKey());
                                 }
                             }
                             // now add the extra params from the query string
@@ -147,7 +147,7 @@ if (endpoint.getQuery()) {
                                     if (pair.length > 1) {
 	                                    testStep.getHttpRequest().addProperty(pair[0]);
 	                                    testStep.getHttpRequest().setPropertyValue(pair[0], pair[1]);
-	                                    log.debug("Added non-standard query parameter for the Getcapabilities requests: " + pair[0] + "=" + pair[1])
+	                                    log.debug("Added non-standard query parameter for the Getcapabilities requests: " + pair[0] + "=" + pair[1]);
 	                       		}
                             }
                         }
@@ -194,31 +194,31 @@ if (endpoint.getQuery()) {
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="90c088bd-0c65-4589-a78d-e363723136a1" name="No invalid characters before XML prolog">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
-import de.interactive_instruments.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
+import de.interactive_instruments.*;
 
 if(!messageExchange.hasResponse()) {
-  throw new TranslatableAssertionError("TR.noDataReturned")
+  throw new TranslatableAssertionError("TR.noDataReturned");
 }
 
 if(messageExchange.responseContent.size()>7) {
 	final String xmlProlog = messageExchange.responseContent.substring(0,7);
 	if(!xmlProlog.trim().startsWith("&lt;")) {
-		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
+		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") );
 	}
 }</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="569e5be5-a54e-436d-8328-d0328fb8c03f" name="Expect a Capabilities root element">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:WFS_Capabilities", "TR.missingCapabilitiesRootElement");</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="03534d3b-47a5-4f39-9231-812a0ae13b90" name="Expect Capabilites in version 2.0.0">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equals("/*:WFS_Capabilities/@version", "Capabilities version", "2.0.0");</scriptText>
                   </con:configuration>
@@ -2481,7 +2481,7 @@ a.equals("/*:WFS_Capabilities/@version", "Capabilities version", "2.0.0");</scri
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="6a42720a-992a-4f82-ab28-79222ce08829" name="xsi:schemaLocation attribute exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:WFS_Capabilities/@*:schemaLocation", "TR.missingSchemaLocation");</scriptText>
                   </con:configuration>
@@ -2611,28 +2611,28 @@ a.exists("/*:WFS_Capabilities/@*:schemaLocation", "TR.missingSchemaLocation");</
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="cd7f7f76-814e-455f-98ab-be5c39010347" name="At least one FeatureType is listed">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("//*:FeatureType[1]");</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="51109c23-673c-46b4-b143-d1ae7eb5b40d" name="FeatureTypep prefixes can be resolved">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.notExists(" //*:FeatureType[1]/*:Name[not(namespace::*[name()=substring-before(//*:FeatureType[1]/*:Name, ':')])] ", "TR.featureTypeUnknownNamespace")</scriptText>
+a.notExists(" //*:FeatureType[1]/*:Name[not(namespace::*[name()=substring-before(//*:FeatureType[1]/*:Name, ':')])] ", "TR.featureTypeUnknownNamespace");</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="810594fa-d3b3-414e-8cee-830f05980533" name="At least one OutputFormat is listed">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("//*:FeatureType[1]/*:OutputFormats/*:Format, /*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name='GetFeature']/*:Parameter[@name='outputFormat']/*:AllowedValues/*:Value", "TR.noOutputFormats");</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="9674d207-2852-4f0b-b343-0cff1b667bae" name="Root element is WFS_Capabilties">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:WFS_Capabilities", "TR.missingCapabilitiesRootElement");</scriptText>
                   </con:configuration>
@@ -2735,13 +2735,16 @@ ph.disableTestSteps(checkedOperations);
 XmlHolder capResp = ph.getTestStepResult("GetCapabilities");
 
 for(operation in operations) {
-	String getEndpt=Util.getHttpGetOnlineResourceForOperation(capResp, operation); if(getEndpt!=null) {
-		def testStep = testRunner.testCase.getTestStepByName(operation) if(testStep!=null) {
+	String getEndpt=Util.getHttpGetOnlineResourceForOperation(capResp, operation); 
+   if(getEndpt!=null) {
+		def testStep = testRunner.testCase.getTestStepByName(operation);
+      if(testStep!=null) {
 			testStep.setDisabled(false);
 		}
 		Util.setProjectProperty(testRunner, "endpt."+operation+".Get", getEndpt);
 	}
-	String postEndpt=Util.getHttpPostOnlineResourceForOperation(capResp, operation); if(postEndpt!=null) {
+	String postEndpt=Util.getHttpPostOnlineResourceForOperation(capResp, operation); 
+   if(postEndpt!=null) {
 		Util.setProjectProperty(testRunner, "endpt."+operation+".Post", postEndpt);
 	}
 }
@@ -3148,12 +3151,16 @@ void initOutputFormats(final XmlHolder capabilitiesXML) {
 			"/*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name=\""+
 			operation+"\"]";
 
-		String allowedValue=""; if(serviceTypeVersion=="2.0.0")
+		String allowedValue=""; 
+      if(serviceTypeVersion=="2.0.0"){
 			allowedValue = "/*:AllowedValues";
+      }
 		final String owsValueXPath="/*:Parameter[@name=\""+parameter+"\"]"+
 			allowedValue+"/*:Value";
 
-		String[] values = capabilitiesXML.getNodeValues(operationXPath+owsValueXPath); log.info(operationXPath+owsValueXPath) if(values.size()==0) {
+		String[] values = capabilitiesXML.getNodeValues(operationXPath+owsValueXPath); 
+      log.info(operationXPath+owsValueXPath); 
+      if(values.size()==0) {
 			throw new Exception(this, "Unable to find \""+operation+"\"");
 		}
 		return values;
@@ -3220,18 +3227,18 @@ def cap = new Capabilities();
 
 ph.getTestCase().setPropertyValue("AutoConfigurationCompleted", "false");
 
-String autoConfiguration = "failed"
+String autoConfiguration = "failed";
 try {
 
 	cap.setCapabilities(ph.getTestStepResult('GetCapabilities'));
 	new ObjectSaver().save(cap);
-	autoConfiguration = "completed"
+	autoConfiguration = "completed";
 	ph.getTestCase().setPropertyValue("AutoConfigurationCompleted", "true");
 
 }catch(Exception e) {
 	log.error(e);
 	ph.getTestCase().setPropertyValue("AutoConfigurationCompleted",e.getMessage());
-	autoConfiguration = e.getMessage()
+	autoConfiguration = e.getMessage();
 	if(e instanceof TranslatableAssertionError) {
 		throw e;
 	}
@@ -3252,36 +3259,37 @@ assert "completed" == autoConfiguration, "Failed to initialize Executable Test S
                <con:request />
                <con:assertion type="GroovyScriptAssertion" id="23a3c57b-db96-4570-a061-dec3596ebf12" name="SchemaLocations are publicly accessible without authentication">
                   <con:configuration>
-                     <scriptText>import com.eviware.soapui.support.XmlHolder
-import de.interactive_instruments.*
-import de.interactive_instruments.etf.suim.TranslatableAssertionError
+                     <scriptText>import com.eviware.soapui.support.XmlHolder;
+import de.interactive_instruments.*;
+import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-def holder = new XmlHolder( messageExchange.responseContentAsXml )
+def holder = new XmlHolder( messageExchange.responseContentAsXml );
 
 def schemaLocations = holder.getNodeValues('//@schemaLocation');
 
-def Credentials credentials = null
+def Credentials credentials = null;
 /*
-String user = messageExchange.modelItem.testStep.testCase.testSuite.project.getPropertyValue('authUser')
-String passwd = messageExchange.modelItem.testStep.testCase.testSuite.project.getPropertyValue('authPwd')
+String user = messageExchange.modelItem.testStep.testCase.testSuite.project.getPropertyValue('authUser');
+String passwd = messageExchange.modelItem.testStep.testCase.testSuite.project.getPropertyValue('authPwd');
 
 if(!SUtils.isNullOrEmpty(user)) {
-	credential = new Credentials(user, passwd)
+	credential = new Credentials(user, passwd);
 }
 */
 
 int getHttpResponseCode(String url, def credentials){
-	def connection = UriUtils.openConnection( new URI(UriUtils.ensureUrlEncodedParams(url)), credentials )
+	def connection = UriUtils.openConnection( new URI(UriUtils.ensureUrlEncodedParams(url)), credentials );
 	if (!(connection instanceof HttpURLConnection)) {
 		throw new IllegalArgumentException("Cannot open a HTTP connection for URL '"+url+"'");
 	}
 	connection.setConnectTimeout(11000);
 	connection.setReadTimeout(91000);
 	connection.setRequestMethod("GET");
-	return connection.getResponseCode()
+	return connection.getResponseCode();
 }
 
-assert schemaLocations != null, "Response does not contain xsi:schemaLocation attribute!" if(schemaLocations!=null) {
+assert schemaLocations != null, "Response does not contain xsi:schemaLocation attribute!";
+ if(schemaLocations!=null) {
 	for(schemaLocation in schemaLocations) {
 		log.info("Checking "+schemaLocation);
 		try {
@@ -3310,7 +3318,7 @@ assert schemaLocations != null, "Response does not contain xsi:schemaLocation at
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="5f792684-1937-44ed-ba8e-144a69f19af4" name="Root element is schema">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:schema", "TR.missingSchemaRootElement");</scriptText>
                   </con:configuration>
@@ -3377,7 +3385,7 @@ a.exists("/*:schema", "TR.missingSchemaRootElement");</scriptText>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="ae2f5738-cd76-4ebc-aea6-d5485d7142f3" name="Root element is FeatureCollection">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:FeatureCollection", "TR.missingFeatureCollectionRootElement");</scriptText>
@@ -3539,14 +3547,14 @@ a.exists("/*:FeatureCollection", "TR.missingFeatureCollectionRootElement");</scr
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="4e754185-b004-47a6-a231-95febc2e5b51" name="Root element is WFS_Capabilties">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:WFS_Capabilities", "TR.missingCapabilitiesRootElement");</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="cbaa6d68-b226-43fd-8851-3724846e3898" name="Expect Capabilites in version 2.0.0">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equals("/*:WFS_Capabilities/@version", "Capabilities version", "2.0.0");</scriptText>
                   </con:configuration>
@@ -3627,7 +3635,7 @@ SOAPUI_I.init(log,context,testRunner);
 
 ProjectHelper ph = new ProjectHelper();
 
-String autoConfigurationCompleted = ph.getTestCase("AutoConfigure WFS").getPropertyValue("AutoConfigurationCompleted")
+String autoConfigurationCompleted = ph.getTestCase("AutoConfigure WFS").getPropertyValue("AutoConfigurationCompleted");
 
 if(!"true".equals(autoConfigurationCompleted)) {
 	throw new TranslatableAssertionError("TR.initializationAndBasicChecksFailed");
@@ -5878,14 +5886,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                <con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="377ecd8e-bc4f-4810-bbfc-1fc26abd8aea" />
                <con:assertion type="GroovyScriptAssertion" id="3123bfdf-4491-4a43-b136-15b5cb596c5b" name="xsi:schemaLocation contains the INSPIRE Download Services schema">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.isTrue("//*[contains(@*:schemaLocation,'inspire_dls.xsd')]", "TR.missingDownloadServiceSchema");</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="efa4fb4d-41e2-4da2-9719-2d97223a91c1" name="ExtendedCapabilities element exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]", "TR.capabilities.extended.inspire.missingElement");</scriptText>
                   </con:configuration>
@@ -5958,7 +5966,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                <con:assertion type="OwsExceptionReportAssertion" id="b885f58e-3f44-4cdf-bb7a-214e01226e33" name="Expect no exception" />
                <con:assertion type="GroovyScriptAssertion" id="d4ad0738-8210-4859-ae5f-c76483b489c5" name="ResponseLanguage element exists in INSPIRE SupportedLanguages">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language", "TR.capabilities.extended.inspire.missingElement");</scriptText>
                   </con:configuration>
@@ -6027,7 +6035,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                <con:assertion type="OwsExceptionReportAssertion" id="d1a1fd48-4f74-4b8f-9fe8-ce424dbd5b70" name="Expect no exception" />
                <con:assertion type="GroovyScriptAssertion" id="36df1598-a75c-4a6a-b868-b7671fc20799" name="INSPIRE SupportedLanguages element exist">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language", "TR.capabilities.extended.inspire.missingElement");</scriptText>
                   </con:configuration>
@@ -6099,7 +6107,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                <con:assertion type="OwsExceptionReportAssertion" id="191b0eba-927e-4143-a212-9d01bca4e09d" name="Expect no exception" />
                <con:assertion type="GroovyScriptAssertion" id="c311b403-730d-4c22-a18c-538c2028f0a7" name="ResponseLanguage equals DefaultLanguage">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValues(
 	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
@@ -6155,7 +6163,7 @@ a.equalPathValues(
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="aaff4d10-41c3-40e1-ba59-9db57820fbbf" name="ResponseLanguage equals DefaultLanguage">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValues(
 	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
@@ -6165,7 +6173,7 @@ a.equalPathValues(
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="52282853-1c26-4274-b5a4-4a2d5c41d686" name="Abstract from previous response equals Abstact in this response">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValuesInStep(
 	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
@@ -6175,7 +6183,7 @@ a.equalPathValuesInStep(
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="ec33b391-c617-4ab2-964e-048891efdada" name="Title from previous response equals Title in this response">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValuesInStep(
 	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
@@ -6266,7 +6274,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                <con:assertion type="OwsExceptionReportAssertion" id="2fd79bb6-2306-4504-bd58-caf9ec9a5e58" name="Fail if service returns OWS Exception Report" />
                <con:assertion type="GroovyScriptAssertion" id="57b9d90b-3332-48ba-bd00-03c4530da2d5" name="OnlineResource exists in Capabilities">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.existsNonEmptyText(
   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:Operation[@name='GetCapabilities']/ows:DCP/ows:HTTP/ows:Get[1]/@xlink:href",
@@ -6376,11 +6384,11 @@ import de.interactive_instruments.UriUtils;
 
 ProjectHelper ph = new ProjectHelper();
 
-def supportedLanguages = ph.getTransferProperty("supportedLanguageCodes").tokenize(',')
+def supportedLanguages = ph.getTransferProperty("supportedLanguageCodes").tokenize(',');
 
 for( supportedLanguage in supportedLanguages ) {
-   ph.setTransferProperty("responseLanguageCode", supportedLanguage)
-   ph.runTestStep("Request GetCapabilities in SupportedLanguage")
+   ph.setTransferProperty("responseLanguageCode", supportedLanguage);
+   ph.runTestStep("Request GetCapabilities in SupportedLanguage");
 }
 
 testRunner.gotoStepByName("End test");</script>
@@ -6408,11 +6416,11 @@ testRunner.gotoStepByName("End test");</script>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="8de39e18-2ee5-42f0-ac5c-49d1771304f9" name="ResponseLanguage equals requested Language">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.xtf.*
-SOAPUI_I.init(log, context, messageExchange)
-final ProjectHelper ph = new ProjectHelper()
+                     <scriptText>import de.interactive_instruments.xtf.*;
+SOAPUI_I.init(log, context, messageExchange);
+final ProjectHelper ph = new ProjectHelper();
 
-import de.interactive_instruments.etf.suim.*
+import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 
@@ -6660,7 +6668,7 @@ string-length(//inspire_dls:ExtendedCapabilities/inspire_common:MetadataUrl/insp
                <con:request />
                <con:assertion type="GroovyScriptAssertion" id="7a951485-0732-40ce-8e89-320a0ccabeef" name="INSPIRE MetadataDate exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.existsNonEmptyText(
 	"//inspire_dls:ExtendedCapabilities/inspire_common:MetadataDate",
@@ -6670,27 +6678,27 @@ a.existsNonEmptyText(
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="10b98589-52a5-43cc-9670-8fefe29d9f66" name="INSPIRE Unique Resource Identifier Namespace exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
   "TR.missingSpatialDataSetIdentifierNamespace"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="12b31278-5c35-4ddf-a583-11a02815b29b" name="INSPIRE Unique Resource Identifier Code exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
   "TR.capabilities.extended.inspire.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="fb084145-6aad-46c1-8c9e-c0a9c74faa18" name="INSPIRE MetadataPointOfContact exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//inspire_dls:ExtendedCapabilities/inspire_common:MetadataPointOfContact",
@@ -6700,134 +6708,134 @@ a.exists(
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="dcf548d0-c1a7-4ae8-9253-8512cb7f2280" name="INSPIRE Keyword infoFeatureAccessService exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Keywords[ows:Keyword='infoFeatureAccessService']",
   "TR.missingInfoFeatureAccessService"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="c52c161b-d938-400c-b51d-33630ac69a8e" name="WFS Abstract exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
   "TR.capabilities.ows.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="b93231f7-1cfd-4f5c-873b-987ac01b53e6" name="WFS Title exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
   "TR.capabilities.ows.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="d5ad7683-3cb1-403f-b66e-f97af327c040" name="INSPIRE ResourceType exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//inspire_dls:ExtendedCapabilities/inspire_common:ResourceType",
 	"TR.capabilities.extended.inspire.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="5adaa01c-edb5-41df-8b1f-fa5b5bc275c4" name="INSPIRE ResourceLocator exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
   "//inspire_dls:ExtendedCapabilities/inspire_common:ResourceLocator",
   "TR.capabilities.extended.inspire.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="c243a94c-dc1f-4f19-8f7e-f62f5e6dbf62" name="INSPIRE SpatialDataServiceType is set at 'download'">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equals(
   "//inspire_dls:ExtendedCapabilities/inspire_common:SpatialDataServiceType",
   "SpatialDataServiceType",
   "download",
   "TR.capabilities.extended.inspire.invalidValue"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="1b1d8f40-304c-4018-b054-f3f6516af734" name="WGS84BoundingBox: WFS Each FeatureType has a WGS84BoundingBox">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.notExists(
 	"//*:FeatureType[string-length(ows:WGS84BoundingBox/ows:LowerCorner)=0]",
   "TR.capabilities.ft.missingOwsWgs84BoundingBox"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="d30513de-b7a7-4bc1-af73-ac76f265a89c" name="INSPIRE TemporalReference exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
   "//inspire_dls:ExtendedCapabilities/inspire_common:TemporalReference",
   "TR.capabilities.extended.inspire.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="a02ff8b1-3749-4b26-bebb-e83d98407466" name="INSPIRE Conformity exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
   "//inspire_dls:ExtendedCapabilities/inspire_common:Conformity",
   "TR.capabilities.extended.inspire.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="43a9de61-b156-4755-b9d9-61695957c817" name="WFS Fees exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//ows:ServiceIdentification/ows:Fees",
   "TR.capabilities.ows.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="77916d05-392d-45ad-a213-439798eab35a" name="AccessConstraints exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//ows:ServiceIdentification/ows:AccessConstraints",
   "TR.capabilities.ows.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="c4f3cfce-b1c0-4031-a606-3d14a41ea9b3" name="WFS ServiceProvider exists, at least a ServiceContact with ContactInfo">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//ows:ServiceProvider/ows:ServiceContact/ows:ContactInfo",
   "TR.capabilities.ows.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="d558167a-781a-4ffb-bbb4-4d23e57e81a9" name="WFS ServiceProvider exists, with ProviderName">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//ows:ServiceProvider/ows:ProviderName",
   "TR.capabilities.ows.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="XQuery Match" name="ft-MetadataURL: INSPIRE Each FeatureType has a MetadataURL" id="13b0e9a4-22d9-424a-a307-bf0f5282b2a2">
@@ -6888,20 +6896,20 @@ SOAPUI_I.init(log,context,testRunner);
 import de.interactive_instruments.UriUtils;
 
 ProjectHelper ph = new ProjectHelper();
-def capsXmlHolder = ph.getTransferPropertyAsXml("Capabilities")
+def capsXmlHolder = ph.getTransferPropertyAsXml("Capabilities");
 
 //Pull out the metadataURLs
 def metadataUrlNodes = capsXmlHolder.getNodeValues("//*:MetadataURL/@*:href");
 log.info("metadataUrlNodes: " + metadataUrlNodes);
-assert metadataUrlNodes.size() > 0
+assert metadataUrlNodes.size() > 0;
 
 // clear url to test
-ph.setTransferProperty("urlToTest","")
+ph.setTransferProperty("urlToTest","");
 
 // run GetMetadata test for each url
 for( url in metadataUrlNodes ) {
-   ph.setTransferProperty("urlToTest", url)
-   ph.runTestStep("Get Metadata from Capabilities")
+   ph.setTransferProperty("urlToTest", url);
+   ph.runTestStep("Get Metadata from Capabilities");
 }
 
 testRunner.gotoStepByName("Internal Service Metadata end");</script>
@@ -6933,22 +6941,22 @@ testRunner.gotoStepByName("Internal Service Metadata end");</script>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="24961c37-323b-4e1f-bd91-bb5bf734be7c" name="fileIdentifier exists in Metadata">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
   "//gmd:MD_Metadata/gmd:fileIdentifier",
   "TR.missingMdFileIdentifier"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="51a3f789-398c-4398-9162-3e7b4c98473e" name="Metadata response has MD_Metadata element">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
   "//gmd:MD_Metadata",
   "TR.invalidIsoMetadata"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:credentials>
@@ -7014,39 +7022,39 @@ empty(//inspire_dls:ExtendedCapabilities/inspire_common:MetadataUrl/inspire_comm
                <con:assertion type="OwsExceptionReportAssertion" id="5e62b0cc-9cf1-461e-9c2a-782abbdf46bc" name="Expect no exception" />
                <con:assertion type="GroovyScriptAssertion" id="62489eed-fc72-4957-ba42-e287fd79bfa6" name="xsi:schemaLocation attribute exists in root element">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("//@*:schemaLocation", "TR.missingSchemaLocation");</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="2afebc3c-44dd-4822-be67-892e55ef4106" name="Metadata has ISO Metadata element (gmd_MD_Metadata exists)">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//gmd:MD_Metadata",
   "TR.notIsoMetadata"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="fdd11996-f179-4179-a8e5-2db146b2338c" name="Metadata contains a coupled resource (srv:operatesOn)">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn",
   	"TR.metadata.operatesOn.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="add2edc0-57bc-4e37-8b8a-b69be030b383" name="srv:operatesOn contains a reference to a metadata document">
                   <con:configuration>
-                     <scriptText> import de.interactive_instruments.etf.suim.*
+                     <scriptText> import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.notExists(
 	"//gmd:MD_Metadata/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn[empty(@xlink:href)]",
   "TR.metadata.operatesOn.missingHref"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:credentials>
@@ -7096,19 +7104,19 @@ import de.interactive_instruments.UriUtils;
 // props = testRunner.testCase.testSteps['Properties']
 // log.info("Caps: " + props.getPropertyValue("Capabilities"))
 ProjectHelper ph = new ProjectHelper();
-def serviceMDXmlHolder = ph.getTransferPropertyAsXml("ServiceMetadataRecord")
+def serviceMDXmlHolder = ph.getTransferPropertyAsXml("ServiceMetadataRecord");
 
 //Pull out the metadataURLs
 def metadataUrlNodes = serviceMDXmlHolder.getNodeValues("//*:operatesOn/@*:href");
 log.info("metadataUrlNodes: " + metadataUrlNodes);
 
 // clear url to test
-ph.setTransferProperty("urlToTest","")
+ph.setTransferProperty("urlToTest","");
 
 // run GetMetadata test for each url
 for( url in metadataUrlNodes ) {
-   ph.setTransferProperty("urlToTest",url)
-   ph.runTestStep("Get Metadata from Service Metadata")
+   ph.setTransferProperty("urlToTest",url);
+   ph.runTestStep("Get Metadata from Service Metadata");
 }
 
 testRunner.gotoStepByName("Test end");
@@ -7137,22 +7145,22 @@ testRunner.gotoStepByName("Test end");
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="0d4fb60d-bd86-4391-844e-697f92398830" name="Metadata has element MD_Metadata">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//gmd:MD_Metadata",
   "TR.notIsoMetadata"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="5456879e-aa5c-4e77-9b9d-c932925849d9" name="Metadata fileIdentifier exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//gmd:MD_Metadata/gmd:fileIdentifier",
   "TR.missingElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="XQuery Match" name="MD_Identifier exist in the ServiceMetadata" id="f9d73158-df14-4818-86b3-fe04649351ca">
@@ -7318,7 +7326,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="67921fc4-bc73-402b-8882-d660a11fcf4a" name="Contains  at least one StoredQuery with the parameters 'CRS', 'DataSetID' , 'DataSetIdNamespace', 'Language'">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[./*:Parameter/@name='CRS' and ./*:Parameter/@name='DataSetIdCode' and ./*:Parameter/@name='DataSetIdNamespace' and ./*:Parameter/@name='Language']", "TR.manual.missingInspireStoredQuery");
                      </scriptText>
@@ -7326,7 +7334,7 @@ a.exists("/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[./*:Paramete
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="ff6b4670-07ca-499c-8a04-2cad813b4671" name="Contains the recommended 'GetSpatialDataSet' identifier">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 // Todo warning for TG Recommendation 13
@@ -7335,12 +7343,12 @@ a.exists("/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[@id='http://
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="f73ac0fa-d4f7-43fb-9271-33f924202c5b" name="Root element is DescribeStoredQueriesResponse">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"/*:DescribeStoredQueriesResponse",
   "missingStoredQueriesRootElement"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:credentials>
@@ -7397,25 +7405,22 @@ declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0
                <con:assertion type="OwsExceptionReportAssertion" id="f11fe012-d2c4-4917-897e-f652ce2b8a32" name="Expect no exception" />
                <con:assertion type="GroovyScriptAssertion" id="76bf11cf-64e0-4ca9-8af3-3bb5adce1559" name="SpatialDataSetIdentifier Namespace exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
   "TR.missingSpatialDataSetIdentifierNamespace"
-)</scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="05dd30c4-a0b0-4680-b00c-0158b0675d8d" name="SpatialDataSetIdentifier Code exists">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
 	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
   "TR.capabilities.extended.inspire.missingElement"
-)
-
-
-                     </scriptText>
+);</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:credentials>
@@ -7516,20 +7521,20 @@ import de.interactive_instruments.UriUtils;
 
 ProjectHelper ph = new ProjectHelper();
 
-def supportedCrs = ph.getTransferProperty("supportedCrs").tokenize(',')
-def supportedLanguages = ph.getTransferProperty("supportedLanguages").tokenize(',')
-def spatialDataSetIdentifierCodes = ph.getTransferProperty("spatialDataSetIdentifierCodes").tokenize(',')
-def spatialDataSetIdentifierNamespaces = ph.getTransferProperty("spatialDataSetIdentifierNamespaces").tokenize(',')
+def supportedCrs = ph.getTransferProperty("supportedCrs").tokenize(',');
+def supportedLanguages = ph.getTransferProperty("supportedLanguages").tokenize(',');
+def spatialDataSetIdentifierCodes = ph.getTransferProperty("spatialDataSetIdentifierCodes").tokenize(',');
+def spatialDataSetIdentifierNamespaces = ph.getTransferProperty("spatialDataSetIdentifierNamespaces").tokenize(',');
 
 
 for( crs in supportedCrs ) {
 	for( language in supportedLanguages ) {
 		spatialDataSetIdentifierCodes.eachWithIndex{ dataSetIdCode, i ->
-			ph.setTransferProperty("crs", crs)
-			ph.setTransferProperty("language", language)
-			ph.setTransferProperty("dataSetIdCode", dataSetIdCode)
-			ph.setTransferProperty("dataSetIdNamespace", spatialDataSetIdentifierNamespaces[i])
-   			ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier")
+			ph.setTransferProperty("crs", crs);
+			ph.setTransferProperty("language", language);
+			ph.setTransferProperty("dataSetIdCode", dataSetIdCode);
+			ph.setTransferProperty("dataSetIdNamespace", spatialDataSetIdentifierNamespaces[i]);
+   		ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier");
 		}
 	}
 }
@@ -7565,7 +7570,7 @@ testRunner.gotoStepByName("End test");</script>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="8898ea8e-b928-4833-a223-2ee9250c7c6c" name="Root element is wfs:FeatureCollection">
                   <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*
+                     <scriptText>import de.interactive_instruments.etf.suim.*;
 
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists("/*:FeatureCollection", "TR.missingFeatureCollectionRootElement");</scriptText>
@@ -7574,18 +7579,18 @@ a.exists("/*:FeatureCollection", "TR.missingFeatureCollectionRootElement");</scr
                <con:assertion type="GroovyScriptAssertion" id="bae987ca-0d10-4298-853e-836c6aeed85f" name="FeatureCollection in requested CRS">
                   <con:configuration>
                      <scriptText>import com.eviware.soapui.support.XmlHolder;
-import de.interactive_instruments.etf.suim.*
-import de.interactive_instruments.xtf.*
+import de.interactive_instruments.etf.suim.*;
+import de.interactive_instruments.xtf.*;
 
-def xml = new XmlHolder(messageExchange.responseContentAsXml)
+def xml = new XmlHolder(messageExchange.responseContentAsXml);
 
-SOAPUI_I.init(log, context, messageExchange)
-final ProjectHelper ph = new ProjectHelper()
+SOAPUI_I.init(log, context, messageExchange);
+final ProjectHelper ph = new ProjectHelper();
 String expectedCrs = ph.getTransferProperty("crs");
 
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
-def node = xml.getDomNode("/*:FeatureCollection/*:boundedBy/gml:Envelope/@srsName")
+def node = xml.getDomNode("/*:FeatureCollection/*:boundedBy/gml:Envelope/@srsName");
 
 
 if (node != null){
@@ -7792,7 +7797,7 @@ if (node != null){
    <con:oAuth2ProfileContainer />
    <con:oAuth1ProfileContainer />
    <con:afterRunScript>import com.eviware.soapui.impl.wsdl.teststeps.HttpTestRequestStep;
-import com.eviware.soapui.impl.wsdl.teststeps.RestTestRequestStep
+import com.eviware.soapui.impl.wsdl.teststeps.RestTestRequestStep;
 import com.eviware.soapui.model.testsuite.TestStepResult;
 
 
@@ -7803,7 +7808,8 @@ def requirements = project.getTestSuiteByName("TestSetup")?.
 log.info("Results: ");
 for( testSuiteR in runner?.getResults() ) {
 	for( testCaseR in testSuiteR?.getResults() ) {
-		for( testStepR in testCaseR?.getResults() ) { if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
+		for( testStepR in testCaseR?.getResults() ) { 
+         if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
 				if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
 					testStepR.testStep.testRequest.assertionList.each{
 						// Extract ID which is seperated with a whitespace and a doublecolon
@@ -7819,7 +7825,7 @@ for( testSuiteR in runner?.getResults() ) {
 
 								// Todo: Save the requirements as an object in a map
 								requirements.getPropertyList().each {
-									log.info(it.getName())
+									log.info(it.getName());
 									if(it.getName().contains(id)) {
 										log.error("   -   "+it.getName()+" :" );
 										log.error("        "+it.getValue());
