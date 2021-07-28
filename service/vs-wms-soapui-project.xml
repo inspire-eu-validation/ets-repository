@@ -412,10 +412,15 @@ if(messageExchange.response.responseContent == null){
 	String[] assertParams = ['parameter', 'request'];
 	throw new TranslatableAssertionError('TR.noMandatoryParameterNotFail', assertParams);
 }
-def xml_root = new XmlSlurper().parseText(messageExchange.response.responseContent);
-if (!(xml_root.ServiceException.size() == 1 || xml_root.Exception.size() == 1)){
-	String[] assertParams = ['parameter', 'request'];
-	throw new TranslatableAssertionError('TR.noMandatoryParameterNotFail', assertParams);
+
+if(!messageExchange.response.responseContent.contains("!DOCTYPE")){
+	def xml_root = new XmlSlurper().parseText(messageExchange.response.responseContent);
+	if (!(xml_root.ServiceException.size() == 1 || xml_root.Exception.size() == 1)){
+		String[] assertParams = ['parameter', 'request'];
+		throw new TranslatableAssertionError('TR.noMandatoryParameterNotFail', assertParams);
+	}
+}else{
+	throw new TranslatableAssertionError('TR.doctypeFound');
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
@@ -6207,11 +6212,11 @@ if(capabilities.Capability.ExtendedCapabilities.ResponseLanguage.Language.toStri
 		</con:property>
 		<con:property>
 			<con:name>etf.last.update.date</con:name>
-			<con:value>2021-03-09T12:55:00</con:value>
+			<con:value>2021-05-07T13:00:00</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.version</con:name>
-			<con:value>1.0.10</con:value>
+			<con:value>1.0.11</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.reference</con:name>
