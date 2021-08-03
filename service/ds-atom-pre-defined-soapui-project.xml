@@ -38,7 +38,7 @@ if (basicAuthUser.length()>0) {
 	log.info("Setting credentials for user: " + basicAuthUser);
 }
 Util.updateCredentials(testRunner);
-</script>
+					</script>
 				</con:config>
 			</con:testStep>
 			<con:testStep type="httprequest" name="Check URL is accessible" id="72c74c78-472f-4baa-bdd5-2dfb1c516bb7">
@@ -649,7 +649,7 @@ def response = context.expand( '${Get Service Feed#Response}' )
 if( response.toString() != messageExchange.getResponseContent().toString() ) {
 	throw new TranslatableAssertionError("TR.responseNotEqual", "testStep", "Get Service Feed");
 }
-</scriptText>
+							</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
@@ -2238,7 +2238,7 @@ def response = context.expand( '${Get Dataset Feed#Response}' )
 if( response.toString() != messageExchange.getResponseContent().toString() ) {
 	throw new TranslatableAssertionError("TR.responseNotEqual", "testStep", "Get Dataset Feed");
 }
-</scriptText>
+							</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
@@ -3134,8 +3134,7 @@ for(int i=0; i &lt; mediaTypeUrls.size(); i++) {
 	ph.runTestStep("Get INSPIRE Media Subtype");
 	def respXmlHolder = ph.getTestStepResult("Get INSPIRE Media Subtype")
 	def extractedMediaTypes = respXmlHolder.getNodeValue( "string-join(/*:feed/*:entry/*:title, '')" );
-	final String mediaTypes = ph.getTransferProperty("mediaTypes")
-	if(mediaTypes!="") {
+	final String mediaTypes = ph.getTransferProperty("mediaTypes") if(mediaTypes!="") {
 		ph.setTransferProperty("mediaTypes", mediaTypes+" "+extractedMediaTypes)
 	}else{
 		ph.setTransferProperty("mediaTypes", extractedMediaTypes)
@@ -3428,9 +3427,7 @@ props.setPropertyValue("dataFeedURL",testRunner.testCase.testSuite.project.getPr
 
 // now run Feed test for each dataFeedUrl, to validate Dataset feeds
 for( i in dataFeedUrlNodes )
-{
-   i=i.replaceAll("%7B","{")
-   i=i.replaceAll("%7D","}")
+{ i=i.replaceAll("%7B","{") i=i.replaceAll("%7D","}")
    log.info("The Atom feed refers to Dataset Feeds. Now checking Dataset Feed with URL: " + i)
    props.setPropertyValue("dataFeedURL",i)
    props.setPropertyValue("dataFeedURLEncoded",i.replaceAll("&amp;","&amp;amp;"))
@@ -3441,7 +3438,7 @@ for( i in dataFeedUrlNodes )
    testRunner.runTestStepByName("ResolveDatasetLink")
    // testRunner.runTestStepByName("Run TestCase M-04: Dataset Metadata Mandatory")
 }
-</script>
+					</script>
 				</con:config>
 			</con:testStep>
 			<con:testStep type="httprequest" name="ValidateDatasetFeed" id="d4c09a50-2618-4207-ae0d-0d5f772b840c">
@@ -3747,9 +3744,7 @@ def dataSetUrlNodes = feedXmlHolder.getNodeValues("//atom:entry/atom:link[(@rel=
 
 // Then run Feed test for each dataSetUrl
 for( i in dataSetUrlNodes )
-{
-   i=i.replaceAll("%7B","{")
-   i=i.replaceAll("%7D","}")
+{ i=i.replaceAll("%7B","{") i=i.replaceAll("%7D","}")
    log.info("The Atom feed refers to a dataset to download at the URL: " + i)
    props.setPropertyValue("dataSetURL",i)
    testRunner.runTestStepByName("ResolveDatasetLink")
@@ -5053,10 +5048,8 @@ a.exists(
 						<con:name>Generic search queries URL</con:name>
 						<con:sourceType>ResponseAsXml</con:sourceType>
 						<con:sourceStep>Get OpenSearch Description</con:sourceStep>
-						<con:sourcePath>declare namespace os='http://a9.com/-/spec/opensearch/1.1/';
-
-/os:OpenSearchDescription/os:Url[@rel='results' and @type='text/html']/@template
-</con:sourcePath>
+						<con:sourcePath>declare namespace os='http://a9.com/-/spec/opensearch/1.1/'; /os:OpenSearchDescription/os:Url[@rel='results' and @type='text/html']/@template
+						</con:sourcePath>
 						<con:targetType>geneircSearchQueriesUrl</con:targetType>
 						<con:targetStep>Transfer_Properties</con:targetStep>
 						<con:upgraded>true</con:upgraded>
@@ -5182,9 +5175,7 @@ def requirements = project.getTestSuiteByName("TestSetup")?.
 log.info("Results: ");
 for( testSuiteR in runner?.getResults() ) {
 	for( testCaseR in testSuiteR?.getResults() ) {
-		for( testStepR in testCaseR?.getResults() ) {
-
-			if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
+		for( testStepR in testCaseR?.getResults() ) { if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
 				if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
 					testStepR.testStep.testRequest.assertionList.each{
 						// Extract ID which is seperated with a whitespace and a doublecolon
@@ -5216,6 +5207,6 @@ for( testSuiteR in runner?.getResults() ) {
 		}
 	}
 }
-</con:afterRunScript>
+	</con:afterRunScript>
 	<con:sensitiveInformation />
 </con:soapui-project>
