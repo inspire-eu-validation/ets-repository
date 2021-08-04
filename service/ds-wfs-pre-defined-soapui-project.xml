@@ -3076,10 +3076,13 @@ public class OutputFormat {
 		this.outputFormat = outputFormat;
 		this.type = FormatType.UNKNOWN;
 
-		if(outputFormat.indexOf("xml")!=-1 ||
-			outputFormat.indexOf("gml")!=-1) { type=FormatType.XML;
-		}else if(outputFormat.indexOf("json")!=-1) { type=FormatType.JSON;
-		}else if(outputFormat.indexOf("text")!=-1) { type=FormatType.TEXT;
+		if(outputFormat.indexOf("xml")!=-1 || outputFormat.indexOf("gml")!=-1)
+		{
+			type=FormatType.XML;
+		}else if(outputFormat.indexOf("json")!=-1) {
+			type=FormatType.JSON;
+		}else if(outputFormat.indexOf("text")!=-1) {
+			type=FormatType.TEXT;
 		}
 	}
 
@@ -3151,14 +3154,13 @@ void initOutputFormats(final XmlHolder capabilitiesXML) {
 			"/*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name=\""+
 			operation+"\"]";
 
-		String allowedValue=""; 
-      if(serviceTypeVersion=="2.0.0"){
+		String allowedValue="";
+      if(serviceTypeVersion=="2.0.0")
 			allowedValue = "/*:AllowedValues";
-      }
 		final String owsValueXPath="/*:Parameter[@name=\""+parameter+"\"]"+
 			allowedValue+"/*:Value";
 
-		String[] values = capabilitiesXML.getNodeValues(operationXPath+owsValueXPath); 
+		String[] values = capabilitiesXML.getNodeValues(operationXPath+owsValueXPath);
       log.info(operationXPath+owsValueXPath); 
       if(values.size()==0) {
 			throw new Exception(this, "Unable to find \""+operation+"\"");
@@ -3289,7 +3291,7 @@ int getHttpResponseCode(String url, def credentials){
 }
 
 assert schemaLocations != null, "Response does not contain xsi:schemaLocation attribute!";
- if(schemaLocations!=null) {
+if(schemaLocations!=null) {
 	for(schemaLocation in schemaLocations) {
 		log.info("Checking "+schemaLocation);
 		try {
@@ -6347,7 +6349,8 @@ declare namespace fes='http://www.opengis.net/fes/2.0';
 declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace xlink='http://www.w3.org/1999/xlink';
 declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0'; /*:WFS_Capabilities/ows:OperationsMetadata/ows:Operation[@name="GetCapabilities"]/ows:DCP/ows:HTTP/ows:Get[1]/@xlink:href
+declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
+/*:WFS_Capabilities/ows:OperationsMetadata/ows:Operation[@name="GetCapabilities"]/ows:DCP/ows:HTTP/ows:Get[1]/@xlink:href
                   </con:sourcePath>
                   <con:targetType>getCapabilitiesOnlineResource</con:targetType>
                   <con:targetStep>Transfer_Properties</con:targetStep>
@@ -6621,7 +6624,8 @@ declare namespace fes='http://www.opengis.net/fes/2.0';
 declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace xlink='http://www.w3.org/1999/xlink';
 declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0'; //ows:Operation[@name='GetCapabilities'][1]/ows:DCP/ows:HTTP/ows:Get/@xlink:href</con:sourcePath>
+declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
+//ows:Operation[@name='GetCapabilities'][1]/ows:DCP/ows:HTTP/ows:Get/@xlink:href</con:sourcePath>
                   <con:targetType>Endpoint</con:targetType>
                   <con:targetStep>Check ServiceMetadata in Capabilities</con:targetStep>
                   <con:upgraded>true</con:upgraded>
@@ -7386,7 +7390,9 @@ a.exists(
                   <con:sourceStep>Request and check DescribeStoredQueries</con:sourceStep>
                   <con:sourcePath>declare namespace wfs='http://www.opengis.net/wfs/2.0';
 declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0'; /*:DescribeStoredQueriesResponse/*:StoredQueryDescription[./*:Parameter/@name='DataSetIdCode' and ./*:Parameter/@name='DataSetIdCode' and ./*:Parameter/@name='DataSetIdNamespace' and ./*:Parameter/@name='Language']/@id</con:sourcePath>
+declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
+
+/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[./*:Parameter/@name='DataSetIdCode' and ./*:Parameter/@name='DataSetIdCode' and ./*:Parameter/@name='DataSetIdNamespace' and ./*:Parameter/@name='Language']/@id</con:sourcePath>
                   <con:targetType>storedQueryId</con:targetType>
                   <con:targetStep>Transfer_Properties</con:targetStep>
                   <con:upgraded>true</con:upgraded>
@@ -7808,7 +7814,8 @@ def requirements = project.getTestSuiteByName("TestSetup")?.
 log.info("Results: ");
 for( testSuiteR in runner?.getResults() ) {
 	for( testCaseR in testSuiteR?.getResults() ) {
-		for( testStepR in testCaseR?.getResults() ) { 
+		for( testStepR in testCaseR?.getResults() ) {
+
          if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
 				if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
 					testStepR.testStep.testRequest.assertionList.each{
