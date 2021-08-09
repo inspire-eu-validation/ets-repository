@@ -196,17 +196,22 @@ if (endpoint.getQuery()) {
                   <con:configuration>
                      <scriptText>import de.interactive_instruments.etf.suim.*
 import de.interactive_instruments.*
-
 if(!messageExchange.hasResponse()) {
-  throw new TranslatableAssertionError("TR.noDataReturned")
+   throw new TranslatableAssertionError("TR.noDataReturned")
 }
 
-if(messageExchange.responseContent.size()>7) {
-	final String xmlProlog = messageExchange.responseContent.substring(0,7);
-	if(!xmlProlog.trim().startsWith("&lt;")) {
-		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
-	}
-}</scriptText>
+if(!messageExchange.response.responseContent.contains("!DOCTYPE")){
+   if(messageExchange.responseContent.size()>7) {
+      final String xmlProlog = messageExchange.responseContent.substring(0,7);
+      if(!xmlProlog.trim().startsWith("&lt;")) {
+         throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
+      }
+   }
+}else{
+	String[] assertParams = ['service', 'WFS'];
+	throw new TranslatableAssertionError('TR.doctypeFound');
+}
+</scriptText>
                   </con:configuration>
                </con:assertion>
                <con:assertion type="GroovyScriptAssertion" id="569e5be5-a54e-436d-8328-d0328fb8c03f" name="Expect a Capabilities root element">
@@ -7764,7 +7769,7 @@ if (node != null){
       </con:property>
       <con:property>
          <con:name>etf.version</con:name>
-         <con:value>1.0.8</con:value>
+         <con:value>1.0.9</con:value>
       </con:property>
       <con:property>
          <con:name>etf.last.editor</con:name>
@@ -7784,7 +7789,7 @@ if (node != null){
       </con:property>
       <con:property>
          <con:name>etf.last.update.date</con:name>
-         <con:value>2020-05-29T09:52:00</con:value>
+         <con:value>2021-08-09T13:00:00</con:value>
       </con:property>
    </con:properties>
    <con:afterLoadScript></con:afterLoadScript>

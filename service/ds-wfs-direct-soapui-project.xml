@@ -201,13 +201,18 @@ import de.interactive_instruments.*
 if(!messageExchange.hasResponse()) {
   throw new TranslatableAssertionError("TR.noDataReturned")
 }
-
-if(messageExchange.responseContent.size()>7) {
-	final String xmlProlog = messageExchange.responseContent.substring(0,7);
-	if(!xmlProlog.trim().startsWith("&lt;")) {
-		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
-	}
-}</scriptText>
+if(!messageExchange.response.responseContent.contains("!DOCTYPE")){
+  if(messageExchange.responseContent.size()>7) {
+    final String xmlProlog = messageExchange.responseContent.substring(0,7);
+    if(!xmlProlog.trim().startsWith("&lt;")) {
+      throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
+    }
+  }
+}else{
+	String[] assertParams = ['service', 'WFS'];
+	throw new TranslatableAssertionError('TR.doctypeFound');
+}
+</scriptText>
             </con:configuration>
           </con:assertion>
           <con:credentials>
@@ -1435,7 +1440,7 @@ a.equals("/*:WFS_Capabilities/fes:Filter_Capabilities/fes:Conformance/fes:Constr
     </con:property>
     <con:property>
       <con:name>etf.version</con:name>
-      <con:value>1.0.4</con:value>
+      <con:value>1.0.5</con:value>
     </con:property>
     <con:property>
       <con:name>etf.last.editor</con:name>
@@ -1455,7 +1460,7 @@ a.equals("/*:WFS_Capabilities/fes:Filter_Capabilities/fes:Conformance/fes:Constr
     </con:property>
     <con:property>
       <con:name>etf.last.update.date</con:name>
-      <con:value>2020-05-295T09:47:00</con:value>
+      <con:value>2021-08-09T13:00:00</con:value>
     </con:property>
     <con:property>
       <con:name>etf.dependency.ids</con:name>

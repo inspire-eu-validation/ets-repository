@@ -801,9 +801,15 @@ if(!language_supported){
 if(messageExchange.response.responseContent == null){
 	throw new TranslatableAssertionError('TR.invalidGetRecordsResponse');
 }
-def getRecordsResponse = new XmlSlurper(false, true).parseText(messageExchange.response.responseContent);
-if(getRecordsResponse.SearchResults.size() != 1){
-	throw new TranslatableAssertionError('TR.invalidGetRecordsResponse');
+
+if(!messageExchange.response.responseContent.contains("!DOCTYPE")){
+	def getRecordsResponse = new XmlSlurper(false, true).parseText(messageExchange.response.responseContent);
+	if(getRecordsResponse.SearchResults.size() != 1){
+		throw new TranslatableAssertionError('TR.invalidGetRecordsResponse');
+	}
+}else{
+	String[] assertParams = ['service', 'CSW 1.1.1'];
+	throw new TranslatableAssertionError('TR.doctypeFound');
 }
 							</scriptText>
 						</con:configuration>
@@ -2068,11 +2074,11 @@ a.exists(
 		</con:property>
 		<con:property>
 			<con:name>etf.last.update.date</con:name>
-			<con:value>2020-03-05T13:00:00</con:value>
+			<con:value>2021-08-09T13:00:00</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.version</con:name>
-			<con:value>0.1.6</con:value>
+			<con:value>0.1.7</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.reference</con:name>

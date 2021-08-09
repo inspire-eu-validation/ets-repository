@@ -70,12 +70,18 @@ if(!messageExchange.hasResponse()) {
   throw new TranslatableAssertionError("TR.noDataReturned")
 }
 
-if(messageExchange.responseContent.size()>7) {
-	final String xmlProlog = messageExchange.responseContent.substring(0,7);
-	if(!xmlProlog.trim().startsWith("&lt;")) {
-		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
+if(!messageExchange.response.responseContent.contains("!DOCTYPE")){
+	if(messageExchange.responseContent.size()>7) {
+		final String xmlProlog = messageExchange.responseContent.substring(0,7);
+		if(!xmlProlog.trim().startsWith("&lt;")) {
+			throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") )
+		}
 	}
-}</scriptText>
+}else{
+	String[] assertParams = ['service', 'ATOM'];
+	throw new TranslatableAssertionError('TR.doctypeFound');
+}
+</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:assertion type="GroovyScriptAssertion" id="5e954eb8-f4fb-49b6-a1e3-2bcec69dbd6b" name="Root element 'feed' exists">
@@ -5152,11 +5158,11 @@ if(!messageExchange.responseHeaders['Content-Type'][0].startsWith('text/html')) 
 		</con:property>
 		<con:property>
 			<con:name>etf.version</con:name>
-			<con:value>1.0.6</con:value>
+			<con:value>1.0.7</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.last.update.date</con:name>
-			<con:value>2020-05-24T16:30:00</con:value>
+			<con:value>2021-08-09T13:00:00</con:value>
 		</con:property>
 	</con:properties>
 	<con:wssContainer />

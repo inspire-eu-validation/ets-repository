@@ -64,7 +64,15 @@ tsGetObservation.setDisabled(true);
 					<con:assertion type="OwsExceptionReportAssertion" id="136249b8-9f81-4761-be97-74c831c7ad62" name="Fail if service returns OWS Exception Report" />
 					<con:assertion type="GroovyScriptAssertion" id="bbf2023a-6f68-45c7-aec4-620da5a8643a" name="check-content-type">
 						<con:configuration>
-							<scriptText>assert (messageExchange.getResponseHeaders().get('Content-Type', 'value').contains('xml'));</scriptText>
+							<scriptText>
+								if(messageExchange.response.responseContent.contains("!DOCTYPE")){
+									String[] assertParams = ['service', 'SOS'];
+									throw new TranslatableAssertionError('TR.doctypeFound');
+								}
+								assert (messageExchange.getResponseHeaders().get('Content-Type', 'value').contains('xml'));
+														
+							
+							</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
@@ -1330,11 +1338,11 @@ assertions.each{
 		</con:property>
 		<con:property>
 			<con:name>etf.last.update.date</con:name>
-			<con:value>2020-03-05T13:00:00</con:value>
+			<con:value>2021-08-09T13:00:00</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.version</con:name>
-			<con:value>0.2.18</con:value>
+			<con:value>0.2.19</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.reference</con:name>
