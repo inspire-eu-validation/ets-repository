@@ -3115,29 +3115,30 @@ SOAPUI_I.init(log,context,testRunner);
 import de.interactive_instruments.UriUtils;
 
 ProjectHelper ph = new ProjectHelper();
-def xmlHolder = ph.getTestStepResult("Get INSPIRE Media Types")
+def xmlHolder = ph.getTestStepResult("Get INSPIRE Media Types");
 
 def mediaTypeUrls = xmlHolder.getNodeValues( "/*:feed/*:entry/*:link[@rel='self']/@href" );
 def mediaBaseTypes = xmlHolder.getNodeValues( "/*:feed/*:entry/*:title" );
 log.info("mediaTypeUrls: " + mediaTypeUrls);
 
 // clear url to test
-ph.setTransferProperty("mediaTypeUrl", "")
-ph.setTransferProperty("mediaTypes", "")
+ph.setTransferProperty("mediaTypeUrl", "");
+ph.setTransferProperty("mediaTypes", "");
 
 for(int i=0; i &lt; mediaTypeUrls.size(); i++) {
 	final String url = mediaTypeUrls[i];
 	final String baseType = mediaBaseTypes[i];
 
-	log.info("Using URL: "+url)
-	ph.setTransferProperty("mediaTypeUrl", url)
+	log.info("Using URL: "+url);
+	ph.setTransferProperty("mediaTypeUrl", url);
 	ph.runTestStep("Get INSPIRE Media Subtype");
-	def respXmlHolder = ph.getTestStepResult("Get INSPIRE Media Subtype")
+	def respXmlHolder = ph.getTestStepResult("Get INSPIRE Media Subtype");
 	def extractedMediaTypes = respXmlHolder.getNodeValue( "string-join(/*:feed/*:entry/*:title, '')" );
-	final String mediaTypes = ph.getTransferProperty("mediaTypes") if(mediaTypes!="") {
-		ph.setTransferProperty("mediaTypes", mediaTypes+" "+extractedMediaTypes)
+	final String mediaTypes = ph.getTransferProperty("mediaTypes");
+	if(mediaTypes != "") {
+		ph.setTransferProperty("mediaTypes", mediaTypes + " " + extractedMediaTypes);
 	}else{
-		ph.setTransferProperty("mediaTypes", extractedMediaTypes)
+		ph.setTransferProperty("mediaTypes", extractedMediaTypes);
 	}
 }
 
@@ -5152,11 +5153,11 @@ if(!messageExchange.responseHeaders['Content-Type'][0].startsWith('text/html')) 
 		</con:property>
 		<con:property>
 			<con:name>etf.version</con:name>
-			<con:value>1.0.6</con:value>
+			<con:value>1.0.7</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.last.update.date</con:name>
-			<con:value>2020-05-24T16:30:00</con:value>
+			<con:value>2021-06-30T12:30:00</con:value>
 		</con:property>
 	</con:properties>
 	<con:wssContainer />
