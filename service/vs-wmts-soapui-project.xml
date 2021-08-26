@@ -601,7 +601,7 @@ requestStepList.each{reqStep->
 	
 		httpResponseHeaders = context.testCase.testSteps[reqStep].testRequest.response.responseHeaders;
 	
-		if(httpResponseHeaders['Content-Type'][0].contains('text/xml')){
+		if(httpResponseHeaders.getCaseInsensitive('Content-Type', 'value').contains('text/xml')){
 	
 			def xml_root = new XmlSlurper().parseText(tileResponse);
 			
@@ -628,7 +628,7 @@ requestStepList.each{reqStep->
 	
 		httpResponseHeaders = context.testCase.testSteps[reqStep].testRequest.response.responseHeaders;
 	
-		if(httpResponseHeaders['Content-Type'][0].contains('text/xml')){
+		if(httpResponseHeaders.getCaseInsensitive('Content-Type', 'value').contains('text/xml')){
 			def xml_root = new XmlSlurper().parseText(tileResponse);
 			if (!(xml_root.ServiceException.size() == 1 || xml_root.Exception.size() == 1)){
 				String[] assertParams = ["parameter", param.toString()];
@@ -1117,12 +1117,12 @@ layers.each{layer->
 
 				def httpResponseHeaders = context.testCase.testSteps["http-request-gettile"].testRequest.response.responseHeaders;
 
-				if(httpResponseHeaders["Content-Type"][0] != null &amp;&amp; httpResponseHeaders["Content-Type"][0] !=  format.toString()){
+				if(httpResponseHeaders.containsKeyIgnoreCase('Content-Type') &amp;&amp; httpResponseHeaders.getCaseInsensitive('Content-Type', 'value') != format.toString()){
 					def identifier_tmp = '';
 					if(layer.Identifier.size() == 1){
 						identifier_tmp = layer.Identifier.toString();
 					}
-					String[] assertParams = ["responseformat", httpResponseHeaders["Content-Type"][0].toString(), "requestedformat", format.toString(), "layerid", identifier_tmp];
+					String[] assertParams = ["responseformat", httpResponseHeaders.getCaseInsensitive('Content-Type', 'value'), "requestedformat", format.toString(), "layerid", identifier_tmp];
 					throw new TranslatableAssertionError("TR.wrongResponseFormat", assertParams);
 					//Msg: The response format ({responseformat}) is distinct to the requested format ({requestedformat}) for the '{layerid}' layer.
 				}
@@ -1917,7 +1917,7 @@ supportedLangs.each{lang->
 	
 				httpResponseHeaders = context.testCase.testSteps["http-request-legend"].testRequest.response.responseHeaders;
 	
-				if(httpResponseHeaders["Content-Type"][0].toString() != format.toString()){
+				if(httpResponseHeaders.getCaseInsensitive('Content-Type', 'value') != format.toString()){
 					String[] assertParams = ["styleid", style.Identifier.toString(), "layerid", layer.Identifier.toString()];
 					throw new TranslatableAssertionError("TR.wrongLegendResponseFormat", assertParams);
 					//Msg: The response format is wrong for the legend resource into the '{styleid}' style into the '{layerid}' layer.
@@ -2141,7 +2141,7 @@ if(testRunner.testCase.testSuite.project.getPropertyValue("defaultGetTile_Endpoi
 	
 		httpResponseHeaders = context.testCase.testSteps["http-request-gettile"].testRequest.response.responseHeaders;
 	
-		if(httpResponseHeaders['Content-Type'][0].contains('text/xml')){
+		if(httpResponseHeaders.getCaseInsensitive('Content-Type', 'value').contains('text/xml')){
 	
 			def xml_root = new XmlSlurper().parseText(tileResponse);
 			
@@ -2168,7 +2168,7 @@ if(testRunner.testCase.testSuite.project.getPropertyValue("defaultGetTile_Endpoi
 	
 		httpResponseHeaders = context.testCase.testSteps["http-request-gettile"].testRequest.response.responseHeaders;
 	
-		if(httpResponseHeaders['Content-Type'][0].contains('text/xml')){
+		if(httpResponseHeaders.getCaseInsensitive('Content-Type', 'value').contains('text/xml')){
 			def xml_root = new XmlSlurper().parseText(tileResponse);
 			if (!(xml_root.ServiceException.size() == 1 || xml_root.Exception.size() == 1)){
 				String[] assertParams = ["parameter", param.toString()];
