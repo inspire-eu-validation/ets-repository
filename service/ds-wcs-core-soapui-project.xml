@@ -1,7 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project id="074570ad-d720-47b3-af79-d54201793404" activeEnvironment="Default" name="Conformance Class: Download Service - WCS Core" resourceRoot="" soapui-version="5.4.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:description><![CDATA[This test suite examines an OGC Web Coverage Service against the requirements related to INSPIRE <br/> <br/> <b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/inspire-eu-validation/community/wiki/Your-feedback" target="_blank">in GitHub</a>. <br/> <br/> Known limitations are documented in the description of the applicable test case or test assertion. <br/> <br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core" target="_blank">Conformance Class 'Download Service WCS Core'</a>]]></con:description><con:settings/><con:testSuite id="54b3f0c6-2bd2-4c77-895e-d83adda3f57f" name="Initialize"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="0beece5a-67d9-46c8-823b-c5487202b337" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="initial-testcase" searchProperties="true"><con:description>&lt;p>This test case initializes the Executable Test Suite.&lt;/p>
-&lt;p>It performs an initial GetCapabilities request, it sets common properties with gathered information and it determines the metadata scenario based on the elements provided in the capabilities document.&lt;/p></con:description><con:settings/><con:testStep type="groovy" name="reset-properties" id="44c10855-6bca-42ef-9e4f-58815cd247ee"><con:settings/><con:config><script>import de.interactive_instruments.xtf.*;
+<con:soapui-project id="074570ad-d720-47b3-af79-d54201793404" activeEnvironment="Default" name="Conformance Class: Download Service - WCS Core" resourceRoot="" soapui-version="5.4.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config">
+	<con:description>
+		<![CDATA[This test suite examines an OGC Web Coverage Service against the requirements related to INSPIRE <br/> <br/> <b>This is a draft version. It has limitations and is expected to contain errors.</b> Please report any issues or problems <a href="https://github.com/INSPIRE-MIF/helpdesk-validator/wiki/Your-feedback" target="_blank">in GitHub</a>. <br/> <br/> Known limitations are documented in the description of the applicable test case or test assertion. <br/> <br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core" target="_blank">Conformance Class 'Download Service WCS Core'</a>]]>
+	</con:description>
+	<con:settings />
+	<con:testSuite id="54b3f0c6-2bd2-4c77-895e-d83adda3f57f" name="Initialize">
+		<con:settings />
+		<con:runType>SEQUENTIAL</con:runType>
+		<con:testCase id="0beece5a-67d9-46c8-823b-c5487202b337" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="initial-testcase" searchProperties="true">
+			<con:description>&lt;p>This test case initializes the Executable Test Suite.&lt;/p>
+&lt;p>It performs an initial GetCapabilities request, it sets common properties with gathered information and it determines the metadata scenario based on the elements provided in the capabilities document.&lt;/p></con:description>
+			<con:settings />
+			<con:testStep type="groovy" name="reset-properties" id="44c10855-6bca-42ef-9e4f-58815cd247ee">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.xtf.*;
 SOAPUI_I.init(log,context,testRunner);
 
 // Also update credentials
@@ -15,9 +29,63 @@ tsGetObservation.setDisabled(true);
 
 def tc03 = testRunner.testCase.testSuite.project.testSuites["Service_Metadata"].testCases["at03-natural-language-fields"];
 tc03.setPropertyValue('AcceptLanguages', '');
-</script></con:config></con:testStep><con:testStep type="httprequest" name="http-request" id="0881dc94-9b6d-4d8c-95e5-a78ef9fc87ef"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="8883f814-d25b-4c80-a0aa-f9819afba000" name="http-request" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="c16690f7-fa18-48bc-9308-ab0e0701b2ec" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="bdc100b2-0d33-4b3c-b3a3-7000e636f17a" name="Response SLA"><con:configuration><SLA>600000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>AcceptVersions</con:name><con:value>${#Project#AcceptVersions}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="set-lastserviceendpoint" id="ca4c8765-3bac-4c85-a19c-a70f75602a71"><con:settings/><con:config><script>def lastServiceEndpoint = context.expand('${http-request#EndPoint}');
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="httprequest" name="http-request" id="0881dc94-9b6d-4d8c-95e5-a78ef9fc87ef">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="8883f814-d25b-4c80-a0aa-f9819afba000" name="http-request" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="Valid HTTP Status Codes" id="c16690f7-fa18-48bc-9308-ab0e0701b2ec" name="Valid HTTP Status Codes">
+						<con:configuration>
+							<codes>200</codes>
+						</con:configuration>
+					</con:assertion>
+					<con:assertion type="Response SLA Assertion" id="bdc100b2-0d33-4b3c-b3a3-7000e636f17a" name="Response SLA">
+						<con:configuration>
+							<SLA>600000</SLA>
+						</con:configuration>
+					</con:assertion>
+					<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters>
+						<con:parameter>
+							<con:name>service</con:name>
+							<con:value>${#Project#service}</con:value>
+							<con:style>QUERY</con:style>
+						</con:parameter>
+						<con:parameter>
+							<con:name>request</con:name>
+							<con:value>GetCapabilities</con:value>
+							<con:style>QUERY</con:style>
+						</con:parameter>
+						<con:parameter>
+							<con:name>AcceptVersions</con:name>
+							<con:value>${#Project#AcceptVersions}</con:value>
+							<con:style>QUERY</con:style>
+						</con:parameter>
+					</con:parameters>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="set-lastserviceendpoint" id="ca4c8765-3bac-4c85-a19c-a70f75602a71">
+				<con:settings />
+				<con:config>
+					<script>def lastServiceEndpoint = context.expand('${http-request#EndPoint}');
 testRunner.testCase.testSuite.project.setPropertyValue( 'lastServiceEndpoint', lastServiceEndpoint);
-</script></con:config></con:testStep><con:testStep type="groovy" name="set-acceptlanguages" id="84ddb36c-a793-46d4-b882-b66c609c6607"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="set-acceptlanguages" id="84ddb36c-a793-46d4-b882-b66c609c6607">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
@@ -33,7 +101,13 @@ if(extendedCapabilities.size() == 1){
 	def tc03 = testRunner.testCase.testSuite.project.testSuites["Service_Metadata"].testCases["at03-natural-language-fields"];
 	tc03.setPropertyValue('AcceptLanguages', defaultLanguage.toString());
 }
-</script></con:config></con:testStep><con:testStep type="groovy" name="set-extended-capabilities-scenario" id="3c07fd97-8c5e-4a44-b854-e335ec99b134"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="set-extended-capabilities-scenario" id="3c07fd97-8c5e-4a44-b854-e335ec99b134">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def response = context.expand('${http-request#Response}');
 def capabilities = new XmlSlurper().parseText(response);
 def extendedCapabilities = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities;
@@ -47,7 +121,18 @@ if(extendedCapabilities.MetadataUrl.size() != 0){
 }
 testRunner.testCase.testSuite.project.setPropertyValue( "extended_capabilities_scenario", scenario );
 log.info('Extended Capabilities Scenario: ' + scenario);
-</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="4e10a229-c426-479b-a67c-ea4f04a04673" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="check-initial-testcase" searchProperties="true"><con:description>&lt;p>This test case checks whether the Executable Test Suite has been initialized. If it has not been, it runs the initialization test case.&lt;/p></con:description><con:settings/><con:testStep type="groovy" name="run-initial-testcase-if-needed" id="4b3f1146-d9bd-4255-82ad-045f3fcac341"><con:settings/><con:config><script>def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:properties />
+		</con:testCase>
+		<con:testCase id="4e10a229-c426-479b-a67c-ea4f04a04673" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="check-initial-testcase" searchProperties="true">
+			<con:description>&lt;p>This test case checks whether the Executable Test Suite has been initialized. If it has not been, it runs the initialization test case.&lt;/p></con:description>
+			<con:settings />
+			<con:testStep type="groovy" name="run-initial-testcase-if-needed" id="4b3f1146-d9bd-4255-82ad-045f3fcac341">
+				<con:settings />
+				<con:config>
+					<script>def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def serviceEndPoint = testRunner.testCase.testSuite.project.getPropertyValue('serviceEndpoint');
 def lastServiceEndPoint = testRunner.testCase.testSuite.project.getPropertyValue('lastServiceEndpoint');
 def makeInitialRequest = false;
@@ -59,8 +144,35 @@ else if(serviceEndPoint != lastServiceEndPoint){
 }
 if(makeInitialRequest){
 	runner = tc.run(new com.eviware.soapui.support.types.StringToObjectMap(), false);
-}</script></con:config></con:testStep><con:properties/></con:testCase><con:properties/></con:testSuite><con:testSuite id="479afa32-fe75-4ac4-a672-ced7c207f5f4" name="Service_Metadata"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="ee02b533-7bee-42ed-a705-d14b821aa071" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at02-protocol-bindings" searchProperties="true"><con:description><![CDATA[<p>Test that the service supports at least one of the WCS protocol bindings KVP, POST or XML/SOAP.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at02-protocol-bindings" target="_blank">Protocol bindings</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="46bdede2-9485-4efb-ae12-bc4643c126a9"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-protocol-bindings" id="6fa28edf-a1f8-43b3-b258-4b42d1365096"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+}</script>
+				</con:config>
+			</con:testStep>
+			<con:properties />
+		</con:testCase>
+		<con:properties />
+	</con:testSuite>
+	<con:testSuite id="479afa32-fe75-4ac4-a672-ced7c207f5f4" name="Service_Metadata">
+		<con:settings />
+		<con:runType>SEQUENTIAL</con:runType>
+		<con:testCase id="ee02b533-7bee-42ed-a705-d14b821aa071" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at02-protocol-bindings" searchProperties="true">
+			<con:description>
+				<![CDATA[<p>Test that the service supports at least one of the WCS protocol bindings KVP, POST or XML/SOAP.</p>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at02-protocol-bindings" target="_blank">Protocol bindings</a></p>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="testcasedependency" name="check-initial-testcase" id="46bdede2-9485-4efb-ae12-bc4643c126a9">
+				<con:settings />
+				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase>
+					<con:properties />
+					<con:returnProperties />
+					<con:runMode>PARALLELL</con:runMode>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="check-protocol-bindings" id="6fa28edf-a1f8-43b3-b258-4b42d1365096">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
@@ -84,8 +196,30 @@ profiles.each{profi ->
 if(valid == false){
 	throw new TranslatableAssertionError('TR.protocolBindings');
 }
-</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="7a34ee6c-de50-4f9a-ad1e-2e963f03ab63" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at03-natural-language-fields" searchProperties="true"><con:description><![CDATA[<p>Test that the natural language fields are in the requested language.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at03-natural-language-fields" target="_blank">Natural language fields</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="d5573f9b-fb9c-4f39-a874-31954da915dd"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-language-provided" id="b92d5f2e-edbb-4a21-930f-cf94b88edb9c"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:properties />
+		</con:testCase>
+		<con:testCase id="7a34ee6c-de50-4f9a-ad1e-2e963f03ab63" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at03-natural-language-fields" searchProperties="true">
+			<con:description>
+				<![CDATA[<p>Test that the natural language fields are in the requested language.</p>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at03-natural-language-fields" target="_blank">Natural language fields</a></p>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="testcasedependency" name="check-initial-testcase" id="d5573f9b-fb9c-4f39-a874-31954da915dd">
+				<con:settings />
+				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase>
+					<con:properties />
+					<con:returnProperties />
+					<con:runMode>PARALLELL</con:runMode>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="check-language-provided" id="b92d5f2e-edbb-4a21-930f-cf94b88edb9c">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
@@ -97,14 +231,144 @@ if(defaultLanguage.size() != 1){
 	String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages/DefaultLanguage/Language'];
 	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
 }
-</script></con:config></con:testStep><con:testStep type="httprequest" name="manual-check" id="c6792979-6b86-48c4-84d5-21025b1a2c2e"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="179b9a23-9080-4b84-9432-902da3304bf3" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="2813389b-3dbf-485f-8264-4c2a52b38a7e" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="d3cdb95f-2516-466d-ba79-55300220446a" name="Response SLA"><con:configuration><SLA>600000</SLA></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="1056a22d-aebe-4152-961a-977a52e8b6bf" name="manual-check-natural-language-fields"><con:configuration><scriptText>import de.interactive_instruments.etf.suim.*
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="httprequest" name="manual-check" id="c6792979-6b86-48c4-84d5-21025b1a2c2e">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="179b9a23-9080-4b84-9432-902da3304bf3" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="Valid HTTP Status Codes" id="2813389b-3dbf-485f-8264-4c2a52b38a7e" name="Valid HTTP Status Codes">
+						<con:configuration>
+							<codes>200</codes>
+						</con:configuration>
+					</con:assertion>
+					<con:assertion type="Response SLA Assertion" id="d3cdb95f-2516-466d-ba79-55300220446a" name="Response SLA">
+						<con:configuration>
+							<SLA>600000</SLA>
+						</con:configuration>
+					</con:assertion>
+					<con:assertion type="GroovyScriptAssertion" id="1056a22d-aebe-4152-961a-977a52e8b6bf" name="manual-check-natural-language-fields">
+						<con:configuration>
+							<scriptText>import de.interactive_instruments.etf.suim.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
   '//zzzz',
   'TR.manual.naturalLanguageFields'
 );
-</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>AcceptVersions</con:name><con:value>${#Project#AcceptVersions}</con:value><con:style>QUERY</con:style></con:parameter><con:parameter><con:name>AcceptLanguages</con:name><con:value>${#TestCase#AcceptLanguages}</con:value><con:style>QUERY</con:style></con:parameter></con:parameters></con:config></con:testStep><con:properties><con:property><con:name>AcceptLanguages</con:name><con:value/></con:property></con:properties></con:testCase><con:testCase id="54921296-a157-4b98-8d05-21a1c6e5f87c" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at04-xml-schema-validation" searchProperties="true"><con:description><![CDATA[<p>Test that the XML capabilities document is schema valid.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at04-xml-schema-validation" target="_blank">XML schema validation</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="e087ca09-9e13-4104-bfc8-fd1c1569943c"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="httprequest" name="http-request-xml-schema-valid" id="31471ae9-341e-468a-aa0a-83c6f83fc044" disabled="true"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="334293c8-de84-4391-a4bb-9deecfe0f347" name="http-request-xml-schema-valid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="09a763bf-d2e7-462b-98de-c9014dd15988" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Simple Schema Validator" id="a7dc0611-bb10-4716-ac6a-f8ebe89333f7" name="Simple Schema Validator"><con:configuration><pathToXSD>xsi:schemaLocation</pathToXSD></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>AcceptVersions</con:name><con:value>${#Project#AcceptVersions}</con:value><con:style>QUERY</con:style><con:default>${#Project#AcceptVersions}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:testStep type="groovy" name="schema-validation" id="fc00bee3-6d13-4aa6-bdef-dab5dc3766a1"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.*
+							</scriptText>
+						</con:configuration>
+					</con:assertion>
+					<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters>
+						<con:parameter>
+							<con:name>service</con:name>
+							<con:value>${#Project#service}</con:value>
+							<con:style>QUERY</con:style>
+						</con:parameter>
+						<con:parameter>
+							<con:name>request</con:name>
+							<con:value>GetCapabilities</con:value>
+							<con:style>QUERY</con:style>
+						</con:parameter>
+						<con:parameter>
+							<con:name>AcceptVersions</con:name>
+							<con:value>${#Project#AcceptVersions}</con:value>
+							<con:style>QUERY</con:style>
+						</con:parameter>
+						<con:parameter>
+							<con:name>AcceptLanguages</con:name>
+							<con:value>${#TestCase#AcceptLanguages}</con:value>
+							<con:style>QUERY</con:style>
+						</con:parameter>
+					</con:parameters>
+				</con:config>
+			</con:testStep>
+			<con:properties>
+				<con:property>
+					<con:name>AcceptLanguages</con:name>
+					<con:value />
+				</con:property>
+			</con:properties>
+		</con:testCase>
+		<con:testCase id="54921296-a157-4b98-8d05-21a1c6e5f87c" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at04-xml-schema-validation" searchProperties="true">
+			<con:description>
+				<![CDATA[<p>Test that the XML capabilities document is schema valid.</p>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at04-xml-schema-validation" target="_blank">XML schema validation</a></p>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="testcasedependency" name="check-initial-testcase" id="e087ca09-9e13-4104-bfc8-fd1c1569943c">
+				<con:settings />
+				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase>
+					<con:properties />
+					<con:returnProperties />
+					<con:runMode>PARALLELL</con:runMode>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="httprequest" name="http-request-xml-schema-valid" id="31471ae9-341e-468a-aa0a-83c6f83fc044" disabled="true">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="334293c8-de84-4391-a4bb-9deecfe0f347" name="http-request-xml-schema-valid" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="Valid HTTP Status Codes" id="09a763bf-d2e7-462b-98de-c9014dd15988" name="Valid HTTP Status Codes">
+						<con:configuration>
+							<codes>200</codes>
+						</con:configuration>
+					</con:assertion>
+					<con:assertion type="Simple Schema Validator" id="a7dc0611-bb10-4716-ac6a-f8ebe89333f7" name="Simple Schema Validator">
+						<con:configuration>
+							<pathToXSD>xsi:schemaLocation</pathToXSD>
+						</con:configuration>
+					</con:assertion>
+					<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters>
+						<con:parameter>
+							<con:name>service</con:name>
+							<con:value>${#Project#service}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#service}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>request</con:name>
+							<con:value>GetCapabilities</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>GetCapabilities</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>AcceptVersions</con:name>
+							<con:value>${#Project#AcceptVersions}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#AcceptVersions}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+					</con:parameters>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="schema-validation" id="fc00bee3-6d13-4aa6-bdef-dab5dc3766a1">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.*
 
 def tsGetObservation = testRunner.testCase.testSuite.project.testSuites["Service_Metadata"].testCases["at04-xml-schema-validation"].getTestStepByName('http-request-xml-schema-valid');
 tsGetObservation.setDisabled(false);
@@ -136,8 +400,30 @@ assertions.each{
 		throw new TranslatableAssertionError('TR.invalidSchema', assertParams);
 	}
 }
-</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="52f5767a-2f01-4fd8-a134-d5aa138ce591" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at06-mandatory-metadata-elements" searchProperties="true"><con:description><![CDATA[<p>Test that the INSPIRE metadata is provided using the Metadata URL element or it is provided in the ExtendedCapabilities section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at06-mandatory-metadata-elements" target="_blank">Mandatory metadata elements</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="57b71db7-1d91-453e-81ae-d2e9b5e6ffa3"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-extended-capabilities" id="1a2ed917-2401-4de0-9506-cb0833909491"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:properties />
+		</con:testCase>
+		<con:testCase id="52f5767a-2f01-4fd8-a134-d5aa138ce591" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at06-mandatory-metadata-elements" searchProperties="true">
+			<con:description>
+				<![CDATA[<p>Test that the INSPIRE metadata is provided using the Metadata URL element or it is provided in the ExtendedCapabilities section.</p>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at06-mandatory-metadata-elements" target="_blank">Mandatory metadata elements</a></p>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="testcasedependency" name="check-initial-testcase" id="57b71db7-1d91-453e-81ae-d2e9b5e6ffa3">
+				<con:settings />
+				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase>
+					<con:properties />
+					<con:returnProperties />
+					<con:runMode>PARALLELL</con:runMode>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="check-extended-capabilities" id="1a2ed917-2401-4de0-9506-cb0833909491">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 
@@ -230,7 +516,13 @@ else{
 		}
 	}
 }
-</script></con:config></con:testStep><con:testStep type="groovy" name="check-other-mandatory-elements" id="91d6811d-aad3-4b0c-ac9a-8d57adf7f8ab"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="check-other-mandatory-elements" id="91d6811d-aad3-4b0c-ac9a-8d57adf7f8ab">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
@@ -296,8 +588,30 @@ if(scenario == '2'){
 		}
 	}
 }
-</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="97c319a0-a0f9-40dc-8159-7fc2b73efe23" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at07-language-request-empty-unsupported" searchProperties="true"><con:description><![CDATA[<p>Test that Title and Abstract fields are provided in default language when the AcceptLanguage parameter is not set in the request or when it is set with a wrong value.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at07-language-request-empty-unsupported" target="_blank">Language request empty and unsupported</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="441b39f2-88ea-4faf-9d19-68e6ef59af6c"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-language-request-empty-unsupported" id="6bfcaa35-d12a-4190-b4b1-53f5e1723105"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:properties />
+		</con:testCase>
+		<con:testCase id="97c319a0-a0f9-40dc-8159-7fc2b73efe23" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at07-language-request-empty-unsupported" searchProperties="true">
+			<con:description>
+				<![CDATA[<p>Test that Title and Abstract fields are provided in default language when the AcceptLanguage parameter is not set in the request or when it is set with a wrong value.</p>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at07-language-request-empty-unsupported" target="_blank">Language request empty and unsupported</a></p>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="testcasedependency" name="check-initial-testcase" id="441b39f2-88ea-4faf-9d19-68e6ef59af6c">
+				<con:settings />
+				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase>
+					<con:properties />
+					<con:returnProperties />
+					<con:runMode>PARALLELL</con:runMode>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="check-language-request-empty-unsupported" id="6bfcaa35-d12a-4190-b4b1-53f5e1723105">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
@@ -348,8 +662,94 @@ if(capabilities.ServiceIdentification.Abstract.toString() != capabilitiesLanguag
 	String[] assertParams = ['default', capabilities.ServiceIdentification.Abstract.toString(), 'found', capabilitiesLanguaged.ServiceIdentification.Abstract.toString()];
 	throw new TranslatableAssertionError('TR.abstractNotEqualDefault', assertParams);
 }
-</script></con:config></con:testStep><con:testStep type="httprequest" name="http-request-lang-empty-unsupported" id="6391fa13-93d7-4da1-a5a3-133bcdbdea62"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="bc7ea022-37a9-478d-b144-e649a1681a54" name="http-request-lang-empty-unsupported" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="46e38462-a477-47b4-b59e-43927ea9e476" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="b2ffd118-84c5-43b3-bbf5-3c0d7f41bf7b" name="Response SLA"><con:configuration><SLA>600000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>AcceptVersions</con:name><con:value>${#Project#AcceptVersions}</con:value><con:style>QUERY</con:style><con:default>${#Project#AcceptVersions}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>AcceptLanguages</con:name><con:value>${#TestCase#AcceptLanguages}</con:value><con:style>QUERY</con:style><con:default>${#TestCase#AcceptLanguages}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:properties><con:property><con:name>AcceptLanguages</con:name><con:value>zzzz</con:value></con:property></con:properties></con:testCase><con:testCase id="0a4aec77-eadd-4c6d-9536-cb8c7797ca5e" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at08-list-supported-languages" searchProperties="true"><con:description><![CDATA[<p>Test that the service provides a list of supported languages.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at08-list-supported-languages" target="_blank">List of supported languages</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="e2430388-11e6-4744-a134-3bf6d374eb0a"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-list-supported-languages" id="af35943d-b6f1-4735-8c91-c8dc48742cfe"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="httprequest" name="http-request-lang-empty-unsupported" id="6391fa13-93d7-4da1-a5a3-133bcdbdea62">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="bc7ea022-37a9-478d-b144-e649a1681a54" name="http-request-lang-empty-unsupported" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="Valid HTTP Status Codes" id="46e38462-a477-47b4-b59e-43927ea9e476" name="Valid HTTP Status Codes">
+						<con:configuration>
+							<codes>200</codes>
+						</con:configuration>
+					</con:assertion>
+					<con:assertion type="Response SLA Assertion" id="b2ffd118-84c5-43b3-bbf5-3c0d7f41bf7b" name="Response SLA">
+						<con:configuration>
+							<SLA>600000</SLA>
+						</con:configuration>
+					</con:assertion>
+					<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters>
+						<con:parameter>
+							<con:name>service</con:name>
+							<con:value>${#Project#service}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#service}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>request</con:name>
+							<con:value>GetCapabilities</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>GetCapabilities</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>AcceptVersions</con:name>
+							<con:value>${#Project#AcceptVersions}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#AcceptVersions}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>AcceptLanguages</con:name>
+							<con:value>${#TestCase#AcceptLanguages}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#TestCase#AcceptLanguages}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+					</con:parameters>
+				</con:config>
+			</con:testStep>
+			<con:properties>
+				<con:property>
+					<con:name>AcceptLanguages</con:name>
+					<con:value>zzzz</con:value>
+				</con:property>
+			</con:properties>
+		</con:testCase>
+		<con:testCase id="0a4aec77-eadd-4c6d-9536-cb8c7797ca5e" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at08-list-supported-languages" searchProperties="true">
+			<con:description>
+				<![CDATA[<p>Test that the service provides a list of supported languages.</p>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at08-list-supported-languages" target="_blank">List of supported languages</a></p>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="testcasedependency" name="check-initial-testcase" id="e2430388-11e6-4744-a134-3bf6d374eb0a">
+				<con:settings />
+				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase>
+					<con:properties />
+					<con:returnProperties />
+					<con:runMode>PARALLELL</con:runMode>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="check-list-supported-languages" id="af35943d-b6f1-4735-8c91-c8dc48742cfe">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
@@ -381,8 +781,30 @@ languages.each{lang ->
 		throw new TranslatableAssertionError('TR.invalidLanguageCode', assertParams);
 	}
 }
-</script></con:config></con:testStep><con:properties/></con:testCase><con:testCase id="a7f718f3-f1b1-4c6b-89f6-19dda1fb896b" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at09-response-language" searchProperties="true"><con:description><![CDATA[<p>Test that the response language changes according with the AcceptLanguages parameter of the GetCapabilities request.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at09-response-language" target="_blank">Response language</a></p>]]></con:description><con:settings/><con:testStep type="testcasedependency" name="check-initial-testcase" id="6f6dcf7b-c11b-45f6-9219-6f3daff67239"><con:settings/><con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase><con:properties/><con:returnProperties/><con:runMode>PARALLELL</con:runMode></con:config></con:testStep><con:testStep type="groovy" name="check-response-language" id="3ab62cac-fc4d-4cc0-86e4-5973b1ced0c5"><con:settings/><con:config><script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:properties />
+		</con:testCase>
+		<con:testCase id="a7f718f3-f1b1-4c6b-89f6-19dda1fb896b" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at09-response-language" searchProperties="true">
+			<con:description>
+				<![CDATA[<p>Test that the response language changes according with the AcceptLanguages parameter of the GetCapabilities request.</p>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/download-wcs/1.0/wcs-core/at09-response-language" target="_blank">Response language</a></p>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="testcasedependency" name="check-initial-testcase" id="6f6dcf7b-c11b-45f6-9219-6f3daff67239">
+				<con:settings />
+				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:targetTestCase>4e10a229-c426-479b-a67c-ea4f04a04673</con:targetTestCase>
+					<con:properties />
+					<con:returnProperties />
+					<con:runMode>PARALLELL</con:runMode>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="check-response-language" id="3ab62cac-fc4d-4cc0-86e4-5973b1ced0c5">
+				<con:settings />
+				<con:config>
+					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
@@ -422,4 +844,157 @@ languages.each{lang ->
 		throw new TranslatableAssertionError('TR.requestedAndResponseLanguageDontMatch', assertParams);
 	}
 }
-</script></con:config></con:testStep><con:testStep type="httprequest" name="http-request-languaged" id="06217aaf-2b28-43f1-a1c9-c5ce6169a233"><con:settings/><con:config method="GET" xsi:type="con:HttpRequest" id="d46ac722-3a08-469e-8f0b-08978e2e7931" name="http-request-languaged" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>${#Project#serviceEndpoint}</con:endpoint><con:request/><con:assertion type="Valid HTTP Status Codes" id="7a16a981-5d86-4506-967c-8b7c69f210dc" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="Response SLA Assertion" id="1fd1122b-7718-4a06-9b5a-77aeddbfa692" name="Response SLA"><con:configuration><SLA>600000</SLA></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><con:parameter><con:name>service</con:name><con:value>${#Project#service}</con:value><con:style>QUERY</con:style><con:default>${#Project#service}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>request</con:name><con:value>GetCapabilities</con:value><con:style>QUERY</con:style><con:default>GetCapabilities</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>AcceptVersions</con:name><con:value>${#Project#AcceptVersions}</con:value><con:style>QUERY</con:style><con:default>${#Project#AcceptVersions}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>AcceptLanguages</con:name><con:value>${#TestCase#AcceptLanguages}</con:value><con:style>QUERY</con:style><con:default>${#TestCase#AcceptLanguages}</con:default><con:path xsi:nil="true"/><con:description xsi:nil="true"/></con:parameter></con:parameters></con:config></con:testStep><con:properties><con:property><con:name>AcceptLanguages</con:name><con:value>eeh</con:value></con:property></con:properties></con:testCase><con:properties/></con:testSuite><con:properties><con:property><con:name>serviceEndpoint</con:name><con:value/></con:property><con:property><con:name>service</con:name><con:value>WCS</con:value></con:property><con:property><con:name>AcceptVersions</con:name><con:value>2.0.1,2.0.0</con:value></con:property><con:property><con:name>extended_capabilities_scenario</con:name><con:value>1</con:value></con:property><con:property><con:name>lastServiceEndpoint</con:name><con:value/></con:property><con:property><con:name>authUser</con:name><con:value/></con:property><con:property><con:name>authPwd</con:name><con:value/></con:property><con:property><con:name>authMethod</con:name><con:value>basic</con:value></con:property><con:property><con:name>etf.ignore.properties</con:name><con:value>service, AcceptVersions, extended_capabilities_scenario, lastServiceEndpoint, authUser, authPwd, authMethod</con:value></con:property><con:property><con:name>etf.tag.ids</con:name><con:value>EID4d43ad6a-8d7a-4897-a86c-5c5cd58fbfe4</con:value></con:property><con:property><con:name>etf.translation.template.collection.id</con:name><con:value>EID67b37079-9ac5-4641-9476-9a646a18b6ce</con:value></con:property><con:property><con:name>etf.supported.test.object.type.ids</con:name><con:value>EIDdac58b52-3ffd-4eb5-96e3-64723d8f0f51</con:value></con:property><con:property><con:name>etf.author</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.creation.date</con:name><con:value>2019-02-15T14:00:00</con:value></con:property><con:property><con:name>etf.last.editor</con:name><con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value></con:property><con:property><con:name>etf.last.update.date</con:name><con:value>2020-03-05T13:00:00</con:value></con:property><con:property><con:name>etf.version</con:name><con:value>0.1.14</con:value></con:property><con:property><con:name>etf.reference</con:name><con:value>https://github.com/inspire-eu-validation/download-wcs</con:value></con:property><con:property><con:name>testIntensive</con:name><con:value/></con:property></con:properties><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
+					</script>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="httprequest" name="http-request-languaged" id="06217aaf-2b28-43f1-a1c9-c5ce6169a233">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="d46ac722-3a08-469e-8f0b-08978e2e7931" name="http-request-languaged" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="Valid HTTP Status Codes" id="7a16a981-5d86-4506-967c-8b7c69f210dc" name="Valid HTTP Status Codes">
+						<con:configuration>
+							<codes>200</codes>
+						</con:configuration>
+					</con:assertion>
+					<con:assertion type="Response SLA Assertion" id="1fd1122b-7718-4a06-9b5a-77aeddbfa692" name="Response SLA">
+						<con:configuration>
+							<SLA>600000</SLA>
+						</con:configuration>
+					</con:assertion>
+					<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters>
+						<con:parameter>
+							<con:name>service</con:name>
+							<con:value>${#Project#service}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#service}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>request</con:name>
+							<con:value>GetCapabilities</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>GetCapabilities</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>AcceptVersions</con:name>
+							<con:value>${#Project#AcceptVersions}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#AcceptVersions}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>AcceptLanguages</con:name>
+							<con:value>${#TestCase#AcceptLanguages}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#TestCase#AcceptLanguages}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+					</con:parameters>
+				</con:config>
+			</con:testStep>
+			<con:properties>
+				<con:property>
+					<con:name>AcceptLanguages</con:name>
+					<con:value>eeh</con:value>
+				</con:property>
+			</con:properties>
+		</con:testCase>
+		<con:properties />
+	</con:testSuite>
+	<con:properties>
+		<con:property>
+			<con:name>serviceEndpoint</con:name>
+			<con:value />
+		</con:property>
+		<con:property>
+			<con:name>service</con:name>
+			<con:value>WCS</con:value>
+		</con:property>
+		<con:property>
+			<con:name>AcceptVersions</con:name>
+			<con:value>2.0.1,2.0.0</con:value>
+		</con:property>
+		<con:property>
+			<con:name>extended_capabilities_scenario</con:name>
+			<con:value>1</con:value>
+		</con:property>
+		<con:property>
+			<con:name>lastServiceEndpoint</con:name>
+			<con:value />
+		</con:property>
+		<con:property>
+			<con:name>authUser</con:name>
+			<con:value />
+		</con:property>
+		<con:property>
+			<con:name>authPwd</con:name>
+			<con:value />
+		</con:property>
+		<con:property>
+			<con:name>authMethod</con:name>
+			<con:value>basic</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.ignore.properties</con:name>
+			<con:value>service, AcceptVersions, extended_capabilities_scenario, lastServiceEndpoint, authUser, authPwd, authMethod</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.tag.ids</con:name>
+			<con:value>EID4d43ad6a-8d7a-4897-a86c-5c5cd58fbfe4</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.translation.template.collection.id</con:name>
+			<con:value>EID67b37079-9ac5-4641-9476-9a646a18b6ce</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.supported.test.object.type.ids</con:name>
+			<con:value>EIDdac58b52-3ffd-4eb5-96e3-64723d8f0f51</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.author</con:name>
+			<con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.creation.date</con:name>
+			<con:value>2019-02-15T14:00:00</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.last.editor</con:name>
+			<con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.last.update.date</con:name>
+			<con:value>2020-03-05T13:00:00</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.version</con:name>
+			<con:value>0.1.14</con:value>
+		</con:property>
+		<con:property>
+			<con:name>etf.reference</con:name>
+			<con:value>https://github.com/inspire-eu-validation/download-wcs</con:value>
+		</con:property>
+		<con:property>
+			<con:name>testIntensive</con:name>
+			<con:value />
+		</con:property>
+	</con:properties>
+	<con:wssContainer />
+	<con:oAuth2ProfileContainer />
+	<con:oAuth1ProfileContainer />
+	<con:sensitiveInformation />
+</con:soapui-project>
