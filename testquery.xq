@@ -1,3 +1,5 @@
+declare namespace act-core='http://inspire.ec.europa.eu/schemas/act-core/4.0';
+declare namespace af='http://inspire.ec.europa.eu/schemas/af/4.0';
 declare namespace bu-base='http://inspire.ec.europa.eu/schemas/bu-base/4.0';
 declare namespace bu-core2d='http://inspire.ec.europa.eu/schemas/bu-core2d/4.0';
 declare namespace hh='http://inspire.ec.europa.eu/schemas/hh/4.0';
@@ -49,6 +51,7 @@ declare namespace lcr='http://inspire.ec.europa.eu/schemas/lcr/4.0';
 declare namespace lcv='http://inspire.ec.europa.eu/schemas/lcv/4.0';
 declare namespace hb='http://inspire.ec.europa.eu/schemas/hb/4.0'; 
 declare namespace mu='http://inspire.ec.europa.eu/schemas/mu/3.0';
+declare namespace oi='http://inspire.ec.europa.eu/schemas/oi/4.0';
 declare namespace pd='http://inspire.ec.europa.eu/schemas/pd/4.0'; 
 declare namespace ps='http://inspire.ec.europa.eu/schemas/ps/4.0'; 
 declare namespace sr='http://inspire.ec.europa.eu/schemas/sr/4.0'; 
