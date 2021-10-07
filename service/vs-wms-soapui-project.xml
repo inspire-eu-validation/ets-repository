@@ -2080,7 +2080,10 @@ layers.each{ layer ->
 			<con:testStep type="groovy" name="check-layer-name" id="738051b8-6344-42be-8315-6fbc69f52575">
 				<con:settings />
 				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					<script>
+						import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+import de.interactive_instruments.xtf.*;
+
 def tc = testRunner.testCase.testSuite.project.testSuites['GetCapabilities_Operation'].testCases['initial-testcase'];
 def response = tc.getTestStepByName('http-request').getPropertyValue('Response');
 
@@ -2097,6 +2100,11 @@ def validHarmonisedNames = register.containeditems.depthFirst().findAll{ it.name
 def invalidLayers = [];
 
 def excludedLayers = ['ACMF', 'AM', 'AU', 'GE', 'PF', 'SD', 'SO', 'US'];
+
+ProjectHelper ph = new ProjectHelper();
+
+String needManual = "not";
+
 
 layers.each{layer->
 	if(layer.Name.size() != 1){
@@ -2120,9 +2128,10 @@ layers.each{layer->
 	}
 }
 if(invalidLayers.size() > 0){
-	String[] assertParams = ['layerid', invalidLayers.join(', ')];
-	throw new TranslatableAssertionError('TR.notHarmonisedValue', assertParams);
-}
+	needManual = "manual";
+	 ph.setTransferProperty("needManual", needManual);
+						<!-- ph.runTestStep("manual-check-harmonized"); -->
+						}
 
 if(layers.Name.size() != layers.Name.unique().size()){
 	throw new TranslatableAssertionError('TR.notUniqueLayerName');
