@@ -4220,13 +4220,13 @@ for( node in getSpatialDataSetUrlTemplates ) {
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-if(messageExchange.responseHeaders["Content-Type"]==null) {
+if(!messageExchange.getResponseHeaders.containsKeyIgnoreCase('Content-Type')) {
 	throw new TranslatableAssertionError("TR.missingContentType");
 }
 String mimeType = context.expand('${Transfer_Properties#mimeType}');
 
-if(!messageExchange.responseHeaders['Content-Type'][0].contains(mimeType)) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", mimeType, "actual", messageExchange.responseHeaders['Content-Type'][0]);
+if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').contains(mimeType)) {
+	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", mimeType, "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
@@ -4458,12 +4458,12 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-if(messageExchange.responseHeaders["Content-Type"]==null) {
+if(!messageExchange.getResponseHeaders.containsKeyIgnoreCase('Content-Type')) {
 	throw new TranslatableAssertionError("TR.missingContentType");
 }
 
-if(!messageExchange.responseHeaders['Content-Type'][0].contains("application/atom+xml")) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "application/atom+xml", "actual", messageExchange.responseHeaders['Content-Type'][0]);
+if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').contains("application/atom+xml")) {
+	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "application/atom+xml", "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
@@ -5080,12 +5080,12 @@ a.exists(
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-if(messageExchange.responseHeaders["Content-Type"]==null) {
+if(!messageExchange.getResponseHeaders.containsKeyIgnoreCase('Content-Type')) {
 	throw new TranslatableAssertionError("TR.missingContentType");
 }
 
-if(!messageExchange.responseHeaders['Content-Type'][0].startsWith('text/html')) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "text/html", "actual", messageExchange.responseHeaders['Content-Type'][0]);
+if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').startsWith('text/html')) {
+	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "text/html", "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
