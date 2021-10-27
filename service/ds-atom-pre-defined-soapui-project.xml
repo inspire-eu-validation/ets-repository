@@ -38,7 +38,7 @@ if (basicAuthUser.length()>0) {
 	log.info("Setting credentials for user: " + basicAuthUser);
 }
 Util.updateCredentials(testRunner);
-</script>
+					</script>
 				</con:config>
 			</con:testStep>
 			<con:testStep type="httprequest" name="Check URL is accessible" id="72c74c78-472f-4baa-bdd5-2dfb1c516bb7">
@@ -649,7 +649,7 @@ def response = context.expand( '${Get Service Feed#Response}' )
 if( response.toString() != messageExchange.getResponseContent().toString() ) {
 	throw new TranslatableAssertionError("TR.responseNotEqual", "testStep", "Get Service Feed");
 }
-</scriptText>
+							</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
@@ -2238,7 +2238,7 @@ def response = context.expand( '${Get Dataset Feed#Response}' )
 if( response.toString() != messageExchange.getResponseContent().toString() ) {
 	throw new TranslatableAssertionError("TR.responseNotEqual", "testStep", "Get Dataset Feed");
 }
-</scriptText>
+							</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
@@ -3053,7 +3053,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/3.1/atom-pre-d
 					<con:properties>
 						<con:property>
 							<con:name>mediaTypes</con:name>
-							<con:value>x-shapefilex-filegdbgml+xmlx-gmzvnd.google-earth.kml+xmlvnd.google-earth.kmzx-ecwx-ascii-gridx-oracledumpx-lasx-lazx-tabx-tab-rasterx-worldfile tiffjp2 csv</con:value>
+							<con:value>x-shapefilex-filegdbgml+xmlx-gmzvnd.google-earth.kml+xmlvnd.google-earth.kmzx-ecwx-ascii-gridx-oracledumpx-lasx-lazx-tabx-tab-rasterx-worldfile tiffjp2 csv image/tiff application=geotiff</con:value>
 						</con:property>
 						<con:property>
 							<con:name>mediaTypeUrl</con:name>
@@ -3069,7 +3069,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/3.1/atom-pre-d
 					<con:settings>
 						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/atom+xml" xmlns="http://eviware.com/soapui/config"/></con:setting>
 					</con:settings>
-					<con:endpoint>https://inspire.ec.europa.eu/media-types</con:endpoint>
+					<con:endpoint>https://inspire.ec.europa.eu/media-types/media-types.es.atom</con:endpoint>
 					<con:request />
 					<con:assertion type="Response SLA Assertion" id="c947b341-320a-4f0b-96aa-3a351ee25a10" name="30 seconds timeout">
 						<con:configuration>
@@ -3115,30 +3115,30 @@ SOAPUI_I.init(log,context,testRunner);
 import de.interactive_instruments.UriUtils;
 
 ProjectHelper ph = new ProjectHelper();
-def xmlHolder = ph.getTestStepResult("Get INSPIRE Media Types")
+def xmlHolder = ph.getTestStepResult("Get INSPIRE Media Types");
 
 def mediaTypeUrls = xmlHolder.getNodeValues( "/*:feed/*:entry/*:link[@rel='self']/@href" );
 def mediaBaseTypes = xmlHolder.getNodeValues( "/*:feed/*:entry/*:title" );
 log.info("mediaTypeUrls: " + mediaTypeUrls);
 
 // clear url to test
-ph.setTransferProperty("mediaTypeUrl", "")
-ph.setTransferProperty("mediaTypes", "")
+ph.setTransferProperty("mediaTypeUrl", "");
+ph.setTransferProperty("mediaTypes", "");
 
 for(int i=0; i &lt; mediaTypeUrls.size(); i++) {
 	final String url = mediaTypeUrls[i];
 	final String baseType = mediaBaseTypes[i];
 
-	log.info("Using URL: "+url)
-	ph.setTransferProperty("mediaTypeUrl", url)
+	log.info("Using URL: "+url);
+	ph.setTransferProperty("mediaTypeUrl", url);
 	ph.runTestStep("Get INSPIRE Media Subtype");
-	def respXmlHolder = ph.getTestStepResult("Get INSPIRE Media Subtype")
+	def respXmlHolder = ph.getTestStepResult("Get INSPIRE Media Subtype");
 	def extractedMediaTypes = respXmlHolder.getNodeValue( "string-join(/*:feed/*:entry/*:title, '')" );
-	final String mediaTypes = ph.getTransferProperty("mediaTypes")
-	if(mediaTypes!="") {
-		ph.setTransferProperty("mediaTypes", mediaTypes+" "+extractedMediaTypes)
+	final String mediaTypes = ph.getTransferProperty("mediaTypes");
+	if(mediaTypes != "") {
+		ph.setTransferProperty("mediaTypes", mediaTypes + " " + extractedMediaTypes);
 	}else{
-		ph.setTransferProperty("mediaTypes", extractedMediaTypes)
+		ph.setTransferProperty("mediaTypes", extractedMediaTypes);
 	}
 }
 
@@ -3367,7 +3367,7 @@ a.isTrue(
 						</con:property>
 						<con:property>
 							<con:name>mediaTypes</con:name>
-							<con:value>application/x-shapefile,application/x-filegdb,image/tiff,application/gml+xml,application/x-gmz,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,image/jp2,application/x-ecw,application/x-ascii-grid,application/x-oracledump,application/x-las,application/x-laz,application/x-tab,application/x-tab-raster,text/csv,application/x-worldfile</con:value>
+							<con:value>application/x-shapefile,application/x-filegdb,image/tiff,application/gml+xml,application/x-gmz,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,image/jp2,application/x-ecw,application/x-ascii-grid,application/x-oracledump,application/x-las,application/x-laz,application/x-tab,application/x-tab-raster,text/csv,application/x-worldfile,image/tiff,application=geotiff</con:value>
 						</con:property>
 					</con:properties>
 				</con:config>
@@ -3428,9 +3428,7 @@ props.setPropertyValue("dataFeedURL",testRunner.testCase.testSuite.project.getPr
 
 // now run Feed test for each dataFeedUrl, to validate Dataset feeds
 for( i in dataFeedUrlNodes )
-{
-   i=i.replaceAll("%7B","{")
-   i=i.replaceAll("%7D","}")
+{ i=i.replaceAll("%7B","{") i=i.replaceAll("%7D","}")
    log.info("The Atom feed refers to Dataset Feeds. Now checking Dataset Feed with URL: " + i)
    props.setPropertyValue("dataFeedURL",i)
    props.setPropertyValue("dataFeedURLEncoded",i.replaceAll("&amp;","&amp;amp;"))
@@ -3441,7 +3439,7 @@ for( i in dataFeedUrlNodes )
    testRunner.runTestStepByName("ResolveDatasetLink")
    // testRunner.runTestStepByName("Run TestCase M-04: Dataset Metadata Mandatory")
 }
-</script>
+					</script>
 				</con:config>
 			</con:testStep>
 			<con:testStep type="httprequest" name="ValidateDatasetFeed" id="d4c09a50-2618-4207-ae0d-0d5f772b840c">
@@ -3747,9 +3745,7 @@ def dataSetUrlNodes = feedXmlHolder.getNodeValues("//atom:entry/atom:link[(@rel=
 
 // Then run Feed test for each dataSetUrl
 for( i in dataSetUrlNodes )
-{
-   i=i.replaceAll("%7B","{")
-   i=i.replaceAll("%7D","}")
+{ i=i.replaceAll("%7B","{") i=i.replaceAll("%7D","}")
    log.info("The Atom feed refers to a dataset to download at the URL: " + i)
    props.setPropertyValue("dataSetURL",i)
    testRunner.runTestStepByName("ResolveDatasetLink")
@@ -4224,13 +4220,13 @@ for( node in getSpatialDataSetUrlTemplates ) {
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-if(messageExchange.responseHeaders["Content-Type"]==null) {
+if(!messageExchange.getResponseHeaders().containsKeyIgnoreCase('Content-Type')) {
 	throw new TranslatableAssertionError("TR.missingContentType");
 }
 String mimeType = context.expand('${Transfer_Properties#mimeType}');
 
-if(!messageExchange.responseHeaders['Content-Type'][0].contains(mimeType)) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", mimeType, "actual", messageExchange.responseHeaders['Content-Type'][0]);
+if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').contains(mimeType)) {
+	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", mimeType, "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
@@ -4462,12 +4458,12 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-if(messageExchange.responseHeaders["Content-Type"]==null) {
+if(!messageExchange.getResponseHeaders().containsKeyIgnoreCase('Content-Type')) {
 	throw new TranslatableAssertionError("TR.missingContentType");
 }
 
-if(!messageExchange.responseHeaders['Content-Type'][0].contains("application/atom+xml")) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "application/atom+xml", "actual", messageExchange.responseHeaders['Content-Type'][0]);
+if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').contains("application/atom+xml")) {
+	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "application/atom+xml", "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
@@ -5053,10 +5049,8 @@ a.exists(
 						<con:name>Generic search queries URL</con:name>
 						<con:sourceType>ResponseAsXml</con:sourceType>
 						<con:sourceStep>Get OpenSearch Description</con:sourceStep>
-						<con:sourcePath>declare namespace os='http://a9.com/-/spec/opensearch/1.1/';
-
-/os:OpenSearchDescription/os:Url[@rel='results' and @type='text/html']/@template
-</con:sourcePath>
+						<con:sourcePath>declare namespace os='http://a9.com/-/spec/opensearch/1.1/'; /os:OpenSearchDescription/os:Url[@rel='results' and @type='text/html']/@template
+						</con:sourcePath>
 						<con:targetType>geneircSearchQueriesUrl</con:targetType>
 						<con:targetStep>Transfer_Properties</con:targetStep>
 						<con:upgraded>true</con:upgraded>
@@ -5086,12 +5080,12 @@ a.exists(
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-if(messageExchange.responseHeaders["Content-Type"]==null) {
+if(!messageExchange.getResponseHeaders().containsKeyIgnoreCase('Content-Type')) {
 	throw new TranslatableAssertionError("TR.missingContentType");
 }
 
-if(!messageExchange.responseHeaders['Content-Type'][0].startsWith('text/html')) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "text/html", "actual", messageExchange.responseHeaders['Content-Type'][0]);
+if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').startsWith('text/html')) {
+	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "text/html", "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
@@ -5151,7 +5145,7 @@ if(!messageExchange.responseHeaders['Content-Type'][0].startsWith('text/html')) 
 		</con:property>
 		<con:property>
 			<con:name>etf.last.editor</con:name>
-			<con:value>interactive instruments GmbH</con:value>
+			<con:value>Consortium Bilbomatica, Guadaltel &amp; Geograma</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.creation.date</con:name>
@@ -5159,11 +5153,11 @@ if(!messageExchange.responseHeaders['Content-Type'][0].startsWith('text/html')) 
 		</con:property>
 		<con:property>
 			<con:name>etf.version</con:name>
-			<con:value>1.0.5</con:value>
+			<con:value>1.0.8</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.last.update.date</con:name>
-			<con:value>2019-09-24T14:42:00</con:value>
+			<con:value>2021-10-13T12:30:00</con:value>
 		</con:property>
 	</con:properties>
 	<con:wssContainer />
@@ -5182,9 +5176,7 @@ def requirements = project.getTestSuiteByName("TestSetup")?.
 log.info("Results: ");
 for( testSuiteR in runner?.getResults() ) {
 	for( testCaseR in testSuiteR?.getResults() ) {
-		for( testStepR in testCaseR?.getResults() ) {
-
-			if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
+		for( testStepR in testCaseR?.getResults() ) { if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
 				if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
 					testStepR.testStep.testRequest.assertionList.each{
 						// Extract ID which is seperated with a whitespace and a doublecolon
@@ -5216,6 +5208,6 @@ for( testSuiteR in runner?.getResults() ) {
 		}
 	}
 }
-</con:afterRunScript>
+	</con:afterRunScript>
 	<con:sensitiveInformation />
 </con:soapui-project>
