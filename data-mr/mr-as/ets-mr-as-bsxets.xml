@@ -13,11 +13,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-mr/master/mr-as" target
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-mr/master/mr-gml" target="_blank">Conformance Class 'GML application schemas, Mineral Resources'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-05-13T09:40:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-11-08T14:15:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-11-09T14:50:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDcf365ad1-38b9-4c3e-86ac-d75b1eccf97f"/>
 	</tags>
@@ -1574,6 +1574,7 @@ $messages)
 									<expression>
 let $features_selected := $features[self::ge:MappedFeature]
 let $gml_ids := $features[self::mr-core:MineralOccurrence]/@*:id
+let $property_string := 'ge:specification'
 let $messages :=
 	for $feature in $features_selected
 		let $urls := 
@@ -1604,13 +1605,13 @@ let $messages :=
 					else ()
 	return
 		if (count($feature/ge:specification) = 0) then
-			local:addMessage('TR.missingElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD1', 'multiplicity': 1, 'count': count($feature/bu-core3d:geometry3DLoD1)}) 
+			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
 		else if (count($feature/ge:specification) > 1) then
-			local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD1', 'multiplicity': 1, 'count': count($feature/bu-core3d:geometry3DLoD1)}) 
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($feature/ge:specification)}) 
 		else if (count($valid_ids) = 0 and count($valid_urls) = 0 and not(exists($feature/ge:specification/mr-core:MineralOccurrence))) then
 			local:addMessage('TR.missingGeometry',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id)})
 		else if (count($feature/ge:specification/mr-core:MineralOccurrence) > 1) then
-			local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD1', 'multiplicity': 1, 'count': count($feature/bu-core3d:geometry3DLoD1)}) 
+			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'ge:specification/mr-core:MineralOccurrence', 'multiplicity': 1, 'count':count($feature/ge:specification/mr-core:MineralOccurrence)}) 
 		else()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
@@ -1619,6 +1620,8 @@ $messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
+										<translationTemplate ref="TR.missingElement"/>
+										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.missingGeometry"/>
 									</translationTemplates>
 								</TestAssertion>
