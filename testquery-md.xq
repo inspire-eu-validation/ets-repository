@@ -142,6 +142,10 @@ declare function local:check-resource-uris($uris as xs:string*, $timeoutInS as x
 {
   let $remote := $uris[starts-with(.,'http://') or starts-with(.,'https://')]
   let $local := $uris[starts-with(.,'#')]
+  let $logs :=
+    for $uri in $uris
+      return
+        local:log('check-resource-uris: ' || $uri)
   return
   map:merge((
    local:check-http-uris($remote, $timeoutInS, count($remote), 0, map{}, $redirect),
