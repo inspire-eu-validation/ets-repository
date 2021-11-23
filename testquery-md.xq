@@ -132,6 +132,10 @@ declare function local:check-http-uris($uris as xs:string*, $timeoutInS as xs:in
   if (count($uris)=0) then $map
   else if ($errors ge $limitErrors) then map:merge(( $map, for $uri in $uris return map{ $uri: 'SKIPPED' } )) (: too many errors already identified, skipping the remaining URIs :)
   else
+  let $logs :=
+    for $uri in $uris
+      return
+        local:log('check-http-uris: ' || $uri)
    let $result := local:check-resource-uri($uris[1], $timeoutInS, $redirect) 
    let $newmap := map:merge( ($map, map{ $uris[1] : $result }) )
    let $newerrors := if (matches($result,'(EXCEPTION|\d{3})')) then $errors+1 else $errors
