@@ -46,6 +46,154 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs" target="_
 			<description>IGNORE</description>
 			<parent ref="EID1067d6b2-3bb1-4e71-8ce1-a744c9bd5a3b" />
 			<testCases>
+				<TestCase id="EIDa82b8a48-805b-43d0-8c56-4e62cb8be3c5">
+					<label>IACS Dataset Keyword</label>
+					<description>Test that keyword(s) for IACS data sets are provided in the metadata.</description>
+					<parent ref="EIDf7c41753-ff62-447c-b629-5bf183943b86" />
+					<testSteps>
+						<TestStep id="EIDe17989de-c33f-4720-8008-1e2f2d3da791">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDa82b8a48-805b-43d0-8c56-4e62cb8be3c5" />
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0" />
+							<testAssertions>
+								<TestAssertion id="EIDd14bfef0-b2ec-4280-8830-c44f4ee2b9f8">
+									<label>Keyword Value</label>
+									<description>
+										<![CDATA[<p>Check that Keyword CharacterString is provided with "Common Agricultural Policy" value and at least one these values: "Land cover" for LPIS datasets OR "Land use" for GSAA datasets or that Keyword Anchor is provided with xlink:href attribute pointing to GEMET common agricultural policy value and at least one these values: GEMET land cover for LPIS datasets OR GEMET land use for GSAA datasets.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ConformanceClass_2c-iacs/iacs" target="_blank">Spatial Scope Keyword</a></p>]]>
+									</description>
+									<parent ref="EIDe17989de-c33f-4720-8008-1e2f2d3da791" />
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+										let $messages := 
+											for $record in $records
+												let $keywordsParent := $record/gmd:descriptiveKeywords
+												let $insideMessages := 
+													for $keywords in $keywordsParent/gmd:MD_Keywords
+														
+														let $keywordAnchor := $keywords/gmd:keyword/gmx:Anchor/@xlink:href
+														let $keywordCharacterString := $keywords/gmd:keyword/gco:CharacterString/text()
+														return
+															if (count($keywords/gmd:keyword) = 0) then
+																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:keyword'}) 
+															else
+																let $dummy := 'aaa'
+																return
+																	if(count($keywordCharacterString) > 1) then
+																		local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gco:CharacterString', 'multiplicity': 1, 'count':count($keywordCharacterString)}) 
+																	else if(count($keywordAnchor) > 1) then
+																		local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmx:Anchor', 'multiplicity': 1, 'count':count($keywordAnchor)}) 
+																	else
+																		let $invalidAnchor := 
+																				if (count($keywordAnchor) = 1 and not(contains($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600'))) then 
+																					local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'https://www.eionet.europa.eu/gemet/en/concept/1600'}) 
+																				else if (count($keywordAnchor) = 1 and not(contains($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lc') or contains($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lu'))) then
+																					local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lc or https://www.eionet.europa.eu/gemet/en/inspire-theme/lu'}) 
+																				else ()
+
+																		let $invalidCharacterString := 
+																				if (count($keywordCharacterString) = 1 and not(contains($keywordCharacterString, 'Common Agricultural Policy'))) then
+																					local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
+																				else if (count($keywordCharacterString) = 1 and not(contains($keywordCharacterString, 'Land cover') or contains($keywordCharacterString, 'Land use'))) then
+																					local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
+																				else ()
+																		return
+																			if(count($invalidAnchor) = 0 and count($invalidCharacterString) = 0) then ()
+																			else if(count($invalidAnchor) = 0 and exists($keywordAnchor) and count($invalidCharacterString) > 1) then ()
+																			else if(count($invalidAnchor) > 1 and exists($keywordCharacterString) and count($invalidCharacterString) = 0) then ()
+																			else if (count($invalidAnchor) > 1 and count($invalidCharacterString) > 1) then
+																				($invalidAnchor, $invalidCharacterString)
+																			else ()
+												return 
+													if(count($keywordsParent/gmd:MD_Keywords) > 1) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmd:MD_Keywords', 'multiplicity': 1, 'count':count($keywordsParent/gmd:MD_Keywords)}) 
+													else if(count($insideMessages) > 0) then 
+														$insideMessages
+													else ()
+											
+										return			
+											(if ($messages) then 'FAILED' else 'PASSED',
+												local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+											$messages)																													
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
+									<translationTemplates>
+										<translationTemplate ref="TR.wrongMultiplicity" />
+										<translationTemplate ref="TR.manual.reviewCitationTitle" />
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID08832f42-696f-4725-9249-2f8edb3f0bfb">
+									<label>Keyword Resource valid</label>
+									<description>
+										<![CDATA[<p>Check that Keyword CharacterString is provided with "IACS" value and at least one these values: "LPIS" for LPIS datasets OR "GSAA" for GSAA datasets or that OR Keyword Anchor is provided with xlink:href attribute pointing to "IACS" value and at least one these values: "LPIS" for LPIS datasets OR "GSAA" for GSAA datasets, from IACS data controlled vocabulary CodeList.</p>
+									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/monitoring/spatial-scope" target="_blank">Spatial Scope Keyword</a></p>]]>
+									</description>
+									<parent ref="EIDe17989de-c33f-4720-8008-1e2f2d3da791" />
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+										let $messages := 
+											for $record in $records
+												let $keywordsParent := $record/gmd:descriptiveKeywords
+												let $insideMessages := 
+													for $keywords in $keywordsParent/gmd:MD_Keywords
+														
+														let $keywordAnchor := $keywords/gmd:keyword/gmx:Anchor/@xlink:href
+														let $keywordCharacterString := $keywords/gmd:keyword/gco:CharacterString/text()
+														return
+															if (count($keywords/gmd:keyword) = 0) then
+																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:keyword'}) 
+															else
+																let $dummy := 'aaa'
+																return
+																	if(count($keywordCharacterString) > 1) then
+																		local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gco:CharacterString', 'multiplicity': 1, 'count':count($keywordCharacterString)}) 
+																	else if(count($keywordAnchor) > 1) then
+																		local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmx:Anchor', 'multiplicity': 1, 'count':count($keywordAnchor)}) 
+																	else
+																		let $invalidAnchor := 
+																				if (count($keywordAnchor) = 1 and not(contains($keywordAnchor, 'https://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs'))) then 
+																					local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'https://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs'}) 
+																				else if (count($keywordAnchor) = 1 and not(contains($keywordAnchor, 'https://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis') or contains($keywordAnchor, 'https://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa'))) then
+																					local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'https://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis or https://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa'}) 
+																				else ()
+
+																		let $invalidCharacterString := 
+																				if (count($keywordCharacterString) = 1 and not(contains($keywordCharacterString, 'IACS'))) then
+																					local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'IACS'}) 
+																				else if (count($keywordCharacterString) = 1 and not(contains($keywordCharacterString, 'LPIS') or contains($keywordCharacterString, 'GSAA'))) then
+																					local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'}) 
+																				else ()
+																		return
+																			if(count($invalidAnchor) = 0 and count($invalidCharacterString) = 0) then ()
+																			else if(count($invalidAnchor) = 0 and exists($keywordAnchor) and count($invalidCharacterString) > 1) then ()
+																			else if(count($invalidAnchor) > 1 and exists($keywordCharacterString) and count($invalidCharacterString) = 0) then ()
+																			else if (count($invalidAnchor) > 1 and count($invalidCharacterString) > 1) then
+																				($invalidAnchor, $invalidCharacterString)
+																			else ()
+												return 
+													if(count($keywordsParent/gmd:MD_Keywords) > 1) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmd:MD_Keywords', 'multiplicity': 1, 'count':count($keywordsParent/gmd:MD_Keywords)}) 
+													else if(count($insideMessages) > 0) then 
+														$insideMessages
+													else ()
+											
+										return			
+											(if ($messages) then 'FAILED' else 'PASSED',
+												local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+											$messages)																																	
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
+									<translationTemplates>
+										<translationTemplate ref="TR.brokenLink" />
+										<translationTemplate ref="TR.manual.resourceLocator" />
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
 				<TestCase id="EID770c8c12-029b-4ec6-aae2-cc655d5e7479">
 					<label>IACS Identification information</label>
 					<description>Test that Identification information for IACS data sets are provided in the metadata.</description>
@@ -67,19 +215,19 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs" target="_
 									<parent ref="EID2667e5cb-6ba8-4cea-b5ad-21c821539a0f" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $property_string := 'Citation Title'
-let $envDoms := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation
-let $messages := 
-	for $record in $envDoms
-		return 
-			if (count($record/gmd:title/gco:CharacterString) > 1) then
-				local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($record/gmd:title/gco:CharacterString)}) 
-			else 
-				local:addMessage('TR.manual.reviewCitationTitle', map { 'filename': local:filename($record), 'featureType': local-name($record), 'gmlid': string($record/@gml:id), 'property': $property_string })
-return
-(if ($messages) then 'PASSED_MANUAL' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)																																															
+										let $property_string := 'Citation Title'
+										let $envDoms := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation
+										let $messages := 
+											for $record in $envDoms
+												return 
+													if (count($record/gmd:title/gco:CharacterString) > 1) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($record/gmd:title/gco:CharacterString)}) 
+													else 
+														local:addMessage('TR.manual.reviewCitationTitle', map { 'filename': local:filename($record), 'featureType': local-name($record), 'gmlid': string($record/@gml:id), 'property': $property_string })
+										return
+										(if ($messages) then 'PASSED_MANUAL' else 'PASSED',
+										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+										$messages)																																															
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
 									<translationTemplates>
@@ -96,42 +244,41 @@ $messages)
 									<parent ref="EID2667e5cb-6ba8-4cea-b5ad-21c821539a0f" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+										let $property_string := 'Resource Locator'							
+										let $messages := 
+											for $record in $records
+												let $urls := $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
+												let $map := local:check-resource-uris($urls, 30, true())
 
-let $property_string := 'Resource Locator'							
-let $messages := 
-    for $record in $records
-		let $urls := $record/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource/gmd:linkage/gmd:URL
-		let $map := local:check-resource-uris($urls, 30, true())
-
-		let $invalid_urls :=
-			for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
-					$url
-				else ()
-		let $valid_urls :=
-			for $href in $urls
-			let $url := string($href)
-			let $validuri := map:get($map, $url)
-			return
-				if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
-					()
-				else 
-					$url
-		return
-			if (count($invalid_urls) > 0) then
-				local:addMessage('TR.brokenLink', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
-			else if(count($valid_urls) > 0) then
-				local:addMessage('TR.manual.resourceLocator', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
-			else ()
-return
-(if ($messages and not($messages/@ref = ('TR.manual.resourceLocator'))) then 'FAILED' 
-else if($messages and $messages/@ref = ('TR.manual.resourceLocator')) then 'PASSED_MANUAL' 
-else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)																																															
+												let $invalid_urls :=
+													for $href in $urls
+													let $url := string($href)
+													let $validuri := map:get($map, $url)
+													return
+														if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+															$url
+														else ()
+												let $valid_urls :=
+													for $href in $urls
+													let $url := string($href)
+													let $validuri := map:get($map, $url)
+													return
+														if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+															()
+														else 
+															$url
+												return
+													if (count($invalid_urls) > 0) then
+														local:addMessage('TR.brokenLink', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+													else if(count($valid_urls) > 0) then
+														local:addMessage('TR.manual.resourceLocator', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
+													else ()
+										return
+										(if ($messages and not($messages/@ref = ('TR.manual.resourceLocator'))) then 'FAILED' 
+										else if($messages and $messages/@ref = ('TR.manual.resourceLocator')) then 'PASSED_MANUAL' 
+										else 'PASSED',
+										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+										$messages)																																															
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
 									<translationTemplates>
@@ -148,29 +295,29 @@ $messages)
 									<parent ref="EID2667e5cb-6ba8-4cea-b5ad-21c821539a0f" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $datasets := ('dataset', 'series')
-let $service := 'service'
-let $property_string := 'Topic Category'
-let $recordsToInspect := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:topicCategory
-let $messages := 
-    for $record in $recordsToInspect
-		let $validCategoryCode :=
-			for $topicCategory in $recordsToInspect/gmd:MD_TopicCategoryCode
-				return
-					if($topicCategory = 'farming') then ()
-					else local:addMessage('TR.topicCategoryError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
+										let $datasets := ('dataset', 'series')
+										let $service := 'service'
+										let $property_string := 'Topic Category'
+										let $recordsToInspect := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:topicCategory
+										let $messages := 
+											for $record in $recordsToInspect
+												let $validCategoryCode :=
+													for $topicCategory in $recordsToInspect/gmd:MD_TopicCategoryCode
+														return
+															if($topicCategory = 'farming') then ()
+															else local:addMessage('TR.topicCategoryError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 
 
-		return 
-			if (count($recordsToInspect/gmd:MD_TopicCategoryCode) = 0 and $recordsToInspect/../../../gmd:hierarchyLevel/*/@codeListValue = $datasets) then
-				local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string}) 
-			else if (count($recordsToInspect/gmd:MD_TopicCategoryCode) != 0 and $recordsToInspect/../../../gmd:hierarchyLevel/*/@codeListValue = $service) then
-				local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 0, 'count':count($recordsToInspect/gmd:MD_TopicCategoryCode)}) 
-			else $validCategoryCode
-return
-(if ($messages) then 'FAILED' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)																																															
+												return 
+													if (count($recordsToInspect/gmd:MD_TopicCategoryCode) = 0 and $recordsToInspect/../../../gmd:hierarchyLevel/*/@codeListValue = $datasets) then
+														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string}) 
+													else if (count($recordsToInspect/gmd:MD_TopicCategoryCode) != 0 and $recordsToInspect/../../../gmd:hierarchyLevel/*/@codeListValue = $service) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 0, 'count':count($recordsToInspect/gmd:MD_TopicCategoryCode)}) 
+													else $validCategoryCode
+										return
+										(if ($messages) then 'FAILED' else 'PASSED',
+										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+										$messages)																																															
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
 									<translationTemplates>
@@ -188,29 +335,28 @@ $messages)
 									<parent ref="EID2667e5cb-6ba8-4cea-b5ad-21c821539a0f" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
+										let $property_string_citation := 'Citation Date'
+										let $property_string_datetype := 'Citation Date Type'
+										let $messages := 
+											for $record in $records/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date
+												return
+													if (count($record/gmd:date/gco:Date) = 0) then
+														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string_citation}) 
+													else if (count($record/gmd:date/gco:Date) > 1) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:date/gco:Date)}) 
 
-let $property_string_citation := 'Citation Date'
-let $property_string_datetype := 'Citation Date Type'
-let $messages := 
-	for $record in $records/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date
-		return
-			if (count($record/gmd:date/gco:Date) = 0) then
-				local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string_citation}) 
-			else if (count($record/gmd:date/gco:Date) > 1) then
-				local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:date/gco:Date)}) 
+													else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) = 0) then
+														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string_datetype}) 
+													else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) > 1) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:dateType/gmd:CI_DateTypeCode)}) 
+													else if (not($record/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'publication')) then
+														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
+													else ()
 
-			else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) = 0) then
-				local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string_datetype}) 
-			else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) > 1) then
-				local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:dateType/gmd:CI_DateTypeCode)}) 
-			else if (not($record/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'publication')) then
-				local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
-			else ()
-
-return
-(if ($messages) then 'FAILED' else 'PASSED',
-local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-$messages)																																															
+										return
+										(if ($messages) then 'FAILED' else 'PASSED',
+										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+										$messages)																																															
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
 									<translationTemplates>
