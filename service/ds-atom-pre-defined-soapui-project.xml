@@ -3129,7 +3129,7 @@ for(int i=0; i &lt; mediaTypeUrls.size(); i++) {
 	final String url = mediaTypeUrls[i];
 	final String baseType = mediaBaseTypes[i];
 
-	log.info("Using URL: "+url);
+	log.info("(Iterate over Media Type entries) Using URL: "+url);
 	ph.setTransferProperty("mediaTypeUrl", url);
 	ph.runTestStep("Get INSPIRE Media Subtype");
 	def respXmlHolder = ph.getTestStepResult("Get INSPIRE Media Subtype");
@@ -4182,13 +4182,16 @@ for( node in getSpatialDataSetUrlTemplates ) {
 
 			for(language in languages) {
 				replaceParameter(parameters, cleanParameters, "language", language )
+                log.info("1");
 				final String url = UriUtils.withQueryParameters(endpoint, cleanParameters)
 				if(!invokedUrls.contains(url)) {
-					log.info("Using URL: "+url)
+					log.info("(Iterate over Get Spatial Dataset URL 1) Using URL: "+url)
 					ph.setTransferProperty("getSpatialDatasetUrl", url)
 					ph.setTransferProperty("mimeType", mimeType)
+					log.info("Before entrance")
 					ph.runTestStep("Get Spatial Dataset");
 					invokedUrls.add(url);
+					log.info("Exit")
 				}
 			}
 		}
@@ -4199,21 +4202,83 @@ for( node in getSpatialDataSetUrlTemplates ) {
 			</con:testStep>
 			<con:testStep type="httprequest" name="Get Spatial Dataset" id="ea92f351-8560-4190-b129-202d1de67410">
 				<con:settings />
-				<con:config method="GET" xsi:type="con:HttpRequest" id="aedd00a3-7612-4084-8c64-19eff6289f73" name="Get Spatial Dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+				<con:config method="HEAD" xsi:type="con:HttpRequest" id="aedd00a3-7612-4084-8c64-19eff6289f73" name="Get Spatial Dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 					<con:description>Checks if the content-type of the Get Spatial Dataset response equals the media-type from the Open Search Description document</con:description>
 					<con:settings>
 						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="${Transfer_Properties#mimeType}" xmlns="http://eviware.com/soapui/config"/></con:setting>
 					</con:settings>
 					<con:endpoint>${Transfer_Properties#getSpatialDatasetUrl}</con:endpoint>
 					<con:request />
-					<con:assertion type="Valid HTTP Status Codes" id="90ac1268-2c6a-46d4-94da-cb1a595847b2" name="HTTP status code 200 is returned">
+					<con:assertion type="GroovyScriptAssertion" id="90ac1268-2c6a-46d4-94da-cb1a595847b2" name="HTTP status code 200 is returned">
 						<con:configuration>
-							<codes>200</codes>
+							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+
+								log.info("status code 200 1");
+								
+								String testURL = context.expand('${Transfer_Properties#getSpatialDatasetUrl}');
+								log.info("status code 200 2");
+								
+								URL url = new URL(testURL);
+								log.info("status code 200 5");
+								
+								HttpURLConnection http = (HttpURLConnection)url.openConnection();
+								log.info("status code 200 6");
+								
+								http.setRequestMethod("HEAD");
+								log.info("status code 200 7");
+								
+								
+								if(connection.getResponseCode()!= 200){
+									log.info("status code 200 10");
+									throw new TranslatableAssertionError("TR.statusException");
+								}
+								
+								log.info("status code 200 11");
+								
+								
+								</scriptText>
 						</con:configuration>
 					</con:assertion>
-					<con:assertion type="Response SLA Assertion" id="4c8b189c-31ec-4098-8f45-6952a58780c6" name="30 seconds timeout">
+					<con:assertion type="GroovyScriptAssertion" id="4c8b189c-31ec-4098-8f45-6952a58780c6" name="30 seconds timeout">
 						<con:configuration>
-							<SLA>30000</SLA>
+							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+
+                                log.info("30 seconds timeout 1");
+                                
+                                String testURL = context.expand('${Transfer_Properties#getSpatialDatasetUrl}');
+                                log.info("30 seconds timeout 2");
+                                
+                                StopWatch pageLoad = new StopWatch();
+                                log.info("30 seconds timeout 3");
+                                
+                                pageLoad.start();
+                                log.info("30 seconds timeout 4");
+                                
+                                URL url = new URL(testURL);
+                                log.info("30 seconds timeout 5");
+                                
+                                HttpURLConnection http = (HttpURLConnection)url.openConnection();
+                                log.info("30 seconds timeout 6");
+                                
+                                http.setRequestMethod("HEAD");
+                                log.info("30 seconds timeout 7");
+                                
+                                pageLoad.stop();
+                                log.info("30 seconds timeout 8");
+                                
+                                
+                                long pageLoadTime_ms = pageLoad.getTime();
+                                log.info("30 seconds timeout 9");
+                                
+                                if(pageLoadTime_ms > 30000){
+                                    log.info("30 seconds timeout 10");
+                                    throw new TranslatableAssertionError("TR.timeException", "expected", mimeType, "actual", messageExchange.responseHeaders['Content-Type'][0]);
+                                }
+                                
+                                log.info("30 seconds timeout 11");
+                                
+                                
+                                </scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:assertion type="GroovyScriptAssertion" id="75f52c4d-7efd-412d-b177-9c7b581e95d3" name="Response content-type equals media-type from Get Spatial Dataset URL">
@@ -4423,7 +4488,7 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 				replaceParameter(parameters, cleanParameters, "language", language )
 				final String url = UriUtils.withQueryParameters(endpoint, cleanParameters)
 				if(!invokedUrls.contains(url)) {
-					log.info("Using URL: "+url)
+                    log.info("(Iterate over Describe Spatial Dataset URL 2) Using URL: "+url)
 					ph.setTransferProperty("describeSpatialDataSetUrl", url)
 					ph.setTransferProperty("mimeType", mimeType)
 					ph.runTestStep("Describe Spatial Dataset");
@@ -4680,7 +4745,7 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 				replaceParameter(parameters, cleanParameters, "language", language )
 				final String url = UriUtils.withQueryParameters(endpoint, cleanParameters)
 				if(!invokedUrls.contains(url)) {
-					log.info("Using URL: "+url)
+                    log.info("(Iterate over Describe Spatial Dataset URL 2) Using URL: "+url)
 					ph.setTransferProperty("describeSpatialDataSetUrl", url)
 					ph.setTransferProperty("mimeType", mimeType)
 					ph.runTestStep("Describe Spatial Dataset");
@@ -4817,7 +4882,7 @@ for( node in getSpatialDataSetUrlTemplates ) {
 				replaceParameter(parameters, cleanParameters, "language", language )
 				final String url = UriUtils.withQueryParameters(endpoint, cleanParameters)
 				if(!invokedUrls.contains(url)) {
-					log.info("Using URL: "+url)
+                    log.info("(Iterate over Get Spatial Dataset URL 2) Using URL: "+url)
 					ph.setTransferProperty("getSpatialDatasetUrl", url)
 					ph.setTransferProperty("mimeType", mimeType)
 					ph.runTestStep("Get Spatial Dataset");
