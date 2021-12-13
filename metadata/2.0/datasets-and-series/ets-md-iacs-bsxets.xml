@@ -118,7 +118,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 																			else ()
 																		return
 																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
-																			else if(count($invalidAnchorBody) > 0 and count($invalidCharacterStringBody) > 0) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'})
+																			else if ((count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) > 0 and count($invalidAnchorBody) > 0) or (count(index-of($keywordCharacterString, 'common agricultural policy')) > 0 and count($invalidCharacterStringBody) > 0)) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'})
 																			else ()
 												return 
 													if(count($keywordsParent/gmd:MD_Keywords) > 1) then
@@ -202,7 +202,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 
 																		return
 																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'IACS'}) 
-																			else if(count($invalidAnchorBody) > 0 and count($invalidCharacterStringBody) > 0) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'})
+																			else if((count(index-of($keywordAnchor, 'https://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0 and count($invalidAnchorBody) > 0) or (count(index-of($keywordCharacterString, 'iacs')) > 0 and count($invalidCharacterStringBody) > 0)) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'})
 																			else ()
 												return 
 													if(count($keywordsParent/gmd:MD_Keywords) > 1) then
@@ -331,21 +331,26 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 										let $datasets := ('dataset', 'series')
 										let $service := 'service'
 										let $property_string := 'Topic Category'
-										let $recordsToInspect := $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:topicCategory
+										let $recordsToInspect := $records/gmd:identificationInfo/gmd:MD_DataIdentification
 										let $messages := 
 											for $record in $recordsToInspect
 												let $validCategoryCode :=
-													for $topicCategory in $recordsToInspect/gmd:MD_TopicCategoryCode
+													for $topicCategory in $recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode
 														return
 															if($topicCategory = 'farming') then ()
 															else local:addMessage('TR.topicCategoryError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 
-
+												let $dummy := local:log('MD_TopicCategoryCode: ' || count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode))
+												let $dummy2 := local:log('codeListValue: ' || $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue)
 												return 
-													if (count($recordsToInspect/gmd:MD_TopicCategoryCode) = 0 and $recordsToInspect/../../../gmd:hierarchyLevel/*/@codeListValue = $datasets) then
+													if (count($recordsToInspect/gmd:topicCategory) = 0 and $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue = $datasets) then
 														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string}) 
-													else if (count($recordsToInspect/gmd:MD_TopicCategoryCode) != 0 and $recordsToInspect/../../../gmd:hierarchyLevel/*/@codeListValue = $service) then
-														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 0, 'count':count($recordsToInspect/gmd:MD_TopicCategoryCode)}) 
+													else if (count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode) = 0 and $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue = $datasets) then
+														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string}) 
+													else if (count($recordsToInspect/gmd:topicCategory) != 0 and $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue = $service) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 0, 'count':count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode)}) 
+													else if (count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode) != 0 and $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue = $service) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 0, 'count':count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode)}) 
 													else $validCategoryCode
 										return
 										(if ($messages) then 'FAILED' else 'PASSED',
