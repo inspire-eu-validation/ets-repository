@@ -59,7 +59,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0" />
 							<testAssertions>
 								<TestAssertion id="EIDd14bfef0-b2ec-4280-8830-c44f4ee2b9f8">
-									<label>Keyword Value</label>
+									<label>Keyword GEMET value</label>
 									<description>
 										<![CDATA[<p> For every <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c-iacs/iacs/IACS-datasets#mdKeywords">MD_Keyword</a> element:
 											<ul>
@@ -78,8 +78,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 												let $keywordsParent := $record//gmd:descriptiveKeywords
 												let $insideMessages := 
 													for $keywords in $keywordsParent/gmd:MD_Keywords
-														let $keywordAnchor := $keywords/gmd:keyword/gmx:Anchor/@xlink:href
-														let $keywordCharacterString := $keywords/gmd:keyword/gco:CharacterString/text()
+														let $keywordAnchor := 
+																for $href in $keywords/gmd:keyword/gmx:Anchor/@xlink:href
+																	return lower-case($href)
+
+														let $keywordCharacterString := 
+															for $text in $keywords/gmd:keyword/gco:CharacterString/text()
+																	return lower-case($text)
 														return
 															if (count($keywords/gmd:keyword) = 0) then
 																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:keyword'}) 
@@ -116,9 +121,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 																			if (count(index-of($keywordCharacterString, 'common agricultural policy')) > 0 and count(index-of($keywordCharacterString, 'land cover')) = 0 and count(index-of($keywordCharacterString, 'land use')) = 0) then
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
 																			else ()
+			
 																		return
-																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
-																			else if ((count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) > 0 and count($invalidAnchorBody) > 0) or (count(index-of($keywordCharacterString, 'common agricultural policy')) > 0 and count($invalidCharacterStringBody) > 0)) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'})
+																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then 
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
+																			else if ((count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) > 0 and count($invalidAnchorBody) > 0) or (count(index-of($keywordCharacterString, 'common agricultural policy')) > 0 and count($invalidCharacterStringBody) > 0)) then 
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'})
 																			else ()
 												return 
 													if(count($keywordsParent/gmd:MD_Keywords) > 1) then
@@ -140,7 +148,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID08832f42-696f-4725-9249-2f8edb3f0bfb">
-									<label>Keyword Resource valid</label>
+									<label>Keyword IACS CodeList value</label>
 									<description>
 										<![CDATA[<p> For every <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c-iacs/iacs/IACS-datasets#mdKeywords">MD_Keyword</a> element:
 											<ul>
@@ -159,8 +167,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 												let $keywordsParent := $record//gmd:descriptiveKeywords
 												let $insideMessages := 
 													for $keywords in $keywordsParent/gmd:MD_Keywords
-														let $keywordAnchor := $keywords/gmd:keyword/gmx:Anchor/@xlink:href
-														let $keywordCharacterString := $keywords/gmd:keyword/gco:CharacterString/text()
+														let $keywordAnchor := 
+															for $href in $keywords/gmd:keyword/gmx:Anchor/@xlink:href
+																return lower-case($href)
+
+														let $keywordCharacterString := 
+															for $text in $keywords/gmd:keyword/gco:CharacterString/text()
+																return lower-case($text)
 														return
 															if (count($keywords/gmd:keyword) = 0) then
 																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:keyword'}) 
@@ -340,8 +353,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 															if($topicCategory = 'farming') then ()
 															else local:addMessage('TR.topicCategoryError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 
-												let $dummy := local:log('MD_TopicCategoryCode: ' || count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode))
-												let $dummy2 := local:log('codeListValue: ' || $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue)
 												return 
 													if (count($recordsToInspect/gmd:topicCategory) = 0 and $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue = $datasets) then
 														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string}) 
@@ -392,7 +403,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 										let $property_string_citation := 'Citation Date'
 										let $property_string_datetype := 'Citation Date Type'
 										let $messages := 
-											for $record in $records/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date
+											for $record in $records//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date
 												return
 													if (count($record/gmd:date/gco:Date) = 0) then
 														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string_citation}) 
