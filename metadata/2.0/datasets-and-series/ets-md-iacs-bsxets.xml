@@ -80,7 +80,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 													for $keywords in $keywordsParent/gmd:MD_Keywords
 														let $keywordAnchor := 
 																for $href in $keywords/gmd:keyword/gmx:Anchor/@xlink:href
-																	return lower-case($href)
+																	return $href
 
 														let $keywordCharacterString := 
 															for $text in $keywords/gmd:keyword/gco:CharacterString/text()
@@ -129,9 +129,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'})
 																			else ()
 												return 
-													if(count($keywordsParent/gmd:MD_Keywords) > 1) then
-														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmd:MD_Keywords', 'multiplicity': 1, 'count':count($keywordsParent/gmd:MD_Keywords)}) 
-													else if(count($insideMessages) > 0) then 
+													if(count($insideMessages) > 0) then 
 														$insideMessages
 													else ()
 										
@@ -169,7 +167,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 													for $keywords in $keywordsParent/gmd:MD_Keywords
 														let $keywordAnchor := 
 															for $href in $keywords/gmd:keyword/gmx:Anchor/@xlink:href
-																return lower-case($href)
+																return $href
 
 														let $keywordCharacterString := 
 															for $text in $keywords/gmd:keyword/gco:CharacterString/text()
@@ -218,9 +216,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 																			else if((count(index-of($keywordAnchor, 'https://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0 and count($invalidAnchorBody) > 0) or (count(index-of($keywordCharacterString, 'iacs')) > 0 and count($invalidCharacterStringBody) > 0)) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'})
 																			else ()
 												return 
-													if(count($keywordsParent/gmd:MD_Keywords) > 1) then
-														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmd:MD_Keywords', 'multiplicity': 1, 'count':count($keywordsParent/gmd:MD_Keywords)}) 
-													else if(count($insideMessages) > 0) then 
+													if(count($insideMessages) > 0) then 
 														$insideMessages
 													else ()
 											
@@ -405,13 +401,10 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/ConformanceClass_2c
 										let $messages := 
 											for $record in $records//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date
 												return
-													if (count($record/gmd:date/gco:Date) = 0) then
-														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string_citation}) 
-													else if (count($record/gmd:date/gco:Date) > 1) then
+													if (count($record/gmd:date/gco:Date) > 1) then
 														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:date/gco:Date)}) 
-
-													else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) = 0) then
-														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string_datetype}) 
+													else if (string-length($record/gmd:date/gco:Date/text()) = 0) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':string-length($record/gmd:date/gco:Date/text())}) 
 													else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) > 1) then
 														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:dateType/gmd:CI_DateTypeCode)}) 
 													else if (not($record/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'publication')) then
