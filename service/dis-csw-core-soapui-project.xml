@@ -1687,9 +1687,102 @@ if(defaultLanguage.size() != 1){
 					</con:settings>
 					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
 					<con:request />
-					<con:assertion type="Simple Schema Validator" id="d487f7f6-3744-4a91-97ba-4b21b59c4161" name="Simple Schema Validator">
+					<con:assertion type="GroovyScriptAssertion" id="750c3343-c095-4488-aa17-1e78e5685f59" name="Response validates agains schema">
 						<con:configuration>
-							<pathToXSD>xsi:schemaLocation</pathToXSD>
+							<scriptText>import javax.xml.transform.stream.StreamSource;
+	import javax.xml.validation.SchemaFactory;
+	import javax.xml.validation.Schema;
+	import javax.xml.validation.Validator
+	import javax.xml.XMLConstants;
+	import java.io.*;
+	import org.xml.sax.SAXException;
+	import de.interactive_instruments.etf.suim.*;
+	import com.eviware.soapui.support.XmlHolder;
+	import javax.xml.transform.Source;
+	Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+	
+	XmlHolder xml = new XmlHolder(messageExchange.responseContentAsXml);
+	def xmlText = xml.getXml();
+	def xsds = ["http://schemas.opengis.net/csw/2.0/csw.xsd", "http://inspire.ec.europa.eu/schemas/inspire_ds/1.0/inspire_ds.xsd"];
+	
+	if(xml.getNodeValue("/*:GetRecords/@*:schemaLocation") != null){
+		xsds = xml.getNodeValue("/*:GetRecords/@*:schemaLocation");
+		def splittedXsds = xsds.split(" ");
+		validationProccess(xmlText, splittedXsds);
+	}else{
+		validationProccess(xmlText, xsds);
+	}
+	
+	public void validationProccess(String xmlText, String[] xsds){
+		def errorMessages = [];
+		def isValid = false;
+		xsds.each{ xsd ->
+			errorMessages.add(hasValidSchema(xmlText, xsd))
+		}
+	
+		for (i = 0; i &lt; errorMessages.size() ; i++){
+			if(isValid == false &amp;&amp; errorMessages[i] == "valid"){
+				isValid = true;
+			}
+		}
+	
+		if(isValid == false){
+			xsds.each{ xsd ->
+				log.debug("xsd");
+				errorMessages.add(validateFile(xmlText, xsd))
+			}
+		}
+	}
+	
+	public boolean validateFile(String xml, String strSchemaLocation) {
+		Source xmlFile = null;
+	
+		try {
+			URL schemaFile = new URL(strSchemaLocation);
+			xmlFile = new StreamSource(createFile(xml));
+			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema schema = schemaFactory.newSchema(schemaFile);
+			Validator validator = schema.newValidator();
+			validator.validate(xmlFile);
+	
+		} catch (SAXException e) {
+			String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
+			throw new TranslatableAssertionError('TR.XmlNotValidAgainstSchemaLocation', assertParams);
+	
+		} catch (IOException ioe) {
+			System.out.println("IOException");    
+		} 
+	}
+	
+	public String hasValidSchema(String xml, String strSchemaLocation) {
+		Source xmlFile = null;
+		
+		try {
+			URL schemaFile = new URL(strSchemaLocation);
+			xmlFile = new StreamSource(createFile(xml));
+			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema schema = schemaFactory.newSchema(schemaFile);
+			Validator validator = schema.newValidator();
+			validator.validate(xmlFile);
+			return "valid";
+	
+		} catch (SAXException e) {
+			String[] assertParams = ['xsd', strSchemaLocation, 'reason', e.getLocalizedMessage()];
+			return "invalid";
+	
+		} catch (IOException ioe) {
+			System.out.println("IOException");
+			return "invalid";
+		}  
+	}
+	
+	public File createFile(String file) throws IOException {
+		File tempFile = File.createTempFile("temporaryfile",".xml")
+		BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+		writer.write(file);
+		writer.close()
+		return tempFile;
+	}</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
