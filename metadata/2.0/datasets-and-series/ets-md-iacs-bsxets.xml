@@ -75,23 +75,23 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<expression>
 										let $messages := 
 											for $record in $records
-												let $keywordsParent := $record//gmd:descriptiveKeywords
+												let $keywords := $record//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
 												let $insideMessages := 
-													for $keywords in $keywordsParent/gmd:MD_Keywords
+													<!-- for $keywords in $keywordsParent -->
 														let $keywordAnchor := 
-																for $href in $keywords/gmd:keyword/gmx:Anchor/@xlink:href
+																for $href in $keywords/gmx:Anchor/@xlink:href
 																	return $href
 
 														let $keywordCharacterString := 
-															for $text in $keywords/gmd:keyword/gco:CharacterString/text()
+															for $text in $keywords/gco:CharacterString/text()
 																	return lower-case($text)
 														return
-															if (count($keywords/gmd:keyword) = 0) then
+															if (count($keywords) = 0) then
 																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:keyword'}) 
 															else
 																let $dummy := 'aaa'
 																let $validkeywordMultiplicity :=
-																	for $keyword in $keywords/gmd:keyword
+																	for $keyword in $keywords
 																		return
 																			if (count($keyword/gco:CharacterString) = 0 and count($keyword/gmx:Anchor) = 0) then
 																				local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:CharacterString or gmx:Anchor'}) 
@@ -111,7 +111,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 																			else ()
 																		let $invalidAnchorBody :=
 																			if (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) > 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4612')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4678')) = 0) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use 1'}) 
 																			else ()
 																		let $invalidCharacterStringMain := 
 																			if (count(index-of($keywordCharacterString, 'common agricultural policy')) = 0) then
@@ -119,14 +119,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 																			else ()
 																		let $invalidCharacterStringBody := 
 																			if (count(index-of($keywordCharacterString, 'common agricultural policy')) > 0 and count(index-of($keywordCharacterString, 'land cover')) = 0 and count(index-of($keywordCharacterString, 'land use')) = 0) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use 2'}) 
 																			else ()
 			
 																		return
 																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then 
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
-																			else if ((count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) > 0 and count($invalidAnchorBody) > 0) or (count(index-of($keywordCharacterString, 'common agricultural policy')) > 0 and count($invalidCharacterStringBody) > 0)) then 
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'})
 																			else ()
 												return 
 													if(count($insideMessages) > 0) then 
@@ -162,9 +160,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<expression>
 										let $messages := 
 											for $record in $records
-												let $keywordsParent := $record//gmd:descriptiveKeywords
+												let $keywords := $record//gmd:descriptiveKeywords/gmd:MD_Keywords
 												let $insideMessages := 
-													for $keywords in $keywordsParent/gmd:MD_Keywords
+													<!-- for $keywords in $keywordsParent -->
 														let $keywordAnchor := 
 															for $href in $keywords/gmd:keyword/gmx:Anchor/@xlink:href
 																return $href
