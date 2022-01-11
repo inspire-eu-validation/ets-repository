@@ -110,20 +110,40 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
 																			else ()
 																		let $invalidAnchorBody :=
-																			if (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) > 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4612')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4678')) = 0) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use 1'}) 
+																			if (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) > 0 and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4612')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lc')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lc')) = 0) and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4678')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lu')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lu')) = 0)) then
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
 																			else ()
+
 																		let $invalidCharacterStringMain := 
 																			if (count(index-of($keywordCharacterString, 'common agricultural policy')) = 0) then
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
 																			else ()
+
+																		let $invalidLPIS := 
+																			if(count(index-of($keywordCharacterString, 'lpis')) > 0 and count(index-of($keywordCharacterString, 'land cover')) = 0)then
+																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land cover', 'property': 'LPIS'}) 
+																			else if(count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis')) > 0 and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lc')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lc')) = 0))then
+																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land cover', 'property': 'LPIS'}) 
+																			else ()
+
+																		let $invalidGSAA := 
+																			if(count(index-of($keywordCharacterString, 'gsaa')) > 0 and count(index-of($keywordCharacterString, 'land cover')) = 0)then
+																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land use', 'property': 'GSAA'}) 
+																			else if(count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa')) > 0 and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lu')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lu')) = 0))then
+																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land use', 'property': 'GSAA'}) 
+																			else ()
+
 																		let $invalidCharacterStringBody := 
 																			if (count(index-of($keywordCharacterString, 'common agricultural policy')) > 0 and count(index-of($keywordCharacterString, 'land cover')) = 0 and count(index-of($keywordCharacterString, 'land use')) = 0) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use 2'}) 
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
 																			else ()
 			
 																		return
-																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then 
+																			if (count($invalidLPIS) > 0) then
+																				$invalidLPIS
+																			else if (count($invalidGSAA) > 0) then
+																				$invalidGSAA
+																			else if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then 
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
 																			else ()
 												return 
