@@ -75,7 +75,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<expression>
 										let $messages := 
 											for $record in $records
-												let $keywords := $record//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
+												let $keywords := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
 												let $insideMessages := 
 													<!-- for $keywords in $keywordsParent -->
 														let $keywordAnchor := 
@@ -180,7 +180,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<expression>
 										let $messages := 
 											for $record in $records
-												let $keywords := $record//gmd:descriptiveKeywords/gmd:MD_Keywords
+												let $keywords := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords
 												let $insideMessages := 
 													<!-- for $keywords in $keywordsParent -->
 														let $keywordAnchor := 
@@ -248,6 +248,75 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 										<translationTemplate ref="TR.missingElement" />
 										<translationTemplate ref="TR.wrongMultiplicity" />
 										<translationTemplate ref="TR.keywordError" />
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID594ab7ef-6138-4998-ab93-0a54ae53f53c">
+									<label>Thesaurus Name Title</label>
+									<description>
+										<![CDATA[<p>Waiting for description</p>]]>
+									</description>
+									<parent ref="EIDe17989de-c33f-4720-8008-1e2f2d3da791" />
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+										let $titlesCharacter :=
+											for $title in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+												return $title/gco:CharacterString
+
+										let $titlesAnchor :=
+											for $title in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+												return $title/gmx:Anchor/@*:href
+
+										let $messages := 
+											for $record in $records
+												return
+											if ((count($titlesCharacter) = 0) and (count($titlesAnchor) = 0)) then
+												local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:CharacterString or gmx:Anchor'}) 
+											else if (count(index-of($titlesCharacter, 'IACS Data')) = 0 and count(index-of($titlesAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData')) = 0) then
+												local:addMessage('TR.citationWrongTitle', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
+											else ()
+										return
+										(if ($messages) then 'FAILED' else 'PASSED',
+										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+										$messages)			
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement" />
+										<translationTemplate ref="TR.wrongMultiplicity" />
+										<translationTemplate ref="TR.temporalReferenceError" />
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDec61bc45-bcb2-47f2-a7d2-4f61541b2529">
+									<label>Thesaurus Name Date</label>
+									<description>
+										<![CDATA[<p>Waiting for description</p>]]>
+									</description>
+									<parent ref="EIDe17989de-c33f-4720-8008-1e2f2d3da791" />
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+										let $dates :=
+											for $date in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date
+												return $date
+
+										let $messages := 
+										for $record in $records
+												return
+											if (count($dates) = 0) then
+												local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:Date'}) 
+											else if (count(index-of($dates, '2021-06-08')) = 0 ) then
+												local:addMessage('TR.citationWrongDate', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'date': '2021-06-08'}) 
+											else ()
+
+										return
+										(if ($messages) then 'FAILED' else 'PASSED',
+										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+										$messages)																														
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement" />
+										<translationTemplate ref="TR.wrongMultiplicity" />
+										<translationTemplate ref="TR.temporalReferenceError" />
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
@@ -408,7 +477,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 								<TestAssertion id="EIDf01808c1-4ad4-46bc-9939-2590529e476d">
 									<label>Citation Date</label>
 									<description>
-										<![CDATA[<p>Check that the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#citationdate">Citation Date</a> contains at least the date of the last revision and the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#citationdatetype">Citation Date Type</a> codeListValue is equal to "publication".</p>
+										<![CDATA[<p>Check that the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#citationdate">Citation Date</a> contains at least the date of the last revision and the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#citationdatetype">Citation Date Type</a> codeListValue is equal to "revision".</p>
 									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#iacs-identification-information" target="_blank">IACS Identification information</a></p>]]>
 									</description>
 									<parent ref="EID41bef917-5208-41d0-bf59-d9573616ec10" />
@@ -417,7 +486,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 										let $property_string_citation := 'Citation Date'
 										let $property_string_datetype := 'Citation Date Type'
 										let $messages := 
-											for $record in $records//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date
+											for $record in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
 												return
 													if (count($record/gmd:date/gco:Date) = 0) then
 														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
@@ -427,7 +496,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 													else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) > 1) then
 														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:dateType/gmd:CI_DateTypeCode)}) 
-													else if (not($record/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'publication')) then
+													else if (not($record/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'revision')) then
 														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 													else ()
 
