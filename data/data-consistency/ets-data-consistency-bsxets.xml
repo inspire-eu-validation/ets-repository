@@ -10,11 +10,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/master/data-consistency
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
 	<reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
-	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-05-16T12:00:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2021-10-29T09:45:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDaeed5629-2c33-4fa6-aa66-f59418abaa70"/>
 	</tags>
@@ -142,7 +142,22 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data/master/data-consistency
 						 <parent ref="EID72a3ee32-8582-4f67-80a0-435f636f8cf3"/>
 						 <expectedResult>NOT_APPLICABLE</expectedResult>
 						 <expression>
-let $featuresWithErrors := $features[*[self::*:validFrom and not(@xsi:nil='true')] and *[self::*:validTo and not(@xsi:nil='true')] and xs:dateTime(*:validFrom/text()) >= xs:dateTime(*:validTo/text())][position() le $limitErrors]
+let $featuresWithErrors :=
+	for $feature in $features
+		let $validFrom := 
+			if(not(contains($feature/*[local-name()='validFrom']/text(), 'T'))) then
+				xs:dateTime(concat($feature/*[local-name()='validFrom']/text(), 'T00:00:00'))
+			else		
+				xs:dateTime($feature/*[local-name()='validFrom']/text())
+
+		let $validTo := 
+			if(not(contains($feature/*[local-name()='validTo']/text(), 'T'))) then
+				xs:dateTime(concat($feature/*[local-name()='validTo']/text(), 'T00:00:00'))
+			else 
+				xs:dateTime($feature/*[local-name()='validTo']/text())
+
+		let $featureWithErrors := $feature[*[self::*:validFrom and not(@xsi:nil='true')] and *[self::*:validTo and not(@xsi:nil='true')] and $validFrom >= $validTo][position() le $limitErrors]
+		return $featureWithErrors
 return
 (if ($featuresWithErrors) then 'FAILED' else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
