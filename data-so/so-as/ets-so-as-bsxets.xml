@@ -157,13 +157,14 @@ let $features_selected := $features[self::so:SoilHorizon]
 
 let $messages :=
 	for $feature in $features_selected/so:FAOHorizonNotation/so:FAOHorizonNotationType
-		let $envDom := $feature/so:FAOHorizonSubordinate
-			return
-				if (not(count($envDom) = count($envDom/@xlink:href))) then
-					local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})	
-				else (
-					local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
-				)
+		let $envDoms := $feature/so:FAOHorizonSubordinate
+			for $envDom in $envDoms
+				return
+					if (not(count($envDoms) = count($envDoms/@xlink:href))) then
+						local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'attribute': 'xlink:href'})	
+					else (
+						local:addMessage('TR.checkManuallyCodeListValue2',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string($envDom/@xlink:href)})
+					)
 
 return
 (if ($messages and ($messages/@ref = ('TR.missingAttribute'))) then 'FAILED' 
