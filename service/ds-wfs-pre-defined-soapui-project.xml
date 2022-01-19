@@ -7081,7 +7081,7 @@ a.notExists(
                   <con:sourcePath>declare namespace gmd='http://www.isotc211.org/2005/gmd';
 declare namespace srv='http://www.isotc211.org/2005/srv';
 declare namespace gco='http://www.isotc211.org/2005/gco';
-string-join(//srv:operatesOn/@uuidref,',')</con:sourcePath>
+string-join(//srv:operatesOn/@*:href,',')</con:sourcePath>
                   <con:targetType>datasetIdentifiersList</con:targetType>
                   <con:targetStep>#Project#</con:targetStep>
                   <con:upgraded>true</con:upgraded>
@@ -7176,15 +7176,13 @@ declare namespace gco='http://www.isotc211.org/2005/gco';
 <etfTranslate what="TR.missingMdIdentifier">{
 let $id:=//gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:MD_Identifier/gmd:code/gco:CharacterString
 return
-if (contains('${#Project#datasetIdentifiersList}', $id))
-then <INFO>the MD_Identifier exists in the Service metadata.</INFO>
-else ( <id>{$id/text()}</id>,<datasetIdentifiersList>${#Project#datasetIdentifiersList}</datasetIdentifiersList> )
+if (contains('${#Project#datasetIdentifiersList}', $id)) then ()
+else 
+   (<id>{$id/text()}</id>,<datasetIdentifiersList>'${#Project#datasetIdentifiersList}'</datasetIdentifiersList>)
 }
 </etfTranslate>]]>
                      </path>
-                     <content>&lt;etfTranslate what="TR.missingMdIdentifier">
-  &lt;INFO>the MD_Identifier exists in the Service metadata.&lt;/INFO>
-&lt;/etfTranslate></content>
+                     <content>&lt;etfTranslate what="TR.missingMdIdentifier"/></content>
                      <allowWildcards>false</allowWildcards>
                      <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
                      <ignoreComments>false</ignoreComments>
@@ -7775,7 +7773,7 @@ if (node != null){
       </con:property>
       <con:property>
          <con:name>etf.version</con:name>
-         <con:value>1.0.8</con:value>
+         <con:value>1.0.9</con:value>
       </con:property>
       <con:property>
          <con:name>etf.last.editor</con:name>
@@ -7795,7 +7793,7 @@ if (node != null){
       </con:property>
       <con:property>
          <con:name>etf.last.update.date</con:name>
-         <con:value>2020-05-29T09:52:00</con:value>
+         <con:value>2021-12-14T09:45:00</con:value>
       </con:property>
    </con:properties>
    <con:afterLoadScript></con:afterLoadScript>
