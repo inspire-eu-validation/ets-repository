@@ -10,11 +10,11 @@ Known limitations are documented in the description of the applicable test case 
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank">Conformance Class 2c: INSPIRE data sets and data set series metadata for IACS</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-11-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-11-30T00:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2022-01-20T11:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae" />
 	</tags>
@@ -61,11 +61,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 								<TestAssertion id="EIDd14bfef0-b2ec-4280-8830-c44f4ee2b9f8">
 									<label>Keyword GEMET value</label>
 									<description>
-										<![CDATA[<p> For every <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#mdKeywords">MD_Keyword</a> element:
+										<![CDATA[<p> For every <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#mdKeywords">MD_Keywords</a> element:
 											<ul>
-												<li>Check that <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordcharacterstring">Keyword CharacterString</a> is provided with "Common Agricultural Policy" value and at least one these values: "Land cover" for LPIS datasets OR "Land use" for GSAA datasets.</li>
-												OR
-												<li>Check that <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordanchor">Keyword Anchor</a> is provided with xlink:href attribute pointing to <a href="https://www.eionet.europa.eu/gemet/en/concept/1600">GEMET common agricultural</a> policy value and at least one these values: <a href="https://www.eionet.europa.eu/gemet/en/concept/4612">GEMET land cover</a> for LPIS datasets OR <a href="https://www.eionet.europa.eu/gemet/en/concept/4678">GEMET land use</a> for GSAA datasets.</li>
+												<li>Check that <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordanchor">Keyword Anchor</a> is provided with xlink:href attribute pointing to <a href="https://www.eionet.europa.eu/gemet/en/concept/1600">GEMET common agricultural policy</a> value and at least one these values related to an INSPIRE data theme: <a href="http://inspire.ec.europa.eu/theme/lc">Land cover</a> for LPIS datasets OR <a href="http://inspire.ec.europa.eu/theme/lu">Land use</a> for GSAA datasets.</li>
+												OR <br/>
+												<a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordcharacterstring">Keyword CharacterString</a> is provided with "Common Agricultural Policy" value and at least one these values: "Land cover" for LPIS datasets OR "Land use" for GSAA datasets.</li>
 											</ul>
 											</p>
 											<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#iacs-datasets-keyword" target="_blank">IACS Datasets Keyword</a></p>]]>
@@ -75,7 +75,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<expression>
 										let $messages := 
 											for $record in $records
-												let $keywords := $record//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
+												let $keywords := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
 												let $insideMessages := 
 													<!-- for $keywords in $keywordsParent -->
 														let $keywordAnchor := 
@@ -166,82 +166,103 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 								<TestAssertion id="EID08832f42-696f-4725-9249-2f8edb3f0bfb">
 									<label>Keyword IACS CodeList value</label>
 									<description>
-										<![CDATA[<p> For every <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#mdKeywords">MD_Keyword</a> element:
+										<![CDATA[<p> For every <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#mdKeywords">MD_Keywords</a> element:
 											<ul>
-												<li>Check that <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordcharacterstring">Keyword CharacterString</a> is provided with "IACS" value and at least one these values: "LPIS" for LPIS datasets OR "GSAA" for GSAA datasets.</li>
+												<li>Check that <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordanchor">Keyword Anchor</a> is provided with xlink:href attribute pointing to <a href="https://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs">IACS</a> value and at least one these values: <a href="https://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis">LPIS</a> for LPIS datasets OR <a href="https://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa">GSAA</a> for GSAA datasets, from <a href="https://inspire.ec.europa.eu/metadata-codelist/IACSData">IACS data controlled vocabulary</a>.</li>
 												OR
-												<li>Check that <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordanchor">Keyword Anchor</a> is provided with xlink:href attribute pointing to <a href="https//inspire.ec.europa.eu/metadata-codelist/IACSData/iacs">IACS</a> value and at least one these values: <a href="https//inspire.ec.europa.eu/metadata-codelist/IACSData/lpis">LPIS</a> for LPIS datasets OR <a href="https//inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa">GSAA</a> for GSAA datasets, from <a href="https//inspire.ec.europa.eu/metadata-codelist/IACSData">IACS data controlled vocabulary CodeList</a>.</li>
-											</ul>
-											</p>
+												<a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordcharacterstring">Keyword CharacterString</a> is provided with "IACS" value and at least one these values: "LPIS" for LPIS datasets OR "GSAA" for GSAA datasets.</li>
+												<br/>
+												In addition:
+    											 <ul><li>Check that the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#thesaurusNameTitle">Thesaurus Name Title</a> contains the xlink:href attribute pointing to <a href="https://inspire.ec.europa.eu/metadata-codelist/IACSData">IACS data controlled vocabulary</a> OR contains the "IACS Data" value.</li>
+    											<li>Check that the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#thesaurusNameDate">Thesaurus Name Date</a> is exactly '2021-06-08'.</li>
+    											<li>Check that the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#thesaurusNameDateType">Thesaurus Name Datetype</a> is exactly 'publication'.</li></ul>
+    										</ul>
 											<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#iacs-datasets-keyword" target="_blank">IACS Datasets Keyword</a></p>]]>
 									</description>
 									<parent ref="EIDe17989de-c33f-4720-8008-1e2f2d3da791" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 										let $messages := 
-											for $record in $records
-												let $keywords := $record//gmd:descriptiveKeywords/gmd:MD_Keywords
-												let $insideMessages := 
-													<!-- for $keywords in $keywordsParent -->
-														let $keywordAnchor := 
-															for $href in $keywords/gmd:keyword/gmx:Anchor/@xlink:href
-																return $href
+											for $record in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords
+												
+												let $keywordAnchor := 
+													for $href in $record/gmd:keyword/gmx:Anchor/@xlink:href
+														return $href
 
-														let $keywordCharacterString := 
-															for $text in $keywords/gmd:keyword/gco:CharacterString/text()
-																return lower-case($text)
+												let $keywordCharacterString := 
+													for $text in $record/gmd:keyword/gco:CharacterString/text()
+														return lower-case($text)
+
+												let $titlesCharacter :=
+													for $title in $record/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+														return $title/gco:CharacterString
+
+												let $titlesAnchor :=
+													for $title in $record/gmd:thesaurusName/gmd:CI_Citation/gmd:title
+														return $title/gmx:Anchor/@*:href
+
+												let $dates :=
+													for $date in $record/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:date/gco:Date
+														return $date
+
+												let $dateTypeCodes :=
+													for $dateTypeCode in $record/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue
+														return $dateTypeCode
+
+												let $validkeywordMultiplicity :=
+													for $keyword in $record/gmd:keyword
 														return
-															if (count($keywords/gmd:keyword) = 0) then
-																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:keyword'}) 
-															else
-																let $dummy := 'aaa'
-																let $validkeywordMultiplicity :=
-																	for $keyword in $keywords/gmd:keyword
-																		return
-																			if (count($keyword/gco:CharacterString) = 0 and count($keyword/gmx:Anchor) = 0) then
-																				local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:CharacterString or gmx:Anchor'}) 
-																			else if (count($keyword/gco:CharacterString) > 1) then
-																				local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gco:CharacterString', 'multiplicity': 1, 'count':count($keyword/gco:CharacterString)}) 
-																			else if (count($keyword/gmx:Anchor) > 1) then
-																				local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmx:Anchor', 'multiplicity': 1, 'count':count($keyword/gmx:Anchor)}) 
-																			else ()
-																return
-																	if(count($validkeywordMultiplicity) > 0) then
-																		$validkeywordMultiplicity
-																	else
-																		let $invalidAnchorMain := 
-																			if (count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) = 0) then 
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'IACS'}) 
-																			else ()
+															if (count($keyword/gco:CharacterString) = 0 and count($keyword/gmx:Anchor) = 0) then
+																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:CharacterString or gmx:Anchor'})
+															else if (count($keyword/gco:CharacterString) > 1) then
+																local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gco:CharacterString', 'multiplicity': 1, 'count':count($keyword/gco:CharacterString)}) 
+															else if (count($keyword/gmx:Anchor) > 1) then
+																local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmx:Anchor', 'multiplicity': 1, 'count':count($keyword/gmx:Anchor)}) 
+															else ()
 
-																		let $invalidAnchorBody := 
-																			if (count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa')) = 0) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'}) 
-																			else ()
+												let $validIACS := 
+													if (count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0 or count(index-of($keywordCharacterString, 'iacs')) > 0)
+														then ( true() )
+														else ( false() )
 
-																		let $invalidCharacterStringMain := 
-																			if (count(index-of($keywordCharacterString, 'iacs')) = 0) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'IACS'}) 
-																			else ()
-
-																		let $invalidCharacterStringBody :=
-																			if (count(index-of($keywordCharacterString, 'iacs')) > 0 and count(index-of($keywordCharacterString, 'lpis')) = 0 and count(index-of($keywordCharacterString, 'gsaa')) = 0) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'}) 
-																			else ()
-
-																		return
-																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'IACS'}) 
-																			else if((count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0 and count($invalidAnchorBody) > 0) or (count(index-of($keywordCharacterString, 'iacs')) > 0 and count($invalidCharacterStringBody) > 0)) then local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'})
-																			else ()
-												return 
-													if(count($insideMessages) > 0) then 
-														$insideMessages
+												let $invalidAnchorBody := 
+													if (count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa')) = 0) then
+														local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'}) 
 													else ()
-											
-										return			
-											(if ($messages) then 'FAILED' else 'PASSED',
-												local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-											$messages)																																	
+
+												let $invalidCharacterStringBody :=
+													if (count(index-of($keywordCharacterString, 'iacs')) > 0 and count(index-of($keywordCharacterString, 'lpis')) = 0 and count(index-of($keywordCharacterString, 'gsaa')) = 0) then
+														local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'}) 
+													else ()
+
+
+												return
+													if (count($record/gmd:keyword) = 0) then
+														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:keyword'}) 
+													else if(count($validkeywordMultiplicity) > 0) then
+														$validkeywordMultiplicity
+													else if(count($invalidAnchorBody) > 0) then
+														$invalidAnchorBody
+													else if(count($invalidCharacterStringBody) > 0) then
+														$invalidCharacterStringBody
+													else if ($validIACS and (count($titlesCharacter) = 0) and (count($titlesAnchor) = 0)) then
+														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:CharacterString or gmx:Anchor'}) 
+													else if ((count(index-of($keywordCharacterString, 'iacs')) > 0 and count(index-of($titlesCharacter, 'IACS Data')) = 0) or (count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0 and  count(index-of($titlesAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData')) = 0)) then
+														local:addMessage('TR.citationWrongTitle', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)})
+													else if ($validIACS and count($dates) = 0) then
+														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:Date'}) 
+													else if ($validIACS and count(index-of($dates, '2021-06-08')) = 0 ) then
+														local:addMessage('TR.citationWrongDate', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'date': '2021-06-08'}) 
+													else if ($validIACS and count($dateTypeCodes) = 0) then
+														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:CI_DateTypeCode'}) 
+													else if ($validIACS and count(index-of($dateTypeCodes, 'publication')) = 0 ) then
+														local:addMessage('TR.citationWrongDateType', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'datetype': 'publication'}) 
+													else ()
+
+										return
+										(if ($messages) then 'FAILED' else 'PASSED',
+										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+										$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
 									<translationTemplates>
@@ -408,7 +429,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 								<TestAssertion id="EIDf01808c1-4ad4-46bc-9939-2590529e476d">
 									<label>Citation Date</label>
 									<description>
-										<![CDATA[<p>Check that the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#citationdate">Citation Date</a> contains at least the date of the last revision and the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#citationdatetype">Citation Date Type</a> codeListValue is equal to "publication".</p>
+										<![CDATA[<p>Check that the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#citationdate">Citation Date</a> contains at least the date of the last revision and the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#citationdatetype">Citation Date Type</a> codeListValue is equal to "revision".</p>
 									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#iacs-identification-information" target="_blank">IACS Identification information</a></p>]]>
 									</description>
 									<parent ref="EID41bef917-5208-41d0-bf59-d9573616ec10" />
@@ -416,8 +437,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<expression>
 										let $property_string_citation := 'Citation Date'
 										let $property_string_datetype := 'Citation Date Type'
+										let $codeListValues :=
+											for $codeListValue in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue
+												return $codeListValue
+
 										let $messages := 
-											for $record in $records//gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:thesaurusName/gmd:CI_Citation/gmd:date/gmd:CI_Date
+											for $record in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
 												return
 													if (count($record/gmd:date/gco:Date) = 0) then
 														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
@@ -427,7 +452,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 													else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) > 1) then
 														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:dateType/gmd:CI_DateTypeCode)}) 
-													else if (not($record/gmd:dateType/gmd:CI_DateTypeCode/@codeListValue = 'publication')) then
+													else if (count(index-of($codeListValues, 'revision')) = 0) then
 														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 													else ()
 
