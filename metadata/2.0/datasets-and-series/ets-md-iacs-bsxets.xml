@@ -182,8 +182,24 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<parent ref="EIDe17989de-c33f-4720-8008-1e2f2d3da791" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-										let $messages := 
-											for $record in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords
+										let $messages :=
+											for $recordm in $records
+
+												let $keywords:= $recordm/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords
+												let $keywordAnchor := 
+														for $href in $keywords/gmd:keyword/gmx:Anchor/@xlink:href
+															return $href
+
+												let $keywordCharacterString := 
+													for $text in $keywords/gmd:keyword/gco:CharacterString/text()
+															return lower-case($text)
+
+												return if (count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) = 0 and count(index-of($keywordCharacterString, 'iacs')) = 0) 
+												then(
+													local:addMessage('TR.keywordError', map {'filename': local:filename($recordm), 'featureType':local-name($recordm), 'gmlid': string($recordm/@*:id), 'value': 'IACS'}) 
+												)
+												else(
+											for $record in $recordm/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords
 												
 												let $keywordAnchor := 
 													for $href in $record/gmd:keyword/gmx:Anchor/@xlink:href
@@ -221,7 +237,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 															else ()
 
 												let $validIACS := 
-													if (count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0 or count(index-of($keywordCharacterString, 'iacs')) > 0)
+													if (((count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/iacs')) > 0) and (count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis'))  > 0)) or
+													((count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa')) > 0) or (count(index-of($keywordCharacterString, 'iacs')) > 0) and ((count(index-of($keywordCharacterString, 'lpis')) > 0) or count(index-of($keywordCharacterString, 'gsaa')) > 0)))
 														then ( true() )
 														else ( false() )
 
@@ -258,6 +275,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 													else if ($validIACS and count(index-of($dateTypeCodes, 'publication')) = 0 ) then
 														local:addMessage('TR.citationWrongDateType', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'datetype': 'publication'}) 
 													else ()
+											)
 
 										return
 										(if ($messages) then 'FAILED' else 'PASSED',
