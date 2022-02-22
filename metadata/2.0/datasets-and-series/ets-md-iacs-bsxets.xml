@@ -182,7 +182,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<parent ref="EIDe17989de-c33f-4720-8008-1e2f2d3da791" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-										let $messages :=
+										let $messagesdoc :=
 											for $recordm in $records
 
 												let $keywords:= $recordm/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords
@@ -198,9 +198,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 												then(
 													local:addMessage('TR.keywordError', map {'filename': local:filename($recordm), 'featureType':local-name($recordm), 'gmlid': string($recordm/@*:id), 'value': 'IACS'}) 
 												)
-												else(
-											for $record in $recordm/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords
-												
+												else()
+
+											
+										let $messageselem := 
+											for $record in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords
+											
 												let $keywordAnchor := 
 													for $href in $record/gmd:keyword/gmx:Anchor/@xlink:href
 														return $href
@@ -208,6 +211,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 												let $keywordCharacterString := 
 													for $text in $record/gmd:keyword/gco:CharacterString/text()
 														return lower-case($text)
+
+												let $validkeywordMultiplicity :=
+													for $keyword in $record/gmd:keyword
+														return
+															if (count($keyword/gco:CharacterString) = 0 and count($keyword/gmx:Anchor) = 0) then
+																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:CharacterString or gmx:Anchor'})
+															else if (count($keyword/gco:CharacterString) > 1) then
+																local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gco:CharacterString', 'multiplicity': 1, 'count':count($keyword/gco:CharacterString)}) 
+															else if (count($keyword/gmx:Anchor) > 1) then
+																local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmx:Anchor', 'multiplicity': 1, 'count':count($keyword/gmx:Anchor)}) 
+															else ()
 
 												let $titlesCharacter :=
 													for $title in $record/gmd:thesaurusName/gmd:CI_Citation/gmd:title
@@ -275,7 +289,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 													else if ($validIACS and count(index-of($dateTypeCodes, 'publication')) = 0 ) then
 														local:addMessage('TR.citationWrongDateType', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'datetype': 'publication'}) 
 													else ()
-											)
+										
+										let $messages:= ($messagesdoc,$messageselem)
 
 										return
 										(if ($messages) then 'FAILED' else 'PASSED',
