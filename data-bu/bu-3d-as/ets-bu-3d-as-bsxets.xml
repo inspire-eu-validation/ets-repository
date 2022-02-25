@@ -204,30 +204,46 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-bu/master/bu-3d-as/cons
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $features_selected := $features[self::bu-core3d:BuildingPart | self::bu-core3d:Building]
+let $features_selectedbp := $features[self::bu-core3d:BuildingPart]
+let $features_selectedb := $features[self::bu-core3d:Building]
 let $buildingPartIDs := $features[self::bu-core3d:BuildingPart]/@*:id
 let $messages :=
 	for $feature in $features_selected
 
+
+
+		let $parts := for $part in $feature/bu-base:parts
+
+					return 
+						if (exists($part/@xlink:href) and substring($part/@xlink:href, 2) = $buildingPartIDs)
+						 then 
+							()
+						else "$feature/bu-base:parts/bu-core3d:BuildingPart"
 		let $element := 
 			if(name($feature) = 'bu-core3d:Building') then
-				let $parts := $feature/bu-base:parts
-					return 
-						if (exists($feature/bu-base:parts/@xlink:href) and substring($feature/bu-base:parts/@xlink:href, 2) = $buildingPartIDs) then 
-							()
-						else $feature/bu-base:parts/bu-core3d:BuildingPart	
+				(let $result:= (if (index-of($parts,"$feature/bu-base:parts/bu-core3d:BuildingPart" ) > 0)
+									then $feature/bu-base:parts/bu-core3d:BuildingPart
+									else())
+				return $result)
 			else $feature
+
+
 		return
 			if (((exists($feature/bu-base:parts/bu-core3d:BuildingPart) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingPart') and count($element/bu-core3d:geometry3DLoD1) = 0 and count($element/bu-core3d:geometry3DLoD2) = 0 and count($element/bu-core3d:geometry3DLoD3) = 0 and count($element/bu-core3d:geometry3DLoD4) = 0) then
-				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($element), 'featureType': local-name($element), 'gmlid': string($element/@gml:id), 'constraint': 'At least one of the geometry3DLoD1 or geometry3DLoD2 or geometry3DLoD3 or geometry3DLoD4 attributes is provided, for the BuildingPart feature type.', 'additionalInfo' : '' })
-			else if (count($element/bu-core3d:geometry3DLoD1) > 1) then
-				local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($element), 'featureType':local-name($element), 'gmlid': string($element/@*:id), 'property': 'bu-core3d:geometry3DLoD1', 'multiplicity': 1, 'count': count($element/bu-core3d:geometry3DLoD1)}) 
-			else if (count($element/bu-core3d:geometry3DLoD2) > 1) then
-				local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($element), 'featureType':local-name($element), 'gmlid': string($element/@*:id), 'property': 'bu-core3d:geometry3DLoD2', 'multiplicity': 1, 'count': count($element/bu-core3d:geometry3DLoD2)}) 
-			else if (count($element/bu-core3d:geometry3DLoD3) > 1) then
-				local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($element), 'featureType':local-name($element), 'gmlid': string($element/@*:id), 'property': 'bu-core3d:geometry3DLoD3', 'multiplicity': 1, 'count': count($element/bu-core3d:geometry3DLoD3)}) 
-			else if (count($element/bu-core3d:geometry3DLoD4) > 1) then
-				local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($element), 'featureType':local-name($element), 'gmlid': string($element/@*:id), 'property': 'bu-core3d:geometry3DLoD4', 'multiplicity': 1, 'count': count($element/bu-core3d:geometry3DLoD4)}) 
-			else ()
+				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one of the geometry3DLoD1 or geometry3DLoD2 or geometry3DLoD3 or geometry3DLoD4 attributes is provided, for the BuildingPart feature type.', 'additionalInfo' : '' })
+			else 
+				for $elem in $element
+					return 
+					(if (count($elem/bu-core3d:geometry3DLoD1) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD1', 'multiplicity': 1, 'count': 'count($elem/bu-core3d:geometry3DLoD1)'}) 
+					else if (count($elem/bu-core3d:geometry3DLoD2) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD2', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD2)}) 
+					else if (count($elem/bu-core3d:geometry3DLoD3) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD3', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD3)}) 
+					else if (count($elem/bu-core3d:geometry3DLoD4) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometry3DLoD4', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD4)}) 
+					else ()
+					)
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
