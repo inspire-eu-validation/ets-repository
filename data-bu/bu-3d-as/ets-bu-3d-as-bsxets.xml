@@ -286,29 +286,53 @@ let $messages :=
 
 
 		return 
-		if(((exists($feature/bu-base:parts/bu-core3d:BuildingPart) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingPart') and ((exists($element/bu-core3d:geometry3DLoD1) and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometrySolid))) or (exists($element/bu-core3d:geometry3DLoD2) and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometrySolid))) or (exists($element/bu-core3d:geometry3DLoD3) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid))) or (exists($element/bu-core3d:geometry3DLoD4) and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)) and not(exists($element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid)))))then
-			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'The geometryMultiSurface or the geometrySolid attribute is provided.', 'additionalInfo' : '' })
-		else 
-			for $elem in $element
+			if ((exists($feature/bu-base:parts/bu-core3d:BuildingPart) and name($feature) = 'bu-core3d:Building') or name($feature) = 'bu-core3d:BuildingPart') then (
+				let $messages1:= for $elem1 in $element/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1
 				return 
-					(if(count($elem/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface) > 1) then
-						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometryMultiSurface)}) 
-					else if(count($elem/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometryMultiSurface) > 1) then
-						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometryMultiSurface)}) 	
-					else if(count($elem/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface) > 1) then
-						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)}) 		
-					else if(count($elem/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface) > 1) then
-						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometryMultiSurface)}) 
-					else if(count($elem/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometrySolid) > 1) then
-						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:referenceGeometry', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD1/bu-core3d:BuildingGeometry3DLoD1/bu-core3d:geometrySolid)}) 
-					else if(count($elem/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometrySolid) > 1) then
-						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:referenceGeometry', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2/bu-core3d:geometrySolid)}) 
-					else if(count($elem/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid) > 1) then
-						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:referenceGeometry', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid)}) 
-					else if(count($elem/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid) > 1) then
-						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-base:referenceGeometry', 'multiplicity': 1, 'count': count($elem/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD/bu-core3d:geometrySolid)}) 
-					else ()
-					)
+					(if(count($elem1/bu-core3d:geometryMultiSurface) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($elem1/bu-core3d:geometryMultiSurface)})
+					else if(count($elem1/bu-core3d:geometrySolid) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometrySolid', 'multiplicity': 1, 'count': count($elem1/bu-core3d:geometrySolid)})
+					else if(not(exists($elem1/bu-core3d:geometryMultiSurface)) and not(exists($elem1/bu-core3d:geometrySolid))) then
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'The geometryMultiSurface or the geometrySolid attribute is provided.', 'additionalInfo' : '' })
+					else()
+
+				)
+				let $messages2:= for $elem2 in $element/bu-core3d:geometry3DLoD2/bu-core3d:BuildingGeometry3DLoD2
+				return 
+					(if(count($elem2/bu-core3d:geometryMultiSurface) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($elem2/bu-core3d:geometryMultiSurface)})
+					else if(count($elem2/bu-core3d:geometrySolid) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometrySolid', 'multiplicity': 1, 'count': count($elem2/bu-core3d:geometrySolid)})
+					else if(not(exists($elem2/bu-core3d:geometryMultiSurface)) and not(exists($elem2/bu-core3d:geometrySolid))) then
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'The geometryMultiSurface or the geometrySolid attribute is provided.', 'additionalInfo' : '' })
+					else()
+				)
+
+				let $messages3 := for $elem3 in $element/bu-core3d:geometry3DLoD3/bu-core3d:BuildingGeometry3DLoD
+				return 
+					(if(count($elem3/bu-core3d:geometryMultiSurface) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($elem3/bu-core3d:geometryMultiSurface)})
+					else if(count($elem3/bu-core3d:geometrySolid) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometrySolid', 'multiplicity': 1, 'count': count($elem3/bu-core3d:geometrySolid)})
+					else if(not(exists($elem3/bu-core3d:geometryMultiSurface)) and not(exists($elem3/bu-core3d:geometrySolid))) then
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'The geometryMultiSurface or the geometrySolid attribute is provided.', 'additionalInfo' : '' })
+					else()
+				)
+				let $messages4:= for $elem4 in $element/bu-core3d:geometry3DLoD4/bu-core3d:BuildingGeometry3DLoD
+				return 
+					(if(count($elem4/bu-core3d:geometryMultiSurface) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometryMultiSurface', 'multiplicity': 1, 'count': count($elem4/bu-core3d:geometryMultiSurface)})
+					else if(count($elem4/bu-core3d:geometrySolid) > 1) then
+						local:addMessage('TR.wrongMultiplicityBuildings', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'bu-core3d:geometrySolid', 'multiplicity': 1, 'count': count($elem4/bu-core3d:geometrySolid)})
+					else if(not(exists($elem4/bu-core3d:geometryMultiSurface)) and not(exists($elem4/bu-core3d:geometrySolid))) then
+						local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'The geometryMultiSurface or the geometrySolid attribute is provided.', 'additionalInfo' : '' })
+					else()
+				)
+				return($messages1, $messages2, $messages3, $messages4)
+			)
+			else()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
 local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
