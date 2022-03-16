@@ -13,11 +13,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-05-07T12:15:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-05-07T12:15:00Z</lastUpdateDate>
+	<lastUpdateDate>2021-11-25T15:55:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID57914240-3457-4c8f-96a0-347440b3d739"/>
 	</tags>
@@ -738,8 +738,6 @@ let $messages :=
 		return
 			if (not(exists($envDom))) then
 				local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
-			else if (count($envDom) > 1) then
-				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count': count($envDom)}) 
 			else if (count($invalid_urls) > 0) then
 				local:addMessage('TR.brokenLink',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
 			else if (count($invalid_element_reference) > 0) then
@@ -753,7 +751,6 @@ $messages)
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>										
 										<translationTemplate ref="TR.missingElement"/>
-										<translationTemplate ref="TR.wrongMultiplicity"/>
 										<translationTemplate ref="TR.brokenLink"/>
 										<translationTemplate ref="TR.missingReferencedElement"/>
 									</translationTemplates>
