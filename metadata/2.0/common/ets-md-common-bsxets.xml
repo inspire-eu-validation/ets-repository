@@ -12,11 +12,11 @@ There is a general limitation in all assertions that polymorphism and containmen
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target="_blank">Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.11</version>
+	<version>1.0.12</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-03-17T14:40:00Z</lastUpdateDate>
+	<lastUpdateDate>2022-01-10T11:45:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae" />
 	</tags>
@@ -142,7 +142,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target=
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 									let $recordsToInspect := $records[gmd:hierarchyLevel/gmd:MD_ScopeCode/@codeListValue = ('dataset','series','service')]
-									let $codes := ('bul', 'hrv', 'cze', 'dan', 'dut', 'eng', 'est', 'fin', 'fre', 'ger', 'gre', 'hun', 'gle', 'ice', 'ita', 'lav', 'lit', 'mlt', 'pol', 'por', 'rum', 'slo', 'slv', 'spa', 'swe')
+									let $codes := ('bul', 'hrv', 'cze', 'dan', 'dut', 'eng', 'est', 'fin', 'fre', 'ger', 'gre', 'hun', 'gle', 'ice', 'ita', 'lav', 'lit', 'mlt', 'nor', 'pol', 'por', 'rum', 'slo', 'slv', 'spa', 'swe')
 									let $messages :=    
 										if (not($recordsToInspect)) then ()
 										else
@@ -886,8 +886,12 @@ let $messages :=
 
 				let $validAnchorText :=
 					for $oc in $x/gmd:otherConstraints/gmx:Anchor
-						where (not(string-length($oc) = 0))
-							return $oc
+						return if (not(string-length($oc) = 0)) then
+							 	$oc
+							 else if(string-length($oc) = 0 and count($validAnchor)=1) then
+							 	$oc
+							 else()
+						
 
 				return
 					if(count($validAccessConstraints) = 1 and (count($validAnchor) = 1 and (not(count($validCharacterString) = 0)))) then $x
@@ -944,7 +948,7 @@ let $messages :=
 			if(count($invalidURI) != 0) then
 				local:addMessage('TR.invalidHttpsUri', map { 'filename': local:filename($record), 'id': $rid, 'type': 'ConditionsApplyingToAccessAndUse' })								
 			else if(count($md_legalConstraints_Conditions) = 0 and count($conditionsConstraint) > 0 and count($validAccessCodelist) = 0 and count($validUseConstraintsCodelist) = 0) then
-				local:addMessage('TR.noValidOtherRestrictionsCodelistValue', map { 'filename': local:filename($record), 'id': $rid, 'invalidElement': string($conditionsConstraint[1]/*/gmd:MD_RestrictionCode/@codeListValue) })								
+				local:addMessage('TR.noValidOtherRestrictionsCodelistValue', map { 'filename': local:filename($record), 'id': $rid, 'invalidElement': string($conditionsConstraint[1]/*/gmd:MD_RestrictionCode/@codeListValue) })		
 			else if(count($md_legalConstraints_Conditions) = 0) then
 				local:addMessage('TR.noResourceConditions', map { 'filename': local:filename($record), 'id': $rid })
 			else if (count($md_legalConstraints_Conditions) != 1) then
