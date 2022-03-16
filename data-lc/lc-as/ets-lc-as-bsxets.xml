@@ -80,12 +80,10 @@ let $messages_lcd :=
 	for $feature in $features_selected_lcd/lcv:nomenclatureDocumentation/lcn:LandCoverNomenclature
 		let $envDomex := $feature/lcn:externalDescription
 		let $envDomem := $feature/lcn:embeddedDescription
-		return
-			if ((not (exists($envDomex) or exists($envDomem))) or (not (exists($envDomem)) and exists($envDomex) and not(has-children($envDomex)))) then
-				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The embedded description OR the external description is provided', 'additionalInfo': ''})
-			else if (count ($envDomem) > 1) then
-				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1' , 'count': count($envDomem)})
-			else if ((not (exists($envDomex)) and exists($envDomem) and not(has-children($envDomem))) or (exists($envDomex) and exists($envDomem) and not(has-children($envDomem) or has-children($envDomex)))) then
+		return	
+			if (count ($envDomem) > 1) then
+				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1' , 'count': count($envDomem)})		
+			else if (not (exists($envDomex) or exists($envDomem))) then
 				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The embedded description OR the external description is provided', 'additionalInfo': ''})
 			else ()
 
@@ -95,11 +93,9 @@ let $messages_lcr :=
 		let $envDomex := $feature/lcn:externalDescription
 		let $envDomem := $feature/lcn:embeddedDescription
 		return
-			if ((not (exists($envDomex) or exists($envDomem))) or (not (exists($envDomem)) and exists($envDomex) and not(has-children($envDomex)))) then
-				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The embedded description OR the external description is provided', 'additionalInfo': ''})
-			else if (count ($envDomem) > 1) then
-				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1' , 'count': count($envDomem)})
-			else if ((not (exists($envDomex)) and exists($envDomem) and not(has-children($envDomem))) or (exists($envDomex) and exists($envDomem) and not(has-children($envDomem) or has-children($envDomex)))) then
+			if (count ($envDomem) > 1) then
+				local:addMessage('TR.wrongMultiplicityLandCover',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'multiplicity': '0 or 1' , 'count': count($envDomem)})		
+			else if (not (exists($envDomex) or exists($envDomem))) then
 				local:addMessage('TR.constraintViolation',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'constraint': 'The embedded description OR the external description is provided', 'additionalInfo': ''})
 			else ()
 
