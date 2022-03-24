@@ -509,6 +509,20 @@ declare function local:getAllowedValuesCode( $valuesURI as xs:string*, $uri as x
   return $valuesCode
 };
 
+declare function local:getXSDSchema( $themeid as xs:string*, $themexsdname as xs:string* ) as xs:string*
+{
+  let $themeschemas:= for $t at $pos in $themeid
+                        return concat("<xs:import namespace='http://inspire.ec.europa.eu/schemas/", string($themeid[$pos]), "/4.0' schemaLocation='http://inspire.ec.europa.eu/schemas/",string($themeid[$pos]),
+                          "/4.0/", string($themexsdname[$pos]) ,".xsd'/>")
+
+
+  let $schema := concat("<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>",string-join($themeschemas,''),
+    "<xs:import namespace='http://www.opengis.net/gml/3.2' schemaLocation='http://schemas.opengis.net/gml/3.2.1/gml.xsd'/>
+    <xs:import namespace='http://www.opengis.net/wfs/2.0' schemaLocation='http://schemas.opengis.net/wfs/2.0/wfs.xsd'/>
+    </xs:schema>")
+    return $schema
+};
+
 (: Start logging :)
 let $logentry := local:log('Testing ' || count($features) || ' features')
 
