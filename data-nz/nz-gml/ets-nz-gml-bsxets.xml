@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml" targe
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
   <reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-07-10T13:30:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2020-08-03T15:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2022-04-13T11:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -74,6 +74,77 @@ return
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.noFeature"/>
+									</translationTemplates>
+								</TestAssertion>
+							</testAssertions>
+						</TestStep>
+					</testSteps>
+				</TestCase>
+				<TestCase id="EIDe64e491e-c6b1-4441-b35d-65c1468aa0ff">
+					<label>Validation against INSPIRE official schema</label>
+					<description>Verify that all XML documents validate against the latest INSPIRE official schema(s).</description>
+					<parent ref="EIDc782f77a-d4c3-4ffa-8139-8f11f2c0d1dd"/>
+					<testSteps>
+						<TestStep id="EIDc7b7dc7b-0676-4c0f-afc4-45b2cf12ff44">
+							<label>IGNORE</label>
+							<description>IGNORE</description>
+							<parent ref="EIDe64e491e-c6b1-4441-b35d-65c1468aa0ff"/>
+							<statementForExecution>not applicable</statementForExecution>
+							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
+							<testAssertions>
+								<TestAssertion id="EID724acd04-f7bc-4ef6-ac20-34fed73a1cf3">
+									<label>nz-gml.b.1: validate XML documents against official schema</label>
+									<description><![CDATA[Validate each document against the latest INSPIRE official schema(s): <a href="https://inspire.ec.europa.eu/schemas/nz-core/4.0/NaturalRiskZonesCore.xsd">https://inspire.ec.europa.eu/schemas/nz-core/4.0/NaturalRiskZonesCore.xsd</a>, using strict XML schema validation.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 3: Common Types. Types that are common to several of the themes listed in Annexes I, II and III to Directive 2007/2/EC shall conform to the definitions and constraints and include the attributes and association roles set out in Annex I.</li>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+<li>IR Requirement Article 4 (3): Types for the Exchange and Classification of Spatial Objects. The enumerations and code lists used in attributes or association roles of spatial object types or data types shall comply with the definitions and include the values set out in Annex II. The enumeration and code list values are uniquely identified by language-neutral mnemonic codes for computers. The values may also include a language-specific name to be used for human interaction.</li>
+<li>IR Requirement Article 5 (2): Types. Types that are a sub-type of another type shall also include all this type‘s attributes and association roles.</li>
+<li>IR Requirement Article 5 (3): Types. Abstract types shall not be instantiated.</li>
+<li>IR Requirement Article 6 (5): Code Lists and Enumerations. Attributes or association roles of spatial object types or data types that have an enumeration type may only take values from the lists specified for the enumeration type.</li>
+<li>IR Requirement Article 9 (1): Identifier Management. The data type Identifier defined in Section 2.1 of Annex I shall be used as a type for the external object identifier of a spatial object.</li>
+<li>TG Requirement 1: Spatial object types and data types shall comply with the multiplicities defined for the attributes and association roles in this section.</li>
+<li>TG Requirement 6: Data instance (XML) documents shall validate without error against the provided XML schema.</li>
+</ul><br/><br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml/official-schema-validation" target="_blank">Abstract Test Case 'Validation against INSPIRE official schema'</a>]]></description>
+									<parent ref="EIDc7b7dc7b-0676-4c0f-afc4-45b2cf12ff44"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+let $errors := (for $file in $db
+ return
+ try { 
+  let $root := $file/element()
+  let $logentry := local:log('Validating ' || local:filename($root))
+  let $start := prof:current-ms()
+	let $schema := local:getXSDSchema( "nz-core", "NaturalRiskZonesCore" )
+
+  let $query := "declare variable $file external; declare variable $schema external; validate:xsd-info($file,$schema)"
+  let $messages := xquery:eval($query, map{ 'file': $file, 'schema': $schema }, map{ 'timeout': 60 })
+  (:let $messages := validate:xsd-info($file):)
+  let $duration := prof:current-ms()-$start
+  let $errors := count($messages)
+  let $logentry := local:log('Duration: ' || $duration || ' ms. Errors: ' || $errors || '.')
+  return
+   if ($errors&gt;0 and exists($logFile)) then
+    (local:addMessage('TR.invalidSchema', map { 'filename': local:filename($root), 'count': string($errors) }),
+     for $message in $messages return local:addMessage('TR.xmlSchemaError', map { 'filename': local:filename($root), 'error': $message }))
+   else ()
+ } catch * 
+ { 
+	let $logerror := local:log('Exception: ' || $err:description)
+   return local:addMessage('TR.timeoutFileOperation', map { 'filename': local:filename($file/element()), 'description': $err:description })
+ }
+ )[position() le $limitErrors]						 
+return
+(if ($errors) then 'FAILED' else 'PASSED',
+ local:error-statistics('TR.filesWithErrors', count($errors[@ref eq 'TR.invalidSchema'])),
+ $errors[position() le $limitErrors])
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.invalidSchema"/>
+										<translationTemplate ref="TR.filesWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
