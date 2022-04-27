@@ -537,6 +537,19 @@ declare function local:getXSDSchemaWithVersion( $themeid as xs:string*, $themexs
     return $schema
 };
 
+declare function local:getXSDSchemaWithURL( $urlid as xs:string*, $urlxsd as xs:string* ) as xs:string*
+{
+  let $themeschemas:= for $t at $pos in $urlid
+                        return concat("<xs:import namespace='", string($urlid[$pos]), "' schemaLocation='", string($urlxsd[$pos]) ,"'/>")
+
+
+  let $schema := concat("<xs:schema xmlns:xs='http://www.w3.org/2001/XMLSchema'>",string-join($themeschemas,''),
+    "<xs:import namespace='http://www.opengis.net/gml/3.2' schemaLocation='http://schemas.opengis.net/gml/3.2.1/gml.xsd'/>
+    <xs:import namespace='http://www.opengis.net/wfs/2.0' schemaLocation='http://schemas.opengis.net/wfs/2.0/wfs.xsd'/>
+    </xs:schema>")
+    return $schema
+};
+
 (: Start logging :)
 let $logentry := local:log('Testing ' || count($features) || ' features')
 
