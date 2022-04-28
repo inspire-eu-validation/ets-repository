@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as"
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-as" target="_blank">Conformance Class 'Application Schema, Statistical Units Base'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-04-19T13:30:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-04-19T13:30:00Z</lastUpdateDate>
+	<lastUpdateDate>2022-04-28T08:45:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDaba29c5b-b0e6-4e2c-908d-ea6c7df08824"/>
 	</tags>
@@ -145,7 +145,7 @@ return
 							<testAssertions>
 								<TestAssertion id="EID520e0547-eebc-486b-8782-5f4f55695512">
 									<label>su-vector-as.b.1: AreaStatisticalUnits</label>
-									<description><![CDATA[Check that vector statistical units with a <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#refGeom>reference geometry</a> instance of <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#GM_MultiSurface>GM_MultiSurface</a> are instances of the specialised class AreaStatisticalUnit.<br/><br/> 
+									<description><![CDATA[Check that vector statistical units with a <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#refGeomVSU>reference geometry</a> instance of <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#GM_MultiSurfaceVSU>GM_MultiSurface</a> are instances of the specialised class AreaStatisticalUnit.<br/><br/> 
 									Relevant requirements:
 									<ul><li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li></ul>
 									Source: <a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_SU_v3.0.pdf">INSPIRE Data Specification on Statistical Units, A.1.6</a>]]></description>
@@ -181,31 +181,29 @@ $messages)
 								</TestAssertion>
 								<TestAssertion id="EID341cd410-7e0e-4e6b-b405-c045c9cb32cc">
 									<label>su-vector-as.b.2: AreaStatisticalUnits II</label>
-									<description><![CDATA[Check that the <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#refGeom>reference geometry</a> of an area statistical units is a <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#GM_MultiSurface>GM_MultiSurface</a>.<br/><br/> 
+									<description><![CDATA[Check that the <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#refGeomASU>reference geometry</a> of an area statistical units is a <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#GM_MultiSurfaceASU>GM_MultiSurface</a> or <a href= http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints#GM_SurfaceASU>GM_Surface</a>.<br/><br/> 
 									Relevant requirements:
 									<ul><li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li></ul>
 									Source: <a href="http://inspire.ec.europa.eu/id/ats/data-su/master/su-vector-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_SU_v3.0.pdf">INSPIRE Data Specification on Statistical Units, A.1.6</a>]]></description>
 									<parent ref="EID88fbb5db-75ee-44ed-9903-7469ec539567"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $property_stringms := 'MultiSurface'
 let $property_stringgt := 'geometryType'
 let $property_string := 'AreaStatisticalUnits II'
 let $features_selected := $features[self::su-vector:AreaStatisticalUnit]
 let $messages :=
 	for $feature in $features_selected/su-vector:geometry/su-vector:VectorStatisticalUnitGeometry
 		let $envDomms := $feature/su-vector:geometry/gml:MultiSurface
+		let $envDoms := $feature/su-vector:geometry/gml:Surface
 
 		for $featurerg in $feature/su-vector:geometryDescriptor/su-vector:GeometryDescriptor
 				let $envDomgt:= $featurerg/su-vector:geometryType
 
 			return
-				if (count($envDomms) > 1) then
-					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_stringms, 'multiplicity': 1, 'count': count($envDomms)})
-				else if (count($envDomgt) > 1) then
+				if (count($envDomgt) > 1) then
 					local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_stringgt, 'multiplicity': 1, 'count': count($envDomgt)})
-				else if ((exists($envDomms) and not($envDomgt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/GeometryTypeValue/referenceGeometry')) or (not(exists($envDomms)) and $envDomgt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/GeometryTypeValue/referenceGeometry')) then
-					local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../..), 'featureType': local-name($feature/../..), 'gmlid': string($feature/../../@gml:id), 'constraint': 'the reference geometry of an area statistical units is a GM_MultiSurface', 'additionalInfo':''})
+				else if (not(exists($envDomms)) and not(exists($envDoms)) and $envDomgt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/GeometryTypeValue/referenceGeometry') then
+					local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../..), 'featureType': local-name($feature/../..), 'gmlid': string($feature/../../@gml:id), 'constraint': 'the reference geometry of an area statistical units is a GM_MultiSurface or GM_Surface', 'additionalInfo':''})
 				else ()
 return
 (if ($messages) then 'FAILED' else 'PASSED',
