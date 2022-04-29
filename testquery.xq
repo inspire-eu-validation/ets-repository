@@ -524,7 +524,7 @@ declare function local:getXSDSchemaWithVersion( $themeid as xs:string*, $themexs
     return $schema
 };
 
-declare function local:getXSDWithURL( $urlid as xs:string*, $urlxsd as xs:string* ) as xs:string*
+declare function local:getXSDSchemaWithURL( $urlid as xs:string*, $urlxsd as xs:string* ) as xs:string*
 {
   let $themeschemas:= for $t at $pos in $urlid
                         return concat("<xs:import namespace='", string($urlid[$pos]), "' schemaLocation='", string($urlxsd[$pos]) ,"'/>")
