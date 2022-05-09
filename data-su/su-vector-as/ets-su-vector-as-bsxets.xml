@@ -16,7 +16,7 @@ Pre-requisite conformance classes:
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-04-19T13:30:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-04-28T08:45:00Z</lastUpdateDate>
+	<lastUpdateDate>2022-05-09T10:45:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDaba29c5b-b0e6-4e2c-908d-ea6c7df08824"/>
 	</tags>
@@ -153,19 +153,21 @@ return
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $property_string := 'AreaStatisticalUnits'
+let $property_stringgt := 'geometryType'
 let $features_selected := $features[self::su-vector:VectorStatisticalUnit]
 let $messages :=
-	for $feature in $features_selected/su-vector:geometry/su-vector:VectorStatisticalUnitGeometry
-		let $envDom := $feature/su-vector:geometry/gml:MultiSurface
-		let $featurems :=  if (exists($envDom))
-						then $feature
-						else()
-		for $featurerg in $featurems/su-vector:geometryDescriptor/su-vector:GeometryDescriptor
-				let $envDomgt:= $featurerg/su-vector:geometryType			
-				return
-					if ($envDomgt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/GeometryTypeValue/referenceGeometry') then
-							local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../..), 'featureType': local-name($feature/../..), 'gmlid': string($feature/../../@gml:id), 'constraint': 'vector statistical units with a reference geometry instance of GM_MultiSurface are instances of the specialised class AreaStatisticalUnit', 'additionalInfo':''})
-					else()
+			for $feature in $features_selected/su-vector:geometry/su-vector:VectorStatisticalUnitGeometry
+					let $envDomms := $feature/su-vector:geometry/gml:MultiSurface
+
+					for $featurerg in $feature/su-vector:geometryDescriptor/su-vector:GeometryDescriptor
+							let $envDomgt:= $featurerg/su-vector:geometryType
+
+						return
+							if (count($envDomgt) > 1) then
+								local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_stringgt, 'multiplicity': 1, 'count': count($envDomgt)})
+							else if (exists($envDomms) and $envDomgt/@xlink:href = 'http://inspire.ec.europa.eu/codelist/GeometryTypeValue/referenceGeometry') then
+								local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature/../..), 'featureType': local-name($feature/../..), 'gmlid': string($feature/../../@gml:id), 'constraint': 'vector statistical units with a reference geometry instance of GM_MultiSurface are instances of the specialised class AreaStatisticalUnit', 'additionalInfo':''})
+							else ()
 
 return
 (if ($messages) then 'FAILED' else 'PASSED',
