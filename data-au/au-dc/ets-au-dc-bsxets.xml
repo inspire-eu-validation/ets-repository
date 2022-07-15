@@ -12,11 +12,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/data-consistency" target="_blank">Conformance Class 'Data consistency'</a></li>
 </ul>]]></description>
 	<reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.2</version>
+	<version>0.2.3</version>
 	<author>PwC</author>
 	<creationDate>2016-09-13T00:00:00Z</creationDate>
-	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-05-16T13:00:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2022-07-15T13:15:00Z</lastUpdateDate>
  	<tags>
 		<tag ref="EIDfe1f3796-0ebf-4960-a6f7-f935e087fa4b"/>
 	</tags>
@@ -405,6 +405,12 @@ let $messages :=
 (for $candidate in $features[self::*:AdministrativeBoundary]
  return
  try {
+ 	let $uris:= for $admUnit in $candidate/au:admUnit/@xlink:href
+ 										return
+											if (starts-with($admUnit, 'http://') or starts-with($admUnit, 'https://')) then
+												($admUnit)
+											else
+												()
   let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
   let $env := ggeo:envelope($candidate_geometry)
   let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
@@ -420,7 +426,9 @@ let $messages :=
 		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
   }
   return 
-  if ($onBoundary) then () 
+  if ($onBoundary and count($uris) = 0) then ()
+  else if (count($uris) > 0) then
+  local:addMessage('TR.manual.AdministrativeBoundaryOnUnit', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id) })
   else local:addMessage('TR.AdministrativeBoundaryOnUnit', map { 'filename': local:filename($candidate), 'featureType' : local-name($candidate), 'gmlid': string($candidate/@gml:id) })
  } catch * { 
 	let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
@@ -428,7 +436,9 @@ let $messages :=
  }
 )[position() le $limitErrors]
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(if ($messages and not($messages/@ref = ('TR.manual.AdministrativeBoundaryOnUnit'))) then 'FAILED' 
+   else if($messages and $messages/@ref = ('TR.manual.AdministrativeBoundaryOnUnit')) then 'PASSED_MANUAL' 
+   else 'PASSED',
  local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messages//etf:argument[@token='gmlid']/text()))),
  $messages)									
 									</expression>
