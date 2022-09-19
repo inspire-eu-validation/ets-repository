@@ -13,11 +13,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-as" target
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-sr/master/sr-gml" target="_blank">Conformance Class 'GML application schemas, Sea Regions'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-02-04T14:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-02-04T14:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2022-08-30T11:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID2654e659-82d6-4584-a94b-f9cd75a817b7"/>
 	</tags>
@@ -425,7 +425,7 @@ let $messages :=
 		return
 			if(count($envDom) > 1) then
 				local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': 'sr:geometry', 'multiplicity': 1, 'count': count($envDom)}) 
-			else if(exists($envDom) and not(exists($envDom/gml:Surface)) and not(exists($envDom/gml:Point))) then
+			else if(exists($envDom) and not(exists($envDom/gml:Surface)) and not(exists($envDom/gml:Point)) and not(exists($envDom/gml:Polygon)) and not(exists($envDom/gml:PolyhedralSurface)) and not(exists($envDom/gml:TriangulatedSurface))) then
 				local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'the geometry element is represented as either a surface or a point', 'additionalInfo':''})
 			else ()
 return
