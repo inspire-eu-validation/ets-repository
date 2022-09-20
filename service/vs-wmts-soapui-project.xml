@@ -1329,6 +1329,49 @@ layers.each{layer->
 }</script>
 				</con:config>
 			</con:testStep>
+			<con:testStep type="httprequest" name="manual-check" id="111f008e-faef-461d-905e-4862e52c3fb5">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="2bbed62e-7b82-4269-99d4-6bba2378a3ae" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="GroovyScriptAssertion" id="a57c2d87-aaa3-40f9-9d2f-3694f6b658f6" name="manual-check-layer-title">
+						<con:configuration>
+							<scriptText>import de.interactive_instruments.etf.suim.*
+								Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+a.exists(
+  '//zzzz',
+  'TR.manual.testManual85'
+);</scriptText>
+						</con:configuration>
+					</con:assertion>
+					<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters>
+						<con:parameter>
+							<con:name>request</con:name>
+							<con:value>GetCapabilities</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>GetCapabilities</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>service</con:name>
+							<con:value>${#Project#service}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#service}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+					</con:parameters>
+				</con:config>
+			</con:testStep>
 			<con:properties />
 		</con:testCase>
 		<con:testCase id="014232e3-18f4-4314-93b3-f9f1d810d26a" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at86-getcapabilities-layer-abstract" searchProperties="true">
