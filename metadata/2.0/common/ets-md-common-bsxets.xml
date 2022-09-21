@@ -12,11 +12,11 @@ There is a general limitation in all assertions that polymorphism and containmen
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/common" target="_blank">Common Requirements for ISO/TC 19139:2007 based INSPIRE metadata records</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.12</version>
+	<version>1.0.13</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-02-21T13:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2022-08-16T13:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae" />
 	</tags>
@@ -644,7 +644,7 @@ let $messages :=
 	 	if (not($title)) then local:addMessage('TR.noTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
         else if (not(string-length($title/gco:CharacterString/text()) != 0 or string-length($title/gmx:Anchor/text()) != 0)) then local:addMessage('TR.emptyTitleForThesaurus', map { 'filename': local:filename($record), 'id': $rid})
 		else if (not($date)) then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $title/*/text(), 'keywords' : $keywords})
-	 	else if (not($dateTypeCode) or $dateTypeCode/@codeListValue != 'publication') then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $title/*/text(), 'keywords' : $keywords})
+	 	else if (not($dateTypeCode) or not($dateTypeCode/@codeListValue = ('publication', 'revision', 'creation'))) then local:addMessage('TR.invalidDateForThesaurus2', map { 'filename': local:filename($record), 'id': $rid, 'thesaurus': $title/*/text(), 'keywords' : $keywords})
 		else ()
 	)[position() le $limitErrors]
 return
