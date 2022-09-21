@@ -216,24 +216,6 @@ if(valid == false){
 					<con:runMode>PARALLELL</con:runMode>
 				</con:config>
 			</con:testStep>
-			<con:testStep type="groovy" name="check-language-provided" id="b92d5f2e-edbb-4a21-930f-cf94b88edb9c">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["Initialize"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def extendedCapabilities = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities;
-
-def defaultLanguage = extendedCapabilities.SupportedLanguages.DefaultLanguage.Language;
-if(defaultLanguage.size() != 1){
-	String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages/DefaultLanguage/Language'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-					</script>
-				</con:config>
-			</con:testStep>
 			<con:testStep type="httprequest" name="manual-check" id="c6792979-6b86-48c4-84d5-21025b1a2c2e">
 				<con:settings />
 				<con:config method="GET" xsi:type="con:HttpRequest" id="179b9a23-9080-4b84-9432-902da3304bf3" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -242,16 +224,6 @@ if(defaultLanguage.size() != 1){
 					</con:settings>
 					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
 					<con:request />
-					<con:assertion type="Valid HTTP Status Codes" id="2813389b-3dbf-485f-8264-4c2a52b38a7e" name="Valid HTTP Status Codes">
-						<con:configuration>
-							<codes>200</codes>
-						</con:configuration>
-					</con:assertion>
-					<con:assertion type="Response SLA Assertion" id="d3cdb95f-2516-466d-ba79-55300220446a" name="Response SLA">
-						<con:configuration>
-							<SLA>600000</SLA>
-						</con:configuration>
-					</con:assertion>
 					<con:assertion type="GroovyScriptAssertion" id="1056a22d-aebe-4152-961a-977a52e8b6bf" name="manual-check-natural-language-fields">
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.*
@@ -282,11 +254,6 @@ a.exists(
 						<con:parameter>
 							<con:name>AcceptVersions</con:name>
 							<con:value>${#Project#AcceptVersions}</con:value>
-							<con:style>QUERY</con:style>
-						</con:parameter>
-						<con:parameter>
-							<con:name>AcceptLanguages</con:name>
-							<con:value>${#TestCase#AcceptLanguages}</con:value>
 							<con:style>QUERY</con:style>
 						</con:parameter>
 					</con:parameters>
