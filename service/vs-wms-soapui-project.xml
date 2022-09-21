@@ -1831,6 +1831,49 @@ layers.each{layer ->
 }</script>
 				</con:config>
 			</con:testStep>
+			<con:testStep type="httprequest" name="manual-check" id="426bb089-0b78-4ee5-afe8-a1c0b484d1ca">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="8f42a026-848a-4235-96e2-1e4ae0451425" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="GroovyScriptAssertion" id="5490fc45-e697-4db4-8d78-95694a452fb9" name="manual-check-layer-title">
+						<con:configuration>
+							<scriptText>import de.interactive_instruments.etf.suim.*
+Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+a.exists(
+  '//zzzz',
+  'TR.manual.testManual33'
+);</scriptText>
+						</con:configuration>
+					</con:assertion>
+					<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters>
+						<con:parameter>
+							<con:name>request</con:name>
+							<con:value>GetCapabilities</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>GetCapabilities</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>service</con:name>
+							<con:value>${#Project#service}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#service}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+					</con:parameters>
+				</con:config>
+			</con:testStep>
 			<con:properties />
 		</con:testCase>
 		<con:testCase id="a8fff5a7-3c9c-4d41-b7d3-6a906ea8b4b5" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at34-getcapabilities-layer-abstract" searchProperties="true">
@@ -2119,15 +2162,71 @@ layers.each{layer->
 		}
 	}
 }
-if(invalidLayers.size() > 0){
-	String[] assertParams = ['layerid', invalidLayers.join(', ')];
-	throw new TranslatableAssertionError('TR.notHarmonisedValue', assertParams);
-}
 
 if(layers.Name.size() != layers.Name.unique().size()){
 	throw new TranslatableAssertionError('TR.notUniqueLayerName');
 }
 					</script>
+				</con:config>
+			</con:testStep>
+			<con:properties />
+		</con:testCase>
+		<con:testCase id="79e0e223-e67f-4d5b-9165-40c9f367ed3b" failOnError="false" failTestCaseOnErrors="false" keepSession="false" maxResults="0" name="at39bis-getcapabilities-harmonised-layer-name" searchProperties="true">
+			<con:description>
+				<![CDATA[<p>Test that at least a harmonised layer according to <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/README#ref_IR_IOP" target="_blank">IR IOP</a> is present, which layer name shall comply with the harmonised layer name defined in Article 14 of <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/README#ref_IR_IOP" target="_blank">IR IOP</a>.</p>
+<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at39bis-getcapabilities-harmonised-layer-name" target="_blank">Harmonised Layer Name</a></p>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="testcasedependency" name="check-initial-testcase" id="956d6394-2eea-481e-b46f-0cc9f39d1fc2">
+				<con:settings />
+				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
+					<con:properties />
+					<con:returnProperties />
+					<con:runMode>PARALLELL</con:runMode>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="httprequest" name="manual-check" id="5a3215eb-0616-445a-89bc-c2d9e39f78f0">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="ddf7a23b-1b16-4b9a-a355-cd2e0e52501e" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="GroovyScriptAssertion" id="e988a1e5-de23-44e6-bfde-5062cfcfac21" name="manual-check-harmonised-layer-name">
+						<con:configuration>
+							<scriptText>import de.interactive_instruments.etf.suim.*
+								Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+a.exists(
+  '//zzzz',
+  'TR.manual.testManual39'
+);</scriptText>
+						</con:configuration>
+					</con:assertion>
+					<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters>
+						<con:parameter>
+							<con:name>request</con:name>
+							<con:value>GetCapabilities</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>GetCapabilities</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+						<con:parameter>
+							<con:name>service</con:name>
+							<con:value>${#Project#service}</con:value>
+							<con:style>QUERY</con:style>
+							<con:default>${#Project#service}</con:default>
+							<con:path xsi:nil="true" />
+							<con:description xsi:nil="true" />
+						</con:parameter>
+					</con:parameters>
 				</con:config>
 			</con:testStep>
 			<con:properties />
