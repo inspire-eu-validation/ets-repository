@@ -10,11 +10,11 @@ Known limitations are documented in the description of the applicable test case 
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank">Conformance Class 2c: INSPIRE data sets and data set series metadata for IACS</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-11-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-05-09T14:30:00Z</lastUpdateDate>
+	<lastUpdateDate>2022-11-23T09:45:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae" />
 	</tags>
@@ -495,7 +495,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 								<TestAssertion id="EIDc8355121-662d-481b-ae97-90b46025e40e">
 									<label>Topic category</label>
 									<description>
-										<![CDATA[<p>Check that the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#topiccategory">Topic category</a> is equal to "farming" value.</p>
+										<![CDATA[<p>Check that at least one <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#topiccategory">Topic category</a> is equal to "farming" value.</p>
 									<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#iacs-identification-information" target="_blank">IACS Identification information</a></p>]]>
 									</description>
 									<parent ref="EID2667e5cb-6ba8-4cea-b5ad-21c821539a0f" />
@@ -507,12 +507,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 										let $recordsToInspect := $records/gmd:identificationInfo/gmd:MD_DataIdentification
 										let $messages := 
 											for $record in $recordsToInspect
-												let $validCategoryCode :=
-													for $topicCategory in $recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode
+												let $topicCategoryCodes := for $topicCategory in $recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode
 														return
-															if($topicCategory = 'farming') then ()
-															else local:addMessage('TR.topicCategoryError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
-
+															$topicCategory
 												return 
 													if (count($recordsToInspect/gmd:topicCategory) = 0 and $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue = $datasets) then
 														local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': $property_string}) 
@@ -522,7 +519,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 0, 'count':count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode)}) 
 													else if (count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode) != 0 and $recordsToInspect/../../gmd:hierarchyLevel/*/@codeListValue = $service) then
 														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string, 'multiplicity': 0, 'count':count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode)}) 
-													else $validCategoryCode
+													else if (count($recordsToInspect/gmd:topicCategory/gmd:MD_TopicCategoryCode) != 0 and count(distinct-values($topicCategoryCodes[.='farming'])) = 0 ) then (
+														local:addMessage('TR.topicCategoryError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}))
+													else()
 										return
 										(if ($messages) then 'FAILED' else 'PASSED',
 										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
