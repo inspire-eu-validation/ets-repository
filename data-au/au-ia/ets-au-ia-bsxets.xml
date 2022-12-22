@@ -12,11 +12,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
   <reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 	<author>PwC</author>
 	<creationDate>2016-10-24T00:00:00Z</creationDate>
-	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-05-16T12:30:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2022-12-21T10:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDfe1f3796-0ebf-4960-a6f7-f935e087fa4b"/>
 	</tags>
@@ -99,12 +99,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'NUTSRegion'
-let $hrefs := $features[self::*:AdministrativeUnit]/*:NUTS/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'NUTS')
+let $features_selected := $features[self::au:AdministrativeUnit]
+let $gml_ids := $features//@gml:id
+let $property_string := 'NUTS'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/*:NUTS
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -128,12 +165,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'Condominium'
-let $hrefs := $features[self::*:AdministrativeUnit]/*:condominium/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'condominium')
+let $features_selected := $features[self::au:AdministrativeUnit]
+let $gml_ids := $features//@gml:id
+let $property_string := 'condominium'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/au:condominium
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -157,12 +231,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'AdministrativeUnit'
-let $hrefs := $features[self::*:AdministrativeUnit]/*:upperLevelUnit/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'upperLevelUnit')
+let $features_selected := $features[self::au:AdministrativeUnit]
+let $gml_ids := $features//@gml:id
+let $property_string := 'upperLevelUnit'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/au:upperLevelUnit
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -186,12 +297,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'AdministrativeUnit'
-let $hrefs := $features[self::*:AdministrativeUnit]/*:lowerLevelUnit/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'lowerLevelUnit')
+let $features_selected := $features[self::au:AdministrativeUnit]
+let $gml_ids := $features//@gml:id
+let $property_string := 'lowerLevelUnit'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/au:lowerLevelUnit
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -215,12 +363,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'AdministrativeUnit'
-let $hrefs := $features[self::*:AdministrativeUnit]/*:administeredBy/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'administeredBy')
+let $features_selected := $features[self::au:AdministrativeUnit]
+let $gml_ids := $features//@gml:id
+let $property_string := 'administeredBy'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/au:administeredBy
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -244,12 +429,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'AdministrativeUnit'
-let $hrefs := $features[self::*:AdministrativeUnit]/*:coAdminister/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'coAdminister')
+let $features_selected := $features[self::au:AdministrativeUnit]
+let $gml_ids := $features//@gml:id
+let $property_string := 'coAdminister'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/au:coAdminister
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)	
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -273,12 +495,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'AdministrativeBoundary'
-let $hrefs := $features[self::*:AdministrativeUnit]/*:boundary/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'boundary')
+let $features_selected := $features[self::au:AdministrativeBoundary]
+let $gml_ids := $features//@gml:id
+let $property_string := 'boundary'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/au:boundary
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -302,12 +561,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $targets := ('AdministrativeUnit')
-let $hrefs := $features[self::au:* or self::au3:*]/*:admUnit/@xlink:href
-let $messages := local:check-feature-references($hrefs, $targets, 'AdministrativeUnit', 'admUnit')
+let $features_selected := $features[self::au:AdministrativeBoundary or self::au:Condominium]
+let $gml_ids := $features//@gml:id
+let $property_string := 'admUnit'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/au:admUnit
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -331,12 +627,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'MaritimeBoundary'
-let $hrefs := $features[self::*:MaritimeZone]/*:boundary/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'boundary')
+let $features_selected := $features[self::mu:MaritimeZone]
+let $gml_ids := $features//@gml:id
+let $property_string := 'boundary'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/mu:boundary
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)	
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -360,12 +693,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $target := 'SeaArea'
-let $hrefs := $features[self::*:MaritimeZone]/*:seaArea/@xlink:href
-let $messages := local:check-feature-references($hrefs, $target, $target, 'seaArea')
+let $features_selected := $features[self::mu:MaritimeZone]
+let $gml_ids := $features//@gml:id
+let $property_string := 'seaArea'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/mu:seaArea
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)	
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
@@ -389,12 +759,49 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-au/master/au-ia/feature
 									<parent ref="EID9cac03a4-541a-41a0-96a8-de004f114416"/>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $targets := ('Baseline', 'Shoreline')
-let $hrefs := $features[self::*:MaritimeZone]/*:baseline/@xlink:href
-let $messages := local:check-feature-references($hrefs, $targets, 'Baseline or Shoreline', 'baseline')
+let $features_selected := $features[self::mu:MaritimeZone]
+let $gml_ids := $features//@gml:id
+let $property_string := 'baseline'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/mu:baseline
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, '#')) then
+					()
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if (count($invalid_urls) > 0) then
+				local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')})
+			else if (count($invalid_element_reference) > 0) then
+				local:addMessage('TR.missingReferencedElement', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_element_reference, ',')})
+			else ()
+
 return
 (if ($messages) then 'FAILED' else 'PASSED',
- $messages)	
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)		
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
