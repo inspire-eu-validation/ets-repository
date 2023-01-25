@@ -1203,11 +1203,11 @@ Relevant Requirements:
 contains an HTTP URI for the 'Download Service Feed' document. The value
 of the 'rel' attribute of this element shall be 'self', the 'hreflang' attribute shall
 use the appropriate language code and the value of the 'type' attribute shall
-be 'application/atom+xml'.</li>
+be 'application/atom+xml', 'application/xml' or 'text/xml.</li>
 </ul>
 <br/>
 <br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/3.1/atom-pre-defined/download-service-feed-self-reference-link" target="_blank">Abstract Test Case 'Download Service feed: self-reference link'</a>]]>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/3.2/atom-pre-defined/download-service-feed-self-reference-link" target="_blank">Abstract Test Case 'Download Service feed: self-reference link'</a>]]>
 			</con:description>
 			<con:settings />
 			<con:testStep type="calltestcase" name="OpenSearch Description link exists" id="07e52606-e155-4314-9ddd-9f1b498690be">
@@ -1261,7 +1261,7 @@ final ProjectHelper ph = new ProjectHelper()
 final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 a.equals(
-  "/atom:feed/atom:link[@rel='self' and @type='application/atom+xml']/@href",
+  "/atom:feed/atom:link[@rel='self' and (@type='application/atom+xml' or @type='application/xml' or @type='text/xml')]/@href",
   "/atom:feed/atom:link with @rel='self'",
   messageExchange.getEndpoint(),
   "TR.incorrectFeedSelfReference"
@@ -1280,7 +1280,7 @@ String languages = context.expand( '${OpenSearch Description link exists#openSea
 log.info("Language: "+languages)
 
 a.exists(
-  "/atom:feed/atom:link[@rel='self' and @type='application/atom+xml' and (@hreflang=/atom:feed/@xml:lang or @hreflang=/atom:feed/atom:title/@xml:lang or contains('"+languages+"', @hreflang))]",
+  "/atom:feed/atom:link[@rel='self' and (@type='application/atom+xml' or @type='application/xml' or @type='text/xml') and (@hreflang=/atom:feed/@xml:lang or @hreflang=/atom:feed/atom:title/@xml:lang or contains('"+languages+"', @hreflang))]",
   "TR.incorrectFeedSelfReferenceLang"
 );</scriptText>
 						</con:configuration>
@@ -1680,11 +1680,11 @@ Relevant Requirements:
 <ul>
 <li>TG Requirement 15: Each feed 'entry' in a 'Download Service Feed' shall contain a single link to a
 'Dataset Feed'. This link shall have a 'rel' attribute with a value of 'alternate'
-and a 'type' attribute with a value 'application/atom+xml'.</li>
+and a 'type' attribute with a value 'application/atom+xml' or 'application/xml' or 'text/xml'.</li>
 </ul>
 <br/>
 <br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/3.1/atom-pre-defined/download-service-feed-links-dataset-feed" target="_blank">Abstract Test Case 'Download Service feed links dataset feed'</a>]]>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/3.2/atom-pre-defined/download-service-feed-links-dataset-feed" target="_blank">Abstract Test Case 'Download Service feed links dataset feed'</a>]]>
 			</con:description>
 			<con:settings />
 			<con:testStep type="httprequest" name="Get Service Feed" id="dafcef94-9aa0-44aa-815b-5966d1813b17">
@@ -1719,7 +1719,7 @@ a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText>
 final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 a.notExists(
-  "/atom:feed/atom:entry[count(atom:link[@rel='alternate' and @type='application/atom+xml'])!=1]",
+  "/atom:feed/atom:entry[count(atom:link[@rel='alternate' and (@type='application/atom+xml' or @type='application/xml' or @type='text/xml')])!=1]",
   "TR.invalidDatasetFeedLinks"
 );</scriptText>
 						</con:configuration>
@@ -4220,13 +4220,13 @@ for( node in getSpatialDataSetUrlTemplates ) {
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-if(messageExchange.responseHeaders["Content-Type"]==null) {
+if(!messageExchange.getResponseHeaders().containsKeyIgnoreCase('Content-Type')) {
 	throw new TranslatableAssertionError("TR.missingContentType");
 }
 String mimeType = context.expand('${Transfer_Properties#mimeType}');
 
-if(!messageExchange.responseHeaders['Content-Type'][0].contains(mimeType)) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", mimeType, "actual", messageExchange.responseHeaders['Content-Type'][0]);
+if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').contains(mimeType)) {
+	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", mimeType, "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
@@ -4252,11 +4252,11 @@ template URL for the Describe Spatial Data Set operation. This template shall
 accept the INSPIRE parameters 'spatial_dataset_identifier_code',
 'spatial_dataset_identifier_namespace' and the OpenSearch 'language'
 parameter. The 'Url' element shall have an attribute 'type' with a value of
-'application/atom+xml' and an attribute 'rel' with the value 'describedby'.</li>
+'application/atom+xml' or 'application/xml' or 'text/xml' and an attribute 'rel' with the value 'describedby'.</li>
 </ul>
 <br/>
 <br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-service/master/atom-pre-defined/opensearch-description-url-describe-spatial-dataset-operation" target="_blank">Abstract Test Case 'OpenSearch Description URL Describe Spatial Dataset operation'</a>]]>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/3.2/atom-pre-defined/opensearch-description-url-describe-spatial-dataset-operation" target="_blank">Abstract Test Case 'OpenSearch Description URL Describe Spatial Dataset operation'</a>]]>
 			</con:description>
 			<con:settings />
 			<con:testStep type="testcasedependency" name="OpenSearch Description link exists" id="703f1938-368b-4d87-8015-a91ba132f77f">
@@ -4356,17 +4356,12 @@ a.exists(
 				<con:config>
 					<script>
 						<![CDATA[import de.interactive_instruments.xtf.*;
+						import de.interactive_instruments.etf.suim.*;
 SOAPUI_I.init(log,context,testRunner);
 import de.interactive_instruments.UriUtils;
 
 ProjectHelper ph = new ProjectHelper();
 def xmlHolder = ph.getTestStepResult("Get OpenSearch Description")
-
-def describeSpatialDataSetUrlTemplates = xmlHolder.getDomNodes(
-	"/*:OpenSearchDescription/*:Url[@rel='describedby' and starts-with(@template,'http') and "+
-	"contains(@template,'crs') and contains(@template,'spatial_dataset_identifier_code') and "+
-	"contains(@template,'spatial_dataset_identifier_namespace') and contains(@template,'language')]");
-log.info("describeSpatialDataSetUrls: " + describeSpatialDataSetUrlTemplates);
 
 
 def languages = xmlHolder.getNodeValues(
@@ -4382,99 +4377,33 @@ def codes = xmlHolder.getNodeValues(
 log.info("codes: " + codes);
 
 // clear url to test
-ph.setTransferProperty("describeSpatialDataSetUrl", "")
 
-void replaceParameter(parameters, cleanParameters, templateKey, templateValue) {
-	for ( e in parameters ) {
-		def value = e.value[0]
-		if(value.contains("{"+templateKey+"}") || value.contains("{"+templateKey+"?}")) {
-			cleanParameters.put(e.key, templateValue);
-		}
-	}
+
+def describeSpatialDataSetUrlTemplates = xmlHolder.getDomNodes("/*:OpenSearchDescription/*:Url[@rel='describedby' and (contains(@type,'application/atom+xml') or contains(@type,'application/xml') or contains(@type,'text/xml'))]");
+log.info("describeSpatialDataSetUrls: " + describeSpatialDataSetUrlTemplates);
+if (describeSpatialDataSetUrlTemplates.size() == 0){
+	throw new TranslatableAssertionError("TR.missingDescribeSpatialDataset");
 }
 
-def initDefaultParameters(parameters) {
-	final Map<String, String> params = new HashMap<String, List<String>>();
-	for ( e in parameters ) {
-		def value = e.value[0]
-		if(!(value.contains("{") && value.contains("}"))) {
-			params.put(e.key, value);
-		}
-	}
-	return params
-}
 
-def invokedUrls = [] as HashSet
-
-for( node in describeSpatialDataSetUrlTemplates ) {
-	String describeSpatialDataSetUrlTemplate = node.attributes.getNamedItem("template").getNodeValue()
-	String mimeType = node.attributes.getNamedItem("type").getNodeValue()
-
-	log.info("Using template URL: "+describeSpatialDataSetUrlTemplate);
-	def parameters = UriUtils.getQueryParameters(describeSpatialDataSetUrlTemplate, false)
-	final Map<String, String> cleanParameters = initDefaultParameters(parameters)
-	final String endpoint = UriUtils.withoutQueryParameters(describeSpatialDataSetUrlTemplate)
-
-	for(int j=0; j<codes.size(); j++) {
-		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_code", codes[j] )
-		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
-
-			for(language in languages) {
-				replaceParameter(parameters, cleanParameters, "language", language )
-				final String url = UriUtils.withQueryParameters(endpoint, cleanParameters)
-				if(!invokedUrls.contains(url)) {
-					log.info("Using URL: "+url)
-					ph.setTransferProperty("describeSpatialDataSetUrl", url)
-					ph.setTransferProperty("mimeType", mimeType)
-					ph.runTestStep("Describe Spatial Dataset");
-					invokedUrls.add(url);
+for( node in describeSpatialDataSetUrlTemplates ) {		
+				String template = node.attributes.getNamedItem("template").getNodeValue();
+				if (!(template.contains("spatial_dataset_identifier_code") && template.contains("spatial_dataset_identifier_namespace") && template.contains("language"))){
+						throw new TranslatableAssertionError("TR.missingDescribeSpatialDatasetContent");
 				}
-			}
-	}
-}]]>
+		}
+
+testRunner.gotoStepByName("End test");
+]]>
 					</script>
 				</con:config>
 			</con:testStep>
-			<con:testStep type="httprequest" name="Describe Spatial Dataset" id="1693ebfb-e21b-457b-9fe3-ebee745d2204">
-				<con:settings />
-				<con:config method="GET" xsi:type="con:HttpRequest" id="587079db-efb1-4b30-b66d-8d120515daec" name="Describe Spatial Dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:description>Checks if the content-type of the Describe Spatial Dataset response equals 'application/atom+xml'.</con:description>
-					<con:settings>
-						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/atom+xml" xmlns="http://eviware.com/soapui/config"/></con:setting>
-					</con:settings>
-					<con:endpoint>${Transfer_Properties#describeSpatialDataSetUrl}</con:endpoint>
-					<con:request />
-					<con:assertion type="Valid HTTP Status Codes" id="d77ce483-2a5c-42af-b442-0043e535de70" name="HTTP status code 200 is returned">
-						<con:configuration>
-							<codes>200</codes>
-						</con:configuration>
-					</con:assertion>
-					<con:assertion type="Response SLA Assertion" id="a1a33924-7e37-4ae9-9d59-24c5bf976d8e" name="30 seconds timeout">
-						<con:configuration>
-							<SLA>30000</SLA>
-						</con:configuration>
-					</con:assertion>
-					<con:assertion type="GroovyScriptAssertion" id="fbb9511f-dd9a-4be4-b8ba-d35eb2039432" name="Response content-type is 'application/atom+xml'">
-						<con:configuration>
-							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-
-if(messageExchange.responseHeaders["Content-Type"]==null) {
-	throw new TranslatableAssertionError("TR.missingContentType");
-}
-
-if(!messageExchange.responseHeaders['Content-Type'][0].contains("application/atom+xml")) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "application/atom+xml", "actual", messageExchange.responseHeaders['Content-Type'][0]);
-}</scriptText>
-						</con:configuration>
-					</con:assertion>
-					<con:credentials>
-						<con:authType>No Authorization</con:authType>
-					</con:credentials>
-					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-					<con:jmsPropertyConfig />
-					<con:parameters />
-				</con:config>
-			</con:testStep>
+			<con:testStep type="properties" name="End test" id="5b677c43-5c1f-4a91-801d-321a5465be6a">
+          <con:settings />
+          <con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <con:properties />
+          </con:config>
+       </con:testStep>
 			<con:properties />
 		</con:testCase>
 		<con:testCase id="34cb9ce5-899c-4f79-bfea-80166b6f6287" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Query examples for each dataset" searchProperties="true">
@@ -4620,7 +4549,7 @@ ProjectHelper ph = new ProjectHelper();
 def xmlHolder = ph.getTestStepResult("Get OpenSearch Description")
 
 def describeSpatialDataSetUrlTemplates = xmlHolder.getDomNodes(
-	"/*:OpenSearchDescription/*:Url[@rel='results' and starts-with(@template,'http') and "+
+	"/*:OpenSearchDescription/*:Url[@rel='describedby' and starts-with(@template,'http') and "+
 	"contains(@template,'crs') and contains(@template,'spatial_dataset_identifier_code') and "+
 	"contains(@template,'spatial_dataset_identifier_namespace') and contains(@template,'language')]");
 log.info("describeSpatialDataSetUrls: " + describeSpatialDataSetUrlTemplates);
@@ -5080,12 +5009,12 @@ a.exists(
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
 
-if(messageExchange.responseHeaders["Content-Type"]==null) {
+if(!messageExchange.getResponseHeaders().containsKeyIgnoreCase('Content-Type')) {
 	throw new TranslatableAssertionError("TR.missingContentType");
 }
 
-if(!messageExchange.responseHeaders['Content-Type'][0].startsWith('text/html')) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "text/html", "actual", messageExchange.responseHeaders['Content-Type'][0]);
+if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').startsWith('text/html')) {
+	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", "text/html", "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
 }</scriptText>
 						</con:configuration>
 					</con:assertion>
