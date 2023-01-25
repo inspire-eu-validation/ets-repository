@@ -170,6 +170,15 @@ try {
 let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
 let $env := ggeo:envelope($candidate_geometry)
 let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+let $manual := if (count($other_features[self::*:WatercourseLink]) = 0) then (
+					true()
+					)
+				else if (count($other_features[self::*:WatercourseLink]/*:centrelineGeometry/*[1]) = 0) then (
+					 true()
+					)
+				else (
+					false()
+				)
 let $touches :=
 for $feature in $other_features[self::*:WatercourseLink]
 return
@@ -180,22 +189,27 @@ return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else
 	let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
 	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
 }
-return if (not($touches)) then $candidate else ()
+return 
+	if ($manual) then 
+		local:addMessage('TR.manual.freeNode', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id) })
+	else if (not($touches)) then
+		local:addMessage('TR.freeNode', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id) })
+	else ()
 } catch * {
 	let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
 	return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
 })[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   return
-     local:addMessage('TR.freeNode', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+(if ($featuresWithErrors and ($featuresWithErrors/@ref = ('TR.freeNode'))) then 'FAILED' 
+else if($featuresWithErrors and $featuresWithErrors/@ref = ('TR.manual.freeNode')) then 'PASSED_MANUAL' 
+else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($featuresWithErrors//etf:argument[@token='id']/text()))),
+$featuresWithErrors)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
 										<translationTemplate ref="TR.freeNode"/>
+										<translationTemplate ref="TR.manual.freeNode"/>
 										<translationTemplate ref="TR.featuresWithErrors"/>
 									</translationTemplates>
 								</TestAssertion>
