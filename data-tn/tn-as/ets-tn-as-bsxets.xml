@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/master/tn-as" target
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-tn/master/tn-gml" target="_blank">Conformance Class 'GML application schemas, Transport Networks'</a></li></ul>]]></description>
   <reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.2</version>
+	<version>0.2.3</version>
 	<author>PwC</author>
 	<creationDate>2016-12-09T00:00:00Z</creationDate>
-	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-05-16T13:00:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
+	<lastUpdateDate>2023-02-20T09:45:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -492,6 +492,16 @@ else
 		let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
 		let $env := ggeo:envelope($candidate_geometry)
  		let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+		let $manual := if (count($other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]) = 0) then (
+					true()
+					)
+				else if (count($other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]/*:centrelineGeometry/*[1]) = 0) then (
+					 true()
+					)
+				else (
+					false()
+				)
+
 		let $touches := 
 		(for $feature in $other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]
 		 return
@@ -503,19 +513,23 @@ else
 			return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
 		 }	
 		) 
-		return if (not($touches)) then $candidate else ()
+		return 
+			if ($manual) then 
+				local:addMessage('TR.manual.tnfreeNode', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id) })
+			else if (not($touches)) then
+				local:addMessage('TR.freeNode', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id) })
+			else ()
 	  } catch * {
 		let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
 		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
 	  }		
 	)[position() le $limitErrors]
 return
-(if ($featuresWithErrors) then 'FAILED' else 'PASSED',
- local:error-statistics('TR.featuresWithErrors', count($featuresWithErrors)),
- for $feature in $featuresWithErrors
-   order by $feature/@gml:id
-   return
-     local:addMessage('TR.freeNode', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id) }))
+(if ($featuresWithErrors and ($featuresWithErrors/@ref = ('TR.freeNode'))) then 'FAILED' 
+else if($featuresWithErrors and $featuresWithErrors/@ref = ('TR.manual.tnfreeNode')) then 'PASSED_MANUAL' 
+else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($featuresWithErrors//etf:argument[@token='id']/text()))),
+$featuresWithErrors)
 									</expression>
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
 									<translationTemplates>
