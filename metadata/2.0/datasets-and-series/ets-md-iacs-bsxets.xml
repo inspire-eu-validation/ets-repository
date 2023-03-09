@@ -568,11 +568,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 										let $messages := 
 											for $record in $records/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date
 												return
-													if (count($record/gmd:date/gco:Date) = 0) then
+													if (count($record/gmd:date/gco:Date) = 0 and count($record/gmd:date/gco:DateTime) = 0) then
 														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 													else if (count($record/gmd:date/gco:Date) > 1) then
 														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:date/gco:Date)}) 
-													else if (string-length($record/gmd:date/gco:Date/text()) = 0) then
+													else if (count($record/gmd:date/gco:DateTime) > 1) then
+														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:date/gco:DateTime)})	
+													else if ((count($record/gmd:date/gco:Date) = 1 and string-length($record/gmd:date/gco:Date/text()) = 0) or (count($record/gmd:date/gco:DateTime) = 1 and string-length($record/gmd:date/gco:DateTime/text()) = 0)) then
 														local:addMessage('TR.temporalReferenceError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id)}) 
 													else if (count($record/gmd:dateType/gmd:CI_DateTypeCode) > 1) then
 														local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': $property_string_citation, 'multiplicity': 1, 'count':count($record/gmd:dateType/gmd:CI_DateTypeCode)}) 
