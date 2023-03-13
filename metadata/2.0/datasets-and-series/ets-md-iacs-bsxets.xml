@@ -184,15 +184,14 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 																			if (count(index-of($keywordCharacterString, 'common agricultural policy')) > 0 and count(distinct-values($keywordCharacterString[.=$lcLabels])) = 0 and count(distinct-values($keywordCharacterString[.=$luLabels])) = 0) then
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
 																			else ()
-			
-																		return
-																			if (count($invalidLPIS) > 0) then
-																				$invalidLPIS
-																			else if (count($invalidGSAA) > 0) then
-																				$invalidGSAA
-																			else if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then 
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
+																		
+																		let $invalidAgricultural :=
+																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then 
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'})
 																			else ()
+
+																		return ($invalidLPIS, $invalidGSAA, $invalidAnchorBody, $invalidCharacterStringBody, $invalidAgricultural)
+
 												return 
 													if(count($insideMessages) > 0) then 
 														$insideMessages
