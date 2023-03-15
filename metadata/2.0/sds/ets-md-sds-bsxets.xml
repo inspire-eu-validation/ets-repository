@@ -14,11 +14,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/sds" target="_b
 Pre-requisite conformance classes: none]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-01-14T14:40:00Z</lastUpdateDate>
+	<lastUpdateDate>2023-03-15T12:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae" />
 	</tags>
@@ -335,42 +335,53 @@ let $messages :=
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
 		let $operatesOnNodes := $record/gmd:identificationInfo/srv:SV_ServiceIdentification/srv:operatesOn
-		for $operatesOn in $operatesOnNodes
-		        let $urls := $operatesOn/@xlink:href
-		        return
-			if (not($urls)) then
-				local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
-			else
-			for $href in $urls
-				let $url := string($href)
-				let $validuri := map:get($map, $url)
-				let $log := local:log('validURI: ' || $validuri)
-				let $log2 := local:log('checked URL: ' || $url)
-				return
-				if ($validuri = 'notHTTP') then
-					local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
-				else if ($validuri = 'idNotFound') then
-					local:addMessage('TR.idNotFound', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
-				else if (starts-with($validuri, 'EXCEPTION')) then
-					local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
-				else if (matches($validuri,'^\d{3}$')) then
-					local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
-				else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
-					try { 
-						let $root := local:get-document($url)
-						let $validCodes := ('dataset','series')
-						return
-						if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
-							local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) }) 
-						else ()
-					} catch * { 
-						local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
-					}
+		return if (not($operatesOnNodes)) then
+			local:addMessage('TR.manual.operatesOn', map { 'filename': local:filename($record), 'featureType':local-name($record), 'id': $rid })
+		else(
+			for $operatesOn in $operatesOnNodes
+			        let $urls := $operatesOn/@xlink:href
+			        return
+				if (not($urls)) then
+					local:addMessage('TR.operatesOnWithoutXlink', map { 'filename': local:filename($record), 'id': $rid })
 				else
-					local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri })
+				for $href in $urls
+					let $url := string($href)
+					let $validuri := map:get($map, $url)
+					return
+					if ($validuri = 'notHTTP') then
+						local:addMessage('TR.urlNotHttp', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+					else if ($validuri = 'idNotFound') then
+						local:addMessage('TR.idNotFound', map { 'filename': local:filename($record), 'id': $rid, 'url': $url })
+					else if (starts-with($validuri, 'EXCEPTION')) then
+						local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': substring-after($validuri, 'EXCEPTION ') })
+					else if (matches($validuri,'^\d{3}$')) then
+						local:addMessage('TR.resourceNotAccessible', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'status' : $validuri })
+					else if (starts-with($validuri,'text/xml') or starts-with($validuri,'application/xml')) then
+						try { 
+							let $root := local:get-document($url)
+							let $validCodes := ('dataset','series')
+							return
+							if ( not($root[//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue = $validCodes]) ) then 
+								local:addMessage('TR.operatesOnWithoutDatasetOrSeriesRecord', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'hierarchyLevel': data($root//gmd:hierarchyLevel[1]/gmd:MD_ScopeCode/@codeListValue) }) 
+							else ()
+						} catch * { 
+							local:addMessage('TR.resourceNotAccessibleException', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'message': $err:description })
+						}
+					else
+						local:addMessage('TR.unknownResourceType', map { 'filename': local:filename($record), 'id': $rid, 'url': $url, 'mediaType': $validuri })
+			)
 	)[position() le $limitErrors]
 return
-(if ($messages) then 'FAILED' else 'PASSED',
+(: (if ($messages and not($messages/@ref = ('TR.manual.operatesOn'))) then 'FAILED' 
+else if($messages/@ref = ('TR.manual.operatesOn') and not($messages/@ref != ('TR.manual.operatesOn'))) then 'PASSED_MANUAL' 
+else if($messages and $messages/@ref != ('TR.manual.operatesOn')) then 'FAILED' 
+else 'PASSED', :)
+
+
+
+(if ($messages and not($messages/@ref = ('TR.manual.operatesOn'))) then 'FAILED' 
+else if($messages and $messages/@ref = ('TR.manual.operatesOn')) then 'PASSED_MANUAL' 
+else 'PASSED',
  	local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
  $messages)
 									</expression>
