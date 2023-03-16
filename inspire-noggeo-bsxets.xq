@@ -356,7 +356,7 @@ try{
 
 let $db := for $i in 0 to $count return db:open($dbBaseName || '-' || $i)[matches(db:path(.),$files_to_test)]
 
-let $features := $db/wfs:FeatureCollection/wfs:member/* | $db/wfs:FeatureCollection/wfs:additionalObjects/wfs:SimpleFeatureCollection/wfs:member/* | $db/gml:FeatureCollection/gml:featureMember/* | $db/gml:FeatureCollection/gml:featureMembers/* | $db/base:SpatialDataSet/base:member/* | $db/base32:SpatialDataSet/base32:member/*
+let $features := $db/wfs:FeatureCollection/wfs:member/* | $db/wfs:FeatureCollection/wfs:member/wfs:FeatureCollection/wfs:member/* | $db/wfs:FeatureCollection/wfs:additionalObjects/wfs:SimpleFeatureCollection/wfs:member/* | $db/gml:FeatureCollection/gml:featureMember/* | $db/gml:FeatureCollection/gml:featureMembers/* | $db/base:SpatialDataSet/base:member/* | $db/base32:SpatialDataSet/base32:member/*
 
 let $stattmpl := if (not($statisticalReportTableType) or not(fn:doc-available($statisticalReportTableType))) then () else doc($statisticalReportTableType)
 let $stat := if (not($stattmpl)) then "let $logentry := local:log('Statistics table: " || string($statisticalReportTableType) || "')" else "
