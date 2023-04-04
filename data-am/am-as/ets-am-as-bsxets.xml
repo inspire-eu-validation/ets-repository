@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-am/master/am-as" target
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-am/master/am-gml" target="_blank">Conformance Class 'GML application schemas, Area Management, Restriction/Regulation Zones and Reporting Units'</a></li></ul>]]></description>
   <reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.2</version>
+	<version>0.1.3</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-04-22T17:00:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-03-21T15:45:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2023-04-04T09:15:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDe4924746-84a8-11ea-bc55-0242ac130003"/>
 	</tags>
@@ -238,11 +238,11 @@ let $messages :=
 	return
 		if(not($feature/am:competentAuthority)) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority'}) 
-		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role)) then
+		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role) and not($feature/am:competentAuthority/@xsi:nil = "true")) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role'}) 
-		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role/@xlink:href)) then
+		else if(not($feature/am:competentAuthority/base2:RelatedParty/base2:role/@xlink:href) and not($feature/am:competentAuthority/@xsi:nil = "true")) then
 			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': 'competentAuthority/RelatedParty/role', 'attribute': 'xlink:href'}) 
-		else if(not($validCompetentAuth)) then
+		else if(not($validCompetentAuth) and not($feature/am:competentAuthority/@xsi:nil = "true")) then
      			local:addMessage('TR.constraintViolation', map { 'filename': local:filename($feature), 'featureType': local-name($feature), 'gmlid': string($feature/@gml:id), 'constraint': 'At least one am:competentAuthority with role authority (http://inspire.ec.europa.eu/codelist/RelatedPartyRoleValue/authority) shall be provided.', 'additionalInfo':''})
 		else ()
 return
