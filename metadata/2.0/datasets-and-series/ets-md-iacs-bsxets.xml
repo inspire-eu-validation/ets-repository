@@ -10,11 +10,11 @@ Known limitations are documented in the description of the applicable test case 
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank">Conformance Class 2c: INSPIRE data sets and data set series metadata for IACS</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-11-30T00:00:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-11-23T09:45:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2023-04-17T12:30:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae" />
 	</tags>
@@ -58,14 +58,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 							<statementForExecution>not applicable</statementForExecution>
 							<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0" />
 							<testAssertions>
-								<TestAssertion id="EIDd14bfef0-b2ec-4280-8830-c44f4ee2b9f8">
-									<label>Keyword GEMET value</label>
+								<TestAssertion id="EIDc3f4e713-1afc-46e9-baeb-8fefa69d030e">
+									<label>Keyword INSPIRE data theme</label>
 									<description>
 										<![CDATA[<p> For every <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#mdKeywords">MD_Keywords</a> element:
 											<ul>
-												<li>Check that <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordanchor">Keyword Anchor</a> is provided with xlink:href attribute pointing to <a href="https://www.eionet.europa.eu/gemet/en/concept/1600">GEMET common agricultural policy</a> value and at least one these values related to an INSPIRE data theme: <a href="http://inspire.ec.europa.eu/theme/lc">Land cover</a> for LPIS datasets OR <a href="http://inspire.ec.europa.eu/theme/lu">Land use</a> for GSAA datasets.</li>
-												OR <br/>
-												<a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordcharacterstring">Keyword CharacterString</a> is provided with "Common Agricultural Policy" value and at least one these values: "Land cover" for LPIS datasets OR "Land use" for GSAA datasets.</li>
+												<li>Check that at least one of these values related to an INSPIRE data theme: <a href="http://inspire.ec.europa.eu/theme/lc">Land cover</a> for LPIS datasets OR <a href="http://inspire.ec.europa.eu/theme/lu">Land use</a> for GSAA datasets is provided using the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordanchor">Keyword Anchor</a> encoding.<br/>
+												OR at least one of these values related to an INSPIRE data theme: Land cover for LPIS datasets OR Land use for GSAA datasets is provided using the <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordcharacterstring">Keyword CharacterString</a> encoding.</li>
 											</ul>
 											</p>
 											<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#iacs-datasets-keyword" target="_blank">IACS Datasets Keyword</a></p>]]>
@@ -152,13 +151,101 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 																	if(count($validkeywordMultiplicity) > 0) then
 																		$validkeywordMultiplicity
 																	else
+
+																		let $invalidLPIS := 
+																			if((count(distinct-values($keywordCharacterString[.=$lpisLabels]))) > 0 and (count(distinct-values($keywordCharacterString[.=$lcLabels])) = 0))then
+																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land cover', 'property': 'LPIS'}) 
+																			else if(count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis')) > 0 and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lc')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lc')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4612')) = 0))then
+																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land cover', 'property': 'LPIS'}) 
+																			else ()
+
+																		let $invalidGSAA := 
+																			if(count(distinct-values($keywordCharacterString[.=$gsaaLabels])) > 0 and count(distinct-values($keywordCharacterString[.=$luLabels])) = 0)then
+																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land use', 'property': 'GSAA'}) 
+																			else if(count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa')) > 0 and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lu')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lu')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4678)')) = 0))then
+																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land use', 'property': 'GSAA'}) 
+																			else ()
+
+																		let $invalidBody :=
+																			if ((count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4612')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lc')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lc')) = 0) and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4678')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lu')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lu')) = 0) and (count(distinct-values($keywordCharacterString[.=$lcLabels])) = 0 and count(distinct-values($keywordCharacterString[.=$luLabels])) = 0)) then
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
+																			else ()
+
+																		let $invalidBody2 :=
+																			if ((count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa')) = 0) and (count(distinct-values($keywordCharacterString[.=$lpisLabels])) = 0 and count(distinct-values($keywordCharacterString[.=$gsaaLabels])) = 0)) then
+																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'LPIS or GSAA'}) 
+																			else ()
+																		
+																		return ($invalidLPIS, $invalidGSAA, $invalidBody, $invalidBody2)
+
+												return 
+													if(count($insideMessages) > 0) then 
+														$insideMessages
+													else ()
+										
+									return			
+									(if ($messages) then 'FAILED' else 'PASSED',
+										local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+									$messages)																															
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElement" />
+										<translationTemplate ref="TR.wrongMultiplicity" />
+										<translationTemplate ref="TR.keywordError" />
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EIDd14bfef0-b2ec-4280-8830-c44f4ee2b9f8">
+									<label>Keyword GEMET value</label>
+									<description>
+										<![CDATA[<p> For every <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#mdKeywords">MD_Keywords</a> element:
+											<ul>
+												<li>Check that <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordanchor">Keyword Anchor</a> is provided with xlink:href attribute pointing to <a href="https://www.eionet.europa.eu/gemet/en/concept/1600">common agricultural policy</a> value of the "GEMET Concepts" Thesaurus OR<br/>
+												<a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#keywordcharacterstring">Keyword CharacterString</a> is provided with "Common Agricultural Policy" value.</li>
+											</ul>
+											</p>
+											<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/iacs/IACS-datasets#iacs-datasets-keyword" target="_blank">IACS Datasets Keyword</a></p>]]>
+									</description>
+									<parent ref="EIDe17989de-c33f-4720-8008-1e2f2d3da791" />
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+
+										let $messages := 
+											for $record in $records
+												let $keywords := $record/gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords/gmd:keyword
+												let $insideMessages := 
+													<!-- for $keywords in $keywordsParent -->
+														let $keywordAnchor := 
+																for $href in $keywords/gmx:Anchor/@xlink:href
+																	return $href
+
+														let $keywordCharacterString := 
+															for $text in $keywords/gco:CharacterString/text()
+																	return $text
+														return
+															if (count($keywords) = 0) then
+																local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gmd:keyword'}) 
+															else
+																let $dummy := 'aaa'
+																let $validkeywordMultiplicity :=
+																	for $keyword in $keywords
+																		return
+																			if (count($keyword/gco:CharacterString) = 0 and count($keyword/gmx:Anchor) = 0) then
+																				local:addMessage('TR.missingElement', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'gco:CharacterString or gmx:Anchor'}) 
+																			else if (count($keyword/gco:CharacterString) > 1) then
+																				local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gco:CharacterString', 'multiplicity': 1, 'count':count($keyword/gco:CharacterString)}) 
+																			else if (count($keyword/gmx:Anchor) > 1) then
+																				local:addMessage('TR.wrongMultiplicity', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'element': 'gmx:Anchor', 'multiplicity': 1, 'count':count($keyword/gmx:Anchor)}) 
+																			else ()
+										
+																return
+																	if(count($validkeywordMultiplicity) > 0) then
+																		$validkeywordMultiplicity
+																	else
 																		let $invalidAnchorMain := 
 																			if (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) = 0) then 
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
-																			else ()
-																		let $invalidAnchorBody :=
-																			if (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/1600')) > 0 and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4612')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lc')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lc')) = 0) and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/concept/4678')) = 0 and count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lu')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lu')) = 0)) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
 																			else ()
 
 																		let $invalidCharacterStringMain := 
@@ -166,31 +253,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'}) 
 																			else ()
 
-																		let $invalidLPIS := 
-																			if((count(distinct-values($keywordCharacterString[.=$lpisLabels]))) > 0 and (count(distinct-values($keywordCharacterString[.=$lcLabels])) = 0))then
-																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land cover', 'property': 'LPIS'}) 
-																			else if(count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/lpis')) > 0 and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lc')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lc')) = 0))then
-																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land cover', 'property': 'LPIS'}) 
-																			else ()
-
-																		let $invalidGSAA := 
-																			if(count(distinct-values($keywordCharacterString[.=$gsaaLabels])) > 0 and count(distinct-values($keywordCharacterString[.=$luLabels])) = 0)then
-																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land use', 'property': 'GSAA'}) 
-																			else if(count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/metadata-codelist/IACSData/gsaa')) > 0 and (count(index-of($keywordAnchor, 'https://www.eionet.europa.eu/gemet/en/inspire-theme/lu')) = 0 and count(index-of($keywordAnchor, 'http://inspire.ec.europa.eu/theme/lu')) = 0))then
-																				local:addMessage('TR.dataThemeNotDeclared', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'theme': 'Land use', 'property': 'GSAA'}) 
-																			else ()
-
-																		let $invalidCharacterStringBody := 
-																			if (count(index-of($keywordCharacterString, 'Common Agricultural Policy')) > 0 and count(distinct-values($keywordCharacterString[.=$lcLabels])) = 0 and count(distinct-values($keywordCharacterString[.=$luLabels])) = 0) then
-																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Land cover or Land use'}) 
-																			else ()
-																		
 																		let $invalidAgricultural :=
 																			if (count($invalidAnchorMain) > 0 and count($invalidCharacterStringMain) > 0) then 
 																				local:addMessage('TR.keywordError', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'value': 'Common Agricultural Policy'})
 																			else ()
 
-																		return ($invalidLPIS, $invalidGSAA, $invalidAnchorBody, $invalidCharacterStringBody, $invalidAgricultural)
+																return ($invalidAgricultural)
 
 												return 
 													if(count($insideMessages) > 0) then 
