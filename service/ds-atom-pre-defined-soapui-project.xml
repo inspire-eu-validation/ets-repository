@@ -4110,6 +4110,9 @@ a.exists(
 				<con:config>
 					<script>
 						<![CDATA[import de.interactive_instruments.xtf.*;
+						import java.net.URL
+						import java.net.URLConnection
+						import de.interactive_instruments.etf.suim.*;
 SOAPUI_I.init(log,context,testRunner);
 import de.interactive_instruments.UriUtils;
 
@@ -4185,9 +4188,14 @@ for( node in getSpatialDataSetUrlTemplates ) {
 				final String url = UriUtils.withQueryParameters(endpoint, cleanParameters)
 				if(!invokedUrls.contains(url)) {
 					log.info("Using URL: "+url)
-					ph.setTransferProperty("getSpatialDatasetUrl", url)
-					ph.setTransferProperty("mimeType", mimeType)
-					ph.runTestStep("Get Spatial Dataset");
+					def urlc = new URL(url);
+					def connection = urlc.openConnection();
+					if(connection.getHeaderField("Content-Type") == null) {
+						throw new TranslatableAssertionError("TR.missingContentType");
+					}
+					if (connection.getContentType().toString() != mimeType){
+							throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", mimeType, "actual", connection.getContentType().toString());
+					}
 					invokedUrls.add(url);
 				}
 			}
@@ -4195,47 +4203,6 @@ for( node in getSpatialDataSetUrlTemplates ) {
 	}
 }]]>
 					</script>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="httprequest" name="Get Spatial Dataset" id="ea92f351-8560-4190-b129-202d1de67410">
-				<con:settings />
-				<con:config method="GET" xsi:type="con:HttpRequest" id="aedd00a3-7612-4084-8c64-19eff6289f73" name="Get Spatial Dataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:description>Checks if the content-type of the Get Spatial Dataset response equals the media-type from the Open Search Description document</con:description>
-					<con:settings>
-						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="${Transfer_Properties#mimeType}" xmlns="http://eviware.com/soapui/config"/></con:setting>
-					</con:settings>
-					<con:endpoint>${Transfer_Properties#getSpatialDatasetUrl}</con:endpoint>
-					<con:request />
-					<con:assertion type="Valid HTTP Status Codes" id="90ac1268-2c6a-46d4-94da-cb1a595847b2" name="HTTP status code 200 is returned">
-						<con:configuration>
-							<codes>200</codes>
-						</con:configuration>
-					</con:assertion>
-					<con:assertion type="Response SLA Assertion" id="4c8b189c-31ec-4098-8f45-6952a58780c6" name="30 seconds timeout">
-						<con:configuration>
-							<SLA>30000</SLA>
-						</con:configuration>
-					</con:assertion>
-					<con:assertion type="GroovyScriptAssertion" id="75f52c4d-7efd-412d-b177-9c7b581e95d3" name="Response content-type equals media-type from Get Spatial Dataset URL">
-						<con:configuration>
-							<scriptText>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-
-if(!messageExchange.getResponseHeaders().containsKeyIgnoreCase('Content-Type')) {
-	throw new TranslatableAssertionError("TR.missingContentType");
-}
-String mimeType = context.expand('${Transfer_Properties#mimeType}');
-
-if(!messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', 'value').contains(mimeType)) {
-	throw new TranslatableAssertionError("TR.unexpectedContentType", "expected", mimeType, "actual", messageExchange.getResponseHeaders().getCaseInsensitive('Content-Type', ''));
-}</scriptText>
-						</con:configuration>
-					</con:assertion>
-					<con:credentials>
-						<con:authType>No Authorization</con:authType>
-					</con:credentials>
-					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-					<con:jmsPropertyConfig />
-					<con:parameters />
 				</con:config>
 			</con:testStep>
 			<con:properties />
