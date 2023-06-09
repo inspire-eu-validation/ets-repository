@@ -4374,8 +4374,9 @@ testRunner.gotoStepByName("End test");
 		</con:testCase>
 		<con:testCase id="34cb9ce5-899c-4f79-bfea-80166b6f6287" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Query examples for each dataset" searchProperties="true">
 			<con:description>
-				<![CDATA[The test case requests the OpenSearch Description document and checks if it provides a Describe Spatial Dataset and Get Spatial Dataset url.
-For each category CRS from the Describe Spatial Dataset response a Get Spatial Dataset request with the CRS, the provided inspire_dls:spatial_dataset_identifier_code and inspire_dls:spatial_dataset_identifier_namespace is invoked.
+				<![CDATA[The test case checks
+				<ul><li>if there is one "Query" element with the "example" role for each dataset declared in the relevant atom "Dataset Feed"</li>
+				<li>the HTTP response code of  Get Spatial Dataset url</li></ul>
 <br/>
 <br/>
 Relevant Requirements:
@@ -4401,15 +4402,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-service/master/atom
 							<con:name>openSearchLanguages</con:name>
 						</con:property>
 					</con:properties>
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="calltestcase" name="Get Spatial Dataset operation link exists" id="b7539b87-0287-452d-a49a-e1c7c342eb8d">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>458af16e-a708-4b83-96f2-f13ec03c6bfd</con:targetTestCase>
-					<con:properties />
 					<con:returnProperties />
 					<con:runMode>PARALLELL</con:runMode>
 				</con:config>
@@ -4509,16 +4501,6 @@ a.exists(
 );</scriptText>
 						</con:configuration>
 					</con:assertion>
-					<con:assertion type="GroovyScriptAssertion" id="c6baa4d2-7ab0-4861-af59-76cb9955bd99" name="At least spatial_dataset_identifier_namespace and spatial_dataset_identifier_code provided">
-						<con:configuration>
-							<scriptText>import de.interactive_instruments.etf.suim.*
-final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.exists(
-  "/os:OpenSearchDescription/os:Query[@role='example' and @inspire_dls:spatial_dataset_identifier_namespace and @inspire_dls:spatial_dataset_identifier_code]"
-);</scriptText>
-						</con:configuration>
-					</con:assertion>
 					<con:credentials>
 						<con:authType>No Authorization</con:authType>
 					</con:credentials>
@@ -4529,6 +4511,7 @@ a.exists(
 			</con:testStep>
 			<con:testStep type="groovy" name="Comparison of number of query elements and entry elements." id="129238a2-999e-4f02-a4e2-63a0d718cc9f">
 				<con:settings />
+				<con:description>If there is one "Query" element with the "example" role for each dataset declared in the relevant atom "Dataset Feed"</con:description>
 				<con:config>
 					<script>
 						<![CDATA[import de.interactive_instruments.xtf.*;
@@ -4540,25 +4523,30 @@ ProjectHelper ph = new ProjectHelper();
 def xmlHolderOS = ph.getTestStepResult("Get OpenSearch Description");
 def xmlHolderSF = ph.getTestStepResult("Get Service Feed");
 
-
-def queries = xmlHolderOS.getDomNodes(
-	"/*:OpenSearchDescription/*:Query[@role='example']");
-log.info("Queries: " +  queries);
-
-def entries = xmlHolderSF.getDomNodes(
-	"/*:feed/*:entry");
-log.info("Entries: " +  entries);
+def queryCodes = xmlHolderOS.getNodeValues(
+	"/*:OpenSearchDescription/*:Query[@role='example']/@inspire_dls:spatial_dataset_identifier_code");
+log.info("QueryCodes: " +  queryCodes);
 
 
-if (queries.size() != entries.size()){
-		throw new TranslatableAssertionError("TR.differentQueriesEntries", "entry", entries.size().toString(), "query", queries.size().toString());
-}
-]]>
+def entryCodes = xmlHolderSF.getNodeValues(
+	"/*:feed/*:entry/inspire_dls:spatial_dataset_identifier_code");
+log.info("EntryCodes: " +  entryCodes);
+
+entryCodesL=new ArrayList<String>(Arrays.asList(entryCodes));
+queryCodesL=new ArrayList<String>(Arrays.asList(queryCodes));
+
+entryCodesL.removeAll(queryCodesL);
+log.info("EntryCodes after removing queryCodes: " + entryCodesL);
+
+if (entryCodesL.size() != 0){
+		throw new TranslatableAssertionError("TR.feedEntryCodesNotInQueryCodes", "count", entryCodesL.size().toString(), "entry", entryCodesL.toString());
+}]]>
 					</script>
 				</con:config>
 			</con:testStep>
-			<con:testStep type="groovy" name="Iterate over Describe Spatial Dataset URL (HTTPCode)" id="9858617d-7532-45ec-b33e-dc2ca953dec2">
+			<con:testStep type="groovy" name="Iterate over Get Spatial Dataset URL (HTTPCode)" id="9858617d-7532-45ec-b33e-dc2ca953dec2">
 				<con:settings />
+				<con:description>For each query element check the HTTP response code to be a valid code from: 200,206,301,302,303</con:description>
 				<con:config>
 					<script>
 						<![CDATA[import de.interactive_instruments.xtf.*;
@@ -4569,10 +4557,9 @@ import de.interactive_instruments.UriUtils;
 ProjectHelper ph = new ProjectHelper();
 def xmlHolder = ph.getTestStepResult("Get OpenSearch Description");
 
-
 def describeSpatialDataSetUrlTemplates = xmlHolder.getDomNodes(
-	"/*:OpenSearchDescription/*:Url[@rel='describedby' and starts-with(@template,'http') and "+
-	"contains(@template,'spatial_dataset_identifier_code') and "+
+	"/*:OpenSearchDescription/*:Url[@rel='results' and starts-with(@template,'http') and "+
+	"contains(@template,'crs') and contains(@template,'spatial_dataset_identifier_code') and "+
 	"contains(@template,'spatial_dataset_identifier_namespace') and contains(@template,'language')]");
 log.info("describeSpatialDataSetUrls: " + describeSpatialDataSetUrlTemplates);
 
@@ -4589,6 +4576,9 @@ def codes = xmlHolder.getNodeValues(
 	"/*:OpenSearchDescription/*:Query[@role='example']/@inspire_dls:spatial_dataset_identifier_code");
 log.info("codes: " + codes);
 
+def crss = xmlHolder.getNodeValues(
+	"distinct-values(/*:OpenSearchDescription/*:Query[@role='example']/@inspire_dls:crs)");
+log.info("CRSs: " + crss);
 
 // clear url to test
 ph.setTransferProperty("describeSpatialDataSetUrl", "")
@@ -4628,6 +4618,9 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_code", codes[j] )
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
 
+	for(crs in crss) {
+			replaceParameter(parameters, cleanParameters, "inspire_dls:crs", crs )
+
 			for(language in languages) {
 				replaceParameter(parameters, cleanParameters, "language", language )
 				final String url = UriUtils.withQueryParameters(endpoint, cleanParameters)
@@ -4648,7 +4641,7 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 				}
 			}
 	}
-}]]>
+}}]]>
 					</script>
 				</con:config>
 			</con:testStep>
