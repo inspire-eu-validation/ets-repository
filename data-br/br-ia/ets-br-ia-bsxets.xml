@@ -13,11 +13,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-01-27T10:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-01-27T10:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2023-06-16T11:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDb7bc5972-ca3a-4275-a9ba-c913d2b724a3"/>
 	</tags>
@@ -81,6 +81,8 @@ let $messages :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -92,6 +94,11 @@ let $messages :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (exists($feature) and not(exists($envDom))) then
@@ -100,8 +107,8 @@ let $messages :=
 			local:addMessage('TR.wrongMultiplicityBioReg',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
 		else if (exists($feature) and not(count($envDom) = count($envDom/@xlink:href))) then
 			local:addMessage('TR.missingAttributeBioReg',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
-		else if(count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLinkBioReg', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if(count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLinkBioReg', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 return 
