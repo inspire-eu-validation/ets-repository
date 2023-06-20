@@ -12,11 +12,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/master/tn-as" target
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-tn/master/tn-gml" target="_blank">Conformance Class 'GML application schemas, Transport Networks'</a></li></ul>]]></description>
   <reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.3</version>
+	<version>0.2.4</version>
 	<author>PwC</author>
 	<creationDate>2016-12-09T00:00:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2023-02-20T09:45:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2023-06-13T12:15:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -481,21 +481,25 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/master/tn-as/geometr
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 let $nodes := $features[(self::*:RoadNode|self::*:RailwayNode|self::*:RailwayYardNode|self::*:RailwayStationNode|self::*:CablewayNode|self::*:WaterwayNode|self::*:PortNode|self::*:Navaid|self::*:DesignatedPoint|self::*:RunwayCentrelinePoint|self::*:TouchDownLiftOff|self::*:AerodromeNode)]
+let $nodesNotAir:= $features[(self::*:RoadNode|self::*:RailwayNode|self::*:RailwayYardNode|self::*:RailwayStationNode|self::*:CablewayNode|self::*:WaterwayNode|self::*:PortNode)]
+let $nodesAir := $features[(self::*:Navaid|self::*:DesignatedPoint|self::*:RunwayCentrelinePoint|self::*:TouchDownLiftOff|self::*:AerodromeNode)]
+let $nodeLinks := $features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]
+
 return
 if (count($nodes) = 0)
 then 'PASSED'
 else
-	let $featuresWithErrors :=
-	(for $candidate in $nodes
+	let $featuresWithErrorsNotAir :=
+	(for $candidate in $nodesNotAir
 	  return
 	  try {
 		let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
 		let $env := ggeo:envelope($candidate_geometry)
  		let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
-		let $manual := if (count($other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]) = 0) then (
+		let $manual := if (count($other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]) = 0 and count($nodeLinks) = 0) then (
 					true()
 					)
-				else if (count($other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]/*:centrelineGeometry/*[1]) = 0) then (
+				else if (count($other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]/*:centrelineGeometry/*[1]) = 0 and count($nodeLinks/*:centrelineGeometry/*[1]) = 0) then (
 					 true()
 					)
 				else (
@@ -524,6 +528,51 @@ else
 		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
 	  }		
 	)[position() le $limitErrors]
+
+	let $featuresWithErrorsAir :=
+	(for $candidate in $nodesAir
+	  return
+	  if (($candidate/tn-a:significantPoint != "false") or (not(exists($candidate/tn-a:significantPoint)))) then(
+	  try {
+		let $candidate_geometry := ggeo:getGeometry($candidate/@gml:id,$candidate/*:geometry/*[1])
+		let $env := ggeo:envelope($candidate_geometry)
+ 		let $other_features := ggeo:search($env[1],$env[2],$env[3],$env[4])
+		let $manual := if (count($other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]) = 0 and count($nodeLinks) = 0) then (
+					true()
+					)
+				else if (count($other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]/*:centrelineGeometry/*[1]) = 0 and count($nodeLinks/*:centrelineGeometry/*[1]) = 0) then (
+					 true()
+					)
+				else (
+					false()
+				)
+
+		let $touches := 
+		(for $feature in $other_features[(self::*:RoadLink|self::*:RailwayLink|self::*:CablewayLink|self::*:WaterwayLink|self::*:AirRouteLink|self::*:ProcedureLink|self::*:StandardInstrumentDeparture|self::*:InstrumentApproachProcedure|self::*:StandardInstrumentArrival)]
+		 return
+		 try { 
+			let $other_geometry := ggeo:getGeometry($feature/@gml:id,$feature/*:centrelineGeometry/*[1])
+			return if (ggeo:touches($candidate_geometry,$other_geometry)) then $feature else ()
+		 } catch * {
+			let $dummy := local:log('Processing feature ' || string($feature/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+			return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+		 }	
+		) 
+		return 
+			if ($manual) then 
+				local:addMessage('TR.manual.tnfreeNode', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id) })
+			else if (not($touches)) then
+				local:addMessage('TR.freeNode', map { 'filename': local:filename($candidate), 'featureType': local-name($candidate), 'gmlid': string($candidate/@gml:id) })
+			else ()
+	  } catch * {
+		let $dummy := local:log('Processing feature ' || string($candidate/@gml:id) || '. Exception: ' || $err:code || ' - ' || $err:description || ' [' || $err:module || ', line: ' || $err:line-number || ', column: ' || $err:column-number || ']')
+		return () (: silently record the exception in the log, but do not raise errors in the test report as parsing exceptions are already reported in assertion gmlas.d.11 :)
+	  })
+	  else()		
+	)[position() le $limitErrors]
+
+	let $featuresWithErrors := ($featuresWithErrorsNotAir, $featuresWithErrorsAir)
+
 return
 (if ($featuresWithErrors and ($featuresWithErrors/@ref = ('TR.freeNode'))) then 'FAILED' 
 else if($featuresWithErrors and $featuresWithErrors/@ref = ('TR.manual.tnfreeNode')) then 'PASSED_MANUAL' 
