@@ -13,11 +13,11 @@ Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/information-accessibility" target="_blank">Conformance Class 'Information accessibility'</a></li>
 </ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-05-13T13:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2021-05-13T13:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2023-06-15T10:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDcf365ad1-38b9-4c3e-86ac-d75b1eccf97f"/>
 	</tags>
@@ -83,6 +83,8 @@ let $messages_co :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -94,6 +96,11 @@ let $messages_co :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (not(exists($envDom))) then
@@ -102,8 +109,8 @@ let $messages_co :=
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
 		else if (not(count($envDom) = count($envDom/@xlink:href))) then
 			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id),'attribute':'@xlink:href', 'property': $property_string})
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 let $messages_mo := 
@@ -115,6 +122,8 @@ let $messages_mo :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -126,6 +135,11 @@ let $messages_mo :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (not(exists($envDom))) then
@@ -134,8 +148,8 @@ let $messages_mo :=
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
 		else if (not(count($envDom) = count($envDom/@xlink:href))) then
 			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id),'attribute':'@xlink:href', 'property': $property_string})
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 
@@ -148,6 +162,8 @@ let $messages_mf :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -159,6 +175,11 @@ let $messages_mf :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (not(exists($envDom))) then
@@ -167,8 +188,8 @@ let $messages_mf :=
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
 		else if (not(count($envDom) = count($envDom/@xlink:href))) then
 			local:addMessage('TR.missingAttribute',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id),'attribute':'@xlink:href', 'property': $property_string})
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 let $messages := ($messages_co, $messages_mo, $messages_mf)
@@ -209,6 +230,8 @@ let $messages_co :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -220,14 +243,19 @@ let $messages_co :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (not(exists($envDom))) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string}) 
 		else if (count($envDom) > 1) then 
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 let $messages_mo := 
@@ -239,6 +267,8 @@ let $messages_mo :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -250,14 +280,19 @@ let $messages_mo :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (not(exists($envDom))) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string}) 
 		else if (count($envDom) > 1) then 
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 
@@ -270,6 +305,8 @@ let $messages_mf :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -281,14 +318,19 @@ let $messages_mf :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (not(exists($envDom))) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string}) 
 		else if (count($envDom) > 1) then 
 			local:addMessage('TR.wrongMultiplicity',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'element': $property_string, 'multiplicity': 1, 'count':count($envDom)}) 
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 let $messages := ($messages_co, $messages_mo, $messages_mf)
@@ -328,6 +370,8 @@ let $messages_mo :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -339,12 +383,17 @@ let $messages_mo :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (not(exists($envDom))) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string}) 
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../..), 'featureType':local-name($feature/../..), 'gmlid': string($feature/../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 
@@ -357,6 +406,8 @@ let $messages_mf :=
 				return
 				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
 					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
 				else
 					$x
 		let $map := local:check-resource-uris($urls, 30, true())
@@ -368,12 +419,17 @@ let $messages_mf :=
 					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 						$url
 					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
 
 	return
 		if (not(exists($envDom))) then
 			local:addMessage('TR.missingElement',  map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string}) 
-		else if (count($invalid_urls) > 0) then
-			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls, ',')}) 
+		else if (count($invalid_urls_orig) > 0) then
+			local:addMessage('TR.brokenLink', map {'filename': local:filename($feature/../../../..), 'featureType':local-name($feature/../../../..), 'gmlid': string($feature/../../../../@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')}) 
 		else ()
 
 let $messages := ($messages_mo, $messages_mf)
