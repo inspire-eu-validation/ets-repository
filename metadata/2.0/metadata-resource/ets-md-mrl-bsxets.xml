@@ -82,7 +82,6 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 										
 										let $protlinks := ('http://www.opengis.net/def/serviceType/ogc/wms','http://www.opengis.net/def/serviceType/ogc/wmts')
 
-
 										let $officialLanguages := ('bg','cs','da','de','et','el','en','es','fr','hr','it','lv','lt','hu','mt','nl','pl','pt','ro','sk','sl','fi','sv')
 										
 										let $protocolUrl := 'https://inspire.ec.europa.eu/metadata-codelist/ProtocolValue/ProtocolValue'
@@ -96,7 +95,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 											}
 										)
 										let $protLabels := ($protocolLabels, 'wms', 'WMS', 'wmts', 'WMTS')										
-										(:let $vsLabels := ('OGC WebMap Service', 'wms', 'WMS', 'OGC Web Map Tile Service', 'wmts', 'WMTS'):)
+										
 
 										let $sdslinks := ('http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download')
 										let $sdsUrl := 'https://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/SpatialDataServiceType'
@@ -110,18 +109,13 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 											}
 										)
 										
-										let $path:= $records/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[exists(gmd:protocol) and (gmd:protocol/gmx:Anchor/@xlink:href= $protlinks or (gmd:protocol/gco:CharacterString/text() = $protLabels)) and exists(gmd:linkage/gmd:URL) and exists(gmd:applicationProfile) and (gmd:applicationProfile/gmx:Anchor/@xlink:href= $sdslinks or (gmd:applicationProfile/gco:CharacterString/text() = $sdsLabels))]
+										let $path:= $records/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[exists(gmd:protocol) and (gmd:protocol/gmx:Anchor/@xlink:href= $protlinks or (gmd:protocol/gco:CharacterString/text() = $protLabels)) and exists(gmd:applicationProfile) and (gmd:applicationProfile/gmx:Anchor/@xlink:href= $sdslinks or (gmd:applicationProfile/gco:CharacterString/text() = $sdsLabels))]
+
 
 										let $messages := for $record in $path
 															let $linkage :=
 																for $url in $record/gmd:linkage/gmd:URL
 																	return $url
-
-
-															(:let $mod_linkage := for $url in $record/gmd:linkage/gmd:URL
-																	return replace($url, 'amp;', '')
-
-															let $mod_linkage2 := ($linkage,$mod_linkage):)
 
 															let $map := local:check-resource-uris($linkage, 30, true())
 															let $invalid_urls :=
@@ -138,13 +132,12 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 																local:addMessage('TR.missingElement',  map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'linkage'})
 															else if (count($invalid_urls) > 0) then
 																local:addMessage('TR.brokenLink', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'linkage', 'value': string-join($invalid_urls, ',')}) 
-															else if (not(contains($linkage, concat('request=getCapabilities',codepoints-to-string(38),'service=WFS')))) then
+															else if (not(contains($linkage, 'request=GetCapabilities') and contains($linkage, 'service=WMS'))) then
 																local:addMessage('TR.manual.resourceLocatorURL', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': $record/@*:id}) 
 															else ()
 															return $linkagecheck
-
 										let $messagesfinal := if (count($path)=0) then
-															local:addMessage('TR.missingElement',  map {'filename': "local:filename($path)", 'featureType':"local-name($path)", 'gmlid': "string($path/@*:id)", 'property': 'protocol3'})
+															local:addMessage('TR.missingLinkage',  map {'filename': local:filename($records), 'featureType':local-name($records), 'gmlid': string($records/@*:id)})
 														else if (count($messages) > 0) then
 															$messages
 														else() 
@@ -159,8 +152,9 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0" target="_blank
 									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElement" />
-										<translationTemplate ref="TR.wrongMultiplicity" />
-										<translationTemplate ref="TR.keywordError" />
+										<translationTemplate ref="TR.brokenLink" />
+										<translationTemplate ref="TR.manual.resourceLocatorURL" />
+										<translationTemplate ref="TR.missingLinkage" />
 									</translationTemplates>
 								</TestAssertion>
 							</testAssertions>
