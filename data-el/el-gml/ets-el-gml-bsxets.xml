@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-el/master/el-gml" targe
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2021-02-15T09:30:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-04-27T11:30:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2024-02-21T15:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -96,9 +96,9 @@ return
 								<TestAssertion id="EID68372458-4ab8-45f3-a8a7-8823d81065dd">
 									<label>el-gml.b.1: validate XML documents against official schema</label>
 									<description><![CDATA[Validate each document against the latest INSPIRE official schema(s), using strict XML schema validation. The official schemas for this data theme are: 
-										<ul><li>ElevationGridCoverage: <a href="https://inspire.ec.europa.eu/schemas/el-cov/4.0/ElevationGridCoverage.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/el-cov/4.0/ElevationGridCoverage.xsd</a></li>
-										<li>ElevationVectorElements: <a href="https://inspire.ec.europa.eu/schemas/el-vec/4.0/ElevationVectorElements.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/el-vec/4.0/ElevationVectorElements.xsd</a></li>
-										<li>ElevationTIN: <a href="https://inspire.ec.europa.eu/schemas/el-tin/4.0/ElevationTin.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/el-tin/4.0/ElevationTin.xsd</a></li>
+										<ul><li>ElevationGridCoverage: <a href="https://inspire.ec.europa.eu/schemas/el-cov/5.0/ElevationGridCoverage.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/el-cov/5.0/ElevationGridCoverage.xsd</a></li>
+										<li>ElevationVectorElements: <a href="https://inspire.ec.europa.eu/schemas/el-vec/5.0/ElevationVectorElements.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/el-vec/5.0/ElevationVectorElements.xsd</a></li>
+										<li>ElevationTIN: <a href="https://inspire.ec.europa.eu/schemas/el-tin/5.0/ElevationTin.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/el-tin/5.0/ElevationTin.xsd</a></li>
 									</ul><br/><br/>
 Relevant requirements:
 <ul>
@@ -122,7 +122,7 @@ let $errors := (for $file in $db
   let $root := $file/element()
   let $logentry := local:log('Validating ' || local:filename($root))
   let $start := prof:current-ms()
-	let $schema := local:getXSDSchema( ("el-cov", "el-vec", "el-tin"), ("ElevationGridCoverage", "ElevationVectorElements", "ElevationTin") )
+	let $schema := local:getXSDSchemaWithVersion( ("el-cov", "el-vec", "el-tin"), ("ElevationGridCoverage", "ElevationVectorElements", "ElevationTin"), ("5.0", "5.0", "5.0") )
 
   let $query := "declare variable $file external; declare variable $schema external; validate:xsd-info($file,$schema)"
   let $messages := xquery:eval($query, map{ 'file': $file, 'schema': $schema }, map{ 'timeout': 60 })

@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-us/master/us-gml" targe
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-11-23T15:00:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-04-21T09:30:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2024-02-21T10:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -95,13 +95,13 @@ return
 								<TestAssertion id="EID3a066400-d580-499a-b496-a93bb36cf740">
 									<label>us-gml.b.1: validate XML documents against official schema</label>
 									<description><![CDATA[Validate each document against the latest INSPIRE official schema(s), using strict XML schema validation. The official schemas for this data theme are: 
-										<ul><li>Administrative and Social Governmental Services: <a href="https://inspire.ec.europa.eu/schemas/us-govserv/4.0/GovernmentalServices.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-govserv/4.0/GovernmentalServices.xsd</a></li>
+										<ul><li>Administrative and Social Governmental Services: <a href="https://inspire.ec.europa.eu/schemas/us-govserv/5.0/GovernmentalServices.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-govserv/5.0/GovernmentalServices.xsd</a></li>
 										<li>Environmental Management Facilities: <a href="https://inspire.ec.europa.eu/schemas/us-emf/4.0/EnvironmentalManagementFacilities.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-emf/4.0/EnvironmentalManagementFacilities.xsd</a></li>
-										<li>Electricity Network: <a href="https://inspire.ec.europa.eu/schemas/us-net-el/4.0/ElectricityNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-net-el/4.0/ElectricityNetwork.xsd</a></li>
-										<li>Oil-Gas-Chemical Network: <a href="https://inspire.ec.europa.eu/schemas/us-net-ogc/4.0/OilGasChemicalsNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-net-ogc/4.0/OilGasChemicalsNetwork.xsd</a></li>
-										<li>Sewer Network: <a href="https://inspire.ec.europa.eu/schemas/us-net-sw/4.0/SewerNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-net-sw/4.0/SewerNetwork.xsd</a></li>
-										<li>Thermal Network: <a href="https://inspire.ec.europa.eu/schemas/us-net-th/4.0/ThermalNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-net-th/4.0/ThermalNetwork.xsd</a></li>
-										<li>Water Network: <a href=" https://inspire.ec.europa.eu/schemas/us-net-wa/4.0/WaterNetwork.xsd" target="_blank"> https://inspire.ec.europa.eu/schemas/us-net-wa/4.0/WaterNetwork.xsd</a></li>
+										<li>Electricity Network: <a href="https://inspire.ec.europa.eu/schemas/us-net-el/5.0/ElectricityNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-net-el/5.0/ElectricityNetwork.xsd</a></li>
+										<li>Oil-Gas-Chemical Network: <a href="https://inspire.ec.europa.eu/schemas/us-net-ogc/5.0/OilGasChemicalsNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-net-ogc/5.0/OilGasChemicalsNetwork.xsd</a></li>
+										<li>Sewer Network: <a href="https://inspire.ec.europa.eu/schemas/us-net-sw/5.0/SewerNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-net-sw/5.0/SewerNetwork.xsd</a></li>
+										<li>Thermal Network: <a href="https://inspire.ec.europa.eu/schemas/us-net-th/5.0/ThermalNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/us-net-th/5.0/ThermalNetwork.xsd</a></li>
+										<li>Water Network: <a href=" https://inspire.ec.europa.eu/schemas/us-net-wa/5.0/WaterNetwork.xsd" target="_blank"> https://inspire.ec.europa.eu/schemas/us-net-wa/5.0/WaterNetwork.xsd</a></li>
 									</ul><br/><br/>
 Relevant requirements:
 <ul>
@@ -125,7 +125,7 @@ let $errors := (for $file in $db
   let $root := $file/element()
   let $logentry := local:log('Validating ' || local:filename($root))
   let $start := prof:current-ms()
-	let $schema := local:getXSDSchema( ("us-govserv", "us-emf", "us-net-el", "us-net-ogc", "us-net-sw", "us-net-th", "us-net-wa"), ("GovernmentalServices", "EnvironmentalManagementFacilities", "ElectricityNetwork", "OilGasChemicalsNetwork", "SewerNetwork", "ThermalNetwork", "WaterNetwork") )
+	let $schema := local:getXSDSchemaWithVersion( ("us-govserv", "us-emf", "us-net-el", "us-net-ogc", "us-net-sw", "us-net-th", "us-net-wa"), ("GovernmentalServices", "EnvironmentalManagementFacilities", "ElectricityNetwork", "OilGasChemicalsNetwork", "SewerNetwork", "ThermalNetwork", "WaterNetwork"), ("5.0", "4.0", "5.0", "5.0", "5.0", "5.0", "5.0") )
 
   let $query := "declare variable $file external; declare variable $schema external; validate:xsd-info($file,$schema)"
   let $messages := xquery:eval($query, map{ 'file': $file, 'schema': $schema }, map{ 'timeout': 60 })
