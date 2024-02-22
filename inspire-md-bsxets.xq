@@ -1,5 +1,5 @@
 declare namespace base32='http://inspire.ec.europa.eu/schemas/base/3.2';
-declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3';
+declare namespace base='http://inspire.ec.europa.eu/schemas/base/4.0';
 declare namespace csw='http://www.opengis.net/cat/csw/2.0.2';
 declare namespace gsr='http://www.isotc211.org/2005/gsr';
 declare namespace gss='http://www.isotc211.org/2005/gss';

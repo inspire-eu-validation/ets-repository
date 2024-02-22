@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-nz/master/nz-gml" targe
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
   <reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2020-07-10T13:30:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-04-13T11:00:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2024-02-21T15:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -94,7 +94,7 @@ return
 							<testAssertions>
 								<TestAssertion id="EID724acd04-f7bc-4ef6-ac20-34fed73a1cf3">
 									<label>nz-gml.b.1: validate XML documents against official schema</label>
-									<description><![CDATA[Validate each document against the latest INSPIRE official schema(s): <a href="https://inspire.ec.europa.eu/schemas/nz-core/4.0/NaturalRiskZonesCore.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/nz-core/4.0/NaturalRiskZonesCore.xsd</a>, using strict XML schema validation.<br/><br/>
+									<description><![CDATA[Validate each document against the latest INSPIRE official schema(s): <a href="https://inspire.ec.europa.eu/schemas/nz-core/5.0/NaturalRiskZonesCore.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/nz-core/5.0/NaturalRiskZonesCore.xsd</a>, using strict XML schema validation.<br/><br/>
 Relevant requirements:
 <ul>
 <li>IR Requirement Article 3: Common Types. Types that are common to several of the themes listed in Annexes I, II and III to Directive 2007/2/EC shall conform to the definitions and constraints and include the attributes and association roles set out in Annex I.</li>
@@ -117,7 +117,7 @@ let $errors := (for $file in $db
   let $root := $file/element()
   let $logentry := local:log('Validating ' || local:filename($root))
   let $start := prof:current-ms()
-	let $schema := local:getXSDSchema( "nz-core", "NaturalRiskZonesCore" )
+	let $schema := local:getXSDSchemaWithVersion( "nz-core", "NaturalRiskZonesCore", "5.0" )
 
   let $query := "declare variable $file external; declare variable $schema external; validate:xsd-info($file,$schema)"
   let $messages := xquery:eval($query, map{ 'file': $file, 'schema': $schema }, map{ 'timeout': 60 })
