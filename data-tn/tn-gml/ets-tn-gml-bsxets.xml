@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-tn/master/tn-gml" targe
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
   <reference>../../inspire-bsxets.xq</reference>
-	<version>0.2.3</version>
+	<version>0.2.4</version>
 	<author>PwC</author>
 	<creationDate>2016-12-09T00:00:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-05-12T08:45:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2024-02-21T15:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -97,9 +97,9 @@ return
 									<description><![CDATA[Validate each document against the latest INSPIRE official schema(s), using strict XML schema validation. The official schemas for this data theme are: 
 										<ul><li>Air Transport Network: <a href="https://inspire.ec.europa.eu/schemas/tn-a/4.0/AirTransportNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/tn-a/4.0/AirTransportNetwork.xsd</a></li>
 										<li>Cable Transport Network: <a href="https://inspire.ec.europa.eu/schemas/tn-c/4.0/CableTransportNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/tn-c/4.0/CableTransportNetwork.xsd</a></li>
-										<li>Railway Transport Network: <a href="https://inspire.ec.europa.eu/schemas/tn-ra/4.0/RailwayTransportNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/tn-ra/4.0/RailwayTransportNetwork.xsd</a></li>
-										<li>Road Transport Network: <a href="https://inspire.ec.europa.eu/schemas/tn-ro/4.0/RoadTransportNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/tn-ro/4.0/RoadTransportNetwork.xsd</a></li>
-										<li>Water Transport Network: <a href="https://inspire.ec.europa.eu/schemas/tn-w/4.0/WaterTransportNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/tn-w/4.0/WaterTransportNetwork.xsd</a></li>						
+										<li>Railway Transport Network: <a href="https://inspire.ec.europa.eu/schemas/tn-ra/5.0/RailwayTransportNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/tn-ra/5.0/RailwayTransportNetwork.xsd</a></li>
+										<li>Road Transport Network: <a href="https://inspire.ec.europa.eu/schemas/tn-ro/5.0/RoadTransportNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/tn-ro/5.0/RoadTransportNetwork.xsd</a></li>
+										<li>Water Transport Network: <a href="https://inspire.ec.europa.eu/schemas/tn-w/5.0/WaterTransportNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/tn-w/5.0/WaterTransportNetwork.xsd</a></li>						
 									</ul><br/><br/>
 Relevant requirements:
 <ul>
@@ -123,7 +123,7 @@ let $errors := (for $file in $db
   let $root := $file/element()
   let $logentry := local:log('Validating ' || local:filename($root))
   let $start := prof:current-ms()
-	let $schema := local:getXSDSchema( ("tn-a", "tn-c", "tn-ra", "tn-ro", "tn-w" ), ("AirTransportNetwork", "CableTransportNetwork", "RailwayTransportNetwork", "RoadTransportNetwork", "WaterTransportNetwork") )
+	let $schema := local:getXSDSchemaWithVersion( ("tn-a", "tn-c", "tn-ra", "tn-ro", "tn-w" ), ("AirTransportNetwork", "CableTransportNetwork", "RailwayTransportNetwork", "RoadTransportNetwork", "WaterTransportNetwork"), ("4.0", "4.0", "5.0", "5.0", "5.0") )
 
   let $query := "declare variable $file external; declare variable $schema external; validate:xsd-info($file,$schema)"
   let $messages := xquery:eval($query, map{ 'file': $file, 'schema': $schema }, map{ 'timeout': 60 })

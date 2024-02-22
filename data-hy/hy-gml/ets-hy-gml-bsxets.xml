@@ -11,11 +11,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/master/hy-gml" targe
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data/master/schemas" target="_blank">Conformance Class 'INSPIRE GML application schemas'</a></li></ul>]]></description>
 	<reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.2.3</version>
+	<version>0.2.4</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-06-03T08:30:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2024-02-21T15:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID54d5f755-e20c-40a7-ab72-5600c71dd049"/>
 	</tags>
@@ -96,7 +96,7 @@ return
 									<label>hy-gml.b.1: validate XML documents against official schema</label>
 									<description><![CDATA[Validate each document against the latest INSPIRE official schema(s), using strict XML schema validation. The official schemas for this data theme are: 
 										<ul><li>Hydro Network: <a href="https://inspire.ec.europa.eu/schemas/hy-n/4.0/HydroNetwork.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/hy-n/4.0/HydroNetwork.xsd</a></li>
-										<li>Hydro Physical Waters: <a href="https://inspire.ec.europa.eu/schemas/hy-p/4.0/HydroPhysicalWaters.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/hy-p/4.0/HydroPhysicalWaters.xsd</a></li>
+										<li>Hydro Physical Waters: <a href="https://inspire.ec.europa.eu/schemas/hy-p/5.0/HydroPhysicalWaters.xsd" target="_blank">https://inspire.ec.europa.eu/schemas/hy-p/5.0/HydroPhysicalWaters.xsd</a></li>
 									</ul><br/><br/>
 Relevant requirements:
 <ul>
@@ -120,7 +120,7 @@ let $errors := (for $file in $db
   let $root := $file/element()
   let $logentry := local:log('Validating ' || local:filename($root))
   let $start := prof:current-ms()
-	let $schema := local:getXSDSchema( ("hy-n", "hy-g"), ("HydroNetwork", "HydroPhysicalWaters") )
+  let $schema := local:getXSDSchemaWithVersion( ("hy-n", "hy-p"), ("HydroNetwork", "HydroPhysicalWaters"), ("4.0", "5.0") )
 
   let $query := "declare variable $file external; declare variable $schema external; validate:xsd-info($file,$schema)"
   let $messages := xquery:eval($query, map{ 'file': $file, 'schema': $schema }, map{ 'timeout': 60 })
