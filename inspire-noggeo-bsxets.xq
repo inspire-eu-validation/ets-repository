@@ -1,5 +1,5 @@
 declare namespace base32='http://inspire.ec.europa.eu/schemas/base/3.2';
-declare namespace base='http://inspire.ec.europa.eu/schemas/base/3.3';
+declare namespace base='http://inspire.ec.europa.eu/schemas/base/4.0';
 declare namespace gml='http://www.opengis.net/gml/3.2';
 declare namespace wfs='http://www.opengis.net/wfs/2.0';
 declare namespace xsi='http://www.w3.org/2001/XMLSchema-instance';
