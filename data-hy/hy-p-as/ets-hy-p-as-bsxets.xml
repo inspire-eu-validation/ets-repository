@@ -10,11 +10,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/master/hy-p-as" targ
 Pre-requisite conformance classes:
 <ul><li><a href="http://inspire.ec.europa.eu/id/ats/data-hy/master/hy-gml" target="_blank">Conformance Class 'GML application schemas, Hydrography'</a></li></ul>]]></description>
   <reference>../../inspire-noggeo-bsxets.xq</reference>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 	<author>interactive instruments GmbH</author>
 	<creationDate>2016-08-15T00:00:00Z</creationDate>
-	<lastEditor>interactive instruments GmbH</lastEditor>
-	<lastUpdateDate>2017-05-16T13:00:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2024-04-04T15:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EID83fc91d3-bdf1-486e-ba8f-cd2c43e14413"/>
 	</tags>
@@ -313,8 +313,45 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/master/hy-p-as/ident
 					<statementForExecution>not applicable</statementForExecution>
 					<testItemType ref="EIDf483e8e8-06b9-4900-ab36-adad0d7f22f0"/>
 					<testAssertions>
+						<TestAssertion id="EIDb8c2894c-d01d-42f6-ac35-1f5ec300bae7">
+						 <label>hy-p-as.d.1: A river/drainage basin geometry may be a surface or a multisurface</label>
+						 <description><![CDATA[A river/drainage basin geometry may be a surface or a multisurface; OCL: "inv: geometry.oclIsKindOf(GM_Surface) or geometry.oclIsKindOf(GM_MultiSurface)". <br/><br/>
+Verify that RiverBasin.geometry/DrainageBasin.geometry is a gml:Surface or gml:MultiSurface or a gml:Polygon.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 4 (2): Types for the Exchange and Classification of Spatial Objects. Spatial object types and data types shall comply with the definitions and constraints and include the attributes and association roles set out in the Annexes.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hy/master/hy-p-as/constraints" target="_blank">Abstract Test Case 'Constraints'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HY_v3.1.pdf">INSPIRE Data Specification on Hydrography, A.1.6</a>]]></description>
+						 <parent ref="EID84f98707-541f-4433-82c6-8d09e29af2bd"/>
+						 <expectedResult>NOT_APPLICABLE</expectedResult>
+						 <expression>
+let $features_selected := $features[self::hy-p:RiverBasin | self::hy-p:DrainageBasin]
+let $gml_ids := $features//@gml:id
+let $property_string := 'aggregationUnit'
+let $messages :=			
+	for $feature in $features_selected/hy-p:geometry
+		let $surfaces := $feature/gml:Surface
+		let $multisurfaces := $feature/gml:MultiSurface
+		let $polygons := $feature/gml:Polygon
+
+		return
+			if (count($surfaces)+count($multisurfaces)+count($polygons) != 1) then
+				local:addMessage('TR.constraintViolation', map {'filename': local:filename($feature/..), 'featureType':local-name($feature/..), 'gmlid': string($feature/../@*:id), 'constraint':concat("A river/drainage basin geometry may be a surface or a multisurface",count($surfaces),count($multisurfaces),count($polygons)), 'additionalInfo':''}) 
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+						 <testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+						 <translationTemplates>
+							<translationTemplate ref="TR.constraintViolation"/>
+							<translationTemplate ref="TR.featuresWithErrors"/>
+						 </translationTemplates>
+					  </TestAssertion>
 					  <TestAssertion id="EID89883b0f-e257-4161-9461-ccf8c455db4c">
-						 <label>hy-p-as.d.1: A river basin may not be contained in any other basin</label>
+						 <label>hy-p-as.d.2: A river basin may not be contained in any other basin</label>
 						 <description><![CDATA[A river basin may not be contained in any other basin.<br/><br/>
 OCL: "inv: self.containsBasin->forall(c | not c.oclIsTypeOf(RiverBasin))".<br/><br/>
 Verify that all resources referenced in containsBasin are not a schema-element(hy-p:RiverBasin).<br/><br/>
@@ -354,7 +391,7 @@ return
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EIDd2b09045-88ee-40a2-b924-04443d40961d">
-						 <label>hy-p-as.d.2: A standing water geometry may be a surface or point</label>
+						 <label>hy-p-as.d.3: A standing water geometry may be a surface or point</label>
 						 <description><![CDATA[A standing water geometry may be a surface or point.<br/><br/>
 OCL: "inv: self.geometry.oclIsTypeOf(GM_Surface) or self.geometry.oclIsTypeOf(GM_Point)".<br/><br/>
 Verify that StandingWater.geometry is a gml:Surface, gml:Polygon or gml:Point.<br/><br/>
@@ -383,7 +420,7 @@ return
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EID88114190-702b-41f0-ae64-67e07ed131a1">
-						 <label>hy-p-as.d.3: A watercourse geometry may be a curve or surface</label>
+						 <label>hy-p-as.d.4: A watercourse geometry may be a curve or surface</label>
 						 <description><![CDATA[A watercourse geometry may be a curve or surface.<br/><br/>
 OCL: "inv: self.geometry.oclIsTypeOf(GM_Curve) or self.geometry.oclIsTypeOf(GM_Surface)".<br/><br/>
 Verify that Watercourse.geometry is a gml:Surface, gml:Polygon, gml:Curve or gml:LineString.<br/><br/>
@@ -412,7 +449,7 @@ return
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EID6d0bedd5-7150-4b14-bca3-3f699faf4084">
-						 <label>hy-p-as.d.4: A condition attribute may be specified only for a man-made watercourse</label>
+						 <label>hy-p-as.d.5: A condition attribute may be specified only for a man-made watercourse</label>
 						 <description><![CDATA[A condition attribute may be specified only for a man-made watercourse.<br/><br/>
 OCL: "inv: (self->count(condition)=1) implies (self.origin=OriginType::manMade)".<br/><br/>
 Verify that condition is only set, if the origin is "manMade".<br/><br/>
@@ -441,7 +478,7 @@ return
 						 </translationTemplates>
 					  </TestAssertion>
 					  <TestAssertion id="EIDe345f883-b479-432c-91f1-fca24e52a266">
-						 <label>hy-p-as.d.5: Shores on either side of a watercourse shall be provided as separate Shore objects</label>
+						 <label>hy-p-as.d.6: Shores on either side of a watercourse shall be provided as separate Shore objects</label>
 						 <description><![CDATA[The shores on either side of a watercourse shall be provided (using the bank property) as two separate Shore objects. Inspect the data set for the Shore objects for each Watercourse and verify that, if they exist, they are referenced from the Watercourse.<br/><br/>
 Relevant requirements:
 <ul>
