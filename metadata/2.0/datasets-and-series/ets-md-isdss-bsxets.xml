@@ -13,11 +13,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/isdss" target="
 Pre-requisite conformance classes: Conformance Class 1]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<author>Consortium Bilbomatica, Guadaltel y Geograma</author>
 	<creationDate>2018-06-30T00:00:00Z</creationDate>
-	<lastEditor>Consortium Bilbomatica, Guadaltel y Geograma</lastEditor>
-	<lastUpdateDate>2022-05-02T11:30:00Z</lastUpdateDate>
+	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
+	<lastUpdateDate>2024-05-03T12:15:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae" />
 	</tags>
@@ -114,12 +114,8 @@ return
 									<parent ref="EIDef8d3d22-be0f-4618-88a2-2bc0bbfc8077" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
-let $urlOpengis := 'http://www.opengis.net/def/crs/EPSG/0/'
-let $epsgCodes := ('4936','4937','4258','3035','3034','3038','3039','3040','3041','3042','3043','3044','3045','3046','3047','3048','3049','3050','3051','5730','5861','5715','7409','5013','5014','5015','5621','9389','9390')
-let $httpURIIdentifier :=
-	for $x in $epsgCodes
-	return
-	concat($urlOpengis, $x)
+let $codelisturl := 'https://inspire.ec.europa.eu/crs/crs.en.xml'
+let $httpURIIdentifier:= fn:doc($codelisturl)/*:register/*:containeditems/*:crs/*:crsidentifier/@id
 let $messages :=  	
 	(for $record in $records
 		let $rid := $record/gmd:fileIdentifier/*/text()
@@ -129,7 +125,7 @@ let $messages :=
 				let $code := $crs/gmd:code
 				let $codeSpace := $crs/gmd:codeSpace
 				let $defaultEpsgCode :=
-					for $x in $epsgCodes
+					for $x in $httpURIIdentifier
 						return
 						if(contains($code/gco:CharacterString/text(), $x)) then $code/gco:CharacterString
 						else if(contains($code/gmx:Anchor/text(), $x)) then $code/gmx:Anchor/@xlink:href
