@@ -130,8 +130,83 @@ $messages)
 										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
 									</translationTemplates>
 								</TestAssertion>
+								<TestAssertion id="EID32d226e8-2213-4333-b818-7048e45ba8ac">
+									<label>hh-ia.a.2: ComponentTypeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:EnvHealthDeterminantConcentrationMeasure]
+let $gml_ids := $features//@gml:id
+let $property_string := 'ComponentTypeValue'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/hh:component
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls_orig) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
 								<TestAssertion id="EIDe6ea4bb6-0de4-4f7e-8878-638d85894e2b">
-									<label>hh-ia.a.2: DiseaseMeasureTypeValue</label>
+									<label>hh-ia.a.3: DiseaseMeasureTypeValue</label>
 									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Relevant requirements:
 <ul>
@@ -206,7 +281,7 @@ $messages)
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID6a13c03d-7e4a-4de6-99e8-6795b77d2522">
-									<label>hh-ia.a.3: EnvHealthDeterminantTypeValue</label>
+									<label>hh-ia.a.4: EnvHealthDeterminantTypeValue</label>
 									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Relevant requirements:
 <ul>
@@ -217,7 +292,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-li
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 									<expression>
 
-let $features_selected := $features[self::hh:EnvHealthDeterminantMeasure | self::hh:EnvHealthDeterminantStatisticalData]
+let $features_selected := $features[self::hh:EnvHealthDeterminantMeasure | self::hh:EnvHealthDeterminantConcentrationMeasure | self::hh:EnvHealthDeterminantNoiseMeasure | self::hh:EnvHealthDeterminantStatisticalData]
 let $gml_ids := $features//@gml:id
 let $property_string := 'EnvHealthDeterminantTypeValue'
 let $messages :=			
@@ -281,7 +356,7 @@ $messages)
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EIDb25e24c3-53ce-41aa-9e74-f649c0a106ee">
-									<label>hh-ia.a.4: GeneralHealthTypeValue</label>
+									<label>hh-ia.a.5: GeneralHealthTypeValue</label>
 									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Relevant requirements:
 <ul>
@@ -356,7 +431,7 @@ $messages)
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID268d4c78-0afc-49d5-bcc5-da4e013d0dd8">
-									<label>hh-ia.a.5: HealthServicesTypeValue </label>
+									<label>hh-ia.a.6: HealthServicesTypeValue </label>
 									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Relevant requirements:
 <ul>
@@ -431,7 +506,7 @@ $messages)
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID31b35af8-3eb7-4bd0-9978-754abe172855">
-									<label>hh-ia.a.6: MatrixValue</label>
+									<label>hh-ia.a.7: MatrixValue</label>
 									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Relevant requirements:
 <ul>
@@ -505,8 +580,158 @@ $messages)
 										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
 									</translationTemplates>
 								</TestAssertion>
+								<TestAssertion id="EID19e00be5-a6d5-460b-a4cc-5a3918106cf7">
+									<label>hh-ia.a.8: MediaTypeValue:</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:EnvHealthDeterminantConcentrationMeasure]
+let $gml_ids := $features//@gml:id
+let $property_string := 'MediaTypeValue'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/hh:media
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls_orig) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
+								<TestAssertion id="EID98f8594d-22ba-4c3d-a4e4-f23cfa8f8e66">
+									<label>hh-ia.a.9: NoiseSourceTypeValue</label>
+									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
+Relevant requirements:
+<ul>
+<li>IR Requirement Article 6 (3): Code Lists and Enumerations. Where, for an attribute whose type is a code list as referred to in points (b), (c) or (d) of paragraph 1, a data provider provides a value that is not specified in this Regulation, that value and its definition shall be made available in a register.</li>
+</ul>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/data-hh/master/hh-ia/code-list" target="_blank">Abstract Test Case 'Code lists'</a>, <a href="http://inspire.ec.europa.eu/documents/Data_Specifications/INSPIRE_DataSpecification_HH_v3.0.pdf">INSPIRE Data Specification on Human Health and Safety, A.5.1</a>]]></description>
+									<parent ref="EID96c7ff8f-f2ec-4632-a10c-2ea7b7a8139f"/>
+									<expectedResult>NOT_APPLICABLE</expectedResult>
+									<expression>
+
+let $features_selected := $features[self::hh:EnvHealthDeterminantNoiseMeasure]
+let $gml_ids := $features//@gml:id
+let $property_string := 'NoiseSourceTypeValue'
+let $messages :=			
+	for $feature in $features_selected
+
+		let $envDom := $feature/hh:source
+		let $urls := 
+			for $x in $envDom/@xlink:href
+				return
+				if (starts-with($x, 'http://inspire.ec.europa.eu/codelist/')) then
+					()
+				else if (starts-with($x, 'https://inspire.ec.europa.eu/codelist/')) then
+					concat('https://inspire.ec.europa.eu/registry/rest?uri=',$x,codepoints-to-string(38),'lang=en', codepoints-to-string(38),'format=jsonc')
+				else
+					$x
+		let $map := local:check-resource-uris($urls, 30, true())
+		let $invalid_urls :=
+			for $href in $urls
+				let $url := string($href)
+				let $validuri := map:get($map, $url)
+				return
+					if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
+						$url
+					else ()
+		let $invalid_urls_orig := for $url in $invalid_urls
+						return if (starts-with($url, 'https://inspire.ec.europa.eu/registry/rest?uri=https://inspire.ec.europa.eu/codelist/')) then
+							tokenize(substring($url,48), codepoints-to-string(38))[1]
+						else
+							$url
+		let $invalid_element_reference :=
+			for $x in $envDom/@xlink:href
+			return
+				if (starts-with($x, '#')) then
+					if (not(substring($x, 2) = $gml_ids)) then
+						$x
+					else ()
+				else ()
+
+		return
+			if(not(exists($envDom))) then
+				local:addMessage('TR.missingElementHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string})
+			else if(count($envDom) > 1) then
+				local:addMessage('TR.wrongMultiplicityHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'multiplicity': 1, 'count': count($envDom)})
+			else if (not(count($envDom) = count($envDom/@xlink:href))) then
+				local:addMessage('TR.missingAttributeHumanHealth',  map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'attribute': 'xlink:href'})
+			else if (count($invalid_urls_orig) > 0) then
+				local:addMessage('TR.brokenLinkHumanHealth', map {'filename': local:filename($feature), 'featureType':local-name($feature), 'gmlid': string($feature/@*:id), 'property': $property_string, 'value': string-join($invalid_urls_orig, ',')})
+			else ()
+
+return
+(if ($messages) then 'FAILED' else 'PASSED',
+local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+$messages)
+									</expression>
+									<testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a"/>
+									<translationTemplates>
+										<translationTemplate ref="TR.missingElementHumanHealth"/>
+										<translationTemplate ref="TR.wrongMultiplicityHumanHealth"/>
+										<translationTemplate ref="TR.missingAttributeHumanHealth"/>
+										<translationTemplate ref="TR.brokenLinkHumanHealth"/>
+									</translationTemplates>
+								</TestAssertion>
 								<TestAssertion id="EIDc615ba12-ab4c-47a6-ab0a-b5263d2318e5">
-									<label>hh-ia.a.7: StatisticalAggregationMethodValue</label>
+									<label>hh-ia.a.10: StatisticalAggregationMethodValue</label>
 									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Relevant requirements:
 <ul>
@@ -581,7 +806,7 @@ $messages)
 									</translationTemplates>
 								</TestAssertion>
 								<TestAssertion id="EID6a610621-ec6e-49b9-b8b0-d44bd7d7c027">
-									<label>hh-ia.a.8: MeasureCategoryTypeValue</label>
+									<label>hh-ia.a.11: MeasureCategoryTypeValue</label>
 									<description><![CDATA[Verify that any code list extensions are publicly accessible via HTTP, i.e. inspect extensible code list values property elements. If a reference (@xlink:href) has a value that does not start with http://inspire.ec.europa.eu/codelist/, verify that a HTTP GET request to the URI retrieves a document.<br/><br/>
 Relevant requirements:
 <ul>
