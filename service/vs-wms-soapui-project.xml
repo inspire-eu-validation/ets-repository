@@ -662,7 +662,7 @@ if (!(xml_root.ServiceException.size() == 1 || xml_root.Exception.size() == 1)){
 						<con:parameters />
 					</con:config>
 				</con:testStep>
-				<con:testStep type="groovy" name="check-metadataurl" id="0662bc92-d717-4247-9459-b9c9cf3099a6">
+				<con:testStep type="groovy" name="check-metadata" id="0662bc92-d717-4247-9459-b9c9cf3099a6">
 					<con:settings />
 					<con:config>
 						<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
@@ -1136,7 +1136,7 @@ if (!(xml_root.ServiceException.size() == 1 || xml_root.Exception.size() == 1)){
 						</con:settings>
 						<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
 						<con:request />
-						<con:assertion type="GroovyScriptAssertion" id="9eeaad78-cd28-4aca-bb89-08c9e1bd5ae3" name="manual-check-metadataurl">
+						<con:assertion type="GroovyScriptAssertion" id="9eeaad78-cd28-4aca-bb89-08c9e1bd5ae3" name="manual-check-metadata">
 							<con:configuration>
 								<scriptText>import de.interactive_instruments.etf.suim.*
 									import de.interactive_instruments.SUtils
@@ -1253,1071 +1253,6 @@ else if(capabilities.Capability.ExtendedCapabilities.ResponseLanguage.toString()
 			</con:testStep>
 			<con:properties />
 		</con:testCase>
-		<!--<con:testCase id="c3591f4d-025e-437a-829e-b92a2acf9c30" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at09-getcapabilities-view-service-metadata-in-discovery-service" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that the metadata of the View Service is published in a Discovery Service.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at09-getcapabilities-view-service-metadata-in-discovery-service" target="_blank">View Service Metadata in Discovery Service</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="a6a3c5c1-c9b8-4097-8000-cde984f01515">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="httprequest" name="http-request-metadata" id="021f8877-3876-496f-a9bc-0b1949fec174" disabled="true">
-				<con:settings />
-				<con:config method="GET" xsi:type="con:HttpRequest" id="47dc0752-c129-4a53-b542-13425d14e699" name="http-request-metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:settings>
-						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-					</con:settings>
-					<con:endpoint>${#TestCase#metadataEndpoint}</con:endpoint>
-					<con:request />
-					<con:assertion type="Valid HTTP Status Codes" id="66a813f3-0e2d-41de-a6fe-c0e3b596a79b" name="Valid HTTP Status Codes">
-						<con:configuration>
-							<codes>200</codes>
-						</con:configuration>
-					</con:assertion>
-					<con:assertion type="OwsExceptionReportAssertion" id="fcb50add-affc-4bb9-923d-8171ae970fe3" name="Fail if service returns OWS Exception Report" />
-					<con:assertion type="Response SLA Assertion" id="ab838fea-55ac-46d2-8038-00c9e6682f99" name="Response SLA">
-						<con:configuration>
-							<SLA>30000</SLA>
-						</con:configuration>
-					</con:assertion>
-					<con:credentials>
-						<con:authType>No Authorization</con:authType>
-					</con:credentials>
-					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-					<con:jmsPropertyConfig />
-					<con:parameters />
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-metadataurl" id="3370ba6f-c044-448e-8c44-062716fd346c">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["at09-getcapabilities-view-service-metadata-in-discovery-service"];
-testRunner.testCase.setPropertyValue("metadataEndpoint", '');
-def ts = testRunner.testCase.testSuite.project.testSuites['GetCapabilities_Operation'].testCases['at09-getcapabilities-view-service-metadata-in-discovery-service'].getTestStepByName('http-request-metadata');
-def metadataEndpoint = capabilities.Capability.ExtendedCapabilities.MetadataUrl.URL;
-if (scenario == '1' &amp;&amp; metadataEndpoint.size() != 1){
-	String[] assertParams = ['element', 'ExtendedCapabilities/MetadataUrl/URL'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-else if(scenario == '1' &amp;&amp; metadataEndpoint.toString().length() == 0){
-	String[] assertParams = ['element', 'ExtendedCapabilities/MetadataUrl/URL'];
-	throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-}
-else if(metadataEndpoint.toString().length() != 0){
-	testRunner.testCase.setPropertyValue("metadataEndpoint", metadataEndpoint.toString());
-	ts.setDisabled(false);
-	ts.run(testRunner, context);
-}
-tc.getTestStepByName('http-request-metadata').setDisabled(true);</script>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="httprequest" name="manual-check" id="7a6d3d1d-6558-41d1-8fb4-a03815a5eb1a">
-				<con:settings />
-				<con:config method="GET" xsi:type="con:HttpRequest" id="818b64f2-e7ac-4ce8-a195-6e84e0806667" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:settings>
-						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-					</con:settings>
-					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
-					<con:request />
-					<con:assertion type="GroovyScriptAssertion" id="5c25d26c-ea92-4845-8c3f-21c08f413cb8" name="manual-check-metadataurl">
-						<con:configuration>
-							<scriptText>import de.interactive_instruments.etf.suim.*
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-  '//zzzz',
-  'TR.manual.testManual09'
-);</scriptText>
-						</con:configuration>
-					</con:assertion>
-					<con:credentials>
-						<con:authType>No Authorization</con:authType>
-					</con:credentials>
-					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-					<con:jmsPropertyConfig />
-					<con:parameters>
-						<con:parameter required="false" disableUrlEncoding="false">
-							<con:name>request</con:name>
-							<con:value>GetCapabilities</con:value>
-							<con:style>QUERY</con:style>
-							<con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type>
-							<con:default>${#Project#request}</con:default>
-							<con:description xsi:nil="true" />
-						</con:parameter>
-						<con:parameter>
-							<con:name>service</con:name>
-							<con:value>${#Project#service}</con:value>
-							<con:style>QUERY</con:style>
-							<con:default>${#Project#service}</con:default>
-							<con:path xsi:nil="true" />
-							<con:description xsi:nil="true" />
-						</con:parameter>
-					</con:parameters>
-				</con:config>
-			</con:testStep>
-			<con:properties>
-				<con:property>
-					<con:name>metadataEndpoint</con:name>
-					<con:value>https://www.nationaalgeoregister.nl/geonetwork/srv/dut/csw?service=CSW&amp;version=2.0.2&amp;request=GetRecordById&amp;outputschema=http://www.isotc211.org/2005/gmd&amp;elementsetname=full&amp;id=b196f948-5d87-4eb4-9854-a93841c3877f</con:value>
-				</con:property>
-			</con:properties>
-		</con:testCase>
-		<con:testCase id="ec968506-6760-47db-bb01-9fa4b9aca10b" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at10-getcapabilities-title-and-abstract" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that Title, Abstract and AccessConstraints elements are provided.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at10-getcapabilities-mapping-of-service-metadata-elements" target="_blank">Mapping of service metadata elements</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="14da54c3-89da-49b8-a52c-bce8f56a36be">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-title-abstract-accessconstraints" id="e3989ad7-9c7c-4762-8419-9f8512a2922d">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	if(capabilities.Service.Title.size() != 1){
-		String[] assertParams = ['element', 'Service/Title'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-	}
-	else if(capabilities.Service.Title.toString().length() == 0){
-		String[] assertParams = ['element', 'Service/Title'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-	if(capabilities.Service.Abstract.size() != 1){
-		String[] assertParams = ['element', 'Service/Abstract'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-	}
-	else if(capabilities.Service.Abstract.toString().length() == 0){
-		String[] assertParams = ['element', 'Service/Abstract'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-	if(capabilities.Service.AccessConstraints.size() == 0){
-		String[] assertParams = ['element', 'Service/AccessConstraints'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	else if(capabilities.Service.AccessConstraints.toString().length() == 0){
-		String[] assertParams = ['element', 'Service/AccessConstraints'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="d1fe6d21-4061-4efd-a627-cfa91cab5846" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at11-getcapabilities-resource-type-is-service" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that a ResourceType element is given and the value is fixed to 'service'.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at11-getcapabilities-resource-type-is-service" target="_blank">Resource type is service</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="7bb4b8d6-e6f5-4165-806e-38bb9bfa24dc">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-resource-type" id="d02b1884-59ed-4be7-bfbc-ebb709b2a83d">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def resourceType = capabilities.Capability.ExtendedCapabilities.ResourceType;
-	if(resourceType.size() != 1){
-		String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-	}
-	else if(resourceType.toString().length() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-	else if(resourceType != 'service'){
-		String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType', 'value', 'service'];
-		throw new TranslatableAssertionError('TR.valueShallBe', assertParams);
-	}
-}</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="97c30e58-255e-4b70-9c55-6cf310666dd7" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at12-getcapabilities-resource-locator" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that a Resource Locator element is provided within the Extended Capabilities section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at12-getcapabilities-resource-locator" target="_blank">Resource locator</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="b2b8447f-2a2c-4d57-8194-0f4f5ce17855">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-resource-locator" id="d29f39cc-85d6-4d5d-8e75-251f1eb04da3">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def resourceLocator = capabilities.Capability.ExtendedCapabilities.ResourceLocator;
-	if(resourceLocator.size() == 0){
-		String[] assertParams = ['element', 'Capability/ExtendedCapabilities/ResourceLocator'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	else if(resourceLocator.toString().length() == 0){
-		String[] assertParams = ['element', 'Capability/ExtendedCapabilities/ResourceLocator'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-}</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="c431515e-068f-429c-aa0a-187d994e53db" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at13-getcapabilities-map-coupled-resource-metadata" searchProperties="true">
-			<con:settings />
-			<con:testStep type="groovy" name="enable-manual-check" id="a7f6c53c-44f7-4b7c-a0fa-8a77585c8f45">
-				<con:settings />
-				<con:config>
-					<script>def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-testRunner.testCase.testSuite.project.testSuites['GetCapabilities_Operation'].testCases['at13-getcapabilities-map-coupled-resource-metadata'].getTestStepByName('manual-check').setDisabled(false);
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="httprequest" name="manual-check" id="aefc4a6d-f013-43cd-8877-ed5cddc43f26" disabled="true">
-				<con:settings />
-				<con:config method="GET" xsi:type="con:HttpRequest" id="d3ffc786-a183-480d-b7e5-3ffe16e15723" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:settings>
-						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-					</con:settings>
-					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
-					<con:request />
-					<con:assertion type="GroovyScriptAssertion" id="7a1d0cf4-30c0-4cb8-adbf-4c161700b470" name="check-manually-coupled-resource">
-						<con:configuration>
-							<scriptText>import de.interactive_instruments.etf.suim.*
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-  '//zzzz',
-  'TR.manual.testManual13'
-);</scriptText>
-						</con:configuration>
-					</con:assertion>
-					<con:credentials>
-						<con:authType>No Authorization</con:authType>
-					</con:credentials>
-					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-					<con:jmsPropertyConfig />
-					<con:parameters>
-						<con:parameter>
-							<con:name>request</con:name>
-							<con:value>GetCapabilities</con:value>
-							<con:style>QUERY</con:style>
-							<con:default>GetCapabilities</con:default>
-							<con:path xsi:nil="true" />
-							<con:description xsi:nil="true" />
-						</con:parameter>
-						<con:parameter>
-							<con:name>service</con:name>
-							<con:value>${#Project#service}</con:value>
-							<con:style>QUERY</con:style>
-							<con:default>${#Projec#service}</con:default>
-							<con:path xsi:nil="true" />
-							<con:description xsi:nil="true" />
-						</con:parameter>
-					</con:parameters>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="7887cf75-a7c9-4e9d-98b4-bdfc993153a0" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at14-getcapabilities-map-coupled-resource-metadata-url" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that, in case of a MetadataURL element is provided, a linkage is provided to a metadata document.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at14-getcapabilities-map-coupled-resource-metadata-url" target="_blank">Map Coupled Resource metadata URL</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="1b2b8893-2b6f-46d3-b4dc-84189e50a663">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-coupled-resource" id="6f967a15-cc2f-4fbb-8e2a-91e13189a312">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def layers = capabilities.Capability.depthFirst().findAll{it.name()=='Layer' &amp;&amp; it.MetadataURL.size() != 0};
-	layers.each{ layer ->
-		if(layer.MetadataURL.OnlineResource.size() == 0){
-			String[] assertParams = ['element', 'Layer/MetadataURL/OnlineResource'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-		}
-		else if(layer.MetadataURL.OnlineResource.'@xlink:href'.toString().length() == 0){
-			throw new TranslatableAssertionError("TR.onlineResourceLink");
-		}
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="11accc35-5947-4cf1-982e-acd4c41fb35b" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at15-getcapabilities-map-sds-type-with-extendedcapabilities" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that a SpatialDataService Type element is given within the ExtendedCapabilities section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at15-getcapabilities-map-sds-type-with-extendedcapabilities" target="_blank">Map SDS Type with Extended Capabilities</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="230f5b22-ae91-499f-b6c1-4fc477e97f47">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-sds-type" id="759c9534-c611-476f-9614-859bf60af037">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def spatialDataServiceType = capabilities.Capability.ExtendedCapabilities.SpatialDataServiceType;
-	if(spatialDataServiceType.size() != 1){
-		String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-	}
-	else if(spatialDataServiceType.toString().length() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-	else if(spatialDataServiceType.toString() != 'view'){
-		throw new TranslatableAssertionError("TR.invalidSpatialDataServiceType");
-	}
-}</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="9ff20c0a-df73-402e-8ac1-4d166a3d3336" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at16-getcapabilities-keyword-node" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that at least one keyword from the "Classification of Spatial data Services" is provided.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at16-getcapabilities-keyword-node" target="_blank">Keyword Node</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="cafe2a50-442c-410c-abc6-aac6c5ee1990">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-keyword" id="850d6fd7-70d4-44a6-a938-f485b77abdad">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-def classificationSDS = ['humanInteractionService', 'humanCatalogueViewer', 'humanGeographicViewer', 'humanGeographicSpreadsheetViewer', 'humanServiceEditor', 'humanChainDefinitionEditor', 'humanWorkflowEnactmentManager', 'humanGeographicFeatureEditor', 'humanGeographicSymbolEditor', 'humanFeatureGeneralizationEditor', 'humanGeographicDataStructureViewer', 'infoManagementService', 'infoFeatureAccessService', 'infoMapAccessService', 'infoCoverageAccessService', 'infoSensorDescriptionService', 'infoProductAccessService', 'infoFeatureTypeService', 'infoCatalogueService', 'infoRegistryService', 'infoGazetteerService', 'infoOrderHandlingService', 'infoStandingOrderService', 'taskManagementService', 'chainDefinitionService', 'workflowEnactmentService', 'subscriptionService', 'spatialProcessingService', 'spatialCoordinateConversionService', 'spatialCoordinateTransformationService', 'spatialCoverageVectorConversionService', 'spatialImageCoordinateConversionService', 'spatialRectificationService', 'spatialOrthorectificationService', 'spatialSensorGeometryModelAdjustmentService', 'spatialImageGeometryModelConversionService', 'spatialSubsettingService', 'spatialSamplingService', 'spatialTilingChangeService', 'spatialDimensionMeasurementService', 'spatialFeatureManipulationService', 'spatialFeatureMatchingService', 'spatialFeatureGeneralizationService', 'spatialRouteDeterminationService', 'spatialPositioningService', 'spatialProximityAnalysisService', 'thematicProcessingService', 'thematicGoparameterCalculationService', 'thematicClassificationService', 'thematicFeatureGeneralizationService', 'thematicSubsettingService', 'thematicSpatialCountingService', 'thematicChangeDetectionService', 'thematicGeographicInformationExtractionService', 'thematicImageProcessingService', 'thematicReducedResolutionGenerationService', 'thematicImageManipulationService', 'thematicImageUnderstandingService', 'thematicImageSynthesisService', 'thematicMultibandImageManipulationService', 'thematicObjectDetectionService', 'thematicGeoparsingService', 'thematicGeocodingService', 'temporalProcessingService', 'temporalReferenceSystemTransformationService', 'temporalSubsettingService', 'temporalSamplingService', 'temporalProximityAnalysisService', 'metadataProcessingService', 'metadataStatisticalCalculationService', 'metadataGeographicAnnotationService', 'comService', 'comEncodingService', 'comTransferService', 'comGeographicCompressionService', 'comGeographicFormatConversionService', 'comMessagingService', 'comRemoteFileAndExecutableManagement'];
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def keywords = capabilities.Service.depthFirst().findAll{it.name() == 'Keyword'};
-	def keywordInclassification = false;
-	keywords.each{keyword ->
-		if(keyword in classificationSDS){
-			keywordInclassification = true;
-		}
-	}
-	if(!keywordInclassification){
-		throw new TranslatableAssertionError("TR.atLeastOneKeywordInClassification");
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="186d16f6-d9e7-4e07-a1f9-0f3759e2e883" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at17-getcapabilities-keyword-list" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that if additional keywords are provided they are mapped into a KeywordList element.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at17-getcapabilities-keyword-list" target="_blank">Keyword List</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="3ef728d9-d606-40f8-b0e1-0ad47ceb72a7">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-keyword-list" id="3d7db4fb-d6d7-4116-90c0-b644e99df7bc">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def keywords = capabilities.Service.depthFirst().findAll{it.name() == 'Keyword'};
-	def keywordListChilds = capabilities.Service.KeywordList.depthFirst().findAll{it.name() == 'Keyword'};
-	
-	if(keywords.size() > 1){
-		if(capabilities.Service.KeywordList.size() != 1){
-			String[] assertParams = ['element', 'Service.KeywordList'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-		}
-		else if(keywords.size() != keywordListChilds.size()){
-			throw new TranslatableAssertionError("TR.keywordsInKeywordList");
-		}
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="d1c55361-6317-48a7-9bb6-b6fefe721317" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at18-getcapabilities-keyword-in-extendedcapabilities" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that keywords are mapped as Keyword and MandatoryKeyword elements into ExtendedCapabilities section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at18-getcapabilities-keyword-in-extendedcapabilities" target="_blank">Keyword within ExtendedCapabilities</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="e0819518-490a-45d8-9158-197321b149fc">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-keyword-extendedcapabilities" id="e34b6ecb-b893-4756-a706-19d83cf014d0">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def keywordsExtended = capabilities.Capability.ExtendedCapabilities.Keyword;
-	def keywordsMandatory = capabilities.Capability.ExtendedCapabilities.MandatoryKeyword;
-
-	if(keywordsMandatory.size() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/MandatoryKeyword'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	if(keywordsMandatory.toString().length() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/MandatoryKeyword'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="ac1256e4-4f73-4205-8f81-759c177df734" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at19-getcapabilities-geographic-boundingbox" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that a Geographic Bounding Box is given for each Layer element.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at19-getcapabilities-geographic-boundingbox" target="_blank">Geographic BoundingBox</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="4a797b0d-56d3-47cd-84ad-9009a52a95da">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="httprequest" name="manual-check" id="945130cc-ea59-47b2-97e0-e0aae29d4e3b" disabled="true">
-				<con:settings />
-				<con:config method="GET" xsi:type="con:HttpRequest" id="e647d915-e5d7-4086-a2dd-319943a7138c" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:settings>
-						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-					</con:settings>
-					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
-					<con:request />
-					<con:assertion type="GroovyScriptAssertion" id="5f58da87-03f2-481a-ac10-b7a0ad5402a9" name="Script Assertion">
-						<con:configuration>
-							<scriptText>import de.interactive_instruments.etf.suim.*
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-  '//zzzz',
-  'TR.manual.testManual19'
-);</scriptText>
-						</con:configuration>
-					</con:assertion>
-					<con:credentials>
-						<con:authType>No Authorization</con:authType>
-					</con:credentials>
-					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-					<con:jmsPropertyConfig />
-					<con:parameters>
-						<con:parameter>
-							<con:name>request</con:name>
-							<con:value>GetCapabilities</con:value>
-							<con:style>QUERY</con:style>
-							<con:default>GetCapabilities</con:default>
-							<con:path xsi:nil="true" />
-							<con:description xsi:nil="true" />
-						</con:parameter>
-						<con:parameter>
-							<con:name>service</con:name>
-							<con:value>${#Project#service}</con:value>
-							<con:style>QUERY</con:style>
-							<con:default>${#Project#service}</con:default>
-							<con:path xsi:nil="true" />
-							<con:description xsi:nil="true" />
-						</con:parameter>
-					</con:parameters>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-geographic-boundingbox" id="3a31614c-ea67-42c0-ae0a-f530bf3dffcf">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def layers = capabilities.Capability.depthFirst().findAll{it.name()=='Layer'};
-	layers.each{ layer ->
-		def inheritedProperty = [];
-		def layerParent = layer.parent();
-		while(layerParent.name() == 'Layer'){
-			if(layerParent.EX_GeographicBoundingBox.size() == 1){
-				inheritedProperty &lt;&lt; layerParent.EX_GeographicBoundingBox;
-			}
-			else if(layerParent.EX_GeographicBoundingBox.size() > 1){
-				String[] assertParams = ['element', 'Layer/EX_GeographicBoundingBox'];
-				throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-			}
-			layerParent = layerParent.parent();
-		}
-		if(layer.EX_GeographicBoundingBox.size() != 1 &amp;&amp; (inheritedProperty.size() == 0)){
-			String[] assertParams = ['element', 'Layer/EX_GeographicBoundingBox'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-		}
-	}
-	def ts = testRunner.testCase.testSuite.project.testSuites['GetCapabilities_Operation'].testCases['at19-getcapabilities-geographic-boundingbox'].getTestStepByName('manual-check');
-	ts.setDisabled(false);
-	ts.run(testRunner, context);
-}</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="7c8dc932-8550-4120-8649-2c0d349c9db6" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at20-getcapabilities-date-type" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that one of the following dates (date of publication, date of last revision or date of creation) is provided.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at20-getcapabilities-date-type" target="_blank">Date type</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="eee91f0c-c780-4313-9d16-581bf306364f">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-date-extended" id="d86bd9a3-b126-453e-8b91-416c2a6d5db5">
-				<con:settings />
-				<con:config>
-					<script>
-						<![CDATA[import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def temporalReferences = capabilities.Capability.ExtendedCapabilities.TemporalReference;
-	if(temporalReferences.size() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	temporalReferences.each{ temporalReference ->
-		if(temporalReference.DateOfPublication.size() == 0 && temporalReference.DateOfLastRevision.size() == 0 && temporalReference.DateOfCreation.size() == 0){
-			throw new TranslatableAssertionError("TR.atLeastOneDateType");
-		}
-		if(temporalReference.DateOfPublication.toString().length() == 0 && temporalReference.DateOfLastRevision.toString().length() == 0 && temporalReference.DateOfCreation.toString().length() == 0){
-			String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference/DateOfPublication'];
-			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-		}
-		if(temporalReference.DateOfPublication.size() == 1 && !(temporalReference.DateOfPublication ==~ /\d{4}\-\d{2}\-\d{2}/)){
-			throw new TranslatableAssertionError("TR.wrongDateFormat");
-		}
-		if(temporalReference.DateOfLastRevision.size() == 1 && !(temporalReference.DateOfLastRevision ==~ /\d{4}\-\d{2}\-\d{2}/)){
-			throw new TranslatableAssertionError("TR.wrongDateFormat");
-		}
-		if(temporalReference.DateOfCreation.size() == 1 && !(temporalReference.DateOfCreation ==~ /\d{4}\-\d{2}\-\d{2}/)){
-			throw new TranslatableAssertionError("TR.wrongDateFormat");
-		}
-	}
-}
-]]>
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="2e9eace6-90c7-458b-ac9e-3d1b8b50f83a" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at21-getcapabilities-temporal-reference" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that at least one TemporalReference is given into the ExtendedCapabilities section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at21-getcapabilities-temporal-reference" target="_blank">Temporal reference</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="5dc70814-c2d8-4eaa-a0b7-853b133bb90b">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-temporal-reference" id="7fcde33b-bfae-4b47-8b27-b2918d1b09eb">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def temporalReferences = capabilities.Capability.ExtendedCapabilities.TemporalReference;
-	if(temporalReferences.size() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	if(temporalReferences.toString().length() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="d698d80a-f0d7-4dfa-95f9-8bd050fd37be" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at22-getcapabilities-degree-of-conformity" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that is provided a Degree element indicating the degree of conformity with the implementing rules provided in Art. 7.1 (Interoperability of spatial data sets and services) of the INSPIRE Directive [Directive 2007/2/EC].</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at22-getcapabilities-degree-of-conformity" target="_blank">Degree of conformity</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-case" id="7fc7aa8a-6325-4bbf-8aee-1f91176fb9b9">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-degree-conformity" id="676f05e3-eca4-4784-ab05-937b55e15d0f">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def conformity = capabilities.Capability.ExtendedCapabilities.Conformity;
-	conformity.each{confor ->
-		if(confor.Degree.size() != 1){
-			String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Degree'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-		}
-		if(!(confor.Degree == 'notEvaluated' || confor.Degree == 'conformant' || confor.Degree == 'notConformant')){
-			throw new TranslatableAssertionError("TR.wrongConformityDegree");
-		}
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="9b316d50-9263-4694-9d2b-5ee557cdcd30" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at23-getcapabilities-conformity" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that is provided a Conformity element into the Extended Capabilities section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at23-getcapabilities-conformity" target="_blank">Conformity</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="d11dbc5e-6ba3-49f8-88a9-f50401c47f3e">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-conformity" id="6d1f1598-cb9d-4711-bcf9-48d0e2db8753">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def conformity = capabilities.Capability.ExtendedCapabilities.Conformity;
-	if(conformity.size() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/Conformity'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	if(conformity.toString().length() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/Conformity'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="3afb9804-1b1e-4cb9-8005-327d6b11f70e" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at24-getcapabilities-fees-node" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that a Fees node is provided defining the conditions for access and use.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at24-getcapabilities-fees-node" target="_blank">Fees node</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="d0c2bd24-6233-4cba-a0a9-03f1cf1a55bd">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-fees" id="df70627f-7d03-4c3e-b2da-ab0582369f91">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def fees = capabilities.Service.Fees;
-	if(fees.size() == 0){
-		String[] assertParams = ['element', 'Service/Fees'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	if(fees.toString().length() == 0){
-		String[] assertParams = ['element', 'Service/Fees'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="7904a83f-adbc-470b-8e26-aecf3522fe95" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at25-getcapabilities-contact-organization" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that the responsible party information is mapped to the wms:ContactOrganization element of the wms:ContactPersonPrimary within the wms:ContactInformation element.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at25-getcapabilities-contact-organization" target="_blank">Contact Organization</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="dee035b7-21b6-48df-b28e-6ab8d2f8f9bf">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-contact-organization" id="08f87997-ab0e-4dd6-871a-fd9462a351df">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def contactInformation = capabilities.Service.ContactInformation;
-	def contactOrganization = capabilities.Service.ContactInformation.ContactPersonPrimary.ContactOrganization;
-	if(contactInformation.size() != 1){
-		String[] assertParams = ['element', 'Service/ContactInformation'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-	}
-	if(contactOrganization.size() == 0){
-		String[] assertParams = ['element', 'Service/ContactInformation/ContactPersonPrimary/ContactOrganization'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	if(contactOrganization.toString().length() == 0){
-		String[] assertParams = ['element', 'Service/ContactInformation/ContactPersonPrimary/ContactOrganization'];
-		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-	}
-}</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="a8271ecc-ffaf-40bc-bf6c-55654a5eb5a1" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at26-getcapabilities-contact-position" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that the responsible party role is mapped to the ContactPosition element within the ContactInformation section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at26-getcapabilities-contact-position" target="_blank">Contact Position</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="cd6c8a6e-417d-48f7-b6f1-0019227b11dc">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-contact-position" id="820872ec-88bb-4107-83fb-8d81b39acac2">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def validValues = ['resourceProvider', 'custodian', 'owner', 'user', 'distributor', 'originator', 'pointOfContact', 'principalInvestigator', 'processor', 'publisher', 'author'];
-	def contactPosition = capabilities.Service.ContactInformation.ContactPosition;
-	if(contactPosition.size() == 0){
-		String[] assertParams = ['element', 'Service/ContactInformation/ContactPosition'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-	contactPosition.each{contact ->
-		if(!(contact in validValues)){
-			String[] assertParams = ['value', contact.toString()];
-			throw new TranslatableAssertionError("TR.wrongContactPosition", assertParams);
-		}
-	}
-}</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="3002d651-bd15-40ab-ad85-ab2a6792c688" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at27-getcapabilities-point-of-contact" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that are provided a OrganisationName and Emailaddress elements within the MetadataPointOfcontact section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at27-getcapabilities-point-of-contact" target="_blank">Point of Contact</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="5f72ae9c-e477-4738-8aaa-027d1762bcbc">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-point-of-contact-extended-name-email" id="c6b85696-a5bc-4fa3-867e-ce64360725d4">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def metadataPointOfContact = capabilities.Capability.ExtendedCapabilities.MetadataPointOfContact;
-	metadataPointOfContact.each{metadataPOC ->
-		log.info(metadataPOC.Role);
-		if(metadataPOC.OrganisationName.size() == 0){
-			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact/OrganisationName'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-		}
-		if(metadataPOC.OrganisationName.toString().length() == 0){
-			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact/OrganisationName'];
-			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-		}
-		if(metadataPOC.EmailAddress.size() == 0){
-			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact/EmailAddress'];
-			throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-		}
-		if(metadataPOC.EmailAddress.toString().length() == 0){
-			String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact/EmailAddress'];
-			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-		}
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="2358e779-eb98-4a6c-be08-218c4b43661c" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at28-getcapabilities-point-of-contact-in-extendedcapabilities" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that a MetadataPointOfContact element is provided within the ExtendedCapabilities section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at28-getcapabilities-point-of-contact-in-extendedcapabilities" target="_blank">Point of Contact in Extended Capabilities</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="ac35c9c2-7ec3-4493-8265-de8326ea686d">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-point-of-contact-extended" id="1383ae93-0e23-4952-b2cf-05ae403e6567">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def metadataPointOfContact = capabilities.Capability.ExtendedCapabilities.MetadataPointOfContact;
-	if(metadataPointOfContact.size() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>
-		<con:testCase id="bd8625dd-1305-43c3-86fd-e8ba25a89fc2" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at29-getcapabilities-metadata-date" searchProperties="true">
-			<con:description>
-				<![CDATA[<p>Test that is provided a MetadataDate element within the ExtendedCapabilities section.</p>
-<p>More information: <a href="http://inspire.ec.europa.eu/id/ats/view-service/master/iso-19128/at29-getcapabilities-metadata-date" target="_blank">Metadata Date</a></p>]]>
-			</con:description>
-			<con:settings />
-			<con:testStep type="testcasedependency" name="check-initial-testcase" id="a5a6ac85-2c4a-4774-ae5d-72c4c1544c55">
-				<con:settings />
-				<con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-					<con:targetTestCase>452f3b7c-9db1-47c7-9621-6f76b761feea</con:targetTestCase>
-					<con:properties />
-					<con:returnProperties />
-					<con:runMode>PARALLELL</con:runMode>
-				</con:config>
-			</con:testStep>
-			<con:testStep type="groovy" name="check-metadata-date" id="ac649b4b-8f33-4379-a815-fdd49e35a988">
-				<con:settings />
-				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
-def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
-def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
-def capabilities = new XmlSlurper(false, true).parseText(response);
-
-def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
-
-if(scenario == '2'){
-	def date = capabilities.Capability.ExtendedCapabilities.MetadataDate;
-	if(date.size() != 1){
-		String[] assertParams = ['element', 'ExtendedCapabilities/MetadataDate'];
-		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-	}
-	if(!(date ==~ /\d{4}\-\d{2}\-\d{2}/)){
-		throw new TranslatableAssertionError("TR.wrongDateFormat");
-	}
-}
-					</script>
-				</con:config>
-			</con:testStep>
-			<con:properties />
-		</con:testCase>-->
 		<con:testCase id="4744842a-f74f-48d2-8ae5-5ddc91647dc5" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="at30-getcapabilities-getcapabilities-operation-metadata" searchProperties="true">
 			<con:description>
 				<![CDATA[<p>Test that GetCapabilities operation metadata is mapped to the wms:GetCapabilities element.</p>
@@ -6736,56 +5671,126 @@ ts.setDisabled(true);</script>
 def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
+def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
 
-def isoLang = ['aar', 'abk', 'ace', 'ach', 'ada', 'ady', 'afa', 'afh', 'afr', 'ain', 'aka', 'akk', 'alb', 'ale', 'alg', 'alt', 'amh', 'ang', 'anp', 'apa', 'ara', 'arc', 'arg', 'arm', 'arn', 'arp', 'art', 'arw', 'asm', 'ast', 'ath', 'aus', 'ava', 'ave', 'awa', 'aym', 'aze', 'bad', 'bai', 'bak', 'bal', 'bam', 'ban', 'baq', 'bas', 'bat', 'bej', 'bel', 'bem', 'ben', 'ber', 'bho', 'bih', 'bik', 'bin', 'bis', 'bla', 'bnt', 'bos', 'bra', 'bre', 'btk', 'bua', 'bug', 'bul', 'bur', 'byn', 'cad', 'cai', 'car', 'cat', 'cau', 'ceb', 'cel', 'cha', 'chb', 'che', 'chg', 'chi', 'chk', 'chm', 'chn', 'cho', 'chp', 'chr', 'chu', 'chv', 'chy', 'cmc', 'cnr', 'cop', 'cor', 'cos', 'cpe', 'cpf', 'cpp', 'cre', 'crh', 'crp', 'csb', 'cus', 'cze', 'dak', 'dan', 'dar', 'day', 'del', 'den', 'dgr', 'din', 'div', 'doi', 'dra', 'dsb', 'dua', 'dum', 'dut', 'dyu', 'dzo', 'efi', 'egy', 'eka', 'elx', 'eng', 'enm', 'epo', 'est', 'ewe', 'ewo', 'fan', 'fao', 'fat', 'fij', 'fil', 'fin', 'fiu', 'fon', 'fre', 'frm', 'fro', 'frr', 'frs', 'fry', 'ful', 'fur', 'gaa', 'gay', 'gba', 'gem', 'geo', 'ger', 'gez', 'gil', 'gla', 'gle', 'glg', 'glv', 'gmh', 'goh', 'gon', 'gor', 'got', 'grb', 'grc', 'gre', 'grn', 'gsw', 'guj', 'gwi', 'hai', 'hat', 'hau', 'haw', 'heb', 'her', 'hil', 'him', 'hin', 'hit', 'hmn', 'hmo', 'hrv', 'hsb', 'hun', 'hup', 'iba', 'ibo', 'ice', 'ido', 'iii', 'ijo', 'iku', 'ile', 'ilo', 'ina', 'inc', 'ind', 'ine', 'inh', 'ipk', 'ira', 'iro', 'ita', 'jav', 'jbo', 'jpn', 'jpr', 'jrb', 'kaa', 'kab', 'kac', 'kal', 'kam', 'kan', 'kar', 'kas', 'kau', 'kaw', 'kaz', 'kbd', 'kha', 'khi', 'khm', 'kho', 'kik', 'kin', 'kir', 'kmb', 'kok', 'kom', 'kon', 'kor', 'kos', 'kpe', 'krc', 'krl', 'kro', 'kru', 'kua', 'kum', 'kur', 'kut', 'lad', 'lah', 'lam', 'lao', 'lat', 'lav', 'lez', 'lim', 'lin', 'lit', 'lol', 'loz', 'ltz', 'lua', 'lub', 'lug', 'lui', 'lun', 'luo', 'lus', 'mac', 'mad', 'mag', 'mah', 'mai', 'mak', 'mal', 'man', 'mao', 'map', 'mar', 'mas', 'may', 'mdf', 'mdr', 'men', 'mga', 'mic', 'min', 'mis', 'mkh', 'mlg', 'mlt', 'mnc', 'mni', 'mno', 'moh', 'mon', 'mos', 'mul', 'mun', 'mus', 'mwl', 'mwr', 'myn', 'myv', 'nah', 'nai', 'nap', 'nau', 'nav', 'nbl', 'nde', 'ndo', 'nds', 'nep', 'new', 'nia', 'nic', 'niu', 'nno', 'nob', 'nog', 'non', 'nor', 'nqo', 'nso', 'nub', 'nwc', 'nya', 'nym', 'nyn', 'nyo', 'nzi', 'oci', 'oji', 'ori', 'orm', 'osa', 'oss', 'ota', 'oto', 'paa', 'pag', 'pal', 'pam', 'pan', 'pap', 'pau', 'peo', 'per', 'phi', 'phn', 'pli', 'pol', 'pon', 'por', 'pra', 'pro', 'pus', 'qaa-qtz', 'que', 'raj', 'rap', 'rar', 'roa', 'roh', 'rom', 'rum', 'run', 'rup', 'rus', 'sad', 'sag', 'sah', 'sai', 'sal', 'sam', 'san', 'sas', 'sat', 'scn', 'sco', 'sel', 'sem', 'sga', 'sgn', 'shn', 'sid', 'sin', 'sio', 'sit', 'sla', 'slo', 'slv', 'sma', 'sme', 'smi', 'smj', 'smn', 'smo', 'sms', 'sna', 'snd', 'snk', 'sog', 'som', 'son', 'sot', 'spa', 'srd', 'srn', 'srp', 'srr', 'ssa', 'ssw', 'suk', 'sun', 'sus', 'sux', 'swa', 'swe', 'syc', 'syr', 'tah', 'tai', 'tam', 'tat', 'tel', 'tem', 'ter', 'tet', 'tgk', 'tgl', 'tha', 'tib', 'tig', 'tir', 'tiv', 'tkl', 'tlh', 'tli', 'tmh', 'tog', 'ton', 'tpi', 'tsi', 'tsn', 'tso', 'tuk', 'tum', 'tup', 'tur', 'tut', 'tvl', 'twi', 'tyv', 'udm', 'uga', 'uig', 'ukr', 'umb', 'und', 'urd', 'uzb', 'vai', 'ven', 'vie', 'vol', 'vot', 'wak', 'wal', 'war', 'was', 'wel', 'wen', 'wln', 'wol', 'xal', 'xho', 'yao', 'yap', 'yid', 'yor', 'ypk', 'zap', 'zbl', 'zen', 'zgh', 'zha', 'znd', 'zul', 'zun', 'zxx', 'zza'];
-def defaultLanguage = capabilities.Capability.ExtendedCapabilities.SupportedLanguages.DefaultLanguage.Language.toString();
-def ts = testRunner.testCase.testSuite.project.testSuites["Language_Requirements"].testCases["at70-language-response"].getTestStepByName('http-request-getcapabilities-language-response');
-ts.setDisabled(false);
+if (scenario== '1' || scenario == '2'){
+	def isoLang = ['aar', 'abk', 'ace', 'ach', 'ada', 'ady', 'afa', 'afh', 'afr', 'ain', 'aka', 'akk', 'alb', 'ale', 'alg', 'alt', 'amh', 'ang', 'anp', 'apa', 'ara', 'arc', 'arg', 'arm', 'arn', 'arp', 'art', 'arw', 'asm', 'ast', 'ath', 'aus', 'ava', 'ave', 'awa', 'aym', 'aze', 'bad', 'bai', 'bak', 'bal', 'bam', 'ban', 'baq', 'bas', 'bat', 'bej', 'bel', 'bem', 'ben', 'ber', 'bho', 'bih', 'bik', 'bin', 'bis', 'bla', 'bnt', 'bos', 'bra', 'bre', 'btk', 'bua', 'bug', 'bul', 'bur', 'byn', 'cad', 'cai', 'car', 'cat', 'cau', 'ceb', 'cel', 'cha', 'chb', 'che', 'chg', 'chi', 'chk', 'chm', 'chn', 'cho', 'chp', 'chr', 'chu', 'chv', 'chy', 'cmc', 'cnr', 'cop', 'cor', 'cos', 'cpe', 'cpf', 'cpp', 'cre', 'crh', 'crp', 'csb', 'cus', 'cze', 'dak', 'dan', 'dar', 'day', 'del', 'den', 'dgr', 'din', 'div', 'doi', 'dra', 'dsb', 'dua', 'dum', 'dut', 'dyu', 'dzo', 'efi', 'egy', 'eka', 'elx', 'eng', 'enm', 'epo', 'est', 'ewe', 'ewo', 'fan', 'fao', 'fat', 'fij', 'fil', 'fin', 'fiu', 'fon', 'fre', 'frm', 'fro', 'frr', 'frs', 'fry', 'ful', 'fur', 'gaa', 'gay', 'gba', 'gem', 'geo', 'ger', 'gez', 'gil', 'gla', 'gle', 'glg', 'glv', 'gmh', 'goh', 'gon', 'gor', 'got', 'grb', 'grc', 'gre', 'grn', 'gsw', 'guj', 'gwi', 'hai', 'hat', 'hau', 'haw', 'heb', 'her', 'hil', 'him', 'hin', 'hit', 'hmn', 'hmo', 'hrv', 'hsb', 'hun', 'hup', 'iba', 'ibo', 'ice', 'ido', 'iii', 'ijo', 'iku', 'ile', 'ilo', 'ina', 'inc', 'ind', 'ine', 'inh', 'ipk', 'ira', 'iro', 'ita', 'jav', 'jbo', 'jpn', 'jpr', 'jrb', 'kaa', 'kab', 'kac', 'kal', 'kam', 'kan', 'kar', 'kas', 'kau', 'kaw', 'kaz', 'kbd', 'kha', 'khi', 'khm', 'kho', 'kik', 'kin', 'kir', 'kmb', 'kok', 'kom', 'kon', 'kor', 'kos', 'kpe', 'krc', 'krl', 'kro', 'kru', 'kua', 'kum', 'kur', 'kut', 'lad', 'lah', 'lam', 'lao', 'lat', 'lav', 'lez', 'lim', 'lin', 'lit', 'lol', 'loz', 'ltz', 'lua', 'lub', 'lug', 'lui', 'lun', 'luo', 'lus', 'mac', 'mad', 'mag', 'mah', 'mai', 'mak', 'mal', 'man', 'mao', 'map', 'mar', 'mas', 'may', 'mdf', 'mdr', 'men', 'mga', 'mic', 'min', 'mis', 'mkh', 'mlg', 'mlt', 'mnc', 'mni', 'mno', 'moh', 'mon', 'mos', 'mul', 'mun', 'mus', 'mwl', 'mwr', 'myn', 'myv', 'nah', 'nai', 'nap', 'nau', 'nav', 'nbl', 'nde', 'ndo', 'nds', 'nep', 'new', 'nia', 'nic', 'niu', 'nno', 'nob', 'nog', 'non', 'nor', 'nqo', 'nso', 'nub', 'nwc', 'nya', 'nym', 'nyn', 'nyo', 'nzi', 'oci', 'oji', 'ori', 'orm', 'osa', 'oss', 'ota', 'oto', 'paa', 'pag', 'pal', 'pam', 'pan', 'pap', 'pau', 'peo', 'per', 'phi', 'phn', 'pli', 'pol', 'pon', 'por', 'pra', 'pro', 'pus', 'qaa-qtz', 'que', 'raj', 'rap', 'rar', 'roa', 'roh', 'rom', 'rum', 'run', 'rup', 'rus', 'sad', 'sag', 'sah', 'sai', 'sal', 'sam', 'san', 'sas', 'sat', 'scn', 'sco', 'sel', 'sem', 'sga', 'sgn', 'shn', 'sid', 'sin', 'sio', 'sit', 'sla', 'slo', 'slv', 'sma', 'sme', 'smi', 'smj', 'smn', 'smo', 'sms', 'sna', 'snd', 'snk', 'sog', 'som', 'son', 'sot', 'spa', 'srd', 'srn', 'srp', 'srr', 'ssa', 'ssw', 'suk', 'sun', 'sus', 'sux', 'swa', 'swe', 'syc', 'syr', 'tah', 'tai', 'tam', 'tat', 'tel', 'tem', 'ter', 'tet', 'tgk', 'tgl', 'tha', 'tib', 'tig', 'tir', 'tiv', 'tkl', 'tlh', 'tli', 'tmh', 'tog', 'ton', 'tpi', 'tsi', 'tsn', 'tso', 'tuk', 'tum', 'tup', 'tur', 'tut', 'tvl', 'twi', 'tyv', 'udm', 'uga', 'uig', 'ukr', 'umb', 'und', 'urd', 'uzb', 'vai', 'ven', 'vie', 'vol', 'vot', 'wak', 'wal', 'war', 'was', 'wel', 'wen', 'wln', 'wol', 'xal', 'xho', 'yao', 'yap', 'yid', 'yor', 'ypk', 'zap', 'zbl', 'zen', 'zgh', 'zha', 'znd', 'zul', 'zun', 'zxx', 'zza'];
+	def defaultLanguage = capabilities.Capability.ExtendedCapabilities.SupportedLanguages.DefaultLanguage.Language.toString();
+	def ts = testRunner.testCase.testSuite.project.testSuites["Language_Requirements"].testCases["at70-language-response"].getTestStepByName('http-request-getcapabilities-language-response');
+	ts.setDisabled(false);
 
-if(!(defaultLanguage in isoLang)){
-	throw new TranslatableAssertionError("TR.languageNotISO");
-}
-def supportedLanguages = [];
-supportedLanguages &lt;&lt; capabilities.Capability.ExtendedCapabilities.SupportedLanguages.DefaultLanguage.Language;
-
-for (x in capabilities.Capability.ExtendedCapabilities.SupportedLanguages.SupportedLanguage){
-	if(x.Language in isoLang){
-		supportedLanguages &lt;&lt; x.Language;
-	}
-	else{
+	if(!(defaultLanguage in isoLang)){
 		throw new TranslatableAssertionError("TR.languageNotISO");
 	}
-}
+	def supportedLanguages = [];
+	supportedLanguages &lt;&lt; capabilities.Capability.ExtendedCapabilities.SupportedLanguages.DefaultLanguage.Language;
 
-// Request without language parameter
-testRunner.testCase.setPropertyValue('language', '');
-ts.run(testRunner, context);
-def capabilitiesLanguaged = new XmlSlurper(false, true).parseText(ts.getPropertyValue("Response"));
-if (defaultLanguage != capabilitiesLanguaged.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString()){
-	throw new TranslatableAssertionError("TR.reponseLanguageShallBeDefault");
-}
+	for (x in capabilities.Capability.ExtendedCapabilities.SupportedLanguages.SupportedLanguage){
+		if(x.Language in isoLang){
+			supportedLanguages &lt;&lt; x.Language;
+		}
+		else{
+			throw new TranslatableAssertionError("TR.languageNotISO");
+		}
+	}
 
-// Request with invalid parameter
-testRunner.testCase.setPropertyValue('language', 'zzzz');
-ts.run(testRunner, context);
-capabilitiesLanguaged = new XmlSlurper(false, true).parseText(ts.getPropertyValue("Response"));
-if (defaultLanguage != capabilitiesLanguaged.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString()){
-	throw new TranslatableAssertionError("TR.reponseLanguageShallBeDefault");
-}
+	// Request without language parameter
+	testRunner.testCase.setPropertyValue('language', '');
+	ts.run(testRunner, context);
+	def capabilitiesLanguaged = new XmlSlurper(false, true).parseText(ts.getPropertyValue("Response"));
+	if (defaultLanguage != capabilitiesLanguaged.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString()){
+		throw new TranslatableAssertionError("TR.reponseLanguageShallBeDefault");
+	}
 
-// Request for default and supported languages
-for (x in supportedLanguages){
-	testRunner.testCase.setPropertyValue('language', x.toString());
+	// Request with invalid parameter
+	testRunner.testCase.setPropertyValue('language', 'zzzz');
 	ts.run(testRunner, context);
 	capabilitiesLanguaged = new XmlSlurper(false, true).parseText(ts.getPropertyValue("Response"));
-	if (x != capabilitiesLanguaged.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString()){
-		String[] assertParams = ['requestedlanguage', x, 'responselanguage', capabilitiesLanguaged.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString()];
-		throw new TranslatableAssertionError("TR.reponseLanguageShallBeSameAsRequested", assertParams);
+	if (defaultLanguage != capabilitiesLanguaged.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString()){
+		throw new TranslatableAssertionError("TR.reponseLanguageShallBeDefault");
 	}
-}
-ts.setDisabled(true);</script>
+
+	// Request for default and supported languages
+	for (x in supportedLanguages){
+		testRunner.testCase.setPropertyValue('language', x.toString());
+		ts.run(testRunner, context);
+		capabilitiesLanguaged = new XmlSlurper(false, true).parseText(ts.getPropertyValue("Response"));
+		if (x != capabilitiesLanguaged.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString()){
+			String[] assertParams = ['requestedlanguage', x, 'responselanguage', capabilitiesLanguaged.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString()];
+			throw new TranslatableAssertionError("TR.reponseLanguageShallBeSameAsRequested", assertParams);
+		}
+	}
+	ts.setDisabled(true);
+	}
+</script>
 				</con:config>
 			</con:testStep>
+			<con:testStep type="httprequest" name="manual-check" id="16315e54-5b2d-4743-be2c-98b5d53b377f">
+					<con:settings />
+					<con:config method="GET" xsi:type="con:HttpRequest" id="ed7394c2-5f5b-4925-8935-fc99727a40b5" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+						<con:settings>
+							<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+						</con:settings>
+						<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+						<con:request />
+						<con:assertion type="GroovyScriptAssertion" id="a0f60266-f59f-4beb-bef4-a8b39ab19e72" name="manual-check-language-response">
+							<con:configuration>
+								<scriptText>import de.interactive_instruments.etf.suim.*
+									import de.interactive_instruments.SUtils
+	import de.interactive_instruments.XmlUtils
+	import de.interactive_instruments.etf.model.exceptions.TestStepNotFoundException
+	import de.interactive_instruments.exceptions.EmptyContentParseException
+	import de.interactive_instruments.exceptions.XmlParseException
+	import de.interactive_instruments.xtf.ProjectHelper
+	import de.interactive_instruments.xtf.SOAPUI_I
+	import com.eviware.soapui.support.XmlHolder
+	Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+
+
+	def capabilities = new XmlSlurper().parseText(a.xml.getXml());
+
+	def scenario = '0';
+
+	if(capabilities.Capability.ExtendedCapabilities.size() == 0){
+		scenario = '3';
+			String[] assertParams = ['elementName', 'ResponseLanguage', 'scenario', scenario];
+			throw new TranslatableAssertionError('TR.manual.checkContent', assertParams);
+		}
+	log.info(scenario);
+	</scriptText>
+							</con:configuration>
+						</con:assertion>
+						<con:credentials>
+							<con:authType>No Authorization</con:authType>
+						</con:credentials>
+						<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+						<con:jmsPropertyConfig />
+						<con:parameters>
+							<con:parameter required="false" disableUrlEncoding="false">
+								<con:name>request</con:name>
+								<con:value>GetCapabilities</con:value>
+								<con:style>QUERY</con:style>
+								<con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type>
+								<con:default>${#Project#request}</con:default>
+								<con:description xsi:nil="true" />
+							</con:parameter>
+							<con:parameter>
+								<con:name>service</con:name>
+								<con:value>${#Project#service}</con:value>
+								<con:style>QUERY</con:style>
+								<con:default>${#Project#service}</con:default>
+								<con:path xsi:nil="true" />
+								<con:description xsi:nil="true" />
+							</con:parameter>
+						</con:parameters>
+					</con:config>
+				</con:testStep>
+
+
+
+
+
+
 			<con:properties>
 				<con:property>
 					<con:name>language</con:name>
@@ -6815,32 +5820,36 @@ ts.setDisabled(true);</script>
 def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
 def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
 def capabilities = new XmlSlurper(false, true).parseText(response);
+def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
 
-if(capabilities.Capability.ExtendedCapabilities.SupportedLanguages.size() != 1){
-	String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(capabilities.Capability.ExtendedCapabilities.SupportedLanguages.DefaultLanguage.size() != 1){
-	String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages/DefaultLanguage'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(capabilities.Capability.ExtendedCapabilities.SupportedLanguages.DefaultLanguage.Language.toString().length() == 0){
-	String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages/DefaultLanguage/Language'];
-	throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
-}
-for (x in capabilities.Capability.ExtendedCapabilities.SupportedLanguages.SupportedLanguage){
-	if(x.Language.toString().length() == 0){
-		String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages/SupportedLanguage'];
+
+if (scenario == '1' || scenario == '2'){
+	if(capabilities.Capability.ExtendedCapabilities.SupportedLanguages.size() != 1){
+		String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(capabilities.Capability.ExtendedCapabilities.SupportedLanguages.DefaultLanguage.size() != 1){
+		String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages/DefaultLanguage'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(capabilities.Capability.ExtendedCapabilities.SupportedLanguages.DefaultLanguage.Language.toString().length() == 0){
+		String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages/DefaultLanguage/Language'];
 		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
 	}
-}
-if(capabilities.Capability.ExtendedCapabilities.ResponseLanguage.size() != 1){
-	String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage'];
-	throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
-}
-if(capabilities.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString().length() == 0){
-	String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage/Language'];
-	throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	for (x in capabilities.Capability.ExtendedCapabilities.SupportedLanguages.SupportedLanguage){
+		if(x.Language.toString().length() == 0){
+			String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages/SupportedLanguage'];
+			throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+		}
+	}
+	if(capabilities.Capability.ExtendedCapabilities.ResponseLanguage.size() != 1){
+		String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage'];
+		throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+	}
+	if(capabilities.Capability.ExtendedCapabilities.ResponseLanguage.Language.toString().length() == 0){
+		String[] assertParams = ['element', 'ExtendedCapabilities/ResponseLanguage/Language'];
+		throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+	}
 }</script>
 				</con:config>
 			</con:testStep>
