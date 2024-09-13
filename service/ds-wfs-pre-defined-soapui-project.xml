@@ -37,13 +37,85 @@ Please note that for technical reasons this Executable Test Suite requires that 
             <con:config>
                <script>import de.interactive_instruments.xtf.*;
 SOAPUI_I.init(log,context,testRunner);
-
+testRunner.testCase.testSuite.project.setPropertyValue( 'extended_capabilities_scenario', '' );
 // Also update credentials
 TestSetup.init();
 
 ProjectHelper ph = new ProjectHelper();
 
 ph.getTestCase("AutoConfigure WFS").setPropertyValue("AutoConfigurationCompleted", "false");</script>
+            </con:config>
+         </con:testStep>
+         <con:testStep type="httprequest" name="http-request" id="c115d16c-e385-459b-af00-7288d5a2b557">
+            <con:settings />
+            <con:config method="GET" xsi:type="con:HttpRequest" id="213cca29-e734-4be7-b27b-f102724eef84" name="http-request" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+               <con:settings>
+                  <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+               </con:settings>
+               <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+               <con:request />
+               <con:assertion type="Valid HTTP Status Codes" id="27f61bb3-64a6-4022-9b10-59c678f999d7" name="Valid HTTP Status Codes">
+                  <con:configuration>
+                     <codes>200</codes>
+                  </con:configuration>
+               </con:assertion>
+               <con:assertion type="OwsExceptionReportAssertion" id="1b6fdd7c-c83e-4577-a44e-b8d3bf2d4d41" name="Fail if service returns OWS Exception Report" />
+               <con:assertion type="Response SLA Assertion" id="7da4ea5b-f7dd-43ab-a098-dfa6ec3dc814" name="Response SLA">
+                  <con:configuration>
+                     <SLA>30000</SLA>
+                  </con:configuration>
+               </con:assertion>
+               <con:credentials>
+                  <con:authType>No Authorization</con:authType>
+               </con:credentials>
+               <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+               <con:jmsPropertyConfig />
+               <con:parameters>
+                  <con:parameter>
+                     <con:name>request</con:name>
+                     <con:value>GetCapabilities</con:value>
+                     <con:style>QUERY</con:style>
+                     <con:default>GetCapabilities</con:default>
+                     <con:path xsi:nil="true" />
+                     <con:description xsi:nil="true" />
+                  </con:parameter>
+                  <con:parameter>
+                     <con:name>service</con:name>
+                     <con:value>${#Project#service}</con:value>
+                     <con:style>QUERY</con:style>
+                     <con:default>${#Project#service}</con:default>
+                     <con:path xsi:nil="true" />
+                     <con:description xsi:nil="true" />
+                  </con:parameter>
+                  <con:parameter>
+                     <con:name>version</con:name>
+                     <con:value>${#Project#version}</con:value>
+                     <con:style>QUERY</con:style>
+                     <con:default>${#Project#version}</con:default>
+                     <con:path xsi:nil="true" />
+                     <con:description xsi:nil="true" />
+                  </con:parameter>
+               </con:parameters>
+            </con:config>
+         </con:testStep>
+         <con:testStep type="groovy" name="set-extended-capabilities-scenario" id="5b8572b7-dfe7-4859-ad99-238542a7e422">
+            <con:settings />
+            <con:config>
+               <script>def response = context.expand('${http-request#Response}');
+def capabilities = new XmlSlurper().parseText(response);
+def scenario = '0';
+
+if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.size() == 0){
+   scenario = '3';
+}
+else if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.ResourceType.size() != 0){
+   scenario = '2';
+}
+else if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.MetadataUrl.size() != 0){
+   scenario = '1';
+}
+testRunner.testCase.testSuite.project.setPropertyValue( "extended_capabilities_scenario", scenario );
+log.info('Extended Capabilities Scenario: ' + scenario);</script>
             </con:config>
          </con:testStep>
          <con:properties>
@@ -145,10 +217,10 @@ if (endpoint.getQuery()) {
                             for (q in queryParams) {
                                     def pair = q.split("=");
                                     if (pair.length > 1) {
-	                                    testStep.getHttpRequest().addProperty(pair[0]);
-	                                    testStep.getHttpRequest().setPropertyValue(pair[0], pair[1]);
-	                                    log.debug("Added non-standard query parameter for the Getcapabilities requests: " + pair[0] + "=" + pair[1]);
-	                       		}
+                                       testStep.getHttpRequest().addProperty(pair[0]);
+                                       testStep.getHttpRequest().setPropertyValue(pair[0], pair[1]);
+                                       log.debug("Added non-standard query parameter for the Getcapabilities requests: " + pair[0] + "=" + pair[1]);
+                              }
                             }
                         }
                     }
@@ -202,10 +274,10 @@ if(!messageExchange.hasResponse()) {
 }
 
 if(messageExchange.responseContent.size()>7) {
-	final String xmlProlog = messageExchange.responseContent.substring(0,7);
-	if(!xmlProlog.trim().startsWith("&lt;")) {
-		throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") );
-	}
+   final String xmlProlog = messageExchange.responseContent.substring(0,7);
+   if(!xmlProlog.trim().startsWith("&lt;")) {
+      throw new TranslatableAssertionError("TR.invalidXmlProlog", "prolog", xmlProlog.replaceAll("\\p{C}", "?") );
+   }
 }</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -2735,18 +2807,18 @@ ph.disableTestSteps(checkedOperations);
 XmlHolder capResp = ph.getTestStepResult("GetCapabilities");
 
 for(operation in operations) {
-	String getEndpt=Util.getHttpGetOnlineResourceForOperation(capResp, operation); 
+   String getEndpt=Util.getHttpGetOnlineResourceForOperation(capResp, operation); 
    if(getEndpt!=null) {
-		def testStep = testRunner.testCase.getTestStepByName(operation);
+      def testStep = testRunner.testCase.getTestStepByName(operation);
       if(testStep!=null) {
-			testStep.setDisabled(false);
-		}
-		Util.setProjectProperty(testRunner, "endpt."+operation+".Get", getEndpt);
-	}
-	String postEndpt=Util.getHttpPostOnlineResourceForOperation(capResp, operation); 
+         testStep.setDisabled(false);
+      }
+      Util.setProjectProperty(testRunner, "endpt."+operation+".Get", getEndpt);
+   }
+   String postEndpt=Util.getHttpPostOnlineResourceForOperation(capResp, operation); 
    if(postEndpt!=null) {
-		Util.setProjectProperty(testRunner, "endpt."+operation+".Post", postEndpt);
-	}
+      Util.setProjectProperty(testRunner, "endpt."+operation+".Post", postEndpt);
+   }
 }
                </script>
             </con:config>
@@ -3064,48 +3136,48 @@ def holder = new XmlHolder(messageExchange.responseContentAsXml)
 
 public class OutputFormat {
 
-	private String outputFormat;
-	private FormatType type;
+   private String outputFormat;
+   private FormatType type;
 
-	public OutputFormat() { }
+   public OutputFormat() { }
 
-	public OutputFormat(String outputFormat) {
+   public OutputFormat(String outputFormat) {
 
-		log.info(outputFormat);
+      log.info(outputFormat);
 
-		this.outputFormat = outputFormat;
-		this.type = FormatType.UNKNOWN;
+      this.outputFormat = outputFormat;
+      this.type = FormatType.UNKNOWN;
 
-		if(outputFormat.indexOf("xml")!=-1 || outputFormat.indexOf("gml")!=-1)
-		{
-			type=FormatType.XML;
-		}else if(outputFormat.indexOf("json")!=-1) {
-			type=FormatType.JSON;
-		}else if(outputFormat.indexOf("text")!=-1) {
-			type=FormatType.TEXT;
-		}
-	}
+      if(outputFormat.indexOf("xml")!=-1 || outputFormat.indexOf("gml")!=-1)
+      {
+         type=FormatType.XML;
+      }else if(outputFormat.indexOf("json")!=-1) {
+         type=FormatType.JSON;
+      }else if(outputFormat.indexOf("text")!=-1) {
+         type=FormatType.TEXT;
+      }
+   }
 
-	public boolean equals(OutputFormat outputFormat) {
-		return this.getFormat().equals(outputFormat.getFormat());
-	}
+   public boolean equals(OutputFormat outputFormat) {
+      return this.getFormat().equals(outputFormat.getFormat());
+   }
 
-	public String toString() {
-		return this.outputFormat;
-	}
+   public String toString() {
+      return this.outputFormat;
+   }
 
-	public String getFormat() {
-		return this.outputFormat;
-	}
+   public String getFormat() {
+      return this.outputFormat;
+   }
 
-	public boolean isParsable() {
-		// JSON is parsable as XML in SoapUI
-		return (type==FormatType.XML || FormatType.JSON);
-	}
+   public boolean isParsable() {
+      // JSON is parsable as XML in SoapUI
+      return (type==FormatType.XML || FormatType.JSON);
+   }
 
-	public boolean isText() {
-		return (type==FORMAT.TEXT);
-	}
+   public boolean isText() {
+      return (type==FORMAT.TEXT);
+   }
 
 }
 
@@ -3120,53 +3192,53 @@ String serviceTypeVersion;
 
 void initOutputFormats(final XmlHolder capabilitiesXML) {
 
-	final String operationNameXPath=
-		"/*:WFS_Capabilities/*:OperationsMetadata/*:Operation/@name";
+   final String operationNameXPath=
+      "/*:WFS_Capabilities/*:OperationsMetadata/*:Operation/@name";
 
-	serviceTypeVersion = capabilitiesXML.getNodeValue("/*:WFS_Capabilities/@version");
+   serviceTypeVersion = capabilitiesXML.getNodeValue("/*:WFS_Capabilities/@version");
 
 
-	for(operationName in capabilitiesXML.getNodeValues(operationNameXPath) ) {
+   for(operationName in capabilitiesXML.getNodeValues(operationNameXPath) ) {
 
-			try {
-				final List&lt;String> allOutputFormats =
-					getOperationParameterValues(capabilitiesXML,
-						operationName, "outputFormat");
-				log.info("Output: "+allOutputFormats);
-				final List&lt;OutputFormat> ofList = new ArrayList&lt;OutputFormat>();
-				for(String o in allOutputFormats.sort()) {
-					ofList.add(new OutputFormat(o));
-				}
-				outputFormats.put(operationName, ofList.toArray(new OutputFormat[0]));
-			}catch(Exception e){
-				//Operation does not Provide an outputFormat
-				log.info("Exc: "+operationName);
-			}
-	}
+         try {
+            final List&lt;String> allOutputFormats =
+               getOperationParameterValues(capabilitiesXML,
+                  operationName, "outputFormat");
+            log.info("Output: "+allOutputFormats);
+            final List&lt;OutputFormat> ofList = new ArrayList&lt;OutputFormat>();
+            for(String o in allOutputFormats.sort()) {
+               ofList.add(new OutputFormat(o));
+            }
+            outputFormats.put(operationName, ofList.toArray(new OutputFormat[0]));
+         }catch(Exception e){
+            //Operation does not Provide an outputFormat
+            log.info("Exc: "+operationName);
+         }
+   }
 }
 
-	String[] getOperationParameterValues(final XmlHolder capabilitiesXML,
-		final String operation,
-		final String parameter)
-	{
+   String[] getOperationParameterValues(final XmlHolder capabilitiesXML,
+      final String operation,
+      final String parameter)
+   {
 
-		final String operationXPath=
-			"/*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name=\""+
-			operation+"\"]";
+      final String operationXPath=
+         "/*:WFS_Capabilities/*:OperationsMetadata/*:Operation[@name=\""+
+         operation+"\"]";
 
-		String allowedValue="";
+      String allowedValue="";
       if(serviceTypeVersion=="2.0.0")
-			allowedValue = "/*:AllowedValues";
-		final String owsValueXPath="/*:Parameter[@name=\""+parameter+"\"]"+
-			allowedValue+"/*:Value";
+         allowedValue = "/*:AllowedValues";
+      final String owsValueXPath="/*:Parameter[@name=\""+parameter+"\"]"+
+         allowedValue+"/*:Value";
 
-		String[] values = capabilitiesXML.getNodeValues(operationXPath+owsValueXPath);
+      String[] values = capabilitiesXML.getNodeValues(operationXPath+owsValueXPath);
       log.info(operationXPath+owsValueXPath); 
       if(values.size()==0) {
-			throw new Exception(this, "Unable to find \""+operation+"\"");
-		}
-		return values;
-	}
+         throw new Exception(this, "Unable to find \""+operation+"\"");
+      }
+      return values;
+   }
 
 initOutputFormats(holder);
                      </scriptText>
@@ -3232,18 +3304,18 @@ ph.getTestCase().setPropertyValue("AutoConfigurationCompleted", "false");
 String autoConfiguration = "failed";
 try {
 
-	cap.setCapabilities(ph.getTestStepResult('GetCapabilities'));
-	new ObjectSaver().save(cap);
-	autoConfiguration = "completed";
-	ph.getTestCase().setPropertyValue("AutoConfigurationCompleted", "true");
+   cap.setCapabilities(ph.getTestStepResult('GetCapabilities'));
+   new ObjectSaver().save(cap);
+   autoConfiguration = "completed";
+   ph.getTestCase().setPropertyValue("AutoConfigurationCompleted", "true");
 
 }catch(Exception e) {
-	log.error(e);
-	ph.getTestCase().setPropertyValue("AutoConfigurationCompleted",e.getMessage());
-	autoConfiguration = e.getMessage();
-	if(e instanceof TranslatableAssertionError) {
-		throw e;
-	}
+   log.error(e);
+   ph.getTestCase().setPropertyValue("AutoConfigurationCompleted",e.getMessage());
+   autoConfiguration = e.getMessage();
+   if(e instanceof TranslatableAssertionError) {
+      throw e;
+   }
 }
 
 assert "completed" == autoConfiguration, "Failed to initialize Executable Test Suite"
@@ -3275,34 +3347,34 @@ String user = messageExchange.modelItem.testStep.testCase.testSuite.project.getP
 String passwd = messageExchange.modelItem.testStep.testCase.testSuite.project.getPropertyValue('authPwd');
 
 if(!SUtils.isNullOrEmpty(user)) {
-	credential = new Credentials(user, passwd);
+   credential = new Credentials(user, passwd);
 }
 */
 
 int getHttpResponseCode(String url, def credentials){
-	def connection = UriUtils.openConnection( new URI(UriUtils.ensureUrlEncodedParams(url)), credentials );
-	if (!(connection instanceof HttpURLConnection)) {
-		throw new IllegalArgumentException("Cannot open a HTTP connection for URL '"+url+"'");
-	}
-	connection.setConnectTimeout(11000);
-	connection.setReadTimeout(91000);
-	connection.setRequestMethod("GET");
-	return connection.getResponseCode();
+   def connection = UriUtils.openConnection( new URI(UriUtils.ensureUrlEncodedParams(url)), credentials );
+   if (!(connection instanceof HttpURLConnection)) {
+      throw new IllegalArgumentException("Cannot open a HTTP connection for URL '"+url+"'");
+   }
+   connection.setConnectTimeout(11000);
+   connection.setReadTimeout(91000);
+   connection.setRequestMethod("GET");
+   return connection.getResponseCode();
 }
 
 assert schemaLocations != null, "Response does not contain xsi:schemaLocation attribute!";
 if(schemaLocations!=null) {
-	for(schemaLocation in schemaLocations) {
-		log.info("Checking "+schemaLocation);
-		try {
-			int responseCode = getHttpResponseCode(schemaLocation,null);
-			if(200 &lt;= responseCode &amp;&amp; responseCode >= 400) {
-					throw new TranslatableAssertionError("TR.schemaNotAccessible", "url", schemaLocation, "code", String.valueOf(responseCode));
-			}
-		}catch(IllegalArgumentException e) {
-			throw new TranslatableAssertionError("TR.schemaNotAnUrl", "url", schemaLocation);
-		}
-	}
+   for(schemaLocation in schemaLocations) {
+      log.info("Checking "+schemaLocation);
+      try {
+         int responseCode = getHttpResponseCode(schemaLocation,null);
+         if(200 &lt;= responseCode &amp;&amp; responseCode >= 400) {
+               throw new TranslatableAssertionError("TR.schemaNotAccessible", "url", schemaLocation, "code", String.valueOf(responseCode));
+         }
+      }catch(IllegalArgumentException e) {
+         throw new TranslatableAssertionError("TR.schemaNotAnUrl", "url", schemaLocation);
+      }
+   }
 }
                      </scriptText>
                   </con:configuration>
@@ -3640,7 +3712,7 @@ ProjectHelper ph = new ProjectHelper();
 String autoConfigurationCompleted = ph.getTestCase("AutoConfigure WFS").getPropertyValue("AutoConfigurationCompleted");
 
 if(!"true".equals(autoConfigurationCompleted)) {
-	throw new TranslatableAssertionError("TR.initializationAndBasicChecksFailed");
+   throw new TranslatableAssertionError("TR.initializationAndBasicChecksFailed");
 }</script>
             </con:config>
          </con:testStep>
@@ -5819,120 +5891,6 @@ if(!"true".equals(autoConfigurationCompleted)) {
       <con:description>Test module for checking Capabilities related information.</con:description>
       <con:settings />
       <con:runType>SEQUENTIAL</con:runType>
-      <con:testCase id="938f750f-00ed-4100-b6ad-cc32c10ffeb3" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Extended Capabilities" searchProperties="true" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="">
-         <con:description>
-            <![CDATA[The test case performs a GetCapabilities request and checks if the response is schema valid and that ExtendedCapabilities element exists .
-<br/>
-<br/>
-Relevant Requirements:
-<ul>
-<li>TG Requirement 60: The Extended Capabilities shall use the XML Schema as defined in the INSPIRE online schema repository.</li>
-</ul>
-<br/>
-<br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-defined/extended-capabilities" target="_blank">Abstract Test Case 'Extended capabilities'</a>]]>
-         </con:description>
-         <con:settings />
-         <con:testStep type="calltestcase" name="Initialization and basic checks" id="5e89fb25-c6e0-486b-a73a-de3eb2cee547">
-            <con:settings />
-            <con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:targetTestCase>96964cba-9ef1-4188-9e87-47bca74559d4</con:targetTestCase>
-               <con:properties>
-                  <con:property>
-                     <con:name>capabilities</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>service</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>version</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>qaf.ShortDescription</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>qaf.Author</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>qaf.CreationDate</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>qaf.Version</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>qaf.AssociatedRequirements</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>qaf.ExpectedResults</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>qaf.Status</con:name>
-                  </con:property>
-                  <con:property>
-                     <con:name>qaf.LastUpdateDate</con:name>
-                  </con:property>
-               </con:properties>
-               <con:returnProperties />
-               <con:runMode>SINGLETON_AND_WAIT</con:runMode>
-            </con:config>
-         </con:testStep>
-         <con:testStep name="GetCapabilities" type="httprequest" id="3e62a8a6-4d3b-4d8a-bcfc-23c3aeb457f4">
-            <con:settings />
-            <con:config method="GET" name="GetCapabilities" timeout="0" xsi:type="con:HttpRequest" id="e3aa2120-0f06-4e06-9b86-e8ab26261ba2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:settings>
-                  <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-               </con:settings>
-               <con:encoding>UTF-8</con:encoding>
-               <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
-               <con:request />
-               <con:assertion type="OwsExceptionReportAssertion" name="Expect no exception" id="377ecd8e-bc4f-4810-bbfc-1fc26abd8aea" />
-               <con:assertion type="GroovyScriptAssertion" id="3123bfdf-4491-4a43-b136-15b5cb596c5b" name="xsi:schemaLocation contains the INSPIRE Download Services schema">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.isTrue("//*[contains(@*:schemaLocation,'inspire_dls.xsd')]", "TR.missingDownloadServiceSchema");</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="efa4fb4d-41e2-4da2-9719-2d97223a91c1" name="ExtendedCapabilities element exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]", "TR.capabilities.extended.inspire.missingElement");</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:credentials>
-                  <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
-                  <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
-                  <con:authType>Global HTTP Settings</con:authType>
-               </con:credentials>
-               <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-               <con:jmsPropertyConfig />
-               <con:parameters>
-
-
-                  <con:parameter>
-                     <con:name>request</con:name>
-                     <con:value>GetCapabilities</con:value>
-                     <con:style>QUERY</con:style>
-                     <con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type>
-                     <con:default>GetCapabilities</con:default>
-                     <con:description xsi:nil="true" />
-                  </con:parameter>
-                  <con:parameter>
-                     <con:name>ACCEPTVERSIONS</con:name>
-                     <con:value>${#TestSuite#version}</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-                  <con:parameter>
-                     <con:name>service</con:name>
-                     <con:value>${#TestSuite#service}</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-               </con:parameters>
-            </con:config>
-         </con:testStep>
-         <con:properties />
-      </con:testCase>
       <con:testCase id="f8615ee2-19af-468c-9031-e5acf761a9ba" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Provide Response Language" searchProperties="true">
          <con:description>
             <![CDATA[The test case performs a GetCapabilities request and checks if the ResponseLanguage element exists.
@@ -5951,7 +5909,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
          <con:testStep type="testcasedependency" name="Extended Capabilities" id="41c19969-04e9-4687-9359-a166359d991f">
             <con:settings />
             <con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:targetTestCase>938f750f-00ed-4100-b6ad-cc32c10ffeb3</con:targetTestCase>
+               <con:targetTestCase>96964cba-9ef1-4188-9e87-47bca74559d4</con:targetTestCase>
                <con:properties />
                <con:returnProperties />
                <con:runMode>SINGLETON_AND_WAIT</con:runMode>
@@ -6020,7 +5978,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
          <con:testStep type="testcasedependency" name="Extended Capabilities" id="99d3b461-d7f4-4360-b1db-00b1b465e0b7">
             <con:settings />
             <con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:targetTestCase>938f750f-00ed-4100-b6ad-cc32c10ffeb3</con:targetTestCase>
+               <con:targetTestCase>96964cba-9ef1-4188-9e87-47bca74559d4</con:targetTestCase>
                <con:properties />
                <con:returnProperties />
                <con:runMode>SINGLETON_AND_WAIT</con:runMode>
@@ -6091,7 +6049,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
          <con:testStep type="testcasedependency" name="Extended Capabilities" id="40a270d9-84c2-4f00-8716-b63fc8d27877">
             <con:settings />
             <con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:targetTestCase>938f750f-00ed-4100-b6ad-cc32c10ffeb3</con:targetTestCase>
+               <con:targetTestCase>96964cba-9ef1-4188-9e87-47bca74559d4</con:targetTestCase>
                <con:properties />
                <con:returnProperties />
                <con:runMode>SINGLETON_AND_WAIT</con:runMode>
@@ -6112,8 +6070,8 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                      <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValues(
-	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
-	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language"
+   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
+   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language"
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6168,8 +6126,8 @@ a.equalPathValues(
                      <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValues(
-	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
-	"/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language"
+   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language",
+   "/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:ResponseLanguage/inspire_common:Language"
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6178,8 +6136,8 @@ a.equalPathValues(
                      <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValuesInStep(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
-	"Request GetCapabilities",
+   "/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
+   "Request GetCapabilities",
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6188,8 +6146,8 @@ a.equalPathValuesInStep(
                      <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.equalPathValuesInStep(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
-	"Request GetCapabilities",
+   "/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
+   "Request GetCapabilities",
 );</scriptText>
                   </con:configuration>
                </con:assertion>
@@ -6319,7 +6277,7 @@ a.existsNonEmptyText(
             <con:settings />
             <con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
                <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false">
-                  <con:name>SupportedLanguage codes	</con:name>
+                  <con:name>SupportedLanguage codes   </con:name>
                   <con:sourceType>ResponseAsXml</con:sourceType>
                   <con:sourceStep>Request GetCapabilities</con:sourceStep>
                   <con:sourcePath>declare namespace wfs='http://www.opengis.net/wfs/2.0';
@@ -6331,8 +6289,8 @@ declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1
 declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
 
 string-join(
-	(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language,
-	/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage/inspire_common:Language),
+   (/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language,
+   /*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage/inspire_common:Language),
 ',')
                   </con:sourcePath>
                   <con:targetType>supportedLanguageCodes</con:targetType>
@@ -6447,8 +6405,8 @@ let $languages :=tokenize( '${#supportedLanguageCodes}', ',' )
 let $expectedLang :='${#responseLanguageCode}'
 for $language in $languages
 where not(
-	exists(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage[inspire_common:Language=$language])
-	or exists(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage[inspire_common:Language=$language])
+   exists(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage[inspire_common:Language=$language])
+   or exists(/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage[inspire_common:Language=$language])
 )
 return (<name>Language</name>,<value>{$language}</value>)
 }
@@ -6505,582 +6463,682 @@ return (<name>Language</name>,<value>{$language}</value>)
          </con:testStep>
          <con:properties />
       </con:testCase>
-      <con:testCase failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Service Metadata" searchProperties="true" timeout="0" wsrmEnabled="false" wsrmVersion="1.0" wsrmAckTo="" amfAuthorisation="false" amfEndpoint="" amfLogin="" amfPassword="" id="1ce771c8-5f56-4a07-830e-4bb7369c7fce">
+      <con:testCase id="e408462c-b4ba-42b0-a17d-4ba9843c3d58" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Service Metadata" searchProperties="true">
          <con:description>
-            <![CDATA[The test case performs a GetCapabilities request and checks if the INSPIRE Service Metadata either be referenced via an Metadata URL
-or the ExtendedCapabilities section contains all Metadata.
-<br/>
-<br/>
-Relevant Requirements:
-<ul>
-<li>TG Requirement 53: INSPIRE Metadata for the Download Service shall EITHER be linked to via an
-inspire_common:MetadataURL in an extended capabilities section, OR
-the extended capabilities section shall contain all the INSPIRE Metadata for
-the Download Service in accordance with Table 19 (pp. 66,67) and the
-inspire_dls:ExtendedCapabilities schema.</li>
-</ul>
-<br/>
-<br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-defined/service-metadata" target="_blank">Abstract Test Case 'Service Metadata'</a>]]>
-         </con:description>
-         <con:settings />
-         <con:testStep type="testcasedependency" name="Initialization and basic checks" id="db93c222-a1ba-4750-80e5-d39ad3e52ba8">
+               <![CDATA[<p>Test that the Service Metadata is provided according with one of the three scenarios:
+               <ul><li>Scenario 1: Use of the ows:ExtendedCapabilities to publish a link to a Download Service metadata record. (e.g. in a discovery service). This should be done using a <inspire_common:MetadataURL> in the extended capabilities section.</li>
+               <li>Scenario 2: Publish all the metadata elements directly in the WFS capabilities and ows:ExtendedCapabilities using the mapping in Table 19a.</li>
+               <li>Scenario 3: TPublish all the metadata elements directly in the WFS capabilities <b>without</b> <i>ows:ExtendedCapabilities</i> using the mapping in Table 19b.</li></ul>The test steps below vary depending on the scenario used. Manual check is not applied to Scenario 1</p>
+               Relevant Requirements:
+                  <ul>
+                  <li>TG Requirement 53: INSPIRE Metadata for the Download Service shall EITHER be linked to via an
+                  inspire_common:MetadataURL in an extended capabilities section, OR
+                  the extended capabilities section shall contain all the INSPIRE Metadata for
+                  the Download Service in accordance with Table 19 (pp. 66,67) and the
+                  inspire_dls:ExtendedCapabilities schema.</li>
+                  </ul>
+                  <br/>
+               <p>More information: <ul><li><a href="http://inspire.ec.europa.eu/id/ats/download-wfs/master/wfs-pre-defined/service-metadata-1" target="_blank">Service Metadata - Scenario 1</a></li>
+               <li><a href="http://inspire.ec.europa.eu/id/ats/download-wfs/master/wfs-pre-defined/service-metadata-2" target="_blank">Service Metadata - Scenario 2</a></li>
+               <li><a href="http://inspire.ec.europa.eu/id/ats/download-wfs/master/wfs-pre-defined/service-metadata-3" target="_blank">Service Metadata - Scenario 3</a></li></ul></p>]]>
+            </con:description>
             <con:settings />
-            <con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:targetTestCase>938f750f-00ed-4100-b6ad-cc32c10ffeb3</con:targetTestCase>
-               <con:properties />
-               <con:returnProperties />
-               <con:runMode>SINGLETON_AND_WAIT</con:runMode>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="properties" name="Transfer_Properties" id="18cd52f9-c0b7-4df3-80ee-421bb6892799">
-            <con:settings />
-            <con:config xsi:type="con:PropertiesStep" saveFirst="true" discardValuesOnSave="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:properties>
-                  <con:property>
-                     <con:name>Capabilities</con:name>
-                     <con:value xsi:nil="true" />
-                  </con:property>
-                  <con:property>
-                     <con:name>urlToTest</con:name>
-                     <con:value xsi:nil="true" />
-                  </con:property>
-                  <con:property>
-                     <con:name>ServiceMetadataRecord</con:name>
-                     <con:value xsi:nil="true" />
-                  </con:property>
-               </con:properties>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="httprequest" name="Request GetCapabilities" id="659adf30-89fd-46f7-8ccc-58ae9b9e6e88">
-            <con:settings />
-            <con:config method="GET" xsi:type="con:HttpRequest" name="Request GetCapabilities" id="69f1ea71-213d-4ed7-9f0a-eb59a654416f" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:description>Request Capabilities to check for the MetadataUrl</con:description>
-               <con:settings>
-                  <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-               </con:settings>
-               <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
-               <con:request />
-               <con:assertion type="OwsExceptionReportAssertion" id="9e1d1830-6437-45ce-b779-0de591387cda" name="Fail if service returns OWS Exception Report" />
-               <con:credentials>
-                  <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
-                  <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
-                  <con:authType>Global HTTP Settings</con:authType>
-               </con:credentials>
-               <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-               <con:jmsPropertyConfig />
-               <con:parameters>
-                  <con:parameter>
-                     <con:name>ACCEPTVERSIONS</con:name>
-                     <con:value>2.0.0</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-                  <con:parameter>
-                     <con:name>SERVICE</con:name>
-                     <con:value>WFS</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-                  <con:parameter>
-                     <con:name>REQUEST</con:name>
-                     <con:value>GetCapabilities</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-                  <con:parameter>
-                     <con:name>version</con:name>
-                     <con:value>2.0.0</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-               </con:parameters>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="transfer" name="Property Transfer" id="4d52b15e-a974-4f9d-b60d-f2794395f56a">
-            <con:settings />
-            <con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="false" ignoreEmpty="true" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false">
-                  <con:name>INSPIREServiceMetadataUrl</con:name>
-                  <con:sourceType>ResponseAsXml</con:sourceType>
-                  <con:sourceStep>Request GetCapabilities</con:sourceStep>
-                  <con:sourcePath>declare namespace wfs='http://www.opengis.net/wfs/2.0';
-declare namespace ows='http://www.opengis.net/ows/1.1';
-declare namespace fes='http://www.opengis.net/fes/2.0';
-declare namespace gml='http://www.opengis.net/gml/3.2';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
+            <con:testStep type="httprequest" name="http-request-metadata" id="57f88823-bd49-434e-b7d5-2d5040cc06fd" disabled="true">
+               <con:settings />
+               <con:config method="GET" xsi:type="con:HttpRequest" id="5820f9b6-1e17-4bc6-b39a-1819ead2d82e" name="http-request-metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                  <con:settings>
+                     <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+                  </con:settings>
+                  <con:endpoint>${#TestCase#metadataEndpoint}</con:endpoint>
+                  <con:request />
+                  <con:assertion type="Valid HTTP Status Codes" id="24fa10e5-ed9b-4845-9cbc-5862f1333941" name="Valid HTTP Status Codes">
+                     <con:configuration>
+                        <codes>200</codes>
+                     </con:configuration>
+                  </con:assertion>
+                  <con:assertion type="OwsExceptionReportAssertion" id="0013e25b-584f-4268-ab11-68e7d795b803" name="Fail if service returns OWS Exception Report" />
+                  <con:assertion type="Response SLA Assertion" id="e8ef1ff8-c65d-4c58-83fc-da8fa791ecef" name="Response SLA">
+                     <con:configuration>
+                        <SLA>30000</SLA>
+                     </con:configuration>
+                  </con:assertion>
+                  <con:credentials>
+                     <con:authType>No Authorization</con:authType>
+                  </con:credentials>
+                  <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+                  <con:jmsPropertyConfig />
+                  <con:parameters />
+               </con:config>
+            </con:testStep>
+            <con:testStep type="groovy" name="check-metadata" id="bf850d28-c293-4e1d-87ea-d3200e80ba73">
+               <con:settings />
+               <con:config>
+                  <script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+   //def tc = testRunner.testCase.testSuite.project.testSuites["GetCapabilities_Operation"].testCases["initial-testcase"];
+   def tc = testRunner.testCase.testSuite.project.testSuites["Initialization and basic checks"].testCases["Init TestProject"];
+   def response = tc.getTestStepByName("http-request").getPropertyValue("Response");
+   def capabilities = new XmlSlurper(false, true).parseText(response);
+   def scenario = testRunner.testCase.testSuite.project.getPropertyValue("extended_capabilities_scenario");
 
-/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities/inspire_common:MetadataUrl/inspire_common:URL
-                  </con:sourcePath>
-                  <con:targetType>Endpoint</con:targetType>
-                  <con:targetStep>Request and check external ServiceMetadata</con:targetStep>
-                  <con:upgraded>true</con:upgraded>
-               </con:transfers>
-               <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="false" ignoreEmpty="false" entitize="false" transferToAll="false">
-                  <con:name>GetCapabilitiesURL from Capabilities</con:name>
-                  <con:sourceType>ResponseAsXml</con:sourceType>
-                  <con:sourceStep>Request GetCapabilities</con:sourceStep>
-                  <con:sourcePath>declare namespace wfs='http://www.opengis.net/wfs/2.0';
-declare namespace ows='http://www.opengis.net/ows/1.1';
-declare namespace fes='http://www.opengis.net/fes/2.0';
-declare namespace gml='http://www.opengis.net/gml/3.2';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
-//ows:Operation[@name='GetCapabilities'][1]/ows:DCP/ows:HTTP/ows:Get/@xlink:href</con:sourcePath>
-                  <con:targetType>Endpoint</con:targetType>
-                  <con:targetStep>Check ServiceMetadata in Capabilities</con:targetStep>
-                  <con:upgraded>true</con:upgraded>
-               </con:transfers>
-               <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false">
-                  <con:name>Capabilities</con:name>
-                  <con:sourceType>ResponseAsXml</con:sourceType>
-                  <con:sourceStep>Request GetCapabilities</con:sourceStep>
-                  <con:sourcePath />
-                  <con:targetType>Capabilities</con:targetType>
-                  <con:targetStep>Transfer_Properties</con:targetStep>
-                  <con:upgraded>true</con:upgraded>
-               </con:transfers>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="goto" name="Goto check external Service Metadata" id="e6a2f44d-c422-4141-96ce-cd6b62f24f09">
-            <con:settings />
-            <con:config xsi:type="con:GotoStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:condition>
-                  <con:name>ExternalServiceMetadata</con:name>
-                  <con:type>XPATH</con:type>
-                  <con:expression>declare namespace wfs='http://www.opengis.net/wfs/2.0';
-declare namespace ows='http://www.opengis.net/ows/1.1';
-declare namespace fes='http://www.opengis.net/fes/2.0';
-declare namespace gml='http://www.opengis.net/gml/3.2';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
+   if (scenario == '1'){
 
-string-length(//inspire_dls:ExtendedCapabilities/inspire_common:MetadataUrl/inspire_common:URL)>0</con:expression>
-                  <con:targetStep>Internal Service Metadata end</con:targetStep>
-               </con:condition>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="httprequest" name="Check ServiceMetadata in Capabilities" id="7ca355c9-7144-4262-90dc-acebb4847157">
-            <con:settings />
-            <con:config method="GET" xsi:type="con:HttpRequest" name="Check ServiceMetadata in Capabilities" id="43b2ce0a-c123-44d9-afd6-00634d234a87" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:description>Check Metadata that are included in the ExtendedCapabilities section</con:description>
-               <con:settings>
-                  <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-               </con:settings>
-               <con:encoding xsi:nil="true" />
-               <con:endpoint>https://www.wfs.nrw.de/geobasis/wfs_nw_inspire-adressen_hk?</con:endpoint>
-               <con:request />
-               <con:assertion type="GroovyScriptAssertion" id="7a951485-0732-40ce-8e89-320a0ccabeef" name="INSPIRE MetadataDate exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.existsNonEmptyText(
-	"//inspire_dls:ExtendedCapabilities/inspire_common:MetadataDate",
-	"TR.capabilities.extended.inspire.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="10b98589-52a5-43cc-9670-8fefe29d9f66" name="INSPIRE Unique Resource Identifier Namespace exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
-  "TR.missingSpatialDataSetIdentifierNamespace"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="12b31278-5c35-4ddf-a583-11a02815b29b" name="INSPIRE Unique Resource Identifier Code exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
-  "TR.capabilities.extended.inspire.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="fb084145-6aad-46c1-8c9e-c0a9c74faa18" name="INSPIRE MetadataPointOfContact exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_common:MetadataPointOfContact",
-	"TR.capabilities.extended.inspire.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="dcf548d0-c1a7-4ae8-9253-8512cb7f2280" name="INSPIRE Keyword infoFeatureAccessService exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Keywords[ows:Keyword='infoFeatureAccessService']",
-  "TR.missingInfoFeatureAccessService"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="c52c161b-d938-400c-b51d-33630ac69a8e" name="WFS Abstract exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Abstract",
-  "TR.capabilities.ows.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="b93231f7-1cfd-4f5c-873b-987ac01b53e6" name="WFS Title exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"/*:WFS_Capabilities/ows:ServiceIdentification/ows:Title",
-  "TR.capabilities.ows.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="d5ad7683-3cb1-403f-b66e-f97af327c040" name="INSPIRE ResourceType exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_common:ResourceType",
-	"TR.capabilities.extended.inspire.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="5adaa01c-edb5-41df-8b1f-fa5b5bc275c4" name="INSPIRE ResourceLocator exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-  "//inspire_dls:ExtendedCapabilities/inspire_common:ResourceLocator",
-  "TR.capabilities.extended.inspire.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="c243a94c-dc1f-4f19-8f7e-f62f5e6dbf62" name="INSPIRE SpatialDataServiceType is set at 'download'">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.equals(
-  "//inspire_dls:ExtendedCapabilities/inspire_common:SpatialDataServiceType",
-  "SpatialDataServiceType",
-  "download",
-  "TR.capabilities.extended.inspire.invalidValue"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="1b1d8f40-304c-4018-b054-f3f6516af734" name="WGS84BoundingBox: WFS Each FeatureType has a WGS84BoundingBox">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.notExists(
-	"//*:FeatureType[string-length(ows:WGS84BoundingBox/ows:LowerCorner)=0]",
-  "TR.capabilities.ft.missingOwsWgs84BoundingBox"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="d30513de-b7a7-4bc1-af73-ac76f265a89c" name="INSPIRE TemporalReference exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-  "//inspire_dls:ExtendedCapabilities/inspire_common:TemporalReference",
-  "TR.capabilities.extended.inspire.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="a02ff8b1-3749-4b26-bebb-e83d98407466" name="INSPIRE Conformity exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-  "//inspire_dls:ExtendedCapabilities/inspire_common:Conformity",
-  "TR.capabilities.extended.inspire.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="43a9de61-b156-4755-b9d9-61695957c817" name="WFS Fees exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//ows:ServiceIdentification/ows:Fees",
-  "TR.capabilities.ows.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="77916d05-392d-45ad-a213-439798eab35a" name="AccessConstraints exists">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//ows:ServiceIdentification/ows:AccessConstraints",
-  "TR.capabilities.ows.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="c4f3cfce-b1c0-4031-a606-3d14a41ea9b3" name="WFS ServiceProvider exists, at least a ServiceContact with ContactInfo">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//ows:ServiceProvider/ows:ServiceContact/ows:ContactInfo",
-  "TR.capabilities.ows.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="d558167a-781a-4ffb-bbb4-4d23e57e81a9" name="WFS ServiceProvider exists, with ProviderName">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//ows:ServiceProvider/ows:ProviderName",
-  "TR.capabilities.ows.missingElement"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="XQuery Match" name="ft-MetadataURL: INSPIRE Each FeatureType has a MetadataURL" id="13b0e9a4-22d9-424a-a307-bf0f5282b2a2">
-                  <con:configuration>
-                     <path>declare namespace wfs='http://www.opengis.net/wfs/2.0';
-declare namespace ows='http://www.opengis.net/ows/1.1';
-declare namespace fes='http://www.opengis.net/fes/2.0';
-declare namespace gml='http://www.opengis.net/gml/3.2';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-declare namespace xsi='http://www.w3.org/2001/XMLSchema-instance';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
+               tc = testRunner.testCase.testSuite.project.testSuites["Capabilities"].testCases["Service Metadata"];
+               testRunner.testCase.setPropertyValue("metadataEndpoint", '');
+               def ts = testRunner.testCase.testSuite.project.testSuites['Capabilities'].testCases['Service Metadata'].getTestStepByName('http-request-metadata');
 
-&lt;etfTranslate what="TR.missingWfsMetadataUrl"> {
-for $featureType in //*:FeatureType
-where string-length($featureType/*:MetadataURL/@xlink:href)=0
-return &lt;name>{$featureType/*:Name/text()}&lt;/name>
-}
-&lt;/etfTranslate></path>
-                     <content>&lt;etfTranslate what="TR.missingWfsMetadataUrl"/></content>
-                     <allowWildcards>false</allowWildcards>
-                     <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
-                     <ignoreComments>false</ignoreComments>
-                  </con:configuration>
-               </con:assertion>
-               <con:credentials>
-                  <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
-                  <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
-                  <con:authType>Global HTTP Settings</con:authType>
-               </con:credentials>
-               <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-               <con:jmsPropertyConfig />
-               <con:parameters>
-                  <con:parameter>
-                     <con:name>SERVICE</con:name>
-                     <con:value>WFS</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-                  <con:parameter>
-                     <con:name>ACCEPTVERSIONS</con:name>
-                     <con:value>2.0.0</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-                  <con:parameter>
-                     <con:name>REQUEST</con:name>
-                     <con:value>GetCapabilities</con:value>
-                     <con:style>QUERY</con:style>
-                  </con:parameter>
-               </con:parameters>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="groovy" name="Loop Metadata URLs from Capabilities" id="4351fa99-ef24-4c69-ab8d-73ad68f60a34">
-            <con:description>Technical test step. Iterate over all Metadata URLs and check with 'Get Metadata from Capabilities' that response contains Metadata.</con:description>
-            <con:settings />
-            <con:config>
-               <script>import de.interactive_instruments.xtf.*;
-SOAPUI_I.init(log,context,testRunner);
-import de.interactive_instruments.UriUtils;
 
-ProjectHelper ph = new ProjectHelper();
-def capsXmlHolder = ph.getTransferPropertyAsXml("Capabilities");
+               def metadataEndpoint = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.MetadataUrl.URL;
+               if (metadataEndpoint.size() != 1){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/MetadataUrl/URL'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(metadataEndpoint.toString().length() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/MetadataUrl/URL'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+               else if(metadataEndpoint.toString().length() != 0){
+                  testRunner.testCase.setPropertyValue("metadataEndpoint", metadataEndpoint.toString());
+                  
+                  ts.setDisabled(false);
+                  ts.run(testRunner, context);
 
-//Pull out the metadataURLs
-def metadataUrlNodes = capsXmlHolder.getNodeValues("//*:MetadataURL/@*:href");
-log.info("metadataUrlNodes: " + metadataUrlNodes);
-assert metadataUrlNodes.size() > 0;
+                  def url= metadataEndpoint.toString()
+                  def urlc = new URL(url);
+                  def connection = urlc.openConnection();
 
-// clear url to test
-ph.setTransferProperty("urlToTest","");
+                  def code = connection.getResponseCode()
+                  log.info("HTTPCode "+ code);
 
-// run GetMetadata test for each url
-for( url in metadataUrlNodes ) {
-   ph.setTransferProperty("urlToTest", url);
-   ph.runTestStep("Get Metadata from Capabilities");
-}
+                  if (code != 200){
+                        throw new TranslatableAssertionError("TR.unexpectedHTTPCodeWithURL", "expected", "200", "actual", code.toString(), "url", url);
+                  }
+               }
+               tc.getTestStepByName('http-request-metadata').setDisabled(true);
 
-testRunner.gotoStepByName("Internal Service Metadata end");</script>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="httprequest" name="Get Metadata from Capabilities" id="f546bbf7-bebb-4619-96e4-1f9e5fb146ad">
-            <con:settings />
-            <con:config method="GET" xsi:type="con:HttpRequest" name="Get Metadata from Capabilities" id="352ed322-02ab-42a5-95b3-0d76f30dd6da" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:description>Called by 'Loop Metadata URLs from Capabilities' with an URL found in the ExtendedCapabilites.</con:description>
-               <con:settings>
-                  <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-               </con:settings>
-               <con:endpoint>${#urlToTest}</con:endpoint>
-               <con:request />
-               <con:assertion type="Valid HTTP Status Codes" id="e4a0963d-c0b5-4fc0-844a-afa5ca3a6a66" name="HTTP status code is 200">
-                  <con:configuration>
-                     <codes>200</codes>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="Response SLA Assertion" id="34d733d7-5066-4e60-8a63-fc06e445af62" name="30 seconds timeout">
-                  <con:configuration>
-                     <SLA>30000</SLA>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="Simple Schema Validator" id="d5dae0e8-2d05-46de-97c6-98d0e6aa93b9" name="response is schema valid">
-                  <con:configuration>
-                     <pathToXSD>xsi:schemaLocation</pathToXSD>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="24961c37-323b-4e1f-bd91-bb5bf734be7c" name="fileIdentifier exists in Metadata">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-  "//gmd:MD_Metadata/gmd:fileIdentifier",
-  "TR.missingMdFileIdentifier"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="51a3f789-398c-4398-9162-3e7b4c98473e" name="Metadata response has MD_Metadata element">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-  "//gmd:MD_Metadata",
-  "TR.invalidIsoMetadata"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:credentials>
-                  <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
-                  <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
-                  <con:authType>Global HTTP Settings</con:authType>
-               </con:credentials>
-               <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-               <con:jmsPropertyConfig />
-               <con:parameters>
-                  <con:parameter>
-                     <con:name>#urlToTest</con:name>
-                     <con:value>#urlToTest</con:value>
-                     <con:style>TEMPLATE</con:style>
-                     <con:default>#urlToTest</con:default>
-                  </con:parameter>
-               </con:parameters>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="transfer" name="Internal Service Metadata end" id="dc8013ce-231c-4c55-a619-1b14aa4916c3">
-            <con:settings />
-            <con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
-         </con:testStep>
-         <con:testStep type="goto" name="Skip external Service Metadata check" id="60466157-968a-4965-adf0-a240688f3f0b">
-            <con:settings />
-            <con:config xsi:type="con:GotoStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:condition>
-                  <con:name>SkipScenario1</con:name>
-                  <con:type>XPATH</con:type>
-                  <con:expression>declare namespace wfs='http://www.opengis.net/wfs/2.0';
-declare namespace ows='http://www.opengis.net/ows/1.1';
-declare namespace fes='http://www.opengis.net/fes/2.0';
-declare namespace gml='http://www.opengis.net/gml/3.2';
-declare namespace xlink='http://www.w3.org/1999/xlink';
-declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1.0';
-declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
+   }
 
-empty(//inspire_dls:ExtendedCapabilities/inspire_common:MetadataUrl/inspire_common:URL)</con:expression>
-                  <con:targetStep>Test end</con:targetStep>
-               </con:condition>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="httprequest" name="Request and check external ServiceMetadata" id="b313b52d-b03c-4861-8c7a-3f7b058e3e9f">
+   else if (scenario == '2'){
+
+               //Title
+               def title = capabilities.ServiceIdentification.Title;
+               if(title.size() != 1){
+                  String[] assertParams = ['element', 'ServiceIdentification/Title'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(title.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/Title'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+               //Abstract
+               def abstract2 = capabilities.ServiceIdentification.Abstract;
+               if(abstract2.size() != 1){
+                  String[] assertParams = ['element', 'ServiceIdentification/Abstract'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(abstract2.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/Abstract'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+               //resourcetype
+               def resourceType = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.ResourceType;
+               if(resourceType.size() != 1){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(resourceType.toString().length() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+               else if(resourceType.toString() != 'service'){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/ResourceType', 'value', 'service'];
+                  throw new TranslatableAssertionError('TR.valueShallBe', assertParams);
+               }
+
+               //resource locator
+               def resourceLocators = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.ResourceLocator;
+               def resourceLocatorUrl = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.ResourceLocator.URL;
+               if(resourceLocators.size() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/ResourceLocator'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+
+               resourceLocators.each{ resourceLocator ->
+                  if(resourceLocator.URL.size() != 1){
+                     String[] assertParams = ['element', 'ExtendedCapabilities/resourceLocator/URL'];
+                     throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+                  }
+                  else if(resourceLocator.URL.toString().length() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/resourceLocator/URL'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+                  def url= resourceLocator.URL.toString()
+                  def urlc = new URL(url);
+                  def connection = urlc.openConnection();
+                  def code = connection.getResponseCode();
+
+                  if (code != 200){
+                        throw new TranslatableAssertionError("TR.unexpectedHTTPCodeWithURL", "expected", "200", "actual", code.toString(), "url", url);
+                  }
+                  
+               }
+
+               //coupled resource
+               
+               def layers = capabilities.FeatureTypeList.depthFirst().findAll{it.name()=='FeatureType' &amp;&amp; it.MetadataURL.size() != 0};
+               layers.each{ layer ->
+                  if(layer.MetadataURL.size() == 0){
+                     String[] assertParams = ['element', 'FeatureType/MetadataURL'];
+                     throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+                  }
+               }
+
+               //spatial data service
+               def spatialDataServiceType = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.SpatialDataServiceType;
+               if(spatialDataServiceType.size() != 1){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(spatialDataServiceType.toString().length() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+               else if(spatialDataServiceType.toString() != 'view'){
+                  throw new TranslatableAssertionError("TR.invalidSpatialDataServiceType");
+               }
+
+               //keyword
+               def classificationSDS = ['humanInteractionService', 'humanCatalogueViewer', 'humanGeographicViewer', 'humanGeographicSpreadsheetViewer', 'humanServiceEditor', 'humanChainDefinitionEditor', 'humanWorkflowEnactmentManager', 'humanGeographicFeatureEditor', 'humanGeographicSymbolEditor', 'humanFeatureGeneralizationEditor', 'humanGeographicDataStructureViewer', 'infoManagementService', 'infoFeatureAccessService', 'infoMapAccessService', 'infoCoverageAccessService', 'infoSensorDescriptionService', 'infoProductAccessService', 'infoFeatureTypeService', 'infoCatalogueService', 'infoRegistryService', 'infoGazetteerService', 'infoOrderHandlingService', 'infoStandingOrderService', 'taskManagementService', 'chainDefinitionService', 'workflowEnactmentService', 'subscriptionService', 'spatialProcessingService', 'spatialCoordinateConversionService', 'spatialCoordinateTransformationService', 'spatialCoverageVectorConversionService', 'spatialImageCoordinateConversionService', 'spatialRectificationService', 'spatialOrthorectificationService', 'spatialSensorGeometryModelAdjustmentService', 'spatialImageGeometryModelConversionService', 'spatialSubsettingService', 'spatialSamplingService', 'spatialTilingChangeService', 'spatialDimensionMeasurementService', 'spatialFeatureManipulationService', 'spatialFeatureMatchingService', 'spatialFeatureGeneralizationService', 'spatialRouteDeterminationService', 'spatialPositioningService', 'spatialProximityAnalysisService', 'thematicProcessingService', 'thematicGoparameterCalculationService', 'thematicClassificationService', 'thematicFeatureGeneralizationService', 'thematicSubsettingService', 'thematicSpatialCountingService', 'thematicChangeDetectionService', 'thematicGeographicInformationExtractionService', 'thematicImageProcessingService', 'thematicReducedResolutionGenerationService', 'thematicImageManipulationService', 'thematicImageUnderstandingService', 'thematicImageSynthesisService', 'thematicMultibandImageManipulationService', 'thematicObjectDetectionService', 'thematicGeoparsingService', 'thematicGeocodingService', 'temporalProcessingService', 'temporalReferenceSystemTransformationService', 'temporalSubsettingService', 'temporalSamplingService', 'temporalProximityAnalysisService', 'metadataProcessingService', 'metadataStatisticalCalculationService', 'metadataGeographicAnnotationService', 'comService', 'comEncodingService', 'comTransferService', 'comGeographicCompressionService', 'comGeographicFormatConversionService', 'comMessagingService', 'comRemoteFileAndExecutableManagement'];
+
+               def keywords1 = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.Keyword
+               def keywords2 = capabilities.ServiceIdentification.Keywords.Keyword
+
+               if(keywords1.size() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/Keyword'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               if(keywords1.toString().length() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/Keyword'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+               if(keywords2.size() == 0){
+                  String[] assertParams = ['element', 'Keywords/Keyword'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               if(keywords2.toString().length() == 0){
+                  String[] assertParams = ['element', 'Keywords/Keyword'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+               //temporal reference
+               def temporalReferences = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.TemporalReference;
+               if(temporalReferences.size() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               temporalReferences.each{ temporalReference ->
+                  if(temporalReference.DateOfPublication.size() == 0 &amp;&amp; temporalReference.DateOfLastRevision.size() == 0 &amp;&amp; temporalReference.DateOfCreation.size() == 0){
+                     throw new TranslatableAssertionError("TR.atLeastOneDateType");
+                  }
+                  if(temporalReference.DateOfPublication.toString().length() == 0 &amp;&amp; temporalReference.DateOfLastRevision.toString().length() == 0 &amp;&amp; temporalReference.DateOfCreation.toString().length() == 0){
+                     String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference/DateOfPublication'];
+                     throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+                  }
+                  if(temporalReference.DateOfPublication.size() == 1 &amp;&amp; !(temporalReference.DateOfPublication ==~ /\d{4}\-\d{2}\-\d{2}/)){
+                     throw new TranslatableAssertionError("TR.wrongDateFormat");
+                  }
+                  if(temporalReference.DateOfLastRevision.size() == 1 &amp;&amp; !(temporalReference.DateOfLastRevision ==~ /\d{4}\-\d{2}\-\d{2}/)){
+                     throw new TranslatableAssertionError("TR.wrongDateFormat");
+                  }
+                  if(temporalReference.DateOfCreation.size() == 1 &amp;&amp; !(temporalReference.DateOfCreation ==~ /\d{4}\-\d{2}\-\d{2}/)){
+                     throw new TranslatableAssertionError("TR.wrongDateFormat");
+                  }
+               }
+
+               //conformity
+               def conformity = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.Conformity;
+               if(conformity.size() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/Conformity'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               else if(conformity.toString().length() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/Conformity'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+               conformity.each{confor ->
+                  if(confor.Degree.size() != 1){
+                     String[] assertParams = ['element', 'ExtendedCapabilities/Conformity/Degree'];
+                     throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+                  }
+                  if(!(confor.Degree == 'notEvaluated' || confor.Degree == 'conformant' || confor.Degree == 'notConformant'))
+
+                   {
+                     confor.Specification.Title.each{ titl ->
+                        if (!(titl.contains('976')) || !(titl.contains('Commission Regulation (EC) No 976/2009 of 19 October 2009 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards the Network Services'))){
+                           throw new TranslatableAssertionError("TR.wrongConformityDegree");
+                        }
+                     }
+                  }
+               }
+
+               //fees
+               def fees = capabilities.ServiceIdentification.Fees;
+               if(fees.size() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/Fees'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               if(fees.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/Fees'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+               //access constraint
+               def accessConstraint = capabilities.ServiceIdentification.AccessConstraints;
+               if(accessConstraint.size() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/AccessConstraints'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               else if(accessConstraint.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/AccessConstraints'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+               //contact
+               def providerName = capabilities.ServiceProvider.ProviderName;
+               def contactInfo = capabilities.ServiceProvider.ServiceContact.ContactInfo;
+               if(providerName.size() != 1){
+                  String[] assertParams = ['element', 'ServiceProvider/ProviderName'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               if(providerName.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceProvider/ProviderName'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+               if(contactInfo.size() == 0){
+                  String[] assertParams = ['element', 'Service/ContactInformation/ServiceProvider/ServiceContact.ContactInfo'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+              
+
+
+               def metadataPointOfContact = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.MetadataPointOfContact;
+               metadataPointOfContact.each{metadataPOC ->
+                  if(metadataPOC.OrganisationName.size() == 0){
+                     String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact/OrganisationName'];
+                     throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+                  }
+                  if(metadataPOC.OrganisationName.toString().length() == 0){
+                     String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact/OrganisationName'];
+                     throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+                  }
+                  if(metadataPOC.EmailAddress.size() == 0){
+                     String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact/EmailAddress'];
+                     throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+                  }
+                  if(metadataPOC.EmailAddress.toString().length() == 0){
+                     String[] assertParams = ['element', 'ExtendedCapabilities/MetadataPointOfContact/EmailAddress'];
+                     throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+                  }
+               }
+
+               //date
+               def date = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.MetadataDate;
+               if(date.size() != 1){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/MetadataDate'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               if(!(date ==~ /\d{4}\-\d{2}\-\d{2}/)){
+                  throw new TranslatableAssertionError("TR.wrongDateFormat");
+               }
+
+               //supportedlang
+               def supportedLanguage = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.SupportedLanguages;
+               if(supportedLanguage.size() != 1){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(supportedLanguage.toString().length() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/SupportedLanguages'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+               //Unique Resource Identifier
+
+               def code2 = capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.SpatialDataSetIdentifier.Code;
+               if(code2.size() != 1){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataSetIdentifier/Code'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(supportedLanguage.toString().length() == 0){
+                  String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataSetIdentifier/Code'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+
+   }
+
+
+   else if (scenario == '3'){
+
+               def title = capabilities.ServiceIdentification.Title;
+               if(title.size() != 1){
+                  String[] assertParams = ['element', 'ServiceIdentification/Title'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(title.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/Title'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+
+               def abstract2 = capabilities.ServiceIdentification.Abstract;
+               if(abstract2.size() != 1){
+                  String[] assertParams = ['element', 'ServiceIdentification/Abstract'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+               else if(abstract2.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/Abstract'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+
+               def layers = capabilities.FeatureTypeList.depthFirst().findAll{it.name()=='FeatureType' &amp;&amp; it.MetadataURL.size() != 0};
+               layers.each{ layer ->
+                  if(layer.MetadataURL.size() == 0){
+                     String[] assertParams = ['element', 'FeatureType/MetadataURL'];
+                     throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+                  }
+               }
+
+
+               def classificationSDS = ['humanInteractionService', 'humanCatalogueViewer', 'humanGeographicViewer', 'humanGeographicSpreadsheetViewer', 'humanServiceEditor', 'humanChainDefinitionEditor', 'humanWorkflowEnactmentManager', 'humanGeographicFeatureEditor', 'humanGeographicSymbolEditor', 'humanFeatureGeneralizationEditor', 'humanGeographicDataStructureViewer', 'infoManagementService', 'infoFeatureAccessService', 'infoMapAccessService', 'infoCoverageAccessService', 'infoSensorDescriptionService', 'infoProductAccessService', 'infoFeatureTypeService', 'infoCatalogueService', 'infoRegistryService', 'infoGazetteerService', 'infoOrderHandlingService', 'infoStandingOrderService', 'taskManagementService', 'chainDefinitionService', 'workflowEnactmentService', 'subscriptionService', 'spatialProcessingService', 'spatialCoordinateConversionService', 'spatialCoordinateTransformationService', 'spatialCoverageVectorConversionService', 'spatialImageCoordinateConversionService', 'spatialRectificationService', 'spatialOrthorectificationService', 'spatialSensorGeometryModelAdjustmentService', 'spatialImageGeometryModelConversionService', 'spatialSubsettingService', 'spatialSamplingService', 'spatialTilingChangeService', 'spatialDimensionMeasurementService', 'spatialFeatureManipulationService', 'spatialFeatureMatchingService', 'spatialFeatureGeneralizationService', 'spatialRouteDeterminationService', 'spatialPositioningService', 'spatialProximityAnalysisService', 'thematicProcessingService', 'thematicGoparameterCalculationService', 'thematicClassificationService', 'thematicFeatureGeneralizationService', 'thematicSubsettingService', 'thematicSpatialCountingService', 'thematicChangeDetectionService', 'thematicGeographicInformationExtractionService', 'thematicImageProcessingService', 'thematicReducedResolutionGenerationService', 'thematicImageManipulationService', 'thematicImageUnderstandingService', 'thematicImageSynthesisService', 'thematicMultibandImageManipulationService', 'thematicObjectDetectionService', 'thematicGeoparsingService', 'thematicGeocodingService', 'temporalProcessingService', 'temporalReferenceSystemTransformationService', 'temporalSubsettingService', 'temporalSamplingService', 'temporalProximityAnalysisService', 'metadataProcessingService', 'metadataStatisticalCalculationService', 'metadataGeographicAnnotationService', 'comService', 'comEncodingService', 'comTransferService', 'comGeographicCompressionService', 'comGeographicFormatConversionService', 'comMessagingService', 'comRemoteFileAndExecutableManagement'];
+
+
+
+
+               def keywords2 = capabilities.ServiceIdentification.Keywords.Keyword;
+
+               if(keywords2.size() == 0){
+                  String[] assertParams = ['element', 'Keywords/Keyword'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               if(keywords2.toString().length() == 0){
+                  String[] assertParams = ['element', 'Keywords/Keyword'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+               def keywords = capabilities.Service.KeywordList.depthFirst().findAll{it.name() == 'Keyword'};
+                  def keywordInclassification = false;
+                  keywords.each{keyword ->
+                     if(keyword in classificationSDS){
+                        keywordInclassification = true;
+                     }
+                  }
+                  if(!keywordInclassification){
+                     throw new TranslatableAssertionError("TR.atLeastOneKeywordInClassification");
+                  }
+
+
+               def temporalReference = capabilities.'@updateSequence';
+               log.info(temporalReference);
+               if(temporalReference.size() != 1){
+                  String[] assertParams = ['element', 'updateSequence'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+
+
+               def conformity = capabilities.ServiceIdentification.Keywords.depthFirst().findAll{it.name() == 'Type'};
+                  def conformed = false;
+                  conformity.each{confor ->
+                     if(confor.'@codespace' == 'http://data.europa.eu/eli' &amp;&amp; confor == 'European Legislation Identifier (ELI)'){
+                        conformed = true;
+                     }
+                  }
+                  if(!conformed){
+                     throw new TranslatableAssertionError("TR.atLeastOneKeywordInClassification");
+                  }
+               
+
+               def fees = capabilities.ServiceIdentification.Fees;
+               if(fees.size() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/Fees'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               if(fees.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/Fees'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+
+               def accessConstraint = capabilities.ServiceIdentification.AccessConstraints;
+               if(accessConstraint.size() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/AccessConstraints'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+               }
+               else if(accessConstraint.toString().length() == 0){
+                  String[] assertParams = ['element', 'ServiceIdentification/AccessConstraints'];
+                  throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+               }
+
+
+
+
+               def providerName = capabilities.ServiceProvider.ProviderName;
+               if(providerName.size() != 1){
+                  String[] assertParams = ['element', 'ServiceProvider/ProviderName'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+
+               def contactInfo = capabilities.ServiceProvider.ServiceContact.ContactInfo;
+               if(providerName.size() != 1){
+                  String[] assertParams = ['element', 'ServiceProvider/ServiceContact/ContactInfo'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+
+
+               def ema = capabilities.ServiceProvider.ServiceContact.ContactInfo.Address.ElectronicMailAddress;
+               if(ema.size() != 1){
+                  String[] assertParams = ['element', 'ServiceProvider/ServiceContact/ContactInfo/Address/ElectronicMailAddress'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+              
+
+
+               def date = capabilities.'@updateSequence';
+               if(date.size() != 1){
+                  String[] assertParams = ['element', 'updateSequence'];
+                  throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+               }
+   }
+   else{
+      throw new TranslatableAssertionError('TR.unknownScenario');
+   }
+   </script>
+               </con:config>
+            </con:testStep>
+            <con:testStep type="httprequest" name="manual-check" id="31383798-52be-4256-902e-0f856682756f">
+               <con:settings />
+               <con:config method="GET" xsi:type="con:HttpRequest" id="6702695e-7141-410d-87d5-ba456cef5021" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                  <con:settings>
+                     <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+                  </con:settings>
+                  <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+                  <con:request />
+                  <con:assertion type="GroovyScriptAssertion" id="ba81ced7-fcfc-485d-a1df-fdf4f9ac3a02" name="manual-check-metadata">
+                     <con:configuration>
+                        <scriptText>import de.interactive_instruments.etf.suim.*
+                           import de.interactive_instruments.SUtils
+   import de.interactive_instruments.XmlUtils
+   import de.interactive_instruments.etf.model.exceptions.TestStepNotFoundException
+   import de.interactive_instruments.exceptions.EmptyContentParseException
+   import de.interactive_instruments.exceptions.XmlParseException
+   import de.interactive_instruments.xtf.ProjectHelper
+   import de.interactive_instruments.xtf.SOAPUI_I
+   import com.eviware.soapui.support.XmlHolder
+   Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+
+
+   def capabilities = new XmlSlurper().parseText(a.xml.getXml());
+
+   def scenario = '0';
+   if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.size() == 0){
+      scenario = '3';
+      def features = capabilities.FeatureTypeList.FeatureType;
+      features.each{feature ->
+      if (feature.WGS84BoundingBox.size == 0){
+         String[] assertParams = ['elementName', 'WGS84BoundingBox', 'scenario', scenario];
+         throw new TranslatableAssertionError('TR.manual.checkContent', assertParams);
+         }
+      }
+   }
+   else if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.ResourceType.size() != 0){
+      scenario = '2';
+      def features = capabilities.FeatureTypeList.FeatureType;
+      features.each{feature ->
+      if (feature.WGS84BoundingBox.size == 0){
+         String[] assertParams = ['elementName', 'WGS84BoundingBox', 'scenario', scenario];
+         throw new TranslatableAssertionError('TR.manual.checkContent', assertParams);
+         }
+      }
+   }
+   else if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.MetadataUrl.size() != 0){
+      scenario = '1';
+   }
+   log.info("Scenario: " + scenario);
+   </scriptText>
+                     </con:configuration>
+                  </con:assertion>
+                  <con:credentials>
+                     <con:authType>No Authorization</con:authType>
+                  </con:credentials>
+                  <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+                  <con:jmsPropertyConfig />
+                  <con:parameters>
+                     <con:parameter required="false" disableUrlEncoding="false">
+                        <con:name>request</con:name>
+                        <con:value>GetCapabilities</con:value>
+                        <con:style>QUERY</con:style>
+                        <con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type>
+                        <con:default>${#Project#request}</con:default>
+                        <con:description xsi:nil="true" />
+                     </con:parameter>
+                     <con:parameter>
+                        <con:name>service</con:name>
+                        <con:value>${#Project#service}</con:value>
+                        <con:style>QUERY</con:style>
+                        <con:default>${#Project#service}</con:default>
+                        <con:path xsi:nil="true" />
+                        <con:description xsi:nil="true" />
+                     </con:parameter>
+                  </con:parameters>
+               </con:config>
+            </con:testStep>
+         <con:properties />
+      </con:testCase>  
+      <con:testCase id="2dbe4a90-d6d8-42ec-9afd-7ef37fa9c0e9" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Provide Supported Languages - Scenario 3" searchProperties="true">
+         <con:description>
+               <![CDATA[<p>Check manually that if the service supports several languages and there is no Extended Capabilities, the xml:lang attribute is used to define the languages used.
+               
+               <p>Relevant Requirements: <ul><li>TG Requirement 79: If the service supports several languages and there is no Extended Capabilities, the xml:lang attribute shall be used to define the languages used.</li></ul></p>
+               Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/master/wfs-pre-defined/provide-supported-languages-scenario3" target="_blank">Provide Supported Languages - Scenario 3</a>]]>
+            </con:description>
             <con:settings />
-            <con:config method="GET" xsi:type="con:HttpRequest" name="Request and check external ServiceMetadata" id="28b7e82a-bda9-4e15-b5bb-e6503921a534" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:description>Uses the MetadataUrl from the ExtendedCapabilities to request the ServiceMetadata.</con:description>
-               <con:settings>
-                  <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
-               </con:settings>
-               <con:encoding xsi:nil="true" />
-               <con:endpoint>http://nowhere</con:endpoint>
-               <con:request />
-               <con:assertion type="Valid HTTP Status Codes" id="bb542144-7b3f-4a81-95dd-927ee8e1898d" name="HTTP status code is 200">
-                  <con:configuration>
-                     <codes>200</codes>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="Response SLA Assertion" id="c8812bd6-1009-43e9-8b0c-a51ead65696a" name="30 seconds timeout">
-                  <con:configuration>
-                     <SLA>30000</SLA>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="OwsExceptionReportAssertion" id="5e62b0cc-9cf1-461e-9c2a-782abbdf46bc" name="Expect no exception" />
-               <con:assertion type="GroovyScriptAssertion" id="62489eed-fc72-4957-ba42-e287fd79bfa6" name="xsi:schemaLocation attribute exists in root element">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("//@*:schemaLocation", "TR.missingSchemaLocation");</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="2afebc3c-44dd-4822-be67-892e55ef4106" name="Metadata has ISO Metadata element (gmd_MD_Metadata exists)">
-                  <con:configuration>
-                     <scriptText>import de.interactive_instruments.etf.suim.*;
-Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists(
-	"//gmd:MD_Metadata",
-  "TR.notIsoMetadata"
-);</scriptText>
-                  </con:configuration>
-               </con:assertion>
-               <con:credentials>
-                  <con:selectedAuthProfile>Basic</con:selectedAuthProfile>
-                  <con:addedBasicAuthenticationTypes>Basic</con:addedBasicAuthenticationTypes>
-                  <con:authType>Global HTTP Settings</con:authType>
-               </con:credentials>
-               <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
-               <con:jmsPropertyConfig />
-               <con:parameters />
-            </con:config>
-         </con:testStep>
-         <con:testStep type="transfer" name="Property Transfer Metadata Identifiers" id="58d868ca-039e-4cc5-b655-caf8eadef48c">
-            <con:settings />
-            <con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="false" ignoreEmpty="true" transferToAll="false" useXQuery="false" entitize="false" transferChildNodes="false">
-                  <con:name>datasetIdentifiersOperatesOn</con:name>
-                  <con:sourceType>ResponseAsXml</con:sourceType>
-                  <con:sourceStep>Request and check external ServiceMetadata</con:sourceStep>
-                  <con:sourcePath>declare namespace gmd='http://www.isotc211.org/2005/gmd';
-declare namespace srv='http://www.isotc211.org/2005/srv';
-declare namespace gco='http://www.isotc211.org/2005/gco';
-string-join(//srv:operatesOn/@*:href,',')</con:sourcePath>
-                  <con:targetType>datasetIdentifiersList</con:targetType>
-                  <con:targetStep>#Project#</con:targetStep>
-                  <con:upgraded>true</con:upgraded>
-               </con:transfers>
-               <con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false">
-                  <con:name>ServiceMetadataRecord</con:name>
-                  <con:sourceType>ResponseAsXml</con:sourceType>
-                  <con:sourceStep>Request and check external ServiceMetadata</con:sourceStep>
-                  <con:sourcePath />
-                  <con:targetType>ServiceMetadataRecord</con:targetType>
-                  <con:targetStep>Transfer_Properties</con:targetStep>
-                  <con:upgraded>true</con:upgraded>
-               </con:transfers>
-            </con:config>
-         </con:testStep>
-         <con:testStep type="transfer" name="Test end" id="cee141cc-c40a-4418-9246-01d0438b44ce">
-            <con:settings />
-            <con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" />
-         </con:testStep>
+            <con:testStep type="httprequest" name="http-request-metadata" id="d2d3b881-0031-44a5-9501-148874b954f7" disabled="true">
+               <con:settings />
+               <con:config method="GET" xsi:type="con:HttpRequest" id="4bf9ebb3-05aa-4742-bfb5-b636620f01ea" name="http-request-metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                  <con:settings>
+                     <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+                  </con:settings>
+                  <con:endpoint>${#TestCase#metadataEndpoint}</con:endpoint>
+                  <con:request />
+                  <con:assertion type="Valid HTTP Status Codes" id="e1301fa4-e39d-44aa-8d21-9b992634381e" name="Valid HTTP Status Codes">
+                     <con:configuration>
+                        <codes>200</codes>
+                     </con:configuration>
+                  </con:assertion>
+                  <con:assertion type="OwsExceptionReportAssertion" id="8eded20c-a3d2-4d60-91ae-d9c9c7b18be6" name="Fail if service returns OWS Exception Report" />
+                  <con:assertion type="Response SLA Assertion" id="bc9867f3-19b6-4bff-ad8a-2eb085e6527b" name="Response SLA">
+                     <con:configuration>
+                        <SLA>30000</SLA>
+                     </con:configuration>
+                  </con:assertion>
+                  <con:credentials>
+                     <con:authType>No Authorization</con:authType>
+                  </con:credentials>
+                  <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+                  <con:jmsPropertyConfig />
+                  <con:parameters />
+               </con:config>
+            </con:testStep>
+            <con:testStep type="httprequest" name="manual-check" id="9bad152a-bd7e-4d2c-8ab2-fd62266a9de6">
+               <con:settings />
+               <con:config method="GET" xsi:type="con:HttpRequest" id="1ab82414-4fa0-4b27-8c9b-8001f98521a7" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                  <con:settings>
+                     <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+                  </con:settings>
+                  <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+                  <con:request />
+                  <con:assertion type="GroovyScriptAssertion" id="0713db7b-73da-44c7-8cc7-edfa641af297" name="manual-check-supported-language">
+                     <con:configuration>
+                        <scriptText>import de.interactive_instruments.etf.suim.*
+                           import de.interactive_instruments.SUtils
+   import de.interactive_instruments.XmlUtils
+   import de.interactive_instruments.etf.model.exceptions.TestStepNotFoundException
+   import de.interactive_instruments.exceptions.EmptyContentParseException
+   import de.interactive_instruments.exceptions.XmlParseException
+   import de.interactive_instruments.xtf.ProjectHelper
+   import de.interactive_instruments.xtf.SOAPUI_I
+   import com.eviware.soapui.support.XmlHolder
+   Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+
+
+   def capabilities = new XmlSlurper().parseText(a.xml.getXml());
+
+   def scenario = '0';
+
+   if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.size() == 0){
+      scenario = '3';
+       String[] assertParams = ['elementName', 'xml:lang', 'scenario', scenario];
+      throw new TranslatableAssertionError('TR.manual.checkContent', assertParams);
+      
+   }
+   else if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.ResourceType.size() != 0){
+      scenario = '2';
+   }
+   else if(capabilities.OperationsMetadata.ExtendedCapabilities.ExtendedCapabilities.MetadataUrl.size() != 0){
+      scenario = '1';
+   }
+   log.info(scenario);
+   </scriptText>
+                     </con:configuration>
+                  </con:assertion>
+                  <con:credentials>
+                     <con:authType>No Authorization</con:authType>
+                  </con:credentials>
+                  <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+                  <con:jmsPropertyConfig />
+                  <con:parameters>
+                     <con:parameter required="false" disableUrlEncoding="false">
+                        <con:name>request</con:name>
+                        <con:value>GetCapabilities</con:value>
+                        <con:style>QUERY</con:style>
+                        <con:type xmlns:xs="http://www.w3.org/2001/XMLSchema">xs:string</con:type>
+                        <con:default>${#Project#request}</con:default>
+                        <con:description xsi:nil="true" />
+                     </con:parameter>
+                     <con:parameter>
+                        <con:name>service</con:name>
+                        <con:value>${#Project#service}</con:value>
+                        <con:style>QUERY</con:style>
+                        <con:default>${#Project#service}</con:default>
+                        <con:path xsi:nil="true" />
+                        <con:description xsi:nil="true" />
+                     </con:parameter>
+                  </con:parameters>
+               </con:config>
+            </con:testStep>
          <con:properties />
       </con:testCase>
       <con:properties>
@@ -7124,7 +7182,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
          <con:testStep type="testcasedependency" name="Extended Capabilities" id="72fd9bfd-4a87-4b44-9b04-6275e4e50437">
             <con:settings />
             <con:config xsi:type="con:RunTestCaseStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-               <con:targetTestCase>938f750f-00ed-4100-b6ad-cc32c10ffeb3</con:targetTestCase>
+               <con:targetTestCase>96964cba-9ef1-4188-9e87-47bca74559d4</con:targetTestCase>
                <con:properties />
                <con:returnProperties />
                <con:runMode>SINGLETON_AND_WAIT</con:runMode>
@@ -7220,7 +7278,7 @@ a.exists("/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[@id='http://
                      <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"/*:DescribeStoredQueriesResponse",
+   "/*:DescribeStoredQueriesResponse",
   "missingStoredQueriesRootElement"
 );</scriptText>
                   </con:configuration>
@@ -7284,7 +7342,7 @@ declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0
                      <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
+   "//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Namespace",
   "TR.missingSpatialDataSetIdentifierNamespace"
 );</scriptText>
                   </con:configuration>
@@ -7294,7 +7352,7 @@ a.exists(
                      <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 a.exists(
-	"//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
+   "//inspire_dls:ExtendedCapabilities/inspire_dls:SpatialDataSetIdentifier/inspire_common:Code",
   "TR.capabilities.extended.inspire.missingElement"
 );</scriptText>
                   </con:configuration>
@@ -7352,8 +7410,8 @@ declare namespace inspire_dls='http://inspire.ec.europa.eu/schemas/inspire_dls/1
 declare namespace inspire_common='http://inspire.ec.europa.eu/schemas/common/1.0';
 
 string-join(
-	distinct-values((/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language,
-	/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage/inspire_common:Language)),
+   distinct-values((/*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:DefaultLanguage/inspire_common:Language,
+   /*:WFS_Capabilities/ows:OperationsMetadata/ows:ExtendedCapabilities/inspire_dls:ExtendedCapabilities[1]/inspire_common:SupportedLanguages/inspire_common:SupportedLanguage/inspire_common:Language)),
 ',')</con:sourcePath>
                   <con:targetType>supportedLanguages</con:targetType>
                   <con:targetStep>Transfer_Properties</con:targetStep>
@@ -7404,15 +7462,15 @@ def spatialDataSetIdentifierNamespaces = ph.getTransferProperty("spatialDataSetI
 
 
 for( crs in supportedCrs ) {
-	for( language in supportedLanguages ) {
-		spatialDataSetIdentifierCodes.eachWithIndex{ dataSetIdCode, i ->
-			ph.setTransferProperty("crs", crs);
-			ph.setTransferProperty("language", language);
-			ph.setTransferProperty("dataSetIdCode", dataSetIdCode);
-			ph.setTransferProperty("dataSetIdNamespace", spatialDataSetIdentifierNamespaces[i]);
-   		ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier");
-		}
-	}
+   for( language in supportedLanguages ) {
+      spatialDataSetIdentifierCodes.eachWithIndex{ dataSetIdCode, i ->
+         ph.setTransferProperty("crs", crs);
+         ph.setTransferProperty("language", language);
+         ph.setTransferProperty("dataSetIdCode", dataSetIdCode);
+         ph.setTransferProperty("dataSetIdNamespace", spatialDataSetIdentifierNamespaces[i]);
+         ph.runTestStep("Invoke Stored Query with CRS, Language, SpatialDataSetIdentifier");
+      }
+   }
 }
 
 testRunner.gotoStepByName("End test");</script>
@@ -7539,8 +7597,18 @@ if (node != null){
          <con:name>excludeFeatureTypes</con:name>
          <con:value />
       </con:property>
-
-
+      <con:property>
+         <con:name>extended_capabilities_scenario</con:name>
+         <con:value />
+      </con:property>
+      <con:property>
+         <con:name>service</con:name>
+         <con:value>WFS</con:value>
+      </con:property>
+      <con:property>
+         <con:name>version</con:name>
+         <con:value>2.0.0</con:value>
+      </con:property>
       <con:property>
          <con:name>featureTypeList</con:name>
          <con:value />
@@ -7679,44 +7747,44 @@ import com.eviware.soapui.model.testsuite.TestStepResult;
 
 // Get the "requirements" test step
 def requirements = project.getTestSuiteByName("TestSetup")?.
-	getTestCaseByName("Requirements")?.getTestStepByName("Requirements");
+   getTestCaseByName("Requirements")?.getTestStepByName("Requirements");
 
 log.info("Results: ");
 for( testSuiteR in runner?.getResults() ) {
-	for( testCaseR in testSuiteR?.getResults() ) {
-		for( testStepR in testCaseR?.getResults() ) {
+   for( testCaseR in testSuiteR?.getResults() ) {
+      for( testStepR in testCaseR?.getResults() ) {
 
          if(testStepR.getStatus()!=TestStepResult.TestStepStatus.OK) {
-				if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
-					testStepR.testStep.testRequest.assertionList.each{
-						// Extract ID which is seperated with a whitespace and a doublecolon
-						String assertionName = it.name;
-						if (assertionName.indexOf(": ") > -1) {
-							String id = assertionName?.substring( 0, assertionName.indexOf(": ") );
-							if(it.valid) {
-								log.info("Assertion "+assertionName+" passed");
-							}else if(it.failed) {
-								log.error("Assertion "+assertionName+" failed with error:");
-								log.error("  -   "+it.getErrors()[0].getMessage());
-								log.error("  -   Requirements:");
+            if (testStepR.testStep instanceof HttpTestRequestStep || testStepR.testStep instanceof  RestTestRequestStep) {
+               testStepR.testStep.testRequest.assertionList.each{
+                  // Extract ID which is seperated with a whitespace and a doublecolon
+                  String assertionName = it.name;
+                  if (assertionName.indexOf(": ") > -1) {
+                     String id = assertionName?.substring( 0, assertionName.indexOf(": ") );
+                     if(it.valid) {
+                        log.info("Assertion "+assertionName+" passed");
+                     }else if(it.failed) {
+                        log.error("Assertion "+assertionName+" failed with error:");
+                        log.error("  -   "+it.getErrors()[0].getMessage());
+                        log.error("  -   Requirements:");
 
-								// Todo: Save the requirements as an object in a map
-								requirements.getPropertyList().each {
-									log.info(it.getName());
-									if(it.getName().contains(id)) {
-										log.error("   -   "+it.getName()+" :" );
-										log.error("        "+it.getValue());
-									}
-								}
-							}else{
-								log.warn("Assertion "+assertionName+" is deactivated");
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+                        // Todo: Save the requirements as an object in a map
+                        requirements.getPropertyList().each {
+                           log.info(it.getName());
+                           if(it.getName().contains(id)) {
+                              log.error("   -   "+it.getName()+" :" );
+                              log.error("        "+it.getValue());
+                           }
+                        }
+                     }else{
+                        log.warn("Assertion "+assertionName+" is deactivated");
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
 }
    </con:afterRunScript>
    <con:sensitiveInformation />
