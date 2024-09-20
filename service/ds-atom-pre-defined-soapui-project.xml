@@ -93,6 +93,22 @@ a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText>
 					<con:parameters />
 				</con:config>
 			</con:testStep>
+			<con:testStep type="groovy" name="set-atom-scenario" id="34db1547-6bda-4868-bb29-f3c59d78083a">
+        <con:settings />
+        <con:config>
+         <script>def response = context.expand('${Check URL is accessible#Response}');
+					def feed = new XmlSlurper().parseText(response);
+					def scenario = '2';
+					def links = feed.link;
+					links.each{link ->
+                     if(link.'@rel' == 'describedby' &amp;&amp; (link.'@type' == 'application/xml' || link.'@type' == 'application/vnd.ogc.csw.GetRecordByIdResponse_xml')){
+                        scenario = '1';
+                     }
+                  }
+					testRunner.testCase.testSuite.project.setPropertyValue( "atom_scenario", scenario );
+					log.info('Atom Scenario: ' + scenario);</script>
+        </con:config>
+     	</con:testStep>
 			<con:properties>
 				<con:property>
 					<con:name>etf.ShortDescription</con:name>
@@ -1736,19 +1752,19 @@ a.notExists(
 		</con:testCase>
 		<con:testCase id="b0be137f-b987-4050-9991-9939c14558fc" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Provide link to metadata record for download service" searchProperties="true">
 			<con:description>
-				<![CDATA[The test case requests the Download Service feed and checks if it provides a link to a metadata record.
+				<![CDATA[The test case requests the Download Service feed and checks if it provides a link to a metadata record. This test only applies to Scenario 1. Otherwise, the test case is skipped.
 <br/>
 <br/>
 Relevant Requirements:
 <ul>
-<li>TG Requirement 6: The 'Download Service Feed' shall contain an Atom 'link' element that links to
+<li>TG Requirement 6(1): The 'Download Service Feed' shall contain an Atom 'link' element that links to
 the metadata record for this Download Service. The value of the 'rel' attribute
 of this element shall be 'describedby' and the value of the 'type' attribute shall
-be either 'application/xml'.</li>
+be either 'application/xml' or "application/vnd.ogc.csw.GetRecordByIdResponse_xml".</li>
 </ul>
 <br/>
 <br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/3.1/atom-pre-defined/download-service-feed-link-to-metadata-record" target="_blank">Abstract Test Case 'Download service feed: Provide link to metadata record for the download service'</a>]]>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/master/atom-pre-defined/download-service-feed-link-to-metadata-record" target="_blank">Abstract Test Case 'Download service feed: Provide link to metadata record for the download service'</a>]]>
 			</con:description>
 			<con:settings />
 			<con:testStep type="properties" name="Transfer_Properties" id="96ce6b09-638f-40cd-919b-785cb006117d">
@@ -1796,11 +1812,20 @@ a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText>
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.*
 final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-
-a.exists(
-  "/atom:feed/atom:link[@rel='describedby' and @type='application/xml' or @type='application/vnd.ogc.csw.GetRecordByIdResponse_xml']",
-  "TR.missingLinkToMetadataRecordForDownloadService"
-);</scriptText>
+def feed = new XmlSlurper().parseText(a.xml.getXml());
+def scenario = '2';
+def links = feed.link;
+links.each{link ->
+   if(link.'@rel' == 'describedby' &amp;&amp; (link.'@type' == 'application/xml' || link.'@type' == 'application/vnd.ogc.csw.GetRecordByIdResponse_xml')){
+      scenario = '1';
+   }
+}
+if(scenario == '1'){
+		a.exists(
+ 		 "/atom:feed/atom:link[@rel='describedby' and @type='application/xml' or @type='application/vnd.ogc.csw.GetRecordByIdResponse_xml']",
+  		"TR.missingLinkToMetadataRecordForDownloadService"
+		);
+}</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
@@ -1811,6 +1836,21 @@ a.exists(
 					<con:parameters />
 				</con:config>
 			</con:testStep>
+			<con:testStep type="groovy" name="Skip for Scenario 2" id="bdb8aae9-88b5-45e4-9aa5-fc918401368c">
+					<con:settings />
+					<con:config>
+						<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					def tc = testRunner.testCase.testSuite.project.testSuites["Initialization and basic checks"].testCases["Setup credentials and check if endpoint is available"];
+					def response = tc.getTestStepByName("Check URL is accessible").getPropertyValue("Response");
+					def atom = new XmlSlurper(false, true).parseText(response);
+					def scenario = testRunner.testCase.testSuite.project.getPropertyValue("atom_scenario");
+
+					log.info("Atom scenario " + scenario);
+					if (scenario == '2')
+					{testRunner.gotoStepByName("Skip scenario");}
+					</script>
+					</con:config>
+				</con:testStep>	
 			<con:testStep type="transfer" name="Extract metadata document URL" id="63db16c5-c828-4922-95dd-5db67bc9c203">
 				<con:settings />
 				<con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -1932,6 +1972,157 @@ a.equalPathValuesInStep(
 					<con:parameters />
 				</con:config>
 			</con:testStep>
+			<con:testStep type="properties" name="Skip scenario" id="5e79687f-f9f3-43be-b87a-9aa93d0f2aa5">
+          <con:settings />
+          <con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+             <con:properties />
+          </con:config>
+       </con:testStep>
+			<con:properties />
+		</con:testCase>
+<con:testCase id="a0e98e90-e4a3-42ec-9f41-8dbbd16d8740" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="Provide Download Service metadata elements in the Feed document" searchProperties="true">
+			<con:description>
+				<![CDATA[The test case requests the Download Service feed and checks if it provides the metadata elements. This test only applies to Scenario 2. Otherwise, the test case is skipped.
+<br/>
+<br/>
+Relevant Requirements:
+<ul>
+<li>TG Requirement 6(2): The Download Service Feed shall contain the INSPIRE Metadata for the Download Service in accordance with Table 17b.</li>
+</ul>
+<br/>
+<br/>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-atom/master/atom-pre-defined/download-service-feed-embedded-metadata-elements" target="_blank">Abstract Test Case 'Download service feed: Provide Download Service metadata elements in the Feed document'</a>]]>
+			</con:description>
+			<con:settings />
+			<con:testStep type="properties" name="Transfer_Properties" id="c4902920-c3b2-43b9-ae8a-4f7ec7a022b7">
+				<con:settings />
+				<con:config xsi:type="con:PropertiesStep" saveFirst="true" discardValuesOnSave="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:properties>
+						<con:property>
+							<con:name>metadataDocumentURL</con:name>
+							<con:value xsi:nil="true" />
+						</con:property>
+						<con:property>
+							<con:name>resourceLocatorURL</con:name>
+							<con:value xsi:nil="true" />
+						</con:property>
+					</con:properties>
+				</con:config>
+			</con:testStep>
+			<con:testStep type="httprequest" name="Get Service Feed" id="bf6fb117-d92a-4875-87b3-e2f9ce3f8da0">
+				<con:settings />
+				<con:config method="GET" xsi:type="con:HttpRequest" id="d839b27b-dee3-4bde-ae87-c2a9634447dc" name="Get Service Feed" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+					<con:description>Requests the Service Feed and checks that the atom elements exist.</con:description>
+					<con:settings>
+						<con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+					</con:settings>
+					<con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+					<con:request />
+					<con:assertion type="Valid HTTP Status Codes" id="fd0df29d-a498-4f3a-a6bb-3e4b63467537" name="HTTP status code 200 is returned">
+						<con:configuration>
+							<codes>200</codes>
+						</con:configuration>
+					</con:assertion>
+					<con:assertion type="Response SLA Assertion" id="e4ea2952-d242-49ea-9139-fb173ad42dc5" name="30 seconds timeout">
+						<con:configuration>
+							<SLA>30000</SLA>
+						</con:configuration>
+					</con:assertion>
+						<con:credentials>
+						<con:authType>No Authorization</con:authType>
+					</con:credentials>
+					<con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+					<con:jmsPropertyConfig />
+					<con:parameters />
+				</con:config>
+			</con:testStep>
+			<con:testStep type="groovy" name="check-atom" id="08d502d4-9896-4d54-a945-d539af97f7ae">
+					<con:settings />
+					<con:config>
+						<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					def tc = testRunner.testCase.testSuite.project.testSuites["Initialization and basic checks"].testCases["Setup credentials and check if endpoint is available"];
+					def response = tc.getTestStepByName("Check URL is accessible").getPropertyValue("Response");
+					def atom = new XmlSlurper(false, true).parseText(response);
+					def scenario = testRunner.testCase.testSuite.project.getPropertyValue("atom_scenario");
+
+					log.info("Atom scenario " + scenario);
+					if (scenario == '2'){
+							//subtitle
+					     def subtitle = atom.subtitle;
+					     if(subtitle.size() != 1){
+					        String[] assertParams = ['element', 'Subtitle'];
+					        throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+					     }
+					     else if(subtitle.toString().length() == 0){
+					        String[] assertParams = ['element', 'Subtitle'];
+					        throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+					     }
+
+				       //conformity
+				       def conformity = atom.category;
+				       if(conformity.size() == 0){
+				          String[] assertParams = ['element', 'Category'];
+				          throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+				       }
+				       keyword = false
+				       conformity.each{confor ->
+				                  if(confor.'@term'.size() != 1){
+				                     String[] assertParams = ['element', 'Category/@term'];
+				                     throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+				                  }
+				                  
+				                  if(confor.'@term'== 'http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceCategory/infoFeatureAccessService'){
+				                     if (confor.'@scheme' == "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceCategory"){
+				                     	keyword = true;
+				                     }
+				                  }
+				                  
+											}
+							if (!keyword){
+				        throw new TranslatableAssertionError('TR.keywordCategory');
+							}
+						}
+
+						</script>
+					</con:config>
+				</con:testStep>	
+				<con:testStep type="httprequest" name="manual-check" id="48e20808-c695-4c52-8f09-8a0ab031fd40">
+           <con:settings />
+           <con:config method="GET" xsi:type="con:HttpRequest" id="1c19d8ae-efd8-46e1-8a1f-cafc4b8a5565" name="manual-check" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+              <con:settings>
+                 <con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting>
+              </con:settings>
+              <con:endpoint>${#Project#serviceEndpoint}</con:endpoint>
+              <con:request />
+              <con:assertion type="GroovyScriptAssertion" id="a77c84d3-f88e-44ec-9864-3a2869a1c464" name="manual-check-atom">
+                 <con:configuration>
+                    <scriptText>import de.interactive_instruments.etf.suim.*
+                       import de.interactive_instruments.SUtils
+										   import de.interactive_instruments.XmlUtils
+										   import com.eviware.soapui.support.XmlHolder
+										   Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
+										   def atom = new XmlSlurper().parseText(a.xml.getXml());
+										   def scenario = '2';
+										   def links = atom.link;
+												links.each{link ->
+			                     if(link.'@rel' == 'describedby' &amp;&amp; (link.'@type' == 'application/xml' || link.'@type' == 'application/vnd.ogc.csw.GetRecordByIdResponse_xml')){
+			                        scenario = '1';
+			                     }
+	                  		}
+										   if(scenario == '2'){
+										      throw new TranslatableAssertionError('TR.manual.checkConformity');
+										   }
+	   								</scriptText>
+                 </con:configuration>
+              </con:assertion>
+              <con:credentials>
+                 <con:authType>No Authorization</con:authType>
+              </con:credentials>
+              <con:jmsConfig JMSDeliveryMode="PERSISTENT" />
+              <con:jmsPropertyConfig />
+              <con:parameters/>
+           </con:config>
+        </con:testStep>
 			<con:properties />
 		</con:testCase>
 		<con:properties />
