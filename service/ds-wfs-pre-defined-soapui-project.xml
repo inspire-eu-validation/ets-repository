@@ -7168,14 +7168,12 @@ Known limitations: The response is currently parsed in memory so that the test c
 Relevant Requirements:
 <ul>
 <li>TG Requirement 49: Pre-defined Stored Queries shall be provided to make pre-defined datasets available.</li>
-<li>TG Requirement 50: Any possible (i.e. available) combinations of CRS/DataSetIdCode/ DataSetIdNamespace/language shall be made available through pre-defined
-stored queries.</li>
-<li>TG Requirement 51: Pre-defined Stored Queries shall use the parameter names 'CRS', 'DataSetIdCode', 'DataSetIdNamespace' and 'Language' to identify the CRS, dataset ID code, dataset ID namespace and language components of a
-query.</li>
+<li>TG Requirement 50: Any possible (i.e. available) combinations of CRS/DataSetIdCode/DataSetIdNamespace/Language shall be made available through pre-defined stored queries if the dataset identifier has a namespace component.</li>
+<li>TG Requirement 51: Pre-defined Stored Queries must use the parameter names "CRS", "DataSetIdCode", and "Language" to identify the CRS, data set identifier code and language components of a query. Pre-defined Stored Queries may also use the parameter name "DataSetIdNamespace" for the namespace of the dataset identifier if the data set identifier has a namespace component.</li>
 </ul>
 <br/>
 <br/>
-Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-defined/predefined-stored-query" target="_blank">Abstract Test Case 'Predefined Stored Query'</a>]]>
+Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/master/wfs-pre-defined/predefined-stored-query" target="_blank">Abstract Test Case 'Predefined Stored Query'</a>]]>
          </con:description>
          <con:settings />
          <con:testStep type="testcasedependency" name="Extended Capabilities" id="72fd9bfd-4a87-4b44-9b04-6275e4e50437">
@@ -7255,11 +7253,11 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/download-wfs/3.1/wfs-pre-def
                      <codes>200</codes>
                   </con:configuration>
                </con:assertion>
-               <con:assertion type="GroovyScriptAssertion" id="67921fc4-bc73-402b-8882-d660a11fcf4a" name="Contains  at least one StoredQuery with the parameters 'CRS', 'DataSetID' , 'DataSetIdNamespace', 'Language'">
+               <con:assertion type="GroovyScriptAssertion" id="67921fc4-bc73-402b-8882-d660a11fcf4a" name="Contains  at least one StoredQuery with the parameters 'CRS', 'DataSetID' , 'Language'">
                   <con:configuration>
                      <scriptText>import de.interactive_instruments.etf.suim.*;
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
-a.exists("/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[./*:Parameter/@name='CRS' and ./*:Parameter/@name='DataSetIdCode' and ./*:Parameter/@name='DataSetIdNamespace' and ./*:Parameter/@name='Language']", "TR.manual.missingInspireStoredQuery");
+a.exists("/*:DescribeStoredQueriesResponse/*:StoredQueryDescription[./*:Parameter/@name='CRS' and ./*:Parameter/@name='DataSetIdCode' and ./*:Parameter/@name='Language']", "TR.manual.missingInspireStoredQuery");
                      </scriptText>
                   </con:configuration>
                </con:assertion>
