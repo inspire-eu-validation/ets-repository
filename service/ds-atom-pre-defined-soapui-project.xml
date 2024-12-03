@@ -3175,9 +3175,8 @@ a.equals(
 								<![CDATA[<etfTranslate what='TR.uniqueAlternateLinkTypes'>
 {
 
-    let $sortedValues := for $entry in //*:entry
-    order by $entry/*:category[1]/@term, $entry/*:link[@rel = 'alternate'][1]/@type
-    return concat('CRS ', $entry/*:category[1]/@term, ' with type ', $entry/*:link[@rel = 'alternate'][1]/@type, '   ')
+    let $sortedValues := for $entry in //*:entry/*:link[@rel = 'alternate'] 
+		return concat('CRS ', $entry/*:category[1]/@term, ' with type ', $entry/*:link[@rel = 'alternate'][1]/@type, '   ')
     
     let $duplicates := $sortedValues[let $pos := position() return . = $sortedValues[$pos+1]]
     let $duplicateCount := count( $duplicates )
