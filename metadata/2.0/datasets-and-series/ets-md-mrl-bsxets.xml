@@ -10,11 +10,11 @@ Known limitations are documented in the description of the applicable test case 
 Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ds-linked-service" target="_blank">Conformance Class 8: INSPIRE data sets and data set series linked service metadata</a><br/><br/>]]>
 	</description>
 	<reference>../../../inspire-md-bsxets.xq</reference>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<author>Consortium Bilbomatica y Guadaltel</author>
 	<creationDate>2023-11-16T00:00:00Z</creationDate>
 	<lastEditor>Consortium Bilbomatica y Guadaltel</lastEditor>
-	<lastUpdateDate>2023-11-16T00:00:00Z</lastUpdateDate>
+	<lastUpdateDate>2025-03-28T12:00:00Z</lastUpdateDate>
 	<tags>
 		<tag ref="EIDc6567beb-fc33-4f2e-865d-0c3ee5b3d1ae" />
 	</tags>
@@ -155,7 +155,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ds-linked-servi
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElement" />
 										<translationTemplate ref="TR.brokenLink" />
-										<translationTemplate ref="TR.manual.resourceLocatorURL" />
+										<translationTemplate ref="TR.manual.resourceLocatorURLvs" />
 										<translationTemplate ref="TR.vsmissingLinkage" />
 									</translationTemplates>
 								</TestAssertion>
@@ -216,6 +216,17 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ds-linked-servi
 										let $path:= $records/gmd:distributionInfo/gmd:MD_Distribution/gmd:transferOptions/gmd:MD_DigitalTransferOptions/gmd:onLine/gmd:CI_OnlineResource[exists(gmd:protocol) and (gmd:protocol/gmx:Anchor/@xlink:href= $protlinks or (gmd:protocol/gco:CharacterString/text() = $protLabels)) and exists(gmd:applicationProfile) and (gmd:applicationProfile/gmx:Anchor/@xlink:href= $sdslinks or (gmd:applicationProfile/gco:CharacterString/text() = $sdsLabels))]
 
 
+										let $haswfsservice :=
+												let $linkage :=
+												for $url in $path/gmd:linkage/gmd:URL
+													return $url
+
+												for  $url in $linkage
+													return
+													if (contains(lower-case($url), 'request=getcapabilities') and contains(lower-case($url), 'service=wfs')) then
+													  $url
+													 else()
+
 										let $messages := for $record in $path
 															let $linkage :=
 																for $url in $record/gmd:linkage/gmd:URL
@@ -230,25 +241,26 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ds-linked-servi
 																		if ($validuri = 'notHTTP' or starts-with($validuri, 'EXCEPTION') or $validuri = 'idNotFound' or matches($validuri,'^\d{3}$')) then
 																			$url
 																		else ()
-								
-															let $linkagecheck :=
+
+														let $linkagecheck := 
 															if (count ($linkage) = 0) then
 																local:addMessage('TR.missingElement',  map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'linkage'})
 															else if (count($invalid_urls) > 0) then
 																local:addMessage('TR.brokenLink', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'linkage', 'value': string-join($invalid_urls, ',')}) 
-															else if (not(contains(lower-case($linkage), 'request=getcapabilities') and contains(lower-case($linkage), 'service=wfs'))) then
-																local:addMessage('TR.manual.resourceLocatorURL', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': $record/@*:id}) 
+															else if (count ($haswfsservice) = 0) then
+																local:addMessage('TR.manual.resourceLocatorURLds', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': $record/@*:id}) 
 															else ()
 															return $linkagecheck
 										let $messagesfinal := if (count($path)=0) then
 															local:addMessage('TR.dsmissingLinkage',  map {'filename': local:filename($records), 'featureType':local-name($records), 'gmlid': string($records/@*:id)})
 														else if (count($messages) > 0) then
-															$messages
-														else() 
-								
+
+															$messages														
+														else()
 									return			
-									(if ($messagesfinal and not($messagesfinal/@ref = ('TR.manual.resourceLocatorURL'))) then 'FAILED' 
-									   else if($messagesfinal and $messagesfinal/@ref = ('TR.manual.resourceLocatorURL')) then 'PASSED_MANUAL' 
+									(if ($messagesfinal and not($messagesfinal/@ref = ('TR.manual.resourceLocatorURLds'))) then 'FAILED' 
+									   else if (count(distinct-values($messagesfinal/@ref[not(.=('TR.manual.resourceLocatorURLds'))])) > 0) then 'FAILED'
+									   else if($messagesfinal and $messagesfinal/@ref = ('TR.manual.resourceLocatorURLds')) then 'PASSED_MANUAL' 
 									   else 'PASSED',
 									 local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messagesfinal//etf:argument[@token='gmlid']/text()))),
 									 $messagesfinal)																									
@@ -257,7 +269,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ds-linked-servi
 									<translationTemplates>
 										<translationTemplate ref="TR.missingElement" />
 										<translationTemplate ref="TR.brokenLink" />
-										<translationTemplate ref="TR.manual.resourceLocatorURL" />
+										<translationTemplate ref="TR.manual.resourceLocatorURLds" />
 										<translationTemplate ref="TR.dsmissingLinkage" />
 									</translationTemplates>
 								</TestAssertion>
