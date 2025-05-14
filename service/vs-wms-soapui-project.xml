@@ -1168,6 +1168,62 @@ if (!(xml_root.ServiceException.size() == 1 || xml_root.Exception.size() == 1)){
 	else if(capabilities.Capability.ExtendedCapabilities.MetadataUrl.size() != 0){
 		scenario = '1';
 	}
+=======
+
+						if (code != 200){
+								throw new TranslatableAssertionError("TR.unexpectedHTTPCodeWithURL", "expected", "200", "actual", code.toString(), "url", url);
+						}
+					}
+
+
+					def spatialDataServiceType = capabilities.Capability.ExtendedCapabilities.SpatialDataServiceType;
+					if(spatialDataServiceType.size() != 1){
+						String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
+						throw new TranslatableAssertionError('TR.multiplicityShallBeOne', assertParams);
+					}
+					else if(spatialDataServiceType.toString().length() == 0){
+						String[] assertParams = ['element', 'ExtendedCapabilities/SpatialDataServiceType'];
+						throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+					}
+					else if(spatialDataServiceType.toString() != 'view'){
+						throw new TranslatableAssertionError("TR.invalidSpatialDataServiceType");
+					}
+
+
+					def classificationSDS = ['humanInteractionService', 'humanCatalogueViewer', 'humanGeographicViewer', 'humanGeographicSpreadsheetViewer', 'humanServiceEditor', 'humanChainDefinitionEditor', 'humanWorkflowEnactmentManager', 'humanGeographicFeatureEditor', 'humanGeographicSymbolEditor', 'humanFeatureGeneralizationEditor', 'humanGeographicDataStructureViewer', 'infoManagementService', 'infoFeatureAccessService', 'infoMapAccessService', 'infoCoverageAccessService', 'infoSensorDescriptionService', 'infoProductAccessService', 'infoFeatureTypeService', 'infoCatalogueService', 'infoRegistryService', 'infoGazetteerService', 'infoOrderHandlingService', 'infoStandingOrderService', 'taskManagementService', 'chainDefinitionService', 'workflowEnactmentService', 'subscriptionService', 'spatialProcessingService', 'spatialCoordinateConversionService', 'spatialCoordinateTransformationService', 'spatialCoverageVectorConversionService', 'spatialImageCoordinateConversionService', 'spatialRectificationService', 'spatialOrthorectificationService', 'spatialSensorGeometryModelAdjustmentService', 'spatialImageGeometryModelConversionService', 'spatialSubsettingService', 'spatialSamplingService', 'spatialTilingChangeService', 'spatialDimensionMeasurementService', 'spatialFeatureManipulationService', 'spatialFeatureMatchingService', 'spatialFeatureGeneralizationService', 'spatialRouteDeterminationService', 'spatialPositioningService', 'spatialProximityAnalysisService', 'thematicProcessingService', 'thematicGoparameterCalculationService', 'thematicClassificationService', 'thematicFeatureGeneralizationService', 'thematicSubsettingService', 'thematicSpatialCountingService', 'thematicChangeDetectionService', 'thematicGeographicInformationExtractionService', 'thematicImageProcessingService', 'thematicReducedResolutionGenerationService', 'thematicImageManipulationService', 'thematicImageUnderstandingService', 'thematicImageSynthesisService', 'thematicMultibandImageManipulationService', 'thematicObjectDetectionService', 'thematicGeoparsingService', 'thematicGeocodingService', 'temporalProcessingService', 'temporalReferenceSystemTransformationService', 'temporalSubsettingService', 'temporalSamplingService', 'temporalProximityAnalysisService', 'metadataProcessingService', 'metadataStatisticalCalculationService', 'metadataGeographicAnnotationService', 'comService', 'comEncodingService', 'comTransferService', 'comGeographicCompressionService', 'comGeographicFormatConversionService', 'comMessagingService', 'comRemoteFileAndExecutableManagement'];				
+					def keywordsMandatory = capabilities.Capability.ExtendedCapabilities.MandatoryKeyword;
+					if(keywordsMandatory.size() == 0){
+						String[] assertParams = ['element', 'ExtendedCapabilities/MandatoryKeyword'];
+						throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+					}
+					if(keywordsMandatory.toString().length() == 0){
+						String[] assertParams = ['element', 'ExtendedCapabilities/MandatoryKeyword'];
+						throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
+					}
+					capabilities.Capability.ExtendedCapabilities.MandatoryKeyword.KeywordValue.depthFirst().findAll{it.name() == 'Keyword'};
+						def keywordInclassification = false;
+						keywordsMandatory.each{keyword ->
+							if(keyword in classificationSDS){
+								keywordInclassification = true;
+							}
+						}
+						if(!keywordInclassification){
+							throw new TranslatableAssertionError("TR.atLeastOneKeywordInClassification");
+						}
+
+
+					def temporalReferences = capabilities.Capability.ExtendedCapabilities.TemporalReference;
+					if(temporalReferences.size() == 0){
+						String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference'];
+						throw new TranslatableAssertionError('TR.multiplicityShallBeOneOrMore', assertParams);
+					}
+					temporalReferences.each{ temporalReference ->
+						if(temporalReference.DateOfPublication.size() == 0 &amp;&amp; temporalReference.DateOfLastRevision.size() == 0 &amp;&amp; temporalReference.DateOfCreation.size() == 0){
+							throw new TranslatableAssertionError("TR.atLeastOneDateType");
+						}
+						if(temporalReference.DateOfPublication.toString().length() == 0 &amp;&amp; temporalReference.DateOfLastRevision.toString().length() == 0 &amp;&amp; temporalReference.DateOfCreation.toString().length() == 0){
+							String[] assertParams = ['element', 'ExtendedCapabilities/TemporalReference/DateOfPublication'];
+							throw new TranslatableAssertionError('TR.valueShallNotBeEmpty', assertParams);
 	log.info(scenario);
 	</scriptText>
 							</con:configuration>
@@ -2308,7 +2364,7 @@ for (x in supportedLanguages){
 					testRunner.testCase.setPropertyValue('legendEndpoint', style.LegendURL.OnlineResource.@'xlink:href'.toString());
 					tsGetLegend.setDisabled(false);
 					tsGetLegend.run(testRunner, context);
-					if(tsGetLegend.testRequest.response.responseHeaders.getCaseInsensitive('Content-Type', 'value') != style.LegendURL.Format.toString()){
+					if(tsGetLegend.testRequest.response.responseHeaders.get('Content-Type')[0] != style.LegendURL.Format.toString()){
 						String[] assertParams = ['Content-Type', tsGetLegend.testRequest.response.responseHeaders.getCaseInsensitive('Content-Type', 'value'), 'LegendURL', style.LegendURL.Format.toString()];
 						throw new TranslatableAssertionError("TR.invalidLegendFormat", assertParams);
 					}
