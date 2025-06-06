@@ -78,15 +78,15 @@ Pre-requisite conformance classes: Conformance Class 4]]>
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 		    <expression>
         let $conformityResult := //gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
-        let $specification := $conformityResult/gmd:specification/gmd:CI_Citation/gmd:title/gco:CharacterString
-        let $specificationText := 'Commission Regulation (EC) No 976/2009'
+        let $specification := $conformityResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
+        let $specificationText := '976/2009'
         let $messages := 
             (for $record in $records
                 let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
                 return
                 if (not($conformityResult)) then
                     local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-                else if (not($specification = $specificationText)) then
+                else if (not(contains($specification, $specificationText)) then
                     local:addMessage('TR.wrongConformitySpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $specification })
                 else ()
             )[position() le $limitErrors]
