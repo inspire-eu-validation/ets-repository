@@ -2942,18 +2942,29 @@ a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText>
 					<con:assertion type="GroovyScriptAssertion" id="d82ba567-ee3b-4df4-be82-dc754c146e97" name="Test if the dataset feed contains at least one link to a registry">
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.*
+									import com.eviware.soapui.support.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
-a.exists(
-	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']", 
+a.existsNonEmptyText(
+	"/atom:feed/atom:link[@rel='describedby']/@href",
+	"/atom:feed/atom:link[@rel='describedby']/@href", 
 	"TR.missingLinkToRegistry"
 );
 
-a.existsNonEmptyText(
-	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']/@href",
-	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']/@href", 
-	"TR.missingLinkToRegistry"
-);</scriptText>
+GroovyUtils groovyUtils = new com.eviware.soapui.support.GroovyUtils(context);
+XmlHolder feedXmlHolder = groovyUtils.getXmlHolder(messageExchange.getResponseContent());
+feedXmlHolder.namespaces["atom"] = "http://www.w3.org/2005/Atom";
+feedXmlHolder.namespaces["xlink"] = "http://www.w3.org/1999/xlink";
+String[] dataSetUrlNodes = feedXmlHolder.getNodeValues("//atom:feed/atom:link[(@rel='describedby') and @type!='text/html']/@href");
+
+for (String url : dataSetUrlNodes){
+	if (url.startsWith("https://inspire.ec.europa.eu") || url.startsWith("http://inspire.ec.europa.eu")) {
+			a.exists(
+			   '//zzzz',
+			   'TR.missingLinkToRegistry'
+			 );
+	}
+}</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
