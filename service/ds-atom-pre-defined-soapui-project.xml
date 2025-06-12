@@ -2951,20 +2951,8 @@ a.existsNonEmptyText(
 	"TR.missingLinkToRegistry"
 );
 
-GroovyUtils groovyUtils = new com.eviware.soapui.support.GroovyUtils(context);
-XmlHolder feedXmlHolder = groovyUtils.getXmlHolder(messageExchange.getResponseContent());
-feedXmlHolder.namespaces["atom"] = "http://www.w3.org/2005/Atom";
-feedXmlHolder.namespaces["xlink"] = "http://www.w3.org/1999/xlink";
-String[] dataSetUrlNodes = feedXmlHolder.getNodeValues("//atom:feed/atom:link[(@rel='describedby') and @type!='text/html']/@href");
-
-for (String url : dataSetUrlNodes){
-	if (url.startsWith("https://inspire.ec.europa.eu") || url.startsWith("http://inspire.ec.europa.eu")) {
-			a.exists(
-			   '//zzzz',
-			   'TR.missingLinkToRegistry'
-			 );
-	}
-}</scriptText>
+a.notExists("//atom:feed/atom:link[(@rel='describedby') and @type!='text/html']/@href","TR.missingLinkToRegistry");
+</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
