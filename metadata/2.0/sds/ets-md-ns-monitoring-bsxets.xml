@@ -77,12 +77,12 @@ Pre-requisite conformance classes: Conformance Class 4]]>
 									<parent ref="EIDffaa83ac-fea5-4017-b743-d5e1dcda8434" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
 		    <expression>
-        let $conformityResult := //gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
-        let $specification := $conformityResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
         let $specificationText := '976/2009'
         let $messages := 
             (for $record in $records
                 let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+	        let $conformityResult := $record/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+                let $specification := $conformityResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
                 return
                 if (not($conformityResult)) then
                     local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
