@@ -4352,8 +4352,9 @@ for( node in getSpatialDataSetUrlTemplates ) {
 
 	for(int j=0; j<codes.size(); j++) {
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_code", codes[j] )
-		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
-
+		if (j<namespaces.size()){
+			replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
+		}
 		for(crs in crss) {
 			replaceParameter(parameters, cleanParameters, "inspire_dls:crs", crs )
 
@@ -4672,7 +4673,7 @@ a.exists("/os:OpenSearchDescription", "TR.missingOpenSearchDescriptionRootElemen
 final Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
 a.exists(
-  "/os:OpenSearchDescription/os:Url[@rel='results' and starts-with(@template,'http') and contains(@template,'crs') and contains(@template,'spatial_dataset_identifier_code') and contains(@template,'spatial_dataset_identifier_namespace') and contains(@template,'language')]",
+  "/os:OpenSearchDescription/os:Url[@rel='results' and starts-with(@template,'http') and contains(@template,'crs') and contains(@template,'spatial_dataset_identifier_code') and contains(@template,'language')]",
   "TR.missingAtLeastOneOpenSearchDescriptionUrl"
 );</scriptText>
 						</con:configuration>
@@ -4792,8 +4793,11 @@ for( node in describeSpatialDataSetUrlTemplates ) {
 
 	for(int j=0; j<codes.size(); j++) {
 		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_code", codes[j] )
-		replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
 
+		if (j < namespaces.size()){
+			replaceParameter(parameters, cleanParameters, "inspire_dls:spatial_dataset_identifier_namespace", namespaces[j] )
+		}
+		
 	for(crs in crss) {
 			replaceParameter(parameters, cleanParameters, "inspire_dls:crs", crs )
 
