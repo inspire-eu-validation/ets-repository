@@ -1117,12 +1117,14 @@ layers.each{layer->
 
 				def httpResponseHeaders = context.testCase.testSteps["http-request-gettile"].testRequest.response.responseHeaders;
 
-				if(httpResponseHeaders.containsKeyIgnoreCase('Content-Type') &amp;&amp; httpResponseHeaders.getCaseInsensitive('Content-Type', 'value') != format.toString()){
+				if(httpResponseHeaders.getCaseInsensitive('Content-Type', 'value') != null &amp;&amp; httpResponseHeaders.getCaseInsensitive('Content-Type', 'value') !=  format.toString()){
+
 					def identifier_tmp = '';
 					if(layer.Identifier.size() == 1){
 						identifier_tmp = layer.Identifier.toString();
 					}
 					String[] assertParams = ["responseformat", httpResponseHeaders.getCaseInsensitive('Content-Type', 'value'), "requestedformat", format.toString(), "layerid", identifier_tmp];
+
 
 					throw new TranslatableAssertionError("TR.wrongResponseFormat", assertParams);
 					//Msg: The response format ({responseformat}) is distinct to the requested format ({requestedformat}) for the '{layerid}' layer.
