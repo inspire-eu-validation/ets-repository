@@ -2942,18 +2942,17 @@ a.exists("/atom:feed", "TR.missingFeedRootElement");</scriptText>
 					<con:assertion type="GroovyScriptAssertion" id="d82ba567-ee3b-4df4-be82-dc754c146e97" name="Test if the dataset feed contains at least one link to a registry">
 						<con:configuration>
 							<scriptText>import de.interactive_instruments.etf.suim.*
+									import com.eviware.soapui.support.*
 Assert a = new Assert(messageExchange, context, log, Assert.INSPIRE_DS_NS);
 
-a.exists(
-	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']", 
+a.existsNonEmptyText(
+	"/atom:feed/atom:link[@rel='describedby']/@href",
+	"/atom:feed/atom:link[@rel='describedby']/@href", 
 	"TR.missingLinkToRegistry"
 );
 
-a.existsNonEmptyText(
-	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']/@href",
-	"/atom:feed/atom:link[@rel='describedby' and @type='text/html']/@href", 
-	"TR.missingLinkToRegistry"
-);</scriptText>
+a.notExists("//atom:feed/atom:link[(@rel='describedby') and @type!='text/html']/@href","TR.missingLinkToRegistry");
+</scriptText>
 						</con:configuration>
 					</con:assertion>
 					<con:credentials>
