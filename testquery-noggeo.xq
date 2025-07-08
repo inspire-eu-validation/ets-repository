@@ -58,6 +58,7 @@ declare namespace mu='http://inspire.ec.europa.eu/schemas/mu/4.0';
 declare namespace om='http://www.opengis.net/om/2.0';
 declare namespace oi='http://inspire.ec.europa.eu/schemas/oi/4.0';
 declare namespace omor='http://inspire.ec.europa.eu/schemas/omor/3.0';
+declare namespace ompr='http://inspire.ec.europa.eu/schemas/ompr/3.0';
 declare namespace omso='http://inspire.ec.europa.eu/schemas/omso/3.0';
 declare namespace pd='http://inspire.ec.europa.eu/schemas/pd/4.0'; 
 declare namespace ps='http://inspire.ec.europa.eu/schemas/ps/5.0';
