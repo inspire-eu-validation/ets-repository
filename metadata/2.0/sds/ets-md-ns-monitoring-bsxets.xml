@@ -82,13 +82,14 @@ Pre-requisite conformance classes: Conformance Class 4]]>
          (for $record in $records
             let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
             let $conformityResult := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
-            let $specification := $conformityResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
+            let $specifications := $conformityResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
             return
             if (not($conformityResult)) then
                 local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-            else if (not(contains($specification, $specificationText))) then
-                local:addMessage('TR.wrongConformitySpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $specification })
-            else ()
+            else for $specification in $specifications
+            	return if (not(contains($specification, $specificationText))) then
+                	local:addMessage('TR.wrongConformitySpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $specification })
+            	else ()
          )[position() le $limitErrors]
        return
          (if ($messages) then 'FAILED' else 'PASSED',
