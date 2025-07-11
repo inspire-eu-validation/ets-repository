@@ -76,24 +76,25 @@ Pre-requisite conformance classes: Conformance Class 4]]>
                             </description>
 									<parent ref="EIDffaa83ac-fea5-4017-b743-d5e1dcda8434" />
 									<expectedResult>NOT_APPLICABLE</expectedResult>
-		    <expression>
-        let $conformityResult := //gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
-        let $specification := $conformityResult/gmd:specification/gmd:CI_Citation/gmd:title/gco:CharacterString
-        let $specificationText := 'Commission Regulation (EC) No 976/2009'
-        let $messages := 
-            (for $record in $records
-                let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
-                return
-                if (not($conformityResult)) then
-                    local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-                else if (not($specification = $specificationText)) then
-                    local:addMessage('TR.wrongConformitySpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $specification })
-                else ()
-            )[position() le $limitErrors]
-        return
-        (if ($messages) then 'FAILED' else 'PASSED',
-         local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
-         $messages)
+    <expression>
+       let $specificationText := '976/2009'
+       let $messages := 
+         (for $record in $records
+            let $rid := $record/gmd:fileIdentifier/gco:CharacterString/text()
+            let $conformityResult := $record/gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult
+            let $specifications := $conformityResult/gmd:specification/gmd:CI_Citation/gmd:title/*/text()
+            return
+            if (not($conformityResult)) then
+                local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
+            else for $specification in $specifications
+            	return if (not(contains($specification, $specificationText))) then
+                	local:addMessage('TR.wrongConformitySpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $specification })
+            	else ()
+         )[position() le $limitErrors]
+       return
+         (if ($messages) then 'FAILED' else 'PASSED',
+            local:error-statistics('TR.recordsWithErrors', count(fn:distinct-values($messages//etf:argument[@token='id']/text()))),
+             $messages)
     </expression>
     <testItemType ref="EIDf0edc596-49d2-48d6-a1a1-1ac581dcde0a" />
     <translationTemplates>
