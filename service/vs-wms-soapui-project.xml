@@ -1646,7 +1646,10 @@ layers.each{ layer ->
 			<con:testStep type="groovy" name="check-layer-name" id="738051b8-6344-42be-8315-6fbc69f52575">
 				<con:settings />
 				<con:config>
-					<script>import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+					<script>
+						import de.interactive_instruments.etf.suim.TranslatableAssertionError;
+import de.interactive_instruments.xtf.*;
+
 def tc = testRunner.testCase.testSuite.project.testSuites['GetCapabilities_Operation'].testCases['initial-testcase'];
 def response = tc.getTestStepByName('http-request').getPropertyValue('Response');
 
@@ -1663,6 +1666,11 @@ def validHarmonisedNames = register.containeditems.depthFirst().findAll{ it.name
 def invalidLayers = [];
 
 def excludedLayers = ['ACMF', 'AM', 'AU', 'GE', 'PF', 'SD', 'SO', 'US'];
+
+ProjectHelper ph = new ProjectHelper();
+
+String needManual = "not";
+
 
 layers.each{layer->
 	if(layer.Name.size() != 1){
@@ -2452,7 +2460,7 @@ layers.each{layer ->
 							<scriptText>/*
 def httpResponseHeaders = context.testCase.testSteps["http-request-getmap-default-parameters"].testRequest.response.responseHeaders;
 def format_requested = context.expand( '${#TestSuite#format}' );
-def format_response = httpResponseHeaders["Content-Type"][0];
+def format_response = httpResponseHeaders.getCaseInsensitive('Content-Type', 'value');
 assert (format_requested == format_response);
 */
 def format_requested = context.expand( '${#TestSuite#format}' );
@@ -5905,7 +5913,7 @@ if (scenario == '1' || scenario == '2'){
 		</con:property>
 		<con:property>
 			<con:name>etf.last.update.date</con:name>
-			<con:value>2021-10-07T13:50:00</con:value>
+			<con:value>2021-10-13T12:30:00</con:value>
 		</con:property>
 		<con:property>
 			<con:name>etf.version</con:name>
