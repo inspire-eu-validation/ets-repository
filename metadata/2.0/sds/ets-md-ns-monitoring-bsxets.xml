@@ -86,9 +86,8 @@ Pre-requisite conformance classes: Conformance Class 4]]>
             return
             if (not($conformityResult)) then
                 local:addMessage('TR.noConformityStatement', map { 'filename': local:filename($record), 'id': $rid })
-            else for $specification in $specifications
-            	return if (not(contains($specification, $specificationText))) then
-                	local:addMessage('TR.wrongConformitySpecification', map { 'filename': local:filename($record), 'id': $rid, 'specification': $specification })
+            else if (not(some $spec in $specifications satisfies contains($spec, $specificationText))) then
+            	  local:addMessage('TR.wrongConformitySpecification', map { 'filename': local:filename($record), 'id': $rid })
             	else ()
          )[position() le $limitErrors]
        return
