@@ -135,7 +135,7 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ds-linked-servi
 															else if (count($invalid_urls) > 0) then
 																local:addMessage('TR.brokenLink', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': string($record/@*:id), 'property': 'linkage', 'value': string-join($invalid_urls, ',')}) 
 															else if (not(contains(lower-case($linkage), 'request=getcapabilities') and contains(lower-case($linkage), 'service=wms'))) then
-																local:addMessage('TR.manual.resourceLocatorURL', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': $record/@*:id}) 
+																local:addMessage('TR.manual.resourceLocatorURLvs', map {'filename': local:filename($record), 'featureType':local-name($record), 'gmlid': $record/@*:id})
 															else ()
 															return $linkagecheck
 										let $messagesfinal := if (count($path)=0) then
@@ -143,10 +143,10 @@ Source: <a href="http://inspire.ec.europa.eu/id/ats/metadata/2.0/ds-linked-servi
 														else if (count($messages) > 0) then
 															$messages
 														else() 
-								
+
 									return			
-									(if ($messagesfinal and not($messagesfinal/@ref = ('TR.manual.resourceLocatorURL'))) then 'FAILED' 
-									   else if($messagesfinal and $messagesfinal/@ref = ('TR.manual.resourceLocatorURL')) then 'PASSED_MANUAL' 
+									(if ($messagesfinal and not($messagesfinal/@ref = ('TR.manual.resourceLocatorURLvs'))) then 'FAILED' 
+									   else if($messagesfinal and $messagesfinal/@ref = ('TR.manual.resourceLocatorURLvs')) then 'PASSED_MANUAL'
 									   else 'PASSED',
 									 local:error-statistics('TR.featuresWithErrors', count(fn:distinct-values($messagesfinal//etf:argument[@token='gmlid']/text()))),
 									 $messagesfinal)																									
